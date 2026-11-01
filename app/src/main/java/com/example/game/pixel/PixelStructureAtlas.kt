@@ -229,7 +229,11 @@ object PixelStructureAtlas {
     val h = 88
     val c = PixelCanvas(w, h)
     val cx = w / 2
+    // bark with highlight + deep furrow
     c.fillRect(cx - 4, 68, 8, 14, 0xFF4A2E1E.toInt())
+    c.vLine(cx - 2, 68, 14, 0xFF6E4632.toInt())
+    c.vLine(cx + 2, 69, 12, 0xFF2A1A12.toInt())
+    c.fillEllipse(cx, 82, 6, 3, 0xFF0A0C14.toInt()) // AO
     for (ry in 10..70) {
       val t = (ry - 10) / 60f
       val halfW = (2 + (sin(t * 2.5f).coerceAtLeast(0.15f) * 15f)).toInt()
@@ -237,12 +241,14 @@ object PixelStructureAtlas {
         val col = when {
           dx < -halfW / 3 -> 0xFF3D5A36.toInt()
           dx < halfW / 3 -> 0xFF2A3D2B.toInt()
-          else -> 0xFF1A2520.toInt()
+          else -> 0xFF162118.toInt()
         }
         c.set(cx + dx, ry, col)
+        // snow tip on windward side
+        if (ry % 8 == 0 && dx == -halfW + 1) c.set(cx + dx, ry, 0xFF8A9AB8.toInt())
       }
     }
-    c.applyCrispOutline(0xFF142E15.toInt())
+    c.applyCrispOutline(0xFF0F1A14.toInt())
     return c.toImageBitmap()
   }
 
@@ -250,11 +256,15 @@ object PixelStructureAtlas {
     val w = 46
     val h = 36
     val c = PixelCanvas(w, h)
+    c.fillEllipse(w / 2, 32, 14, 4, 0xFF0A0C14.toInt()) // AO
     c.drawOrganicLeafCluster(
       w / 2, 20, 18, 12,
-      0xFF1A2520.toInt(), 0xFF2A3D2B.toInt(), 0xFF3D5A36.toInt(), 0xFF4A6B3E.toInt(), seed = 1802,
+      0xFF162118.toInt(), 0xFF1A2E1F.toInt(), 0xFF2A3D2B.toInt(), 0xFF3D5A36.toInt(), seed = 1802,
     )
-    c.applyCrispOutline(0xFF142E15.toInt())
+    // highlight flecks + micro flower
+    c.set(w / 2 - 4, 16, 0xFF4A6B3E.toInt())
+    c.set(w / 2 + 5, 18, 0xFF8A7A97.toInt())
+    c.applyCrispOutline(0xFF0F1A14.toInt())
     return c.toImageBitmap()
   }
 

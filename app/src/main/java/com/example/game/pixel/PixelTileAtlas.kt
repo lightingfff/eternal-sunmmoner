@@ -664,28 +664,38 @@ object PixelTileAtlas {
       0xFF7D4E30.toInt(),
       0xFF945F3C.toInt(),
     )
-    // 8 foreshortened oak floorboards summing to full 64px
+    // 8 foreshortened oak boards — premium grain with wear + nail + sheen
     val heights = intArrayOf(8, 8, 8, 8, 8, 8, 8, 8)
     var y0 = 0
     for (row in heights.indices) {
       val rh = heights[row]
       val base = planks[(variant + row) % planks.size]
       c.fillRect(0, y0, TILE_PX, rh - 1, base)
-      c.hLine(0, y0, TILE_PX, 0xFFB0774E.toInt())
-      c.hLine(0, y0 + rh - 1, TILE_PX, seam)
-
-      repeat(5) {
-        val gx = rng.nextInt(54)
+      c.hLine(0, y0, TILE_PX, 0xFFB0774E.toInt()) // light lip
+      c.hLine(0, y0 + rh - 1, TILE_PX, seam) // deep seam
+      // fine grain + knot
+      repeat(6) {
+        val gx = rng.nextInt(52)
         val gy = y0 + 2 + rng.nextInt((rh - 3).coerceAtLeast(1))
-        c.hLine(gx, gy, 6 + rng.nextInt(5), if (rng.nextBoolean()) 0xFF6E4328.toInt() else 0xFFA66D46.toInt())
+        val grainCol = when (rng.nextInt(3)) {
+          0 -> 0xFF6E4328.toInt()
+          1 -> 0xFFA66D46.toInt()
+          else -> 0xFF5C3821.toInt()
+        }
+        c.hLine(gx, gy, 5 + rng.nextInt(6), grainCol)
+        if (rng.nextInt(7) == 0) c.set(gx + 2, gy + 1, 0xFF3B2214.toInt()) // knot
       }
-
+      // wear scuff on high-traffic variants
+      if ((variant + row) % 4 == 0) c.hLine(6 + rng.nextInt(30), y0 + 3, 10, 0xFFC48B60.toInt())
       val jointX = ((variant * 11 + row * 17) % 52) + 6
       c.vLine(jointX, y0, rh, seam)
       c.set(jointX - 2, y0 + 2, 0xFF4A2C1A.toInt())
       c.set(jointX + 2, y0 + 2, 0xFF4A2C1A.toInt())
+      c.set(jointX, y0 + rh - 3, 0xFF3B2112.toInt()) // nail head shadow
       y0 += rh
     }
+    // subtle AO darkening at tile edge for volume
+    c.hLine(0, TILE_PX - 2, TILE_PX, 0xFF2B1A0F.toInt())
     return c.toImageBitmap()
   }
 
@@ -704,7 +714,11 @@ object PixelTileAtlas {
       var idx = 0
       while (px < TILE_PX) {
         val cw = 16 + ((variant + r + idx) % 3) * 5
-        c.beveledSlab(px, py, cw, rows[r], palette[(r + idx) % palette.size], hi, sh, mortar, rng, hi, sh)
+        val base = palette[(r + idx) % palette.size]
+        c.beveledSlab(px, py, cw, rows[r], base, hi, sh, mortar, rng, hi, sh)
+        // wear chip + moss vein
+        if ((variant + r + idx) % 6 == 0) c.set(px + 3, py + 4, 0xFF4A4740.toInt())
+        if ((variant + r + idx) % 5 == 2) c.set(px + cw - 3, py + rows[r] - 3, 0xFF3D5A36.toInt())
         px += cw
         idx++
       }

@@ -460,7 +460,13 @@ object SanctuaryWorldRenderer {
       lineTo(sx(285f), sy(1540f, 0f) + dropMain * 0.34f)
       close()
     }
-    drawPath(leftCliff, Color(0xFF2E303A))
+    drawPath(leftCliff, Color(0xFF2A2E3A))
+    // Strata lines on left cliff for depth
+    for (frac in listOf(0.25f, 0.55f, 0.80f)) {
+      val ly = dropMain * frac
+      drawPath(leftCliff, Color(0xFF1E2028).copy(alpha = 0.35f), style = Stroke(width = (1.0f*zoom).coerceAtLeast(0.7f)))
+      // subtle horizontal strata via extra path would clutter — keep minimal
+    }
 
     val centerChasm = Path().apply {
       moveTo(sx(1360f), sy(2370f, 0f))
@@ -470,7 +476,9 @@ object SanctuaryWorldRenderer {
       lineTo(sx(1300f), sy(2370f, 0f) + dropMain * 0.84f)
       close()
     }
-    drawPath(centerChasm, Color(0xFF13131A))
+    drawPath(centerChasm, Color(0xFF0B0D1A))
+    // Chasm depth gradient overlay
+    drawPath(centerChasm, Color(0xFF1A1F33).copy(alpha = 0.22f))
 
     val rightCliff = Path().apply {
       moveTo(sx(1780f), sy(2380f, 0f))
@@ -484,7 +492,7 @@ object SanctuaryWorldRenderer {
       lineTo(sx(1880f), sy(2380f, 0f) + dropMain * 1.00f)
       close()
     }
-    drawPath(rightCliff, Color(0xFF262830))
+    drawPath(rightCliff, Color(0xFF242735))
 
     for (cxWorld in listOf(560f to 2040f, 880f to 2340f, 1160f to 2370f, 2060f to 2370f, 2360f to 2330f, 2660f to 2040f)) {
       val rx = sx(cxWorld.first)
@@ -536,9 +544,11 @@ object SanctuaryWorldRenderer {
     rimShadowPath.close()
     rimBrightPath.close()
 
-    drawPath(rimShadowPath, Color(0xFF1B2A20))
-    drawPath(rimBrightPath, Color(0xFF2F4A2E))
-    drawPath(rimBrightPath, Color(0xFF1A2520), style = Stroke(width = (2.0f * zoom).coerceAtLeast(1f)))
+    drawPath(rimShadowPath, Color(0xFF0F1A14))
+    drawPath(rimBrightPath, Color(0xFF2A3D2B))
+    // highlight lip on rim top edge
+    drawPath(rimBrightPath, Color(0xFF3D5A36).copy(alpha = 0.45f), style = Stroke(width = (1.2f*zoom).coerceAtLeast(0.8f)))
+    drawPath(rimBrightPath, Color(0xFF0A0C14), style = Stroke(width = (1.6f * zoom).coerceAtLeast(1f)))
   }
 
   private fun DrawScope.drawResidentialGardenCourtyards(
@@ -1158,8 +1168,12 @@ object SanctuaryWorldRenderer {
         center = Offset(pCx, pCy), radius = 160f * zoom
       ), radius = 160f*zoom, center = Offset(pCx, pCy)
     )
-    // Use shader pipeline for contact shadows (verified integrated)
-    with(SanctuaryDarkFantasyShaders) { drawDarkFantasyVignette() }
+    // Shader pipeline — vignette + volumetric fog + chasm depth + AO
+    with(SanctuaryDarkFantasyShaders) {
+      drawDarkFantasyVignette()
+      drawGroundFog(timeSec, baseY = size.height * 0.68f)
+      drawChasmDepth(center = Offset(size.width*0.5f, size.height*0.78f), radius = size.width*0.42f)
+    }
     // Faint warm window lights from cottage cluster (west residential)
     listOf(995f to 655f, 825f to 790f, 1105f to 925f).forEach { (wx, wy) ->
       val cx = sx(wx); val cy = sy(wy, 0f)
