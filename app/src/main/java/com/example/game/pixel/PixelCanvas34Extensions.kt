@@ -173,21 +173,26 @@ fun PixelCanvas.drawStoneWall34(
     rowIdx++
   }
 
-  // Heavy Corner Quoins on Left & Right Edges
+  // Heavy Corner Quoins with chamfer highlight
   for (qy in y until (y + h - 4) step 6) {
     val qw = if ((qy / 6) % 2 == 0) 6 else 4
     fillRect(x, qy, qw, 5, stoneHi)
+    hLine(x, qy, qw, 0xFF8A9AB8.toInt()) // moonlight chamfer
     hLine(x, qy + 4, qw, stoneShadow)
     fillRect(x + w - qw, qy, qw, 5, stoneAlt)
     hLine(x + w - qw, qy + 4, qw, stoneShadow)
+    // lichen on quoin
+    if ((qy / 6) % 3 == 0) set(x + qw - 1, qy + 2, 0xFF2A3D2B.toInt())
   }
 
-  // Cast Eave Shadow along top of wall
+  // Cast AO + eave shadow along top of wall
   fillRect(x, y, w, 3, stoneShadow)
+  hLine(x, y, w, 0xFF4A4E5E.toInt())
 
-  // Stepped Stone Foundation Plinth at Bottom
+  // Stepped Stone Foundation Plinth with highlight coping
   fillRect(x - 2, y + h - 5, w + 4, 5, stoneShadow)
   hLine(x - 2, y + h - 5, w + 4, stoneHi)
+  hLine(x - 2, y + h - 1, w + 4, 0xFF1A1C24.toInt())
 
   // 2.5D Oblique Right-Side Shaded Wall Return
   if (sideDepthPx > 0) {

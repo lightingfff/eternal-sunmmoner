@@ -119,7 +119,7 @@ object PixelStructureAtlas {
     val stoneDark = 0xFF23262E.toInt()
     val mortar = 0xFF5C5446.toInt()
 
-    // Cylindrical / octagonal stone shaft with vertical sun-to-shadow shading & horizontal courses
+    // Cylindrical stone shaft — vertical sun-to-shadow + horizontal ashlar courses + wear
     for (py in topY..botY) {
       val courseSeam = ((py - topY) % 8 == 0)
       for (dx in -rx..rx) {
@@ -133,31 +133,41 @@ object PixelStructureAtlas {
           else -> stoneShadow
         }
         c.set(cx + dx, py, col)
+        // stone chip highlight on sun side
+        if (!courseSeam && normX < -0.2f && (py + dx) % 17 == 0) c.set(cx + dx, py, 0xFF5A5F6E.toInt())
       }
     }
-    // Rounded tower base plinth
+    // Rounded tower base plinth with AO shadow
     c.fillEllipse(cx, botY, rx + 2, 10, stoneDark)
     c.fillEllipse(cx, botY - 2, rx + 1, 9, stoneMid)
     c.strokeEllipse(cx, botY, rx + 2, 10, mortar, thickness = 1)
+    c.fillEllipse(cx, botY + 6, rx, 4, 0xFF0A0C14.toInt()) // contact AO
 
-    // Narrow medieval arrow slits on front shaft
-    c.fillRect(cx - 2, topY + 38, 4, 16, 0xFF24201D.toInt())
+    // Narrow arrow slits with inner shadow depth
+    c.fillRect(cx - 2, topY + 38, 4, 16, 0xFF1A1818.toInt())
+    c.vLine(cx - 2, topY + 38, 16, 0xFF2E2A28.toInt())
+    c.vLine(cx + 1, topY + 38, 16, 0xFF0F0E14.toInt())
     if (isGatehouse) {
-      c.fillRect(cx - 18, topY + 46, 3, 13, 0xFF24201D.toInt())
-      c.fillRect(cx + 15, topY + 46, 3, 13, 0xFF24201D.toInt())
+      c.fillRect(cx - 18, topY + 46, 3, 13, 0xFF1A1818.toInt())
+      c.fillRect(cx + 15, topY + 46, 3, 13, 0xFF1A1818.toInt())
+      c.vLine(cx - 18, topY + 46, 13, 0xFF2E2A28.toInt())
+      c.vLine(cx + 17, topY + 46, 13, 0xFF0F0E14.toInt())
     }
 
-    // Corbelled parapet ring & top circular roof deck
+    // Corbelled parapet ring & top deck with highlight chamfer
     c.fillEllipse(cx, topY + 2, rx + 4, 13, stoneDark)
     c.fillEllipse(cx, topY, rx + 4, 12, stoneLight)
+    c.fillEllipse(cx, topY - 1, rx + 2, 8, 0xFF4A4E5E.toInt())
     c.fillEllipse(cx, topY, rx - 3, 8, stoneMid)
     c.strokeEllipse(cx, topY, rx + 4, 12, mortar, thickness = 1)
 
-    // Crenellated Battlement Merlons around the crown!
+    // Crenellated merlons — cold moonlight highlight + side shadow depth
     for (mx in (cx - rx - 2)..(cx + rx - 6) step 11) {
       c.fillRect(mx, topY - 8, 7, 9, stoneSun)
       c.fillRect(mx + 5, topY - 8, 2, 9, stoneShadow)
-      c.hLine(mx, topY - 8, 7, 0xFFF7F2E7.toInt())
+      c.fillRect(mx, topY + 1, 7, 1, stoneShadow)
+      c.hLine(mx, topY - 8, 7, 0xFF8A9AB8.toInt()) // cold moonlight
+      c.set(mx + 6, topY - 7, 0xFF6B7A9A.toInt()) // highlight nick
     }
 
     c.applyCrispOutline(0xFF241F1B.toInt())
@@ -219,7 +229,11 @@ object PixelStructureAtlas {
     val h = 88
     val c = PixelCanvas(w, h)
     val cx = w / 2
+    // bark with highlight + deep furrow
     c.fillRect(cx - 4, 68, 8, 14, 0xFF4A2E1E.toInt())
+    c.vLine(cx - 2, 68, 14, 0xFF6E4632.toInt())
+    c.vLine(cx + 2, 69, 12, 0xFF2A1A12.toInt())
+    c.fillEllipse(cx, 82, 6, 3, 0xFF0A0C14.toInt()) // AO
     for (ry in 10..70) {
       val t = (ry - 10) / 60f
       val halfW = (2 + (sin(t * 2.5f).coerceAtLeast(0.15f) * 15f)).toInt()
@@ -227,12 +241,14 @@ object PixelStructureAtlas {
         val col = when {
           dx < -halfW / 3 -> 0xFF3D5A36.toInt()
           dx < halfW / 3 -> 0xFF2A3D2B.toInt()
-          else -> 0xFF1A2520.toInt()
+          else -> 0xFF162118.toInt()
         }
         c.set(cx + dx, ry, col)
+        // snow tip on windward side
+        if (ry % 8 == 0 && dx == -halfW + 1) c.set(cx + dx, ry, 0xFF8A9AB8.toInt())
       }
     }
-    c.applyCrispOutline(0xFF142E15.toInt())
+    c.applyCrispOutline(0xFF0F1A14.toInt())
     return c.toImageBitmap()
   }
 
@@ -240,11 +256,15 @@ object PixelStructureAtlas {
     val w = 46
     val h = 36
     val c = PixelCanvas(w, h)
+    c.fillEllipse(w / 2, 32, 14, 4, 0xFF0A0C14.toInt()) // AO
     c.drawOrganicLeafCluster(
       w / 2, 20, 18, 12,
-      0xFF1A2520.toInt(), 0xFF2A3D2B.toInt(), 0xFF3D5A36.toInt(), 0xFF4A6B3E.toInt(), seed = 1802,
+      0xFF162118.toInt(), 0xFF1A2E1F.toInt(), 0xFF2A3D2B.toInt(), 0xFF3D5A36.toInt(), seed = 1802,
     )
-    c.applyCrispOutline(0xFF142E15.toInt())
+    // highlight flecks + micro flower
+    c.set(w / 2 - 4, 16, 0xFF4A6B3E.toInt())
+    c.set(w / 2 + 5, 18, 0xFF8A7A97.toInt())
+    c.applyCrispOutline(0xFF0F1A14.toInt())
     return c.toImageBitmap()
   }
 
@@ -634,35 +654,44 @@ object PixelStructureAtlas {
     val h = 136
     val c = PixelCanvas(w, h)
 
-    // Gnarled Bark Trunk, Bark Furrows & Spreading Buttress Roots
+    // Premium gnarled bark trunk — furrow, highlight, AO roots
     c.fillRect(45, 76, 22, 46, 0xFF3D251A.toInt())
     c.fillRect(48, 78, 8, 42, 0xFF633E2B.toInt())
     c.fillRect(60, 80, 5, 40, 0xFF26160F.toInt())
-    c.vLine(53, 82, 34, 0xFF3D251A.toInt()) // Bark furrow
-    // Buttress roots gripping ground
+    c.vLine(53, 82, 34, 0xFF2A1A10.toInt()) // deep furrow
+    c.vLine(50, 84, 28, 0xFF7A4B2E.toInt()) // sun highlight
+    c.vLine(62, 86, 22, 0xFF1E120E.toInt()) // shadow side
+    // Buttress roots with AO contact shadow
     c.fillRect(34, 114, 44, 10, 0xFF3D251A.toInt())
     c.fillRect(38, 112, 16, 7, 0xFF633E2B.toInt())
     c.fillRect(62, 115, 14, 7, 0xFF26160F.toInt())
-    // Upper spreading boughs
+    c.hLine(34, 124, 44, 0xFF1A120E.toInt())
+    // Upper spreading boughs with highlight
     for (i in 0..14) {
       c.fillRect(46 - i, 78 - i, 7, 5, 0xFF4D2F21.toInt())
       c.fillRect(58 + i, 78 - i, 7, 5, 0xFF362016.toInt())
+      if (i < 6) c.set(46 - i, 77 - i, 0xFF7A5A3E.toInt())
     }
+    // Ground AO oval under ancient oak
+    c.fillEllipse(56, 128, 22, 6, 0xFF0A0C14.toInt())
 
     val sh = 0xFF0F1A1F.toInt()
     val mid = 0xFF1A2E1F.toInt()
     val br = 0xFF2F4A2E.toInt()
     val hi = 0xFF3D5A36.toInt()
+    val crownHi = 0xFF6B8A5A.toInt()
 
-    // Back shadow & lower bough leaf clusters
+    // Back shadow & lower bough leaf clusters - layered depth
     c.drawOrganicLeafCluster(30, 62, 24, 18, sh, mid, br, hi, seed = 701)
     c.drawOrganicLeafCluster(82, 64, 24, 18, sh, mid, br, hi, seed = 702)
-    // Mid crown clusters
+    // Mid crown clusters with inner highlight veins
     c.drawOrganicLeafCluster(56, 48, 34, 24, sh, mid, br, hi, seed = 703)
-    c.drawOrganicLeafCluster(34, 42, 22, 17, sh, mid, br, hi, seed = 704)
-    c.drawOrganicLeafCluster(76, 44, 22, 17, sh, mid, br, hi, seed = 705)
-    // Sunlit top crown leaf cluster
-    c.drawOrganicLeafCluster(52, 26, 26, 18, mid, br, hi, 0xFFD4F26B.toInt(), seed = 706)
+    c.drawOrganicLeafCluster(34, 42, 22, 17, sh, mid, br, crownHi, seed = 704)
+    c.drawOrganicLeafCluster(76, 44, 22, 17, sh, mid, br, crownHi, seed = 705)
+    // Sunlit top crown - frost tip + scattered bright flecks
+    c.drawOrganicLeafCluster(52, 26, 26, 18, mid, br, hi, crownHi, seed = 706)
+    c.set(48, 20, 0xFF8AB87A.toInt())
+    c.set(56, 18, 0xFF8AB87A.toInt())
 
     c.applyCrispOutline(0xFF0A1B21.toInt())
     return c.toImageBitmap()
@@ -678,21 +707,30 @@ object PixelStructureAtlas {
 
     c.fillRect(44, 74, 20, 44, 0xFF332038.toInt())
     c.fillRect(47, 76, 7, 40, 0xFF523559.toInt())
+    c.vLine(46, 76, 38, 0xFF6A4A7A.toInt()) // sun edge
+    c.vLine(60, 78, 34, 0xFF1A0F22.toInt()) // shadow edge
     c.fillRect(35, 110, 38, 9, 0xFF332038.toInt())
+    c.hLine(35, 119, 38, 0xFF1A0F22.toInt())
     for (i in 0..12) {
       c.fillRect(45 - i, 76 - i, 6, 5, 0xFF472D4F.toInt())
       c.fillRect(56 + i, 76 - i, 6, 5, 0xFF2A1930.toInt())
+      if (i < 5) c.set(45 - i, 75 - i, 0xFF6A5290.toInt())
     }
+    c.fillEllipse(54, 124, 18, 5, 0xFF0A0C14.toInt()) // AO
 
     val sh = 0xFF1A0F2A.toInt()
     val mid = 0xFF3A1F5A.toInt()
     val br = 0xFF5A2F7A.toInt()
-    val hi = 0xFF7A4E9A.toInt()
+    val hi = 0xFF8A6AB8.toInt()
+    val bloom = 0xFFFAE8FF.toInt()
 
     c.drawOrganicLeafCluster(30, 60, 22, 16, sh, mid, br, hi, seed = 721)
     c.drawOrganicLeafCluster(78, 62, 22, 16, sh, mid, br, hi, seed = 722)
     c.drawOrganicLeafCluster(54, 46, 32, 22, sh, mid, br, hi, seed = 723)
-    c.drawOrganicLeafCluster(48, 26, 24, 16, mid, br, hi, 0xFFFAE8FF.toInt(), seed = 724)
+    c.drawOrganicLeafCluster(48, 26, 24, 16, mid, br, hi, bloom, seed = 724)
+    // bloom flecks
+    c.set(46, 22, bloom)
+    c.set(54, 20, 0xFFE8C8FF.toInt())
 
     c.applyCrispOutline(0xFF120824.toInt())
     return c.toImageBitmap()
@@ -703,7 +741,8 @@ object PixelStructureAtlas {
     val h = 124
     val c = PixelCanvas(w, h)
     c.fillRect(38, 84, 12, 32, 0xFF2E202E.toInt())
-    c.fillRect(40, 84, 5, 30, 0xFF4F374A.toInt())
+    c.fillRect(40, 84, 5, 30, 0xFF5A3D2E.toInt()) // warmer highlight
+    c.vLine(44, 86, 28, 0xFF362A1A.toInt())
     for (tier in 0..4) {
       val baseY = 90 - tier * 16
       val maxSpan = 34 - tier * 5
@@ -711,14 +750,18 @@ object PixelStructureAtlas {
         val span = (22 - ry) * maxSpan / 22
         val jag = if (ry % 4 == 0) 2 else 0
         val col = when {
-          ry < 5 -> 0xFF0C1A22.toInt()
+          ry < 5 -> 0xFF0F1A1F.toInt()
           ry < 11 -> 0xFF132A2E.toInt()
           ry < 17 -> 0xFF1B3A2E.toInt()
-          else -> 0xFF2F4A2E.toInt()
+          ry < 20 -> 0xFF2F4A2E.toInt()
+          else -> 0xFF3D5A36.toInt() // sun tip
         }
         c.hLine(44 - span - jag, baseY - ry, (span + jag) * 2, col)
+        // snow/lichen speck on sun side
+        if (ry == 19 && tier % 2 == 0) c.set(44 - span + 2, baseY - ry, 0xFF8A9AB8.toInt())
       }
     }
+    c.fillEllipse(44, 116, 14, 4, 0xFF0A0C14.toInt()) // AO
     c.applyCrispOutline(0xFF08161F.toInt())
     return c.toImageBitmap()
   }
@@ -752,13 +795,18 @@ object PixelStructureAtlas {
     val w = 44
     val h = 74
     val c = PixelCanvas(w, h)
-    c.fillRect(10, 16, 24, 52, 0xFF333045.toInt())
-    c.fillRect(12, 8, 20, 60, 0xFF4B4763.toInt())
-    c.fillRect(14, 10, 7, 54, 0xFF6B658C.toInt())
-    c.fillRect(12, 8, 16, 5, 0xFF4D7C3A.toInt())
-    c.hLine(13, 8, 12, 0xFF8BC441.toInt())
+    c.fillRect(10, 16, 24, 52, 0xFF2A2E4A.toInt()) // deeper indigo stone
+    c.fillRect(12, 8, 20, 60, 0xFF3A3F5A.toInt())
+    c.fillRect(14, 10, 7, 54, 0xFF5A5F7A.toInt()) // sun chamfer
+    c.fillRect(26, 10, 4, 54, 0xFF1E1E2E.toInt()) // shadow side
+    c.fillRect(12, 8, 16, 5, 0xFF2A3D2B.toInt())
+    c.hLine(13, 8, 12, 0xFF3D5A36.toInt())
+    c.set(18, 9, 0xFF4A6B3E.toInt()) // moss dot
     c.fillRect(21, 24, 3, 28, 0xFF38BDF8.toInt())
     c.hLine(16, 32, 13, 0xFF38BDF8.toInt())
+    // weather cracks
+    c.vLine(16, 16, 12, 0xFF1A1E24.toInt())
+    c.fillEllipse(22, 68, 10, 4, 0xFF0A0C14.toInt()) // AO
     c.applyCrispOutline()
     return c.toImageBitmap()
   }
@@ -767,11 +815,16 @@ object PixelStructureAtlas {
     val w = 48
     val h = 38
     val c = PixelCanvas(w, h)
-    c.fillEllipse(24, 22, 18, 12, 0xFF475569.toInt())
-    c.fillEllipse(19, 23, 13, 10, 0xFF64748B.toInt())
-    c.fillEllipse(31, 25, 11, 8, 0xFF334155.toInt())
-    c.fillEllipse(21, 13, 12, 5, 0xFF4D7C3A.toInt())
-    c.hLine(15, 11, 12, 0xFF84BD3E.toInt())
+    c.fillEllipse(24, 22, 18, 12, 0xFF3A3F4A.toInt()) // cold stone base
+    c.fillEllipse(19, 23, 13, 10, 0xFF4A4D55.toInt())
+    c.fillEllipse(31, 25, 11, 8, 0xFF2E333E.toInt())
+    // crack across boulder
+    c.hLine(14, 22, 10, 0xFF1A1E24.toInt())
+    c.set(18, 23, 0xFF1E2026.toInt())
+    c.fillEllipse(21, 13, 13, 6, 0xFF2A3D2B.toInt()) // moss cap thicker
+    c.fillEllipse(21, 11, 9, 4, 0xFF3D5A36.toInt())
+    c.hLine(15, 11, 12, 0xFF4A6B3E.toInt())
+    c.set(28, 18, 0xFF5A5F6E.toInt()) // quartz vein
     c.applyCrispOutline()
     return c.toImageBitmap()
   }
@@ -780,14 +833,23 @@ object PixelStructureAtlas {
     val w = 36
     val h = 54
     val c = PixelCanvas(w, h)
+    // Stone pedestal with highlight/so
     c.fillRect(11, 40, 14, 9, 0xFF27223D.toInt())
-    c.fillRect(7, 28, 22, 12, 0xFF3D355E.toInt())
-    c.hLine(7, 28, 22, 0xFFF5B841.toInt())
+    c.hLine(11, 40, 14, 0xFF4A4E5E.toInt())
+    c.fillRect(7, 28, 22, 12, 0xFF3A3F4A.toInt())
+    c.hLine(7, 28, 22, 0xFF8A9AB8.toInt()) // cold moon rim
+    c.fillRect(9, 30, 18, 8, 0xFF2A2D38.toInt()) // inner soot
     val shift = frame - 1
+    // Triple flame layers: outer violet, mid cyan, core white with flicker shift
+    c.fillCircle(18 + shift, 21, 9, 0xFF6B21A8.toInt())
     c.fillCircle(18 + shift, 21, 8, 0xFF7C3AED.toInt())
     c.fillCircle(18 - shift, 18, 6, 0xFF38BDF8.toInt())
+    c.fillCircle(18, 18, 4, 0xFF7DD3FC.toInt())
     c.fillCircle(18 + shift, 13, 3, 0xFFE0F2FE.toInt())
-    c.set(16 + frame * 2, 7, 0xFFF5B841.toInt())
+    c.set(18, 11, 0xFFFFFFFF.toInt())
+    c.set(16 + frame * 2, 7, 0xFFF59E0B.toInt()) // ember spark
+    // Light pool on base
+    c.fillEllipse(18, 38, 8, 2, 0xFF7C3AED.toInt())
     c.applyCrispOutline()
     return c.toImageBitmap()
   }

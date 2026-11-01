@@ -1,6 +1,7 @@
 package com.example
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -32,6 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.data.SessionAccountMode
+import com.example.data.firebase.FirebaseAvailability
 import com.example.data.firebase.SummonerRepository
 import com.example.data.firebase.authStateFlow
 import com.example.data.firebase.performInteractiveGoogleSignIn
@@ -51,14 +53,23 @@ import com.example.ui.theme.ObsidianVoid
 import com.example.ui.theme.PortalCyan
 import com.example.ui.theme.SummonerGold
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    // Crash fix: Thread.setDefaultUncaughtExceptionHandler to log FATAL without silent exit
+    val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+    Thread.setDefaultUncaughtExceptionHandler { t, e ->
+      Log.e("MainActivity", "FATAL uncaught on ${t.name}", e)
+      defaultHandler?.uncaughtException(t, e)
+    }
     enableEdgeToEdge()
     setContent {
       EternalSummonerTheme {
@@ -75,8 +86,38 @@ fun EternalSummonerRootApp() {
   val credentialManager = remember(context) { CredentialManager.create(context) }
   val saveManager = remember(context) { LocalGuestSaveManager(context) }
 
-  val currentUser by Firebase.auth.authStateFlow()
-    .collectAsStateWithLifecycle(initialValue = Firebase.auth.currentUser)
+  // ---- ANDROID STABILITY FIX: guard Firebase availability ----
+  // Build can succeed with google-services.json missing (WARN+passthrough) but at runtime
+  // FirebaseApp is not initialized → Firebase.auth throws IllegalStateException and app crashes
+  // on launch before any UI appears. We check availability once and fall back to pure offline guest mode.
+  val isFirebaseReady = remember(context) {
+    val ready = FirebaseAvailability.isFirebaseReady(context)
+    if (!ready) {
+      Log.w("EternalSummoner", "Firebase not ready — forcing offline guest mode. Cloud sync disabled.")
+    }
+    ready
+  }
+
+  // Safe auth flow: only subscribe if Firebase is actually initialized
+  val firebaseUserFlow: Flow<FirebaseUser?> = remember(isFirebaseReady) {
+    if (isFirebaseReady) {
+      try {
+        Firebase.auth.authStateFlow()
+      } catch (e: Exception) {
+        Log.w("EternalSummoner", "authStateFlow failed, fallback to null flow", e)
+        flowOf(null)
+      }
+    } else {
+      flowOf(null)
+    }
+  }
+  val initialUser: FirebaseUser? = remember(isFirebaseReady) {
+    if (isFirebaseReady) {
+      try { Firebase.auth.currentUser } catch (_: Exception) { null }
+    } else null
+  }
+  val currentUser by firebaseUserFlow
+    .collectAsStateWithLifecycle(initialValue = initialUser)
   val sessionMode by saveManager.sessionMode.collectAsStateWithLifecycle()
   val gameSettings by saveManager.settings.collectAsStateWithLifecycle()
   val guestSnapshot by saveManager.guestSnapshot.collectAsStateWithLifecycle()
@@ -86,7 +127,7 @@ fun EternalSummonerRootApp() {
   var linkStatusMessage by remember { mutableStateOf<String?>(null) }
   var allowSilentGoogleOnGate by remember { mutableStateOf(true) }
 
-  val cloudUser = currentUser
+  val cloudUser = if (isFirebaseReady) currentUser else null
   LaunchedEffect(cloudUser?.uid) {
     if (cloudUser != null) {
       saveManager.markGoogleCloudSessionActive()
@@ -104,7 +145,7 @@ fun EternalSummonerRootApp() {
       AuthGateScreen(
         hasExistingGuestSave = guestSnapshot != null,
         savedGuestSummary = savedSummary,
-        allowSilentAutoSignIn = allowSilentGoogleOnGate,
+        allowSilentAutoSignIn = allowSilentGoogleOnGate && isFirebaseReady,
         onContinueAsGuest = {
           scope.launch {
             saveManager.startOrResumeGuestSession("Master")
@@ -140,13 +181,22 @@ fun EternalSummonerRootApp() {
     factory = viewModelFactory {
       initializer {
         val app = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]!!
-        if (cloudUser != null) {
-          val db = FirebaseFirestore.getInstance(app.getString(R.string.firestore_database_id))
-          SummonerViewModel(
-            repository = SummonerRepository(db = db, auth = Firebase.auth),
-            currentUserId = cloudUser.uid,
-            preferredDisplayName = cloudUser.displayName?.takeIf { it.isNotBlank() } ?: "Master",
-          )
+        if (cloudUser != null && isFirebaseReady) {
+          try {
+            val db = FirebaseFirestore.getInstance(app.getString(R.string.firestore_database_id))
+            SummonerViewModel(
+              repository = SummonerRepository(db = db, auth = Firebase.auth),
+              currentUserId = cloudUser.uid,
+              preferredDisplayName = cloudUser.displayName?.takeIf { it.isNotBlank() } ?: "Master",
+            )
+          } catch (e: Exception) {
+            Log.e("EternalSummoner", "Firestore init failed, fallback to guest", e)
+            SummonerViewModel(
+              repository = LocalGuestDataSource(saveManager),
+              currentUserId = activeUserId,
+              preferredDisplayName = guestSnapshot?.profile?.masterName ?: "Master",
+            )
+          }
         } else {
           SummonerViewModel(
             repository = LocalGuestDataSource(saveManager),
@@ -196,6 +246,14 @@ fun EternalSummonerRootApp() {
           style = MaterialTheme.typography.bodySmall,
           color = PortalCyan,
         )
+        if (!isFirebaseReady) {
+          Spacer(modifier = Modifier.height(8.dp))
+          Text(
+            text = "⚡ Chế độ Khách ngoại tuyến — đám mây chưa cấu hình",
+            style = MaterialTheme.typography.labelSmall,
+            color = SummonerGold.copy(alpha = 0.85f),
+          )
+        }
       }
     }
     return
@@ -206,12 +264,18 @@ fun EternalSummonerRootApp() {
     showSettingsModal = false
     linkStatusMessage = null
     saveManager.logoutToTitleGate()
-    if (Firebase.auth.currentUser != null) {
-      signOutSummoner(
-        credentialManager = credentialManager,
-        scope = scope,
-        onComplete = {},
-      )
+    if (isFirebaseReady) {
+      try {
+        if (Firebase.auth.currentUser != null) {
+          signOutSummoner(
+            credentialManager = credentialManager,
+            scope = scope,
+            onComplete = {},
+          )
+        }
+      } catch (e: Exception) {
+        Log.w("EternalSummoner", "signOut failed", e)
+      }
     }
   }
 
@@ -303,7 +367,7 @@ fun EternalSummonerRootApp() {
         onClose = { showSettingsModal = false },
         isLinkingAccount = isLinkingAccount,
         linkStatusMessage = linkStatusMessage,
-        onLinkGoogleAccount = if (activeMode == SessionAccountMode.GUEST_LOCAL) {
+        onLinkGoogleAccount = if (activeMode == SessionAccountMode.GUEST_LOCAL && isFirebaseReady) {
           {
             val snapToMigrate = saveManager.guestSnapshot.value
             if (snapToMigrate != null && !isLinkingAccount) {
