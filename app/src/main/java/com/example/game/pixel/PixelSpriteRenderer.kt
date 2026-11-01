@@ -516,7 +516,11 @@ object PixelSpriteRenderer {
     )
   }
 
-  /** Unified directional contact + cast shadow (shadow-stack spec §3.1) — replaces fixed generic ellipse. */
+  /**
+   * Silhouette-aware directional shadow — height-aware offset per shadow-rendering.md.
+   * RECT: footprint rectangle (roof/wall) projected; ELLIPSE: irregular canopy wobble (canopy/bush);
+   * CUSTOM_POLYGON: gate twin-pillars. Contact AO always footprint-matched dense ellipse.
+   */
   private fun DrawScope.drawCastersShadow(
     cx: Float,
     footY: Float,
@@ -526,34 +530,79 @@ object PixelSpriteRenderer {
   ) {
     val baseAlpha = alphaOverride ?: caster.opacity
     if (baseAlpha < 0.02f) return
-    // Contact AO pinned at foot
-    val contactRX = caster.footprintRX * zoom * 0.92f
-    val contactRY = caster.footprintRY * zoom * 0.62f
-    val rx = (caster.footprintRX * 0.92f + caster.softnessPx * 0.35f) * zoom
-    val ryForCast = (caster.heightPx * 0.14f + caster.footprintRY * 0.42f) * zoom
     val (offWx, offWy) = SanctuaryLight.shadowWorldOffset(caster.heightPx)
     val offX = offWx * zoom
     val offY = offWy * zoom * ObliqueCamera.OBLIQUE_Y_SCALE
-    // Layer 1 outer halo (soft penumbra)
+    // Contact AO — always pinned at foot, footprint-matched, never offset
+    val contactRX = caster.footprintRX * zoom * 0.92f
+    val contactRY = caster.footprintRY * zoom * 0.62f
     drawOval(
-      color = Color(0xFF0A0C14).copy(alpha = (baseAlpha * 0.38f).coerceIn(0f, 0.32f)),
-      topLeft = Offset(cx - rx + offX - 2f * zoom, footY - ryForCast + offY - 1f * zoom),
-      size = Size(rx * 2.25f + 6f * zoom, ryForCast * 1.55f + 4f * zoom),
+      color = Color.Black.copy(alpha = (baseAlpha * 1.10f).coerceIn(0f, 0.55f)),
+      topLeft = Offset(cx - contactRX * 0.90f, footY - contactRY * 0.78f),
+      size = Size(contactRX * 1.80f, contactRY * 1.38f),
     )
-    // Layer 2 core cast
-    drawOval(
-      color = Color(0xFF0A0C14).copy(alpha = (baseAlpha * 0.58f).coerceIn(0f, 0.40f)),
-      topLeft = Offset(cx - rx * 0.86f + offX, footY - ryForCast * 0.72f + offY),
-      size = Size(rx * 2.05f, ryForCast * 1.45f),
-    )
-    // Layer 3 contact AO (dense, pinned)
-    drawOval(
-      color = Color.Black.copy(alpha = (baseAlpha * 1.15f).coerceIn(0f, 0.58f)),
-      topLeft = Offset(cx - contactRX * 0.90f, footY - contactRY * 0.70f),
-      size = Size(contactRX * 1.85f, contactRY * 1.35f),
-    )
+    // Cast silhouette — directional, material-specific, softness-driven
+    when (caster.silhouette) {
+      com.example.game.map.ShadowSilhouette.RECT -> drawRectCastShadow(cx, footY, caster, zoom, offX, offY, baseAlpha)
+      com.example.game.map.ShadowSilhouette.ELLIPSE -> drawCanopyCastShadow(cx, footY, caster, zoom, offX, offY, baseAlpha)
+      com.example.game.map.ShadowSilhouette.CUSTOM_POLYGON -> drawGateCastShadow(cx, footY, caster, zoom, offX, offY, baseAlpha)
+      else -> drawCanopyCastShadow(cx, footY, caster, zoom, offX, offY, baseAlpha)
+    }
+  }
+  private fun DrawScope.drawRectCastShadow(cx: Float, footY: Float, caster: ShadowCaster, zoom: Float, offX: Float, offY: Float, baseAlpha: Float) {
+    // Footprint rectangle with softness chamfer — represents roof/wall mass
+    val hw = caster.footprintRX * zoom
+    val hd = caster.footprintRY * zoom / ObliqueCamera.GROUND_ELLIPSE_RATIO * ObliqueCamera.OBLIQUE_Y_SCALE
+    // Soft expand: larger softness → more penumbra spread
+    val expand = caster.softnessPx * zoom * 0.32f
+    val left = cx - hw - expand; val right = cx + hw + expand
+    val top = footY - hd * 2f - expand; val bottom = footY + expand * 0.45f
+    // Outer penumbra (2x blur, lighter)
+    val outer = Path().apply { moveTo(left + offX - 2f*zoom, top + offY); lineTo(right + offX + 2f*zoom, top + offY); lineTo(right + offX + 2f*zoom, bottom + offY); lineTo(left + offX - 2f*zoom, bottom + offY); close() }
+    drawPath(outer, Color(0xFF0A0C14).copy(alpha = (baseAlpha * 0.22f).coerceIn(0f, 0.22f)))
+    // Core (tighter, denser)
+    val inner = Path().apply { moveTo(cx - hw*0.88f + offX, footY - hd*1.55f + offY); lineTo(cx + hw*0.88f + offX, footY - hd*1.55f + offY); lineTo(cx + hw*0.88f + offX, footY - hd*0.15f + offY); lineTo(cx - hw*0.88f + offX, footY - hd*0.15f + offY); close() }
+    drawPath(inner, Color(0xFF0A0C14).copy(alpha = (baseAlpha * 0.48f).coerceIn(0f, 0.38f)))
+  }
+  private fun DrawScope.drawCanopyCastShadow(cx: Float, footY: Float, caster: ShadowCaster, zoom: Float, offX: Float, offY: Float, baseAlpha: Float) {
+    // Irregular canopy — 12-point radial wobble seeded by id hash, mimics alpha-masked foliage
+    val rx = (caster.footprintRX * 0.95f + caster.softnessPx * 0.28f) * zoom
+    val ry = (caster.heightPx * 0.10f + caster.footprintRY * 0.55f) * zoom
+    val seed = caster.id.hashCode()
+    fun wobblePath(expandK: Float): Path {
+      val p = Path()
+      for (i in 0 until 12) {
+        val ang = i * (Math.PI * 2.0 / 12.0)
+        val wob = 0.86f + 0.14f * sin(ang * 3.2 + seed * 0.011f + i * 0.9f).toFloat() + 0.08f * cos(ang * 5.0 + seed * 0.007f).toFloat()
+        val rrx = rx * wob * expandK
+        val rry = ry * wob * 0.72f * expandK
+        val px = cx + cos(ang).toFloat() * rrx + offX
+        val py = footY - rry * 0.65f + offY
+        if (i == 0) p.moveTo(px, py) else p.lineTo(px, py)
+      }
+      p.close(); return p
+    }
+    drawPath(wobblePath(1.12f), Color(0xFF0A0C14).copy(alpha = (baseAlpha * 0.30f).coerceIn(0f, 0.25f)))
+    drawPath(wobblePath(0.88f), Color(0xFF0A0C14).copy(alpha = (baseAlpha * 0.42f).coerceIn(0f, 0.30f)))
+  }
+  private fun DrawScope.drawGateCastShadow(cx: Float, footY: Float, caster: ShadowCaster, zoom: Float, offX: Float, offY: Float, baseAlpha: Float) {
+    val hw = caster.footprintRX * zoom * 0.92f
+    val hd = caster.footprintRY * zoom / ObliqueCamera.GROUND_ELLIPSE_RATIO * ObliqueCamera.OBLIQUE_Y_SCALE
+    // Twin pillars with gap (portal void keeps light)
+    val gap = hw * 0.42f
+    val pillarW = hw * 0.38f
+    fun pillarPath(centerOffset: Float): Path {
+      val pcx = cx + centerOffset
+      return Path().apply { moveTo(pcx - pillarW + offX, footY - hd*2.2f + offY); lineTo(pcx + pillarW + offX, footY - hd*2.2f + offY); lineTo(pcx + pillarW + offX, footY + offY); lineTo(pcx - pillarW + offX, footY + offY); close() }
+    }
+    drawPath(pillarPath(-gap), Color(0xFF0A0C14).copy(alpha = (baseAlpha * 0.42f).coerceIn(0f, 0.33f)))
+    drawPath(pillarPath(gap), Color(0xFF0A0C14).copy(alpha = (baseAlpha * 0.42f).coerceIn(0f, 0.33f)))
+    // Faint connector under arch
+    val arch = Path().apply { moveTo(cx - hw*0.62f + offX, footY - hd*0.55f + offY); lineTo(cx + hw*0.62f + offX, footY - hd*0.55f + offY); lineTo(cx + hw*0.62f + offX, footY - hd*0.15f + offY); lineTo(cx - hw*0.62f + offX, footY - hd*0.15f + offY); close() }
+    drawPath(arch, Color(0xFF0A0C14).copy(alpha = (baseAlpha * 0.16f).coerceIn(0f, 0.14f)))
   }
 
+  @Deprecated("Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.")
   private fun DrawScope.drawDirectionalShadow34(
     cx: Float,
     footY: Float,
@@ -561,23 +610,11 @@ object PixelSpriteRenderer {
     halfH: Float,
     alpha: Float = 0.52f,
   ) {
-    // Legacy delegator — map hand-tuned halfW/halfH to height-proxy for directional offset.
-    val heightProxy = (halfW * 1.05f + halfH * 1.6f).coerceAtLeast(12f)
-    val rx = halfW * 0.92f
-    val ry = halfH * 1.10f
-    val (offWx, offWy) = SanctuaryLight.shadowWorldOffset(heightProxy)
-    val offX = offWx * 0.28f // scale to screen; proxy already screen-sized
-    val offY = offWy * 0.28f * ObliqueCamera.OBLIQUE_Y_SCALE
-    drawOval(
-      color = Color(0xFF0A0C14).copy(alpha = (alpha * 0.58f).coerceIn(0f, 0.45f)),
-      topLeft = Offset(cx - rx * 0.68f + offX, footY - ry * 0.60f + offY),
-      size = Size(rx * 2.35f, ry * 1.65f),
-    )
-    drawOval(
-      color = Color.Black.copy(alpha = (alpha * 0.90f).coerceIn(0f, 0.65f)),
-      topLeft = Offset(cx - halfW * 0.88f, footY - halfH * 0.85f),
-      size = Size(halfW * 1.75f, halfH * 1.35f),
-    )
+    val heightProxy = (halfW * 0.95f + halfH * 1.35f).coerceAtLeast(12f)
+    val rx = halfW * 0.92f; val ry = halfH * 0.92f
+    // Build lightweight caster to reuse silhouette path
+    val tmp = ShadowCaster(id = "legacy_${cx.toInt()}_${footY.toInt()}", heightPx = heightProxy, footprintRX = rx, footprintRY = ry, silhouette = com.example.game.map.ShadowSilhouette.RECT, opacity = alpha, softnessPx = 5f)
+    drawCastersShadow(cx, footY, tmp, zoom = 1f, alphaOverride = alpha * 0.92f)
   }
 
   fun DrawScope.drawProp(
