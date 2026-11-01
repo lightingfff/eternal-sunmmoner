@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.example.data.model.HeroClassType
@@ -60,23 +61,14 @@ object PixelSpriteRenderer {
     midColor: Color? = null,
     ellipseRatio: Float = ObliqueCamera.GROUND_ELLIPSE_RATIO,
   ) {
-    if (radiusX <= 2f) return
-    if (cx + radiusX < -40f || cx - radiusX > size.width + 40f) return
-    val ry = radiusX * ellipseRatio
-    if (cy + ry < -40f || cy - ry > size.height + 40f) return
-    withTransform({
-      scale(scaleX = 1f, scaleY = ellipseRatio, pivot = Offset(cx, cy))
-    }) {
-      val stops = if (midColor != null) {
-        listOf(innerColor.copy(alpha=(innerColor.alpha*com.example.game.world.WorldEnvironment.lighting.localLightIntensity).coerceAtMost(.6f)), midColor, Color.Transparent)
-      } else {
-        listOf(innerColor.copy(alpha=(innerColor.alpha*com.example.game.world.WorldEnvironment.lighting.localLightIntensity).coerceAtMost(.6f)), Color.Transparent)
-      }
-      drawCircle(
-        brush = Brush.radialGradient(colors = stops, center = Offset(cx, cy), radius = radiusX),
-        radius = radiusX,
-        center = Offset(cx, cy),
-      )
+    if (radiusX <= 2f || cx+radiusX < 0f || cx-radiusX > size.width) return
+    val ry=radiusX*ellipseRatio
+    if (cy+ry < 0f || cy-ry > size.height) return
+    val intensity=com.example.game.world.WorldEnvironment.lighting.localLightIntensity
+    val tint=if(innerColor.red>innerColor.blue*1.15f) DepthPresentation.LightTint.WARM_AMBER
+      else DepthPresentation.LightTint.COOL_AETHER
+    with(DepthPresentation) {
+      drawLightStamp(Offset(cx,cy),radiusX,ry,tint,(innerColor.alpha*intensity*.65f).coerceAtMost(.20f))
     }
   }
 
@@ -1108,6 +1100,33 @@ object PixelSpriteRenderer {
     }
   }
 
+  /** Overhang is an actor-local depth layer, never a blanket foreground canopy redraw.
+   * North actors are occluded naturally by the later sorted tree. South actors are
+   * covered only while under its crown's ground footprint, with no sway/anchor mismatch. */
+  fun DrawScope.drawActorCanopyOcclusion(
+    obstacles: List<WorldObstacle>, actorWorldX: Float, actorWorldY: Float,
+    camX: Float, camY: Float, zoom: Float, timeSec: Float,
+  ) {
+    val ax = ObliqueCamera.worldToScreenX(actorWorldX,camX,zoom,size.width/2f)
+    val ay = ObliqueCamera.worldToScreenY(actorWorldY,camY,zoom,size.height/2f)
+    if (ax < -100f || ax > size.width+100f || ay < -20f || ay > size.height+150f) return
+    for (obs in obstacles) {
+      if (!obs.occludesUpperCanopy || !ObliqueSpriteGeometry.isTree(obs.propKind)) continue
+      if (actorWorldY <= obs.y+obs.sortYBias || actorWorldY > obs.y+90f*obs.scale) continue
+      if (abs(actorWorldX-obs.x) > 220f*obs.scale) continue
+      val bmp = SanctuaryEnvironmentShadows.sprite(obs) ?: continue
+      val scale = ObliqueSpriteGeometry.pixelScale(obs.propKind)*obs.scale
+      if (actorWorldY > obs.y+bmp.width*scale*.18f || abs(actorWorldX-obs.x)>bmp.width*scale*.5f+24f) continue
+      val cx = ObliqueCamera.worldToScreenX(obs.x,camX,zoom,size.width/2f)
+      val cy = ObliqueCamera.worldToScreenY(obs.y,camY,zoom,size.height/2f,obs.elevationZ)
+      clipRect(ax-45f*zoom,ay-110f*zoom,ax+45f*zoom,ay+8f*zoom) {
+        drawCrispUpperCanopyPortion(bmp,cx,
+          cy+ObliqueSpriteGeometry.drawFootOffset(obs.propKind,bmp)*obs.scale*zoom,
+          scale*zoom,topFraction=if(obs.propKind==PropKind.PINE_SPIRIT_TREE) .52f else .56f,alpha=1f)
+      }
+    }
+  }
+
   fun DrawScope.drawSouthernForegroundWalls(
     biome: BiomeTheme,
     camX: Float,
@@ -1144,6 +1163,7 @@ object PixelSpriteRenderer {
     facingNorth: Boolean = false,
     heroName: String? = null,
     skillAnimation: Boolean = false,
+    emotion: String = "calm",
   ) {
     val cx = ObliqueCamera.worldToScreenX(worldX, camX, zoom, size.width / 2f)
     val cy = ObliqueCamera.worldToScreenY(worldY, camY, zoom, size.height / 2f)
@@ -1167,7 +1187,7 @@ object PixelSpriteRenderer {
       drawSkillGround(cx,cy,zoom,attackAnimProgress,skillAnimation)
     }
     val frameBmp = premium?.frame(facingRight,facingNorth,isMoving,attackAnimProgress,
-      skillAnimation,hurtFlash,isInjuredResting,timeSec) ?: run {
+      skillAnimation,hurtFlash,isInjuredResting,timeSec,emotion=emotion) ?: run {
     val sheet = if (isMaster) {
       PixelCharacterAtlas.masterSprites
     } else {

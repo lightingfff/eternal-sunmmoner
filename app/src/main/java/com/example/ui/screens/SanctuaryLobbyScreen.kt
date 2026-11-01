@@ -121,7 +121,7 @@ import com.example.game.pixel.PixelSpriteRenderer.drawForegroundAtmosphere
 import com.example.game.pixel.PixelSpriteRenderer.drawProp
 import com.example.game.pixel.PixelSpriteRenderer.drawSanctuaryZoneFloorRing
 import com.example.game.pixel.PixelSpriteRenderer.drawSouthernForegroundWalls
-import com.example.game.pixel.PixelSpriteRenderer.drawUpperCanopyOcclusionPass
+import com.example.game.pixel.PixelSpriteRenderer.drawActorCanopyOcclusion
 import com.example.game.pixel.PixelSpriteRenderer.drawWorldBackground
 import com.example.game.story.ManhwaStoryData
 import com.example.game.tower.TowerFloorCatalog
@@ -574,19 +574,16 @@ fun SanctuaryLobbyScreen(
               timeSec = animTimeSec,
               facingNorth = a.facingNorth,
               heroName = a.name,
+              emotion = when {
+                a.isInjured -> "fear"
+                a.attackPracticeAnim > 0f || isSelected -> "alert"
+                else -> "calm"
+              },
             )
+            drawActorCanopyOcclusion(layout.obstacles,a.x,a.y,camX,camY,zoom,animTimeSec)
           }
         }
       }
-
-      // Walk-behind overhanging tree canopy pass
-      drawUpperCanopyOcclusionPass(
-        obstacles = layout.obstacles,
-        camX = camX,
-        camY = camY,
-        zoom = zoom,
-        timeSec = animTimeSec,
-      )
 
       // Foreground Southern Fortress Parapet Walls (layered above courtyard terrain & characters near rim)
       if (!lobbyEngine.isInsideInterior) {

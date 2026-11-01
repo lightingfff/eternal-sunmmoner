@@ -1,0 +1,2 @@
+Native Canvas comparison, 1280x720, camera=(1530,1220), zoom=0.45
+Changed distant pixels=3177; changed opaque gameplay/actor/UI pixels=0

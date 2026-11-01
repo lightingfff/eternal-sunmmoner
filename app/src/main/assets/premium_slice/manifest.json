@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "origin": "Original ETERNAL SUMMONER art; authored polygon/cluster recipes in tools/generate_premium_slice.py; no external art",
   "frame": [
     64,
@@ -16,66 +16,146 @@
     "back_right",
     "back_left"
   ],
+  "clip_order": [
+    "idle",
+    "walk",
+    "attack",
+    "skill",
+    "hit",
+    "rest",
+    "defeat",
+    "calm",
+    "alert",
+    "fear",
+    "victory"
+  ],
   "clips": {
     "idle": [
-      0.36,
-      0.18,
-      0.36
-    ],
-    "walk": [
-      0.1,
-      0.08,
-      0.12,
-      0.1,
-      0.08,
-      0.12
-    ],
-    "attack": [
-      0.12,
-      0.1,
-      0.08,
-      0.18
-    ],
-    "skill": [
+      0.24,
       0.16,
-      0.14,
-      0.09,
-      0.13,
+      0.2,
+      0.24,
+      0.16,
       0.2
     ],
+    "walk": [
+      0.08,
+      0.07,
+      0.07,
+      0.08,
+      0.08,
+      0.07,
+      0.07,
+      0.08
+    ],
+    "attack": [
+      0.06,
+      0.06,
+      0.06,
+      0.04,
+      0.045,
+      0.055,
+      0.07,
+      0.09
+    ],
+    "skill": [
+      0.08,
+      0.08,
+      0.07,
+      0.07,
+      0.06,
+      0.07,
+      0.08,
+      0.09,
+      0.12
+    ],
     "hit": [
-      0.11,
-      0.17
+      0.045,
+      0.065,
+      0.085,
+      0.105
     ],
     "rest": [
       1.0
     ],
     "defeat": [
-      0.12,
+      0.09,
+      0.11,
+      0.13,
+      0.15,
+      0.2,
+      0.32
+    ],
+    "calm": [
+      0.24,
       0.18,
-      0.3
+      0.2,
+      0.24,
+      0.16,
+      0.18
+    ],
+    "alert": [
+      0.16,
+      0.2,
+      0.18,
+      0.26
+    ],
+    "fear": [
+      0.12,
+      0.08,
+      0.16,
+      0.09,
+      0.18,
+      0.17
+    ],
+    "victory": [
+      0.14,
+      0.16,
+      0.22,
+      0.24,
+      0.2,
+      0.24
     ]
   },
+  "loop_clips": [
+    "idle",
+    "walk",
+    "calm",
+    "alert",
+    "fear",
+    "victory"
+  ],
   "contact_seconds": {
     "attack": 0.22,
     "skill": 0.3
   },
+  "contact_frames": {
+    "attack": 4,
+    "skill": 4
+  },
+  "emotion_clips": {
+    "calm": "calm",
+    "alert": "alert",
+    "fear": "fear",
+    "victory": "victory"
+  },
+  "lighting": "upper-left; left-facing poses reramp material glints after mirroring",
   "assets": {
     "kaelen": {
       "file": "kaelen.png",
       "size": [
-        1536,
+        4096,
         384
       ],
-      "sha256": "50356e1922ae7add0ebb987b5f76d6bb60df5b276540e11875d3624c5eb43a5b"
+      "sha256": "25dc3beec8b70bf17c0a946946f716d5d19c4b4c7697d04c92ffa5c4316a3256"
     },
     "goblin_raider": {
       "file": "goblin_raider.png",
       "size": [
-        1536,
+        4096,
         384
       ],
-      "sha256": "6b09c4db344dc92a74eed89a7111e28ce617f752b9861d0a92a57f3c26a210b4"
+      "sha256": "769c75f8ec227412a6716cb9f49b6bd8b7d0ef2eec8a46e802b4cc6384a4fbb1"
     },
     "armory": {
       "file": "armory.png",
