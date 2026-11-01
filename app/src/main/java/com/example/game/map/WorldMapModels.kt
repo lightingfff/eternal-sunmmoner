@@ -354,6 +354,21 @@ object SanctuaryShadowRegistry {
     PropKind.STREET_LANTERN, PropKind.ARCANE_BRAZIER -> 0.30f
     else -> 0.32f
   }
+  /** Per-kind penumbra softness: buildings crisp, canopy soft. */
+  fun softnessFor(kind: PropKind): Float = when (kind) {
+    PropKind.FACILITY_TOWER_GATE, PropKind.TOWER_PORTAL_GATE,
+    PropKind.FACILITY_SUMMONING_HALL, PropKind.FACILITY_HERO_QUARTERS,
+    PropKind.FACILITY_RESTAURANT, PropKind.FACILITY_ARMORY,
+    PropKind.FACILITY_SYNTHESIS_LAB,
+    PropKind.MEDIEVAL_TOWNHOUSE_A, PropKind.MEDIEVAL_TOWNHOUSE_B,
+    PropKind.SANCTUARY_COTTAGE_BROWN, PropKind.SANCTUARY_COTTAGE_SLATE -> 5f
+    PropKind.FORTRESS_CORNER_TOWER, PropKind.SOUTHERN_GATE_TOWER -> 4.5f
+    PropKind.OAK_TREE, PropKind.MYSTIC_PLUM_TREE, PropKind.SAKURA_BLOSSOM_TREE,
+    PropKind.PINE_SPIRIT_TREE, PropKind.CYPRESS_CONIFER_TREE -> 9f
+    PropKind.GARDEN_HEDGE_BUSH, PropKind.FOREST_CANOPY_BUSH -> 7f
+    PropKind.MOSSY_BOULDER -> 4f
+    else -> 6f
+  }
   fun casterFor(obs: WorldObstacle): ShadowCaster {
     val h = heightFor(obs.propKind) * obs.scale
     val rx = (if (obs.footprintHalfW > 0f) obs.footprintHalfW else obs.radius).coerceAtLeast(8f)
@@ -365,7 +380,16 @@ object SanctuaryShadowRegistry {
       footprintRY = ry,
       silhouette = silhouetteFor(obs.propKind),
       opacity = opacityFor(obs.propKind),
+      softnessPx = softnessFor(obs.propKind),
     )
+  }
+  /**
+   * Lightweight cache key — shadows are static for Sanctuary (no moving buildings).
+   * Invalidate when obstacle moves, rescales, or SanctuaryLight changes.
+   */
+  fun cacheKey(obs: WorldObstacle, zoom: Float): Long {
+    val qZoom = (zoom * 20f).toInt() // 0.05 bucket
+    return (obs.id.hashCode().toLong() shl 32) xor (qZoom.toLong() and 0xFFFFFFFFL)
   }
   fun build(obstacles: List<WorldObstacle>): Map<String, ShadowCaster> =
     obstacles.associate { it.id to casterFor(it) }

@@ -327,10 +327,10 @@ object PixelTileAtlas {
       val cy = 18 + rng.nextInt(28)
       c.fillEllipse(cx, cy, 5, 3, 0xFF2E2A24.toInt())
     }
-    // Fine stone grit - cold slate pebbles + slate shards embedded in moss
-    repeat(26) {
-      val sx = 4 + rng.nextInt(56)
-      val sy = 4 + rng.nextInt(56)
+    // Fine stone grit — restrained to preserve breathing room (18 not 26; keep 2px edge clear for seamless)
+    repeat(18) {
+      val sx = 6 + rng.nextInt(52)
+      val sy = 6 + rng.nextInt(52)
       val col = when (rng.nextInt(4)) {
         0 -> 0xFF3A3F45.toInt()
         1 -> 0xFF4A4D55.toInt()
@@ -338,10 +338,9 @@ object PixelTileAtlas {
         else -> 0xFF5A5F6E.toInt()
       }
       c.set(sx, sy, col)
-      if (rng.nextInt(6) == 0 && sx < 63) c.set(sx + 1, sy, 0xFF2A2E34.toInt())
+      if (rng.nextInt(7) == 0 && sx < 62) c.set(sx + 1, sy, 0xFF2A2E34.toInt())
     }
-
-    // Dark fantasy foliage specks - 7-tone depth with clustered micro-detail (shadow-mid-highlight + frost)
+    // Foliage micro-detail: reduced 135→110, grouped into darker under + lighter tip tiers (texture-art-direction hierarchy)
     val deepShadow = 0xFF162118.toInt()
     val midMoss = 0xFF2A3D2B.toInt()
     val mutedMid = 0xFF344E35.toInt()
@@ -349,9 +348,9 @@ object PixelTileAtlas {
     val mossHi = 0xFF4A6B3E.toInt()
     val frostTip = 0xFF5A7A52.toInt()
     val earthUnder = 0xFF1E2620.toInt()
-    repeat(135) {
-      val gx = 2 + rng.nextInt(60)
-      val gy = 2 + rng.nextInt(60)
+    repeat(110) {
+      val gx = 6 + rng.nextInt(52)
+      val gy = 6 + rng.nextInt(52)
       val roll = rng.nextInt(8)
       val col = when (roll) {
         0 -> deepShadow
@@ -363,21 +362,20 @@ object PixelTileAtlas {
         else -> frostTip
       }
       c.set(gx, gy, col)
-      if (rng.nextInt(4) == 0 && gx < 62) c.set(gx + 1, gy, midMoss)
-      if (roll == 6 && rng.nextInt(3) == 0 && gy > 2) c.set(gx, gy - 1, mossLight)
+      if (rng.nextInt(5) == 0 && gx < 61) c.set(gx + 1, gy, midMoss)
+      if (roll == 6 && rng.nextInt(4) == 0 && gy > 4) c.set(gx, gy - 1, mossLight)
     }
-
-    // Premium wind-bent tufts - 3-stem clumped with AO base + highlight tip + bent lean
-    repeat(15) {
-      val tx = 6 + rng.nextInt(52)
-      val ty = 10 + rng.nextInt(48)
+    // Wind-bent tufts — 12 not 15, keeps grass readable at zoom 0.36; AO 2px only
+    repeat(12) {
+      val tx = 8 + rng.nextInt(48)
+      val ty = 12 + rng.nextInt(44)
       val lean = if (rng.nextBoolean()) 1 else 0
-      c.hLine(tx - 1, ty + 1, 5, 0xFF1A1E1B.toInt()) // AO contact shadow
-      c.hLine(tx - 1, ty, 4, deepShadow)
+      c.hLine(tx - 1, ty + 1, 4, 0xFF1A1E1B.toInt())
+      c.hLine(tx - 1, ty, 3, deepShadow)
       c.vLine(tx - 1 + lean, ty - 2, 3, mossLight)
       c.vLine(tx + lean, ty - 4, 5, mossHi)
       c.vLine(tx + 1 + lean, ty - 2, 3, mutedMid)
-      if (rng.nextInt(3) == 0) c.set(tx + lean, ty - 5, frostTip) // sun catch tip
+      if (rng.nextInt(4) == 0) c.set(tx + lean, ty - 5, frostTip)
     }
 
     // Micro clover / fern flecks - 3-pixel clusters for close-zoom readability
@@ -507,13 +505,14 @@ object PixelTileAtlas {
       while (curX < TILE_PX) {
         val cw = 20 + ((variant + r * 3 + idx) % 3) * 6
         val base = bases[(variant + r + idx) % bases.size]
-        c.beveledSlab(curX, curY, cw, rh, base, hi, sh, mortar, rng, hi, sh)
-        // Age: vertical crack + chip + lichen
-        if (rng.nextInt(6) == 0) c.vLine(curX + cw / 2, curY + 3, rh - 6, 0xFF1E2026.toInt())
-        if (rng.nextInt(10) == 0) c.set(curX + 3, curY + 4, 0xFF252830.toInt()) // chip
-        if ((variant + r + idx) % 7 == 0) c.set(curX + cw - 4, curY + rh - 4, 0xFF2A332E.toInt()) // lichen in corner
-        // chisel tool mark
-        if (rng.nextInt(9) == 0) c.hLine(curX + 4, curY + rh / 2, 4, 0xFF4A4F5C.toInt())
+        // Top-plane sun highlight stronger on north row (r==0 faces moonlight AZ 142°)
+        val hiRow = if (r == 0) 0xFF656A7A.toInt() else hi
+        c.beveledSlab(curX, curY, cw, rh, base, hiRow, sh, mortar, rng, hi, sh)
+        // Age: vertical crack + chip + lichen — keep sparse (1/7–1/10) for premium readability
+        if (rng.nextInt(7) == 0) c.vLine(curX + cw / 2, curY + 3, rh - 6, 0xFF1E2026.toInt())
+        if (rng.nextInt(11) == 0) c.set(curX + 3, curY + 4, 0xFF252830.toInt())
+        if ((variant + r + idx) % 8 == 0) c.set(curX + cw - 4, curY + rh - 4, 0xFF2A332E.toInt())
+        if (rng.nextInt(10) == 0) c.hLine(curX + 4, curY + rh / 2, 4, 0xFF4A4F5C.toInt())
         curX += cw
         idx++
       }
