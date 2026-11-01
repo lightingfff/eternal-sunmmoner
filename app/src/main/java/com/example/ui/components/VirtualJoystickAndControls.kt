@@ -202,6 +202,7 @@ fun PixelHeroPortraitAvatar(
   heroClass: HeroClassType?,
   sizeDp: Dp = 48.dp,
   modifier: Modifier = Modifier,
+  heroName: String? = null,
 ) {
   val bg = when (heroClass) {
     HeroClassType.KNIGHT -> Color(0xFF1E3A5F)
@@ -226,14 +227,16 @@ fun PixelHeroPortraitAvatar(
     contentAlignment = Alignment.Center,
   ) {
     Canvas(modifier = Modifier.size(sizeDp * 0.90f)) {
-      val sprite = if (heroClass == null) {
+      val premium = if (heroName == "Kaelen" && heroClass == HeroClassType.KNIGHT)
+        com.example.game.pixel.PremiumActorAtlas.get("kaelen") else null
+      val sprite = premium?.frame(true,false,false,0f,false,0f,false,0f) ?: if (heroClass == null) {
         PixelCharacterAtlas.masterSprites.idleRight.first()
       } else {
         PixelCharacterAtlas.heroSheet(heroClass).idleRight.first()
       }
       drawImage(
         image = sprite,
-        srcOffset = IntOffset(6, 3),
+        srcOffset = if (premium == null) IntOffset(6, 3) else IntOffset(19, 4),
         srcSize = IntSize(26, 26),
         dstOffset = IntOffset(0, 0),
         dstSize = IntSize(size.width.toInt().coerceAtLeast(2), size.height.toInt().coerceAtLeast(2)),

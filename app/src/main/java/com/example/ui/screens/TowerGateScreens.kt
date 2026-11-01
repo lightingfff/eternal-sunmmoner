@@ -873,7 +873,7 @@ private fun SquadHeroRosterList(
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-          PixelHeroPortraitAvatar(heroClass = hero.classType, sizeDp = 48.dp)
+          PixelHeroPortraitAvatar(heroName = hero.name, heroClass = hero.classType, sizeDp = 48.dp)
 
           Column(modifier = Modifier.weight(1f)) {
             Text(

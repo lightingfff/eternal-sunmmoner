@@ -121,7 +121,7 @@ import com.example.game.pixel.PixelSpriteRenderer.drawForegroundAtmosphere
 import com.example.game.pixel.PixelSpriteRenderer.drawProp
 import com.example.game.pixel.PixelSpriteRenderer.drawSanctuaryZoneFloorRing
 import com.example.game.pixel.PixelSpriteRenderer.drawSouthernForegroundWalls
-import com.example.game.pixel.PixelSpriteRenderer.drawUpperCanopyOcclusionPass
+import com.example.game.pixel.PixelSpriteRenderer.drawActorCanopyOcclusion
 import com.example.game.pixel.PixelSpriteRenderer.drawWorldBackground
 import com.example.game.story.ManhwaStoryData
 import com.example.game.tower.TowerFloorCatalog
@@ -143,7 +143,7 @@ import com.example.ui.theme.SummonerGold
 import kotlin.math.abs
 import kotlin.math.hypot
 
-private sealed interface LobbyDrawableItem {
+internal sealed interface LobbyDrawableItem {
   val sortY: Float
 
   data class Prop(val obs: WorldObstacle) : LobbyDrawableItem {
@@ -162,6 +162,39 @@ private sealed interface LobbyDrawableItem {
 
   data class HeroNpc(val actor: LobbyHeroActor) : LobbyDrawableItem {
     override val sortY: Float get() = actor.y
+  }
+}
+
+/** Static props are sorted once. Reuse wrappers, insertion-sort the small moving roster,
+ * then merge into one reusable list; no per-frame buildList/sorted copy/TimSort buffer. */
+internal class LobbyDrawQueue {
+  private var sourceProps: List<WorldObstacle>? = null
+  private var sourceActors: List<LobbyHeroActor>? = null
+  private var props: List<LobbyDrawableItem.Prop> = emptyList()
+  private val actors = ArrayList<LobbyDrawableItem.HeroNpc>()
+  private val result = ArrayList<LobbyDrawableItem>()
+  fun ordered(obstacles: List<WorldObstacle>, roster: List<LobbyHeroActor>): List<LobbyDrawableItem> {
+    if (obstacles !== sourceProps) {
+      sourceProps = obstacles
+      props = obstacles.map { LobbyDrawableItem.Prop(it) }.sortedBy { it.sortY }
+    }
+    if (roster !== sourceActors) {
+      sourceActors = roster
+      actors.clear()
+      roster.forEach { actors.add(LobbyDrawableItem.HeroNpc(it)) }
+    }
+    for (i in 1 until actors.size) {
+      val item = actors[i]; var j = i-1
+      while (j >= 0 && actors[j].sortY > item.sortY) { actors[j+1] = actors[j]; j-- }
+      actors[j+1] = item
+    }
+    result.clear()
+    var p = 0; var a = 0
+    while (p < props.size || a < actors.size) {
+      if (a == actors.size || (p < props.size && props[p].sortY <= actors[a].sortY)) result.add(props[p++])
+      else result.add(actors[a++])
+    }
+    return result
   }
 }
 
@@ -193,6 +226,7 @@ fun SanctuaryLobbyScreen(
   remember(artContext) { com.example.game.pixel.SanctuaryArtAssets.init(artContext) }
   remember(artContext) { com.example.game.world.WorldEnvironment.init(artContext) }
   val lobbyEngine = remember { SanctuaryLobbyEngine() }
+  val depthQueue = remember { LobbyDrawQueue() }
   val textMeasurer = rememberTextMeasurer()
   val focusRequester = remember { FocusRequester() }
 
@@ -496,10 +530,7 @@ fun SanctuaryLobbyScreen(
 
       if (!lobbyEngine.isInsideInterior) with(com.example.game.pixel.LivingWorldRenderer) { drawWeather(camX,camY,zoom,false) }
       // Y-Sorted 2.5D Architecture, Trees, Furnishings, and Autonomous 3/4 Anime Heroes
-      val drawables = buildList {
-        layout.obstacles.forEach { add(LobbyDrawableItem.Prop(it)) }
-        lobbyEngine.heroActors.forEach { add(LobbyDrawableItem.HeroNpc(it)) }
-      }.sortedBy { it.sortY }
+      val drawables = depthQueue.ordered(layout.obstacles,lobbyEngine.heroActors)
 
       if (!lobbyEngine.isInsideInterior) {
         with(com.example.game.pixel.SanctuaryEnvironmentShadows) {
@@ -515,7 +546,7 @@ fun SanctuaryLobbyScreen(
             zoom = zoom,
             timeSec = animTimeSec,
             highestClearedFloor = highestClearedFloorInt,
-            renderShadow = lobbyEngine.isInsideInterior || com.example.game.pixel.SanctuaryEnvironmentShadows.sprite(item.obs) == null,
+            renderShadow = if (lobbyEngine.isInsideInterior) true else null,
           )
           is LobbyDrawableItem.Master -> {} // External Commander is observing from outside world
           is LobbyDrawableItem.HeroNpc -> {
@@ -542,19 +573,17 @@ fun SanctuaryLobbyScreen(
               isInjuredResting = a.isInjured || a.isSeatedDining,
               timeSec = animTimeSec,
               facingNorth = a.facingNorth,
+              heroName = a.name,
+              emotion = when {
+                a.isInjured -> "fear"
+                a.attackPracticeAnim > 0f || isSelected -> "alert"
+                else -> "calm"
+              },
             )
+            drawActorCanopyOcclusion(layout.obstacles,a.x,a.y,camX,camY,zoom,animTimeSec)
           }
         }
       }
-
-      // Walk-behind overhanging tree canopy pass
-      drawUpperCanopyOcclusionPass(
-        obstacles = layout.obstacles,
-        camX = camX,
-        camY = camY,
-        zoom = zoom,
-        timeSec = animTimeSec,
-      )
 
       // Foreground Southern Fortress Parapet Walls (layered above courtyard terrain & characters near rim)
       if (!lobbyEngine.isInsideInterior) {
@@ -1082,7 +1111,7 @@ fun SanctuaryLobbyScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
               ) {
-                PixelHeroPortraitAvatar(heroClass = hero.classType, sizeDp = 22.dp)
+                PixelHeroPortraitAvatar(heroName = hero.name, heroClass = hero.classType, sizeDp = 22.dp)
                 Text(
                   text = hero.name.substringBefore(" "),
                   style = MaterialTheme.typography.labelSmall,

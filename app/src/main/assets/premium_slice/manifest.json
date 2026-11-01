@@ -1,0 +1,191 @@
+{
+  "version": 2,
+  "origin": "Original ETERNAL SUMMONER art; authored polygon/cluster recipes in tools/generate_premium_slice.py; no external art",
+  "frame": [
+    64,
+    96
+  ],
+  "pivot": [
+    32,
+    90
+  ],
+  "world_pixel_scale": 1.08,
+  "directions": [
+    "front_right",
+    "front_left",
+    "back_right",
+    "back_left"
+  ],
+  "clip_order": [
+    "idle",
+    "walk",
+    "attack",
+    "skill",
+    "hit",
+    "rest",
+    "defeat",
+    "calm",
+    "alert",
+    "fear",
+    "victory"
+  ],
+  "clips": {
+    "idle": [
+      0.24,
+      0.16,
+      0.2,
+      0.24,
+      0.16,
+      0.2
+    ],
+    "walk": [
+      0.08,
+      0.07,
+      0.07,
+      0.08,
+      0.08,
+      0.07,
+      0.07,
+      0.08
+    ],
+    "attack": [
+      0.06,
+      0.06,
+      0.06,
+      0.04,
+      0.045,
+      0.055,
+      0.07,
+      0.09
+    ],
+    "skill": [
+      0.08,
+      0.08,
+      0.07,
+      0.07,
+      0.06,
+      0.07,
+      0.08,
+      0.09,
+      0.12
+    ],
+    "hit": [
+      0.045,
+      0.065,
+      0.085,
+      0.105
+    ],
+    "rest": [
+      1.0
+    ],
+    "defeat": [
+      0.09,
+      0.11,
+      0.13,
+      0.15,
+      0.2,
+      0.32
+    ],
+    "calm": [
+      0.24,
+      0.18,
+      0.2,
+      0.24,
+      0.16,
+      0.18
+    ],
+    "alert": [
+      0.16,
+      0.2,
+      0.18,
+      0.26
+    ],
+    "fear": [
+      0.12,
+      0.08,
+      0.16,
+      0.09,
+      0.18,
+      0.17
+    ],
+    "victory": [
+      0.14,
+      0.16,
+      0.22,
+      0.24,
+      0.2,
+      0.24
+    ]
+  },
+  "loop_clips": [
+    "idle",
+    "walk",
+    "calm",
+    "alert",
+    "fear",
+    "victory"
+  ],
+  "contact_seconds": {
+    "attack": 0.22,
+    "skill": 0.3
+  },
+  "contact_frames": {
+    "attack": 4,
+    "skill": 4
+  },
+  "emotion_clips": {
+    "calm": "calm",
+    "alert": "alert",
+    "fear": "fear",
+    "victory": "victory"
+  },
+  "lighting": "upper-left; left-facing poses reramp material glints after mirroring",
+  "assets": {
+    "kaelen": {
+      "file": "kaelen.png",
+      "size": [
+        4096,
+        384
+      ],
+      "sha256": "25dc3beec8b70bf17c0a946946f716d5d19c4b4c7697d04c92ffa5c4316a3256"
+    },
+    "goblin_raider": {
+      "file": "goblin_raider.png",
+      "size": [
+        4096,
+        384
+      ],
+      "sha256": "769c75f8ec227412a6716cb9f49b6bd8b7d0ef2eec8a46e802b4cc6384a4fbb1"
+    },
+    "armory": {
+      "file": "armory.png",
+      "size": [
+        190,
+        166
+      ],
+      "sha256": "3b03aac65f04d57e74e490ed9b1a7ca67ef1fe10c71101ffa010b0e3cfc954d9"
+    },
+    "smithy_verge": {
+      "file": "smithy_verge.png",
+      "size": [
+        128,
+        96
+      ],
+      "sha256": "dc5d920a5ee7fc73e128b15b5a95ebb327a6bdfce109c255d190c89d70fa9ac2"
+    }
+  },
+  "sample": {
+    "armory_anchor": [
+      995,
+      655
+    ],
+    "verge_top_left": [
+      950,
+      720
+    ],
+    "verge_world_size": [
+      256,
+      192
+    ]
+  }
+}

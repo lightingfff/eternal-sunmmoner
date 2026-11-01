@@ -619,6 +619,23 @@ class TowerCombatEngine(
     enemy.warcryCooldown = (enemy.warcryCooldown - dt).coerceAtLeast(0f)
     enemy.atkBuffTimer = (enemy.atkBuffTimer - dt).coerceAtLeast(0f)
 
+    if (enemy.archetype == EnemyArchetype.FIELD_GOBLIN_RAIDER && enemy.contactAttack.active) {
+      enemy.isMoving = false
+      if (enemy.contactAttack.advance(dt)) {
+        val targetId = enemy.contactAttack.targetId
+        if (targetId == null) {
+          if (hypot(masterX-enemy.x,masterY-enemy.y) <= enemy.archetype.attackRange+12f)
+            applyDamageToMaster(enemy.pendingAttackDamage)
+        } else {
+          val hero = heroes.firstOrNull { it.id == targetId && !it.knockedOut }
+          if (hero != null && hypot(hero.x-enemy.x,hero.y-enemy.y) <= enemy.archetype.attackRange+12f)
+            applyDamageToHero(hero,enemy.pendingAttackDamage)
+        }
+      }
+      enemy.attackAnim = enemy.contactAttack.progress
+      return
+    }
+
     data class PotentialTarget(val x: Float, val y: Float, val hero: HeroCombatUnit?)
 
     val livingHeroes = heroes.filter { !it.knockedOut }
@@ -742,6 +759,11 @@ class TowerCombatEngine(
             color = Color(enemy.archetype.accentColor),
           )
         } else {
+          if (enemy.archetype == EnemyArchetype.FIELD_GOBLIN_RAIDER) {
+            enemy.contactAttack.start(nearest.hero?.id)
+            enemy.pendingAttackDamage = effectiveAttack
+            return
+          }
           if (enemy.archetype.isBoss) {
             aoeEffects += CombatAoEEffect(enemy.x + (dx / dist) * 28f, enemy.y, 75f, Color(0xFFE11D48))
           }

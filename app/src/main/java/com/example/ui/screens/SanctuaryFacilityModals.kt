@@ -317,6 +317,18 @@ private fun SummoningHallContent(
   onToggleSquad: (HeroRecord) -> Unit,
   onOpenHeroProfile: ((HeroRecord) -> Unit)? = null,
 ) {
+  var confirmSummon by remember { mutableStateOf(false) }
+  if(confirmSummon) {
+    androidx.compose.material3.AlertDialog(
+      onDismissRequest={confirmSummon=false},
+      containerColor=FantasySkin.Panel,
+      title={Text("Xác nhận triệu hồi",color=FantasySkin.Gold)},
+      text={Text("Tiêu hao 20 Mảnh Linh Hồn và 40 Mana. Anh hùng nhận được sẽ được lưu vào đội ngũ của bạn.")},
+      confirmButton={Button(onClick={confirmSummon=false;onSummonHero()},
+        enabled=!isBusy && profile.soulShards>=20 && profile.manaCrystals>=40,
+        modifier=Modifier.testTag("confirm_summon_spend")) {Text("Triệu hồi • 20 Hồn / 40 Mana")}},
+      dismissButton={androidx.compose.material3.TextButton(onClick={confirmSummon=false},modifier=Modifier.testTag("cancel_summon_spend")) {Text("Hủy",color=RuneSilver)}})
+  }
   val infinite = rememberInfiniteTransition(label = "summonRune")
   val angle by infinite.animateFloat(
     initialValue = 0f,
@@ -387,7 +399,7 @@ private fun SummoningHallContent(
         }
 
         Button(
-          onClick = onSummonHero,
+          onClick = { confirmSummon=true },
           enabled = !isBusy && canSummon,
           modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("summon_ritual_button"),
           colors = FantasySkin.buttonColors(containerColor = ArcaneViolet, contentColor = Color.White),
@@ -450,7 +462,7 @@ private fun SummoningHallContent(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
       ) {
-        PixelHeroPortraitAvatar(heroClass = hero.classType, sizeDp = 46.dp)
+        PixelHeroPortraitAvatar(heroName = hero.name, heroClass = hero.classType, sizeDp = 46.dp)
         Column(modifier = Modifier.weight(1f)) {
           Text(
             text = "${hero.name} (${"★".repeat(hero.rarity.toInt())}) • Lv.${hero.level}",
@@ -567,7 +579,7 @@ private fun TrainingGroundContent(
           .padding(12.dp),
       ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-          PixelHeroPortraitAvatar(heroClass = hero.classType, sizeDp = 46.dp)
+          PixelHeroPortraitAvatar(heroName = hero.name, heroClass = hero.classType, sizeDp = 46.dp)
           Column(modifier = Modifier.weight(1f)) {
             Text(
               text = "${hero.name} — Lv.${hero.level}${if (inTraining) " • [Đang Tập Võ]" else ""}",
@@ -1024,7 +1036,7 @@ private fun HeroQuartersContent(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
       ) {
-        PixelHeroPortraitAvatar(heroClass = hero.classType, sizeDp = 46.dp)
+        PixelHeroPortraitAvatar(heroName = hero.name, heroClass = hero.classType, sizeDp = 46.dp)
         Column(modifier = Modifier.weight(1f)) {
           Text("${hero.name} • Sĩ khí ${hero.morale}%", style = MaterialTheme.typography.titleSmall, color = ParchmentLight)
           Text(

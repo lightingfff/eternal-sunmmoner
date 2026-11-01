@@ -10,14 +10,19 @@ object SanctuaryArtAssets {
   private var context: Context? = null
   private val images = mutableMapOf<String, ImageBitmap>()
   private val families = mutableMapOf<String, List<ImageBitmap>>()
+  internal val cachedImageCount get() = images.size
   fun init(context: Context) { this.context = context.applicationContext }
-  fun image(id: String): ImageBitmap? {
-    val app = context ?: return null
-    return images.getOrPut(id) {
-      app.assets.open("sanctuary_p03/$id.png").use {
-        BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inScaled = false })!!.asImageBitmap()
-      }
+  fun image(id: String): ImageBitmap? = asset("sanctuary_p03/$id.png")
+  internal fun textAsset(path: String): String? = context?.assets?.open(path)?.bufferedReader()?.use { it.readText() }
+  internal fun asset(path: String): ImageBitmap? {
+    if (context == null) return null
+    return images.getOrPut(path) {
+      decodeAsset(path)!!
     }
+  }
+  // Atlas source is temporary: only the extracted frames stay cached, not both copies.
+  internal fun decodeAsset(path: String): ImageBitmap? = context?.assets?.open(path)?.use {
+    BitmapFactory.decodeStream(it,null,BitmapFactory.Options().apply { inScaled = false })!!.asImageBitmap()
   }
   fun tiles(name: String, count: Int): List<ImageBitmap>? {
     if (context == null) return null

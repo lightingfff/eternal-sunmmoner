@@ -68,7 +68,7 @@ object SanctuaryWorldRenderer {
     drawDriftingSkyClouds(camX, camY, zoom, timeSec)
     val daylight = ((com.example.game.world.WorldEnvironment.lighting.ambientIntensity-.73f)/.27f).coerceIn(0f,1f)
     drawRect(com.example.game.world.WorldEnvironment.lighting.skyTint.copy(alpha=daylight*.26f))
-    drawBackgroundFloatingIslands(::sx, ::sy, zoom, timeSec)
+    with(DepthPresentation) { drawDistantFocus(camX,camY,zoom,timeSec) }
 
     // 2. Faceted Rocky Cliff Underside & Lush Green Grass Rim Beneath the 8-Sided Island Polygon
     val verts = SanctuaryIslandGeometry.POLYGON_VERTICES
@@ -146,6 +146,7 @@ object SanctuaryWorldRenderer {
       )
 
       // 3E. Monumental Central Circular White Stone Plaza, 4 Pastel Elemental Runes & Grand SE Staircase
+      with(PremiumSliceRenderer) { drawSmithyVerge(camX,camY,zoom) }
       drawCentralCircularWhitePlaza(::sx, ::sy, zoom, timeSec)
 
       // 3F. Dark Fantasy Ambient Occlusion - soft contact shadows under walls, plaza rim, gate
@@ -400,69 +401,6 @@ object SanctuaryWorldRenderer {
         drawOval(Color(0xFF34385A).copy(alpha = 0.38f), Offset(cx - 108f * s, cy - 34f * s), Size(110f * s, 52f * s))
         drawOval(Color(0xFF3D405E).copy(alpha = 0.32f), Offset(cx - 46f * s, cy - 52f * s), Size(118f * s, 64f * s))
         drawOval(Color(0xFF34385A).copy(alpha = 0.38f), Offset(cx + 28f * s, cy - 32f * s), Size(92f * s, 48f * s))
-      }
-    }
-  }
-
-  private fun DrawScope.drawBackgroundFloatingIslands(
-    sx: (Float) -> Float,
-    sy: (Float, Float) -> Float,
-    zoom: Float,
-    timeSec: Float,
-  ) {
-    data class SkyIsle(val wx: Float, val wy: Float, val rw: Float, val rh: Float, val hasPines: Boolean)
-    val isles = listOf(
-      SkyIsle(90f, 520f, 165f, 68f, hasPines = false),
-      SkyIsle(1280f, 60f, 190f, 72f, hasPines = false),
-      SkyIsle(3090f, 260f, 225f, 88f, hasPines = true),
-      SkyIsle(2660f, 150f, 85f, 38f, hasPines = false),
-      SkyIsle(140f, 2480f, 115f, 48f, hasPines = false),
-      SkyIsle(3060f, 2420f, 175f, 68f, hasPines = false),
-    )
-
-    isles.forEachIndexed { idx, isle ->
-      val bob = sin(timeSec * 0.9f + idx * 1.3f) * 8f
-      val cx = sx(isle.wx)
-      val cy = sy(isle.wy, bob)
-      val rw = isle.rw * zoom
-      val rh = isle.rh * zoom
-      if (cx + rw < -80f || cx - rw > size.width + 80f || cy + rh * 2.4f < -80f || cy - rh > size.height + 80f) return@forEachIndexed
-
-      val rock = Path().apply {
-        moveTo(cx - rw * 0.92f, cy)
-        lineTo(cx - rw * 0.55f, cy + rh * 1.35f)
-        lineTo(cx - rw * 0.08f, cy + rh * 2.15f)
-        lineTo(cx + rw * 0.48f, cy + rh * 1.45f)
-        lineTo(cx + rw * 0.92f, cy)
-        close()
-      }
-      drawPath(rock, Color(0xFF2E303A))
-      val rockShadow = Path().apply {
-        moveTo(cx - rw * 0.08f, cy + rh * 0.2f)
-        lineTo(cx - rw * 0.08f, cy + rh * 2.15f)
-        lineTo(cx + rw * 0.48f, cy + rh * 1.45f)
-        lineTo(cx + rw * 0.92f, cy)
-        close()
-      }
-      drawPath(rockShadow, Color(0xFF1E2028))
-      drawPath(rock, Color(0xFF2B2830), style = Stroke(width = (1.6f * zoom).coerceAtLeast(1f)))
-
-      drawOval(Color(0xFF243326), Offset(cx - rw, cy - rh * 0.44f), Size(rw * 2f, rh * 0.96f))
-      drawOval(Color(0xFF2F4A2E), Offset(cx - rw * 0.95f, cy - rh * 0.48f), Size(rw * 1.90f, rh * 0.82f))
-
-      if (isle.hasPines) {
-        listOf(-0.38f to -0.15f, -0.12f to -0.28f, 0.22f to -0.10f).forEach { (ox, oy) ->
-          val px = cx + rw * ox
-          val py = cy + rh * oy
-          val pine = Path().apply {
-            moveTo(px, py - 46f * zoom)
-            lineTo(px - 18f * zoom, py)
-            lineTo(px + 18f * zoom, py)
-            close()
-          }
-          drawPath(pine, Color(0xFF2A3D2E))
-          drawPath(pine, Color(0xFF1A2520), style = Stroke(width = 1.2f * zoom))
-        }
       }
     }
   }
@@ -1195,41 +1133,21 @@ object SanctuaryWorldRenderer {
   }
 
   private fun DrawScope.drawSanctuaryLocalLights(
-    sx: (Float) -> Float,
-    sy: (Float, Float) -> Float,
-    zoom: Float,
-    timeSec: Float,
+    sx:(Float)->Float,sy:(Float,Float)->Float,zoom:Float,timeSec:Float,
   ) {
-    val pulse = 0.85f + 0.15f * kotlin.math.sin(timeSec * 1.8f)
-    val flicker = 0.90f + 0.10f * kotlin.math.sin(timeSec * 3.1f + 1.7f) * kotlin.math.cos(timeSec * 2.3f)
-    with(SanctuaryDarkFantasyShaders) {
-      // Warm amber braziers — radial falloff + pixel bloom (core sharp, outer soft)
-      listOf(1490f to 2155f, 1730f to 2155f).forEach { (wx, wy) ->
-        val cx = sx(wx); val cy = sy(wy, 0f)
-        drawCircle(brush = Brush.radialGradient(listOf(Color(0xFFFFB844).copy(alpha = 0.18f * pulse * flicker), Color.Transparent), center = Offset(cx, cy), radius = 90f * zoom), radius = 90f*zoom, center = Offset(cx, cy))
-        drawPixelBloom(cx, cy, 22f*zoom, Color(0xFFFFB844), intensity=0.9f*pulse, pulse=flicker)
+    val intensity=com.example.game.world.WorldEnvironment.lighting.localLightIntensity
+    val flicker=.94f+.06f*sin(timeSec*3.1f+1.7f)
+    with(DepthPresentation) {
+      // Emissive-only bloom; world grade/weather own atmosphere. No stacked ground haze,
+      // whole-screen vignette/chasm darkening or duplicate generic landmark shadows.
+      for(i in 0..1) {
+        val wx=if(i==0) 1490f else 1730f
+        val x=sx(wx);val y=sy(2155f,0f)
+        drawLightStamp(Offset(x,y),70f*zoom,50f*zoom,DepthPresentation.LightTint.WARM_AMBER,.13f*intensity*flicker)
       }
-      // Cold rune plaza — bloom + radial
-      val pCx = sx(SanctuaryIslandGeometry.PLAZA_CENTER_X); val pCy = sy(SanctuaryIslandGeometry.PLAZA_CENTER_Y, 0f)
-      drawCircle(brush = Brush.radialGradient(listOf(Color(0xFF7DD3FC).copy(alpha = 0.12f * pulse), Color.Transparent), center = Offset(pCx, pCy), radius = 160f * zoom), radius = 160f*zoom, center = Offset(pCx, pCy))
-      drawPixelBloom(pCx, pCy, 28f*zoom, Color(0xFF7DD3FC), intensity=0.7f*pulse)
-      // Shader pipeline — vignette + 4 fog layers + chasm depth
-      drawDarkFantasyVignette()
-      drawBackgroundHaze(alpha=0.05f)
-      drawMidgroundFog(alpha=0.06f)
-      drawGroundFog(timeSec, baseY = size.height * 0.68f)
-      drawChasmDepth(center = Offset(size.width*0.5f, size.height*0.78f), radius = size.width*0.42f)
-      drawLocalMist(pCx-40f*zoom, pCy+20f*zoom, 90f*zoom, alpha=0.05f)
-      drawDistantFade(alpha=0.06f)
-      // Faint warm window lights — bloom per cottage
-      listOf(995f to 655f, 825f to 790f, 1105f to 925f).forEach { (wx, wy) ->
-        val cx = sx(wx); val cy = sy(wy, 0f)
-        drawCircle(brush = Brush.radialGradient(listOf(Color(0xFFFFC86B).copy(alpha = 0.10f), Color.Transparent), center = Offset(cx, cy - 12f*zoom), radius = 70f*zoom), radius = 70f*zoom, center = Offset(cx, cy - 12f*zoom))
-        drawPixelBloom(cx, cy-12f*zoom, 14f*zoom, Color(0xFFFFC86B), intensity=0.6f)
-      }
-      // Directional cast shadows for large landmarks — moonlight 0.35,-0.45,0.82 down-right
-      drawDirectionalCastShadow(sx(1960f), sy(635f,0f), 42f*zoom, 18f*zoom, zoom, alpha=0.26f)
-      drawDirectionalCastShadow(sx(890f), sy(1790f,0f), 52f*zoom, 20f*zoom, zoom, alpha=0.20f)
+      val x=sx(SanctuaryIslandGeometry.PLAZA_CENTER_X)
+      val y=sy(SanctuaryIslandGeometry.PLAZA_CENTER_Y,0f)
+      drawLightStamp(Offset(x,y),65f*zoom,46f*zoom,DepthPresentation.LightTint.COOL_AETHER,.08f*intensity)
     }
   }
 }

@@ -75,23 +75,16 @@ object PixelCharacterAtlas {
     buildHumanoidSheet(isMaster = true, heroClass = HeroClassType.MAGE)
   }
 
-  private val heroSheets: Map<HeroClassType, DirectionalCharacterSprites> by lazy {
-    HeroClassType.entries.associateWith { cls ->
-      buildHumanoidSheet(isMaster = false, heroClass = cls)
-    }
-  }
-
-  private val enemySheets: Map<EnemyArchetype, DirectionalCharacterSprites> by lazy {
-    EnemyArchetype.entries.associateWith { arch ->
-      buildEnemySheet(arch)
-    }
-  }
+  private val heroSheets = mutableMapOf<HeroClassType, DirectionalCharacterSprites>()
+  private val enemySheets = mutableMapOf<EnemyArchetype, DirectionalCharacterSprites>()
+  internal val builtHeroSheetCount get() = heroSheets.size
+  internal val builtEnemySheetCount get() = enemySheets.size
 
   fun heroSheet(heroClass: HeroClassType): DirectionalCharacterSprites =
-    heroSheets[heroClass] ?: masterSprites
+    heroSheets.getOrPut(heroClass) { buildHumanoidSheet(isMaster = false, heroClass = heroClass) }
 
   fun enemySheet(archetype: EnemyArchetype): DirectionalCharacterSprites =
-    enemySheets.getValue(archetype)
+    enemySheets.getOrPut(archetype) { buildEnemySheet(archetype) }
 
   private enum class Pose {
     IDLE_0,

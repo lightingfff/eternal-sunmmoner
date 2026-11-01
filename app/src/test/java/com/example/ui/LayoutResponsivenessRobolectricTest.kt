@@ -830,4 +830,20 @@ class LayoutResponsivenessRobolectricTest {
     host?.let { saveViewScreenshot(it,"build/visual_screenshots/p2/rewards_component.png") }
   }
 
+  @Test fun `summoning requires explicit spend confirmation and supports cancellation`() {
+    var calls=0
+    val state=buildRichSampleState()
+    composeTestRule.setContent { EternalSummonerTheme {
+      SanctuaryFacilityModalOverlay(facility=FacilityType.SUMMONING_HALL,state=state,onClose={},
+        onSummonHero={calls++},onTrainHero={_,_->},onEquipItem={_,_->},onSynthesizeGear={},
+        onEnhanceGear={},onRecoverHero={_,_->},onHostMeal={},onToggleSquad={})
+    } }
+    composeTestRule.onNodeWithTag("summon_ritual_button").performClick()
+    composeTestRule.onNodeWithTag("cancel_summon_spend").performClick()
+    composeTestRule.runOnIdle { assertEquals(0,calls) }
+    composeTestRule.onNodeWithTag("summon_ritual_button").performClick()
+    composeTestRule.onNodeWithTag("confirm_summon_spend").performClick()
+    composeTestRule.runOnIdle { assertEquals(1,calls) }
+  }
+
 }

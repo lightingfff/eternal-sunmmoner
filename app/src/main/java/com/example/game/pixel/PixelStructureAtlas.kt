@@ -15,7 +15,8 @@ object PixelStructureAtlas {
   val summoningHallStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildSummoningHall() }
   val heroRegistryStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildHeroRegistryHall() }
   val trainingGroundStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildTrainingGround() }
-  val armoryStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildArmory() }
+  val armoryStructure: ImageBitmap get() = SanctuaryArtAssets.asset("premium_slice/armory.png") ?: armoryFallback
+  private val armoryFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildArmory() }
   val synthesisLabStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildSynthesisLab() }
   val heroQuartersStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildHeroQuarters() }
   val restaurantStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildRestaurantExterior() }

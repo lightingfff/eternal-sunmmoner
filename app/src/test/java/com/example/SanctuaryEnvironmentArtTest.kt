@@ -80,7 +80,7 @@ class SanctuaryEnvironmentArtTest {
       CanvasDrawScope().draw(Density(1f),LayoutDirection.Ltr,Canvas(image),Size(640f,640f)) {
         drawRect(Color(0xff37483e))
         drawGroundShadows(listOf(obs),1500f,1280f,1.6f)
-        fun hero() = drawCharacterSprite(1535f,1340f,1500f,1280f,1.6f,false,HeroClassType.KNIGHT,true,false,0f,0f,1f,null,false,0f)
+        fun hero() = drawCharacterSprite(1535f,1340f,1500f,1280f,1.6f,false,HeroClassType.KNIGHT,true,false,0f,0f,1f,null,false,0f,heroName="Kaelen")
         if (!withCanopy) {
           // Diagnostic unoccluded reference; final capture below uses actual world-Y order.
           drawProp(obs,1500f,1280f,1.6f,0f,renderShadow=false)

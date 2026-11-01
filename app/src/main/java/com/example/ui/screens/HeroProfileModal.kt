@@ -267,7 +267,7 @@ fun SelectedHeroCompactCard(
           horizontalArrangement = Arrangement.spacedBy(8.dp),
           modifier = Modifier.weight(1f),
         ) {
-          PixelHeroPortraitAvatar(heroClass = hero.classType, sizeDp = 36.dp)
+          PixelHeroPortraitAvatar(heroName = hero.name, heroClass = hero.classType, sizeDp = 36.dp)
           Column(modifier = Modifier.weight(1f)) {
             Text(
               text = "${hero.name} • Lv.${hero.level} (${"★".repeat(hero.rarity.toInt().coerceIn(1, 5))})",
@@ -427,7 +427,7 @@ fun HeroFullProfileModal(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.weight(1f),
           ) {
-            PixelHeroPortraitAvatar(heroClass = hero.classType, sizeDp = if (isShort) 42.dp else 52.dp)
+            PixelHeroPortraitAvatar(heroName = hero.name, heroClass = hero.classType, sizeDp = if (isShort) 42.dp else 52.dp)
             Column(modifier = Modifier.weight(1f)) {
               Text(
                 text = "${hero.name} — ${hero.title}",

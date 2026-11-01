@@ -48,6 +48,34 @@ object AutonomousHeroAi {
     val livingEnemies = enemies.filter { !it.dead }
     val livingAllies = allHeroes.filter { !it.knockedOut }
 
+    // The sample's contact frame is also the real damage event. Keep the existing
+    // Knight skill values/cooldowns; only its delivery gains a visible windup.
+    if (hero.premiumSample && hero.contactAttack.active) {
+      if (order == TacticalOrder.RETREAT) {
+        hero.contactAttack.cancel()
+        hero.attackAnim = 0f
+      } else {
+        hero.isMoving = false
+        if (hero.contactAttack.advance(dt)) {
+          if (hero.contactAttack.skill) {
+            hero.shieldHp = (hero.shieldHp + 65 + hero.skillLevel * 12).coerceAtMost(220)
+            spawnAoE(CombatAoEEffect(hero.x,hero.y,115f,Color(0xFF38BDF8)))
+            val mult = 1.65f + hero.skillLevel * .14f
+            livingEnemies.forEach { enemy ->
+              if (hypot(enemy.x-hero.x,enemy.y-hero.y) <= 120f)
+                dealDamageToEnemy(enemy,(hero.attack*mult).toInt(),true)
+            }
+          } else {
+            val enemy = livingEnemies.firstOrNull { it.id == hero.contactAttack.targetId }
+            if (enemy != null && hypot(enemy.x-hero.x,enemy.y-hero.y) <= hero.heroClass.preferredRange+35f)
+              dealDamageToEnemy(enemy,hero.attack,false)
+          }
+        }
+        hero.attackAnim = hero.contactAttack.progress
+        return
+      }
+    }
+
     // 1. Priest Emergency Ally Heal Priority (Ally Awareness)
     if (hero.heroClass == HeroClassType.PRIEST && hero.skillCooldown <= 0f) {
       val woundedAlly = livingAllies.minByOrNull { it.hp.toFloat() / it.maxHp.toFloat() }
@@ -301,6 +329,12 @@ object AutonomousHeroAi {
         )
       )
 
+      if (hero.premiumSample) {
+        hero.contactAttack.start(target.id,skill = true)
+        hero.isMoving = false
+        return
+      }
+
       when (hero.heroClass) {
         HeroClassType.KNIGHT -> {
           // Shield Shockwave + Self Shield Barrier
@@ -372,6 +406,12 @@ object AutonomousHeroAi {
       val atkInterval = (1.15f - (hero.speed - 90f) * 0.003f).coerceIn(0.55f, 1.25f)
       hero.attackCooldown = atkInterval
       hero.attackAnim = 1f
+
+      if (hero.premiumSample) {
+        hero.contactAttack.start(target.id)
+        hero.isMoving = false
+        return
+      }
 
       when (hero.heroClass) {
         HeroClassType.ARCHER, HeroClassType.MAGE, HeroClassType.PRIEST -> {

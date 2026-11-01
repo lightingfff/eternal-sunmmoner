@@ -97,7 +97,7 @@ import com.example.game.pixel.PixelSpriteRenderer.drawCharacterSprite
 import com.example.game.pixel.PixelSpriteRenderer.drawEnemySprite
 import com.example.game.pixel.PixelSpriteRenderer.drawForegroundAtmosphere
 import com.example.game.pixel.PixelSpriteRenderer.drawProp
-import com.example.game.pixel.PixelSpriteRenderer.drawUpperCanopyOcclusionPass
+import com.example.game.pixel.PixelSpriteRenderer.drawActorCanopyOcclusion
 import com.example.game.pixel.PixelSpriteRenderer.drawWorldBackground
 import com.example.game.story.ManhwaStoryData
 import com.example.ui.SummonerUiState
@@ -451,9 +451,13 @@ fun TowerBattleScreen(
         combatEngine.enemies.filter { !it.dead || it.deathAnimProgress < 1f }.forEach { add(BattleDrawable.Enemy(it)) }
       }.sortedBy { it.sortY }
 
+      with(com.example.game.pixel.SanctuaryEnvironmentShadows) {
+        drawGroundShadows(layout.obstacles,camX,camY,zoom,clipToIsland=false,
+          groundWidth=layout.width,groundHeight=layout.height)
+      }
       drawables.forEach { item ->
         when (item) {
-          is BattleDrawable.Prop -> drawProp(item.obs, camX, camY, zoom, animTimeSec)
+          is BattleDrawable.Prop -> drawProp(item.obs, camX, camY, zoom, animTimeSec,renderShadow=null)
           is BattleDrawable.Master -> Unit // Rendered above as Ground Tactical Command Sigil
           is BattleDrawable.Hero -> {
             val h = item.unit
@@ -478,7 +482,16 @@ fun TowerBattleScreen(
               shieldOrAuraColor = aura,
               isInjuredResting = false,
               timeSec = animTimeSec,
+              heroName = h.name,
+              skillAnimation = h.premiumSample && h.contactAttack.skill,
+              emotion = when {
+                combatEngine.stage == MissionStage.VICTORY -> "victory"
+                combatEngine.activeOrder == TacticalOrder.RETREAT || h.hp < h.maxHp*.25f -> "fear"
+                h.currentTargetId != null -> "alert"
+                else -> "calm"
+              },
             )
+            drawActorCanopyOcclusion(layout.obstacles,h.x,h.y,camX,camY,zoom,animTimeSec)
           }
           is BattleDrawable.Enemy -> {
             val e = item.unit
@@ -498,19 +511,12 @@ fun TowerBattleScreen(
               timeSec = animTimeSec,
               deathAnimProgress = if (e.dead) e.deathAnimProgress else 0f,
             )
+            drawActorCanopyOcclusion(layout.obstacles,e.x,e.y,camX,camY,zoom,animTimeSec)
           }
         }
       }
 
       // Walk-behind upper forest canopy occlusion pass
-      drawUpperCanopyOcclusionPass(
-        obstacles = layout.obstacles,
-        camX = camX,
-        camY = camY,
-        zoom = zoom,
-        timeSec = animTimeSec,
-      )
-
       // 3/4 Elevated Projectiles (flying at torso height above ground shadow)
       combatEngine.projectiles.forEach { p ->
         val px = ObliqueCamera.worldToScreenX(p.x, camX, zoom, halfW)
@@ -1307,7 +1313,7 @@ private fun SquadSkillHorizontalBar(
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-          PixelHeroPortraitAvatar(heroClass = hero.heroClass, sizeDp = 30.dp)
+          PixelHeroPortraitAvatar(heroName = hero.name, heroClass = hero.heroClass, sizeDp = 30.dp)
           Column(modifier = Modifier.weight(1f)) {
             Row(
               modifier = Modifier.fillMaxWidth(),
