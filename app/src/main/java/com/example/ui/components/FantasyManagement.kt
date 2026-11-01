@@ -39,25 +39,33 @@ private val Ink=Color(0xf51b222b)
   }
 }
 @Composable fun HeroManagementDialog(heroes: List<HeroRecord>,teamMode: Boolean,busy: Boolean,
-  onClose: ()->Unit,onInspect: (HeroRecord)->Unit,onToggle: (HeroRecord)->Unit) {
+  onClose: ()->Unit,onInspect: (HeroRecord)->Unit,onToggle: (HeroRecord)->Unit,equipment: List<com.example.data.model.EquipmentRecord> = emptyList()) {
+  var query by remember { mutableStateOf("") }
+  val dialogHeight=minOf(540.dp,(androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp*.88f).dp)
   Dialog(onDismissRequest=onClose) {
-    FantasyPanel(Modifier.fillMaxWidth().heightIn(max=540.dp).testTag("hero_management_dialog")) {
-      Column(Modifier.padding(12.dp)) {
+    FantasyPanel(Modifier.fillMaxWidth().height(dialogHeight).testTag("hero_management_dialog")) {
+      Column(Modifier.fillMaxSize().padding(12.dp)) {
         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
-          Text(if(teamMode) "Đội hình • ${heroes.count { it.inActiveSquad }} đã chọn" else "Anh hùng • ${heroes.size}",color=Gold,style=MaterialTheme.typography.titleMedium)
+          Text(if(teamMode) "Đội hình • ${heroes.count { it.inActiveSquad }} đã chọn" else "Anh hùng • ${heroes.size}",modifier=Modifier.weight(1f),color=Gold,style=MaterialTheme.typography.titleMedium)
           TextButton(onClose,Modifier.testTag("close_hero_management")) {Text("Đóng",color=Gold)}
         }
         Text(if(teamMode) "Chọn anh hùng sẵn sàng, rồi vào Tháp để chuẩn bị xuất trận." else "Xem hồ sơ để luyện tập, nâng kỹ năng và quản lý trang bị.",color=Color(0xffc6cbd0),style=MaterialTheme.typography.bodySmall)
+        Row(horizontalArrangement=Arrangement.spacedBy(4.dp)) {
+          for((id,label) in listOf("" to "Tất cả","team" to "Trong đội","ready" to "Sẵn sàng")) {
+            TextButton(onClick={query=id}) { Text(label,color=if(query==id) Gold else Color(0xffaeb9c4),style=MaterialTheme.typography.labelSmall) }
+          }
+        }
         Spacer(Modifier.height(8.dp))
-        LazyColumn(verticalArrangement=Arrangement.spacedBy(8.dp)) {
-          items(heroes,key={it.id}) { hero ->
+        LazyColumn(modifier=Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(8.dp)) {
+          items(heroes.filter { query.isBlank() || (query=="team" && it.inActiveSquad) || (query=="ready" && !it.isCurrentlyInjured()) },key={it.id}) { hero ->
             FantasyPanel(Modifier.fillMaxWidth()) {
               Column(Modifier.padding(10.dp)) {
                 Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)) {
                   PixelHeroPortraitAvatar(heroClass=hero.classType,sizeDp=42.dp)
                   Column(Modifier.weight(1f)) {
                     Text("${hero.name} • Lv.${hero.level}",color=Color(0xffece5d5),maxLines=1,overflow=TextOverflow.Ellipsis)
-                    Text("${"★".repeat(hero.rarity.toInt().coerceIn(1,6))} • ${hero.classType.name}",color=Gold,style=MaterialTheme.typography.labelSmall)
+                    Text("${"★".repeat(hero.rarity.toInt().coerceIn(1,6))} • ${hero.classType.labelVi}",color=Gold,style=MaterialTheme.typography.labelSmall)
+                    Text("LC ${hero.totalAttack(equipment)*3+hero.totalDefense(equipment)*2+hero.totalMaxHp(equipment)/4} • ${if(hero.isCurrentlyInjured()) "Dưỡng thương" else if(hero.inActiveSquad) "Đang trong đội" else "Sẵn sàng"}",color=Gold,style=MaterialTheme.typography.labelSmall)
                     Text("HP ${hero.maxHp} • ATK ${hero.attack} • DEF ${hero.defense}",color=Color(0xffb7c2ce),style=MaterialTheme.typography.labelSmall)
                   }
                 }

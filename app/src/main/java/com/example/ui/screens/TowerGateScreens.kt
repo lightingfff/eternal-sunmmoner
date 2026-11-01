@@ -39,7 +39,8 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.Button
+import com.example.ui.components.FantasyButton as Button
+import com.example.ui.components.FantasySkin
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -127,7 +128,7 @@ fun FloorSelectionScreen(
       // Ornate Slim Header Bar
       Surface(
         shape = RoundedCornerShape(14.dp),
-        color = SanctuaryStone.copy(alpha = 0.94f),
+        color = FantasySkin.Panel.copy(alpha = 0.94f),
         modifier = Modifier
           .fillMaxWidth()
           .widthIn(max = 880.dp)
@@ -257,7 +258,7 @@ fun FloorSelectionScreen(
 
           Surface(
             shape = RoundedCornerShape(16.dp),
-            color = SanctuaryStone.copy(alpha = if (isUnlocked) 0.95f else 0.68f),
+            color = FantasySkin.Panel.copy(alpha = if (isUnlocked) 0.95f else 0.68f),
             modifier = Modifier
               .fillMaxWidth()
               .border(1.5.dp, borderColor, RoundedCornerShape(16.dp))
@@ -484,7 +485,7 @@ private fun FloorDetailsBody(
           .heightIn(min = 48.dp)
           .testTag("enter_floor_${floor.floorNumber}_button"),
         shape = RoundedCornerShape(10.dp),
-        colors = ButtonDefaults.buttonColors(
+        colors = FantasySkin.buttonColors(
           containerColor = if (isUnlocked) SummonerGold else BorderRune,
           contentColor = ObsidianVoid,
         ),
@@ -562,7 +563,7 @@ fun SquadPreparationScreen(
       // Compact Responsive Top Bar (Zero text wrapping on 360dp phones!)
       Surface(
         shape = RoundedCornerShape(14.dp),
-        color = SanctuaryStone.copy(alpha = 0.94f),
+        color = FantasySkin.Panel.copy(alpha = 0.94f),
         modifier = Modifier
           .fillMaxWidth()
           .widthIn(max = 920.dp)
@@ -653,7 +654,7 @@ fun SquadPreparationScreen(
         ) {
           Surface(
             shape = RoundedCornerShape(16.dp),
-            color = SanctuaryStone.copy(alpha = 0.93f),
+            color = FantasySkin.Panel.copy(alpha = 0.93f),
             modifier = Modifier
               .weight(0.38f)
               .fillMaxHeight()
@@ -722,7 +723,7 @@ fun SquadPreparationScreen(
                   .heightIn(min = 50.dp)
                   .testTag("deploy_tower_button"),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
+                colors = FantasySkin.buttonColors(
                   containerColor = SummonerGold,
                   contentColor = ObsidianVoid,
                 ),
@@ -748,7 +749,7 @@ fun SquadPreparationScreen(
         // Narrow Portrait: Stacked Briefing Card + Weighted Roster List!
         Surface(
           shape = RoundedCornerShape(14.dp),
-          color = SanctuaryStone.copy(alpha = 0.93f),
+          color = FantasySkin.Panel.copy(alpha = 0.93f),
           modifier = Modifier
             .fillMaxWidth()
             .border(1.5.dp, ArcaneViolet.copy(alpha = 0.7f), RoundedCornerShape(14.dp)),
@@ -783,7 +784,7 @@ fun SquadPreparationScreen(
                 .heightIn(min = 50.dp)
                 .testTag("deploy_tower_button"),
               shape = RoundedCornerShape(12.dp),
-              colors = ButtonDefaults.buttonColors(
+              colors = FantasySkin.buttonColors(
                 containerColor = SummonerGold,
                 contentColor = ObsidianVoid,
               ),
@@ -920,7 +921,7 @@ private fun SquadHeroRosterList(
             modifier = Modifier.heightIn(min = 48.dp),
             shape = RoundedCornerShape(10.dp),
             contentPadding = PaddingValues(horizontal = 12.dp),
-            colors = ButtonDefaults.buttonColors(
+            colors = FantasySkin.buttonColors(
               containerColor = if (selected) EmeraldVitality else SanctuaryStone,
               contentColor = if (selected) ObsidianVoid else ParchmentLight,
             ),

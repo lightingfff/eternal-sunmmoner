@@ -35,7 +35,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Bolt
-import androidx.compose.material3.Button
+import com.example.ui.components.FantasyButton as Button
+import com.example.ui.components.FantasySkin
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -655,7 +656,7 @@ fun TowerBattleScreen(
           // Left: Compact Master HP + Floor Objective Pill
           Surface(
             shape = RoundedCornerShape(12.dp),
-            color = SanctuaryStone.copy(alpha = 0.90f),
+            color = FantasySkin.Panel.copy(alpha = 0.90f),
             modifier = Modifier
               .weight(if (isWideScreen) 0.78f else 1f)
               .border(1.dp, SummonerGold.copy(alpha = 0.45f), RoundedCornerShape(12.dp)),
@@ -983,7 +984,7 @@ fun TowerBattleScreen(
       ) {
         Surface(
           shape = RoundedCornerShape(16.dp),
-          color = SanctuaryStone,
+          color = FantasySkin.Panel,
           modifier = Modifier
             .fillMaxWidth()
             .widthIn(max = 640.dp)
@@ -1039,7 +1040,7 @@ fun TowerBattleScreen(
                   }
                 },
                 modifier = Modifier.heightIn(min = 48.dp).testTag("start_combat_button"),
-                colors = ButtonDefaults.buttonColors(
+                colors = FantasySkin.buttonColors(
                   containerColor = SummonerGold,
                   contentColor = ObsidianVoid,
                 ),
@@ -1068,7 +1069,7 @@ fun TowerBattleScreen(
       ) {
         Surface(
           shape = RoundedCornerShape(16.dp),
-          color = SanctuaryStone,
+          color = FantasySkin.Panel,
           modifier = Modifier
             .fillMaxWidth()
             .widthIn(max = 420.dp)
@@ -1108,7 +1109,7 @@ fun TowerBattleScreen(
                   combatEngine.confirmTacticalRetreat()
                 },
                 modifier = Modifier.heightIn(min = 48.dp).testTag("confirm_retreat_button"),
-                colors = ButtonDefaults.buttonColors(
+                colors = FantasySkin.buttonColors(
                   containerColor = WarningAmber,
                   contentColor = ObsidianVoid,
                 ),
@@ -1142,7 +1143,7 @@ fun TowerBattleScreen(
       ) {
         Surface(
           shape = RoundedCornerShape(18.dp),
-          color = SanctuaryStone,
+          color = FantasySkin.Panel,
           modifier = Modifier
             .fillMaxWidth()
             .widthIn(max = 540.dp)
@@ -1186,6 +1187,12 @@ fun TowerBattleScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
               ) {
                 CircularProgressIndicator(color = SummonerGold, modifier = Modifier.size(22.dp))
+                if(!state.isBusyAction && state.bannerFeedback != null) {
+                  Button(onClick={
+                    if(onFinishExpeditionDetailed!=null) onFinishExpeditionDetailed(isWin,combatEngine.fallenHeroIds(),combatEngine.retreatCompleted,combatEngine.bonusDiscoveryGold,combatEngine.bonusDiscoveryMana,combatEngine.discoveredNodeIds())
+                    else onFinishExpedition(isWin,combatEngine.fallenHeroIds())
+                  },modifier=Modifier.testTag("retry_settlement_button")) { Text("Thử lưu lại") }
+                }
                 Text(
                   text = "Đang đồng bộ chiến lợi phẩm về Thánh Địa...",
                   style = MaterialTheme.typography.bodySmall,
@@ -1202,16 +1209,8 @@ fun TowerBattleScreen(
                   modifier = Modifier.padding(12.dp),
                   verticalArrangement = Arrangement.spacedBy(5.dp),
                 ) {
-                  Text(
-                    text = "+${settlement.goldEarned} Vàng • +${settlement.manaEarned} Mana • +${settlement.shardsEarned} Mảnh Hồn",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = SummonerGold,
-                  )
-                  Text(
-                    text = "+${settlement.oreEarned} Quặng Sắt • +${settlement.essenceEarned} Tinh Hoa Cổ Ngữ",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = EmeraldVitality,
-                  )
+                  com.example.ui.components.RewardSummary(settlement.goldEarned,settlement.manaEarned,settlement.shardsEarned,settlement.oreEarned,settlement.essenceEarned)
+                  Text(if(isWin) "Tiếp theo: nâng cấp đội hình và mở thử thách mới." else "Tiếp theo: hồi phục đội hình tại Khu Nghỉ Ngơi.",color=RuneSilver,style=MaterialTheme.typography.bodySmall)
                   if (settlement.discoveredNodesCount > 0) {
                     Text(
                       text = "✦ Khám phá thực địa (${settlement.discoveredNodesCount} điểm): +${settlement.bonusDiscoveryGold} Vàng • +${settlement.bonusDiscoveryMana} Mana",
@@ -1252,13 +1251,13 @@ fun TowerBattleScreen(
 
             Button(
               onClick = onReturnToSanctuary,
-              enabled = !state.isBusyAction,
+              enabled = !state.isBusyAction && settlement != null,
               modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 48.dp)
                 .testTag("return_sanctuary_button"),
               shape = RoundedCornerShape(12.dp),
-              colors = ButtonDefaults.buttonColors(
+              colors = FantasySkin.buttonColors(
                 containerColor = SummonerGold,
                 contentColor = ObsidianVoid,
               ),
@@ -1291,7 +1290,7 @@ private fun SquadSkillHorizontalBar(
       val ready = !hero.knockedOut && hero.skillCooldown <= 0.05f
       Surface(
         shape = RoundedCornerShape(10.dp),
-        color = SanctuaryStone.copy(alpha = if (hero.knockedOut) 0.55f else 0.90f),
+        color = FantasySkin.Panel.copy(alpha = if (hero.knockedOut) 0.55f else 0.90f),
         modifier = Modifier
           .width(124.dp)
           .heightIn(min = 48.dp)

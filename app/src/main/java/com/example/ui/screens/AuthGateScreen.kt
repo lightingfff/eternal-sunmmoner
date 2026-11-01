@@ -29,7 +29,8 @@ import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material3.Button
+import com.example.ui.components.FantasyButton as Button
+import com.example.ui.components.FantasySkin
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -351,7 +352,7 @@ private fun AuthSignInCard(
           .heightIn(min = 50.dp)
           .testTag("continue_as_guest_button"),
         shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(
+        colors = FantasySkin.buttonColors(
           containerColor = SummonerGold,
           contentColor = ObsidianVoid,
         ),

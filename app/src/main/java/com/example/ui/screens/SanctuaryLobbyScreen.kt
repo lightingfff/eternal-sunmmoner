@@ -54,7 +54,8 @@ import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Button
+import com.example.ui.components.FantasyButton as Button
+import com.example.ui.components.FantasySkin
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import com.example.game.lobby.HeroTaskType
@@ -62,6 +63,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -206,6 +208,7 @@ fun SanctuaryLobbyScreen(
   var activeInteriorState by remember { mutableStateOf<FacilityType?>(null) }
   val insideInterior = activeInteriorState != null
   val insideRestaurantState = activeInteriorState == FacilityType.RESTAURANT
+  var showQuickCommands by remember { mutableStateOf(false) }
   var managementMode by remember { mutableStateOf<String?>(null) }
   var promptedFacility by remember { mutableStateOf<FacilityType?>(null) }
   var inspectingHeroId by remember { mutableStateOf<String?>(null) }
@@ -858,7 +861,7 @@ fun SanctuaryLobbyScreen(
       // Bottom-Left: Free Camera Quick Control Suite
       Surface(
         shape = RoundedCornerShape(14.dp),
-        color = SanctuaryStone.copy(alpha = 0.94f),
+        color = FantasySkin.Panel.copy(alpha = 0.94f),
         border = BorderStroke(1.dp, SummonerGold.copy(alpha = 0.60f)),
         modifier = Modifier
           .align(Alignment.BottomStart)
@@ -975,7 +978,11 @@ fun SanctuaryLobbyScreen(
           )
         }
 
-        // Scrollable Quick Bar (Interior Entry/Exit + Island Expansion + Hero Roster Chips)
+        TextButton(onClick={showQuickCommands=!showQuickCommands},modifier=Modifier.testTag("quick_commands_toggle")) {
+          Text(if(showQuickCommands) "Thu gọn lệnh ▴" else "Lệnh & công trình ▾",color=RuneSilver,style=MaterialTheme.typography.labelSmall)
+        }
+        // Secondary commands stay accessible without permanently covering the world.
+        androidx.compose.animation.AnimatedVisibility(visible=showQuickCommands) {
         Row(
           modifier = Modifier.horizontalScroll(rememberScrollState()),
           horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -993,7 +1000,7 @@ fun SanctuaryLobbyScreen(
                 .testTag("exit_restaurant_interior_button"),
               contentPadding = PaddingValues(horizontal = if (isNarrowScreen) 8.dp else 10.dp),
               shape = RoundedCornerShape(10.dp),
-              colors = ButtonDefaults.buttonColors(containerColor = AmberWarning, contentColor = ObsidianVoid),
+              colors = FantasySkin.buttonColors(containerColor = AmberWarning, contentColor = ObsidianVoid),
             ) {
               Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null, modifier = Modifier.size(15.dp))
               Spacer(modifier = Modifier.width(4.dp))
@@ -1011,7 +1018,7 @@ fun SanctuaryLobbyScreen(
                 .testTag("exit_active_interior_chip"),
               contentPadding = PaddingValues(horizontal = if (isNarrowScreen) 8.dp else 10.dp),
               shape = RoundedCornerShape(10.dp),
-              colors = ButtonDefaults.buttonColors(containerColor = AmberWarning, contentColor = ObsidianVoid),
+              colors = FantasySkin.buttonColors(containerColor = AmberWarning, contentColor = ObsidianVoid),
             ) {
               Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null, modifier = Modifier.size(15.dp))
               Spacer(modifier = Modifier.width(4.dp))
@@ -1030,7 +1037,7 @@ fun SanctuaryLobbyScreen(
                 .testTag("enter_restaurant_interior_button"),
               contentPadding = PaddingValues(horizontal = if (isNarrowScreen) 8.dp else 10.dp),
               shape = RoundedCornerShape(10.dp),
-              colors = ButtonDefaults.buttonColors(containerColor = SanctuaryStone.copy(alpha = 0.94f), contentColor = SummonerGold),
+              colors = FantasySkin.buttonColors(containerColor = SanctuaryStone.copy(alpha = 0.94f), contentColor = SummonerGold),
             ) {
               Icon(Icons.Default.Restaurant, contentDescription = null, modifier = Modifier.size(15.dp))
               Spacer(modifier = Modifier.width(4.dp))
@@ -1047,7 +1054,7 @@ fun SanctuaryLobbyScreen(
                 .testTag("open_expansion_modal_button"),
               contentPadding = PaddingValues(horizontal = if (isNarrowScreen) 8.dp else 10.dp),
               shape = RoundedCornerShape(10.dp),
-              colors = ButtonDefaults.buttonColors(containerColor = SanctuaryStone.copy(alpha = 0.94f), contentColor = PortalCyan),
+              colors = FantasySkin.buttonColors(containerColor = SanctuaryStone.copy(alpha = 0.94f), contentColor = PortalCyan),
             ) {
               Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(15.dp))
               Spacer(modifier = Modifier.width(4.dp))
@@ -1087,6 +1094,8 @@ fun SanctuaryLobbyScreen(
           }
         }
 
+        }
+
         // Facility Proximity & Interaction Prompt Button
         val nearby = lobbyEngine.nearbyFacility
         Button(
@@ -1102,7 +1111,7 @@ fun SanctuaryLobbyScreen(
             .heightIn(min = 44.dp)
             .testTag("interact_facility_button"),
           shape = RoundedCornerShape(12.dp),
-          colors = ButtonDefaults.buttonColors(
+          colors = FantasySkin.buttonColors(
             containerColor = if (nearby != null || insideInterior) SummonerGold else SanctuaryStone.copy(alpha = 0.92f),
             contentColor = if (nearby != null || insideInterior) ObsidianVoid else ParchmentLight,
           ),
@@ -1118,7 +1127,7 @@ fun SanctuaryLobbyScreen(
               else -> if (nearby != null) {
                 "Vào: ${nearby.titleVi.substringAfter("• ").trim()}"
               } else {
-                "Khám Phá Cổng Tháp"
+                "Vào Tháp"
               }
             },
             style = MaterialTheme.typography.labelLarge,
@@ -1143,7 +1152,7 @@ fun SanctuaryLobbyScreen(
       },
     )
     if(managementMode!=null) com.example.ui.components.HeroManagementDialog(
-      heroes=state.heroes,teamMode=managementMode=="team",busy=state.isBusyAction,
+      heroes=state.heroes,teamMode=managementMode=="team",busy=state.isBusyAction,equipment=state.equipment,
       onClose={managementMode=null},onInspect={managementMode=null;inspectingHeroId=it.id},onToggle=onToggleSquad)
 
     // 4. Active Sanctuary Facility Modal
@@ -1370,7 +1379,7 @@ private fun SanctuaryOverviewMapOverlay(
   ) {
     Surface(
       shape = RoundedCornerShape(18.dp),
-      color = SanctuaryStone,
+      color = FantasySkin.Panel,
       modifier = Modifier
         .fillMaxSize()
         .widthIn(max = 760.dp)
@@ -1508,7 +1517,7 @@ private fun SanctuaryOverviewMapOverlay(
           Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(
               onClick = onOpenSettings,
-              colors = ButtonDefaults.buttonColors(containerColor = AstralSlate, contentColor = SummonerGold),
+              colors = FantasySkin.buttonColors(containerColor = AstralSlate, contentColor = SummonerGold),
               modifier = Modifier.testTag("pause_settings_button"),
             ) {
               Icon(Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -1517,7 +1526,7 @@ private fun SanctuaryOverviewMapOverlay(
             }
             Button(
               onClick = onSignOut,
-              colors = ButtonDefaults.buttonColors(containerColor = CrimsonDark, contentColor = ParchmentLight),
+              colors = FantasySkin.buttonColors(containerColor = CrimsonDark, contentColor = ParchmentLight),
               modifier = Modifier.testTag("pause_signout_button"),
             ) {
               Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -1528,7 +1537,7 @@ private fun SanctuaryOverviewMapOverlay(
 
           Button(
             onClick = onClose,
-            colors = ButtonDefaults.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
+            colors = FantasySkin.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
             modifier = Modifier.testTag("resume_game_button"),
           ) {
             Text("Tiếp Tục Leo Tháp ▸", fontWeight = FontWeight.Bold)
@@ -1548,7 +1557,7 @@ private fun FastTravelChip(
 ) {
   Surface(
     shape = RoundedCornerShape(8.dp),
-    color = SanctuaryStone.copy(alpha = 0.90f),
+    color = FantasySkin.Panel.copy(alpha = 0.90f),
     modifier = Modifier
       .border(1.dp, PortalCyan.copy(alpha = 0.65f), RoundedCornerShape(8.dp))
       .clickable { onFastTravel(targetX, targetY) },
@@ -1579,7 +1588,7 @@ private fun SanctuaryChronicleOverlay(
   ) {
     Surface(
       shape = RoundedCornerShape(18.dp),
-      color = SanctuaryStone,
+      color = FantasySkin.Panel,
       modifier = Modifier
         .fillMaxWidth()
         .widthIn(max = 680.dp)
@@ -1619,7 +1628,7 @@ private fun SanctuaryChronicleOverlay(
 
         Button(
           onClick = onClose,
-          colors = ButtonDefaults.buttonColors(containerColor = PortalCyan, contentColor = ObsidianVoid),
+          colors = FantasySkin.buttonColors(containerColor = PortalCyan, contentColor = ObsidianVoid),
           modifier = Modifier.align(Alignment.End),
         ) {
           Text("Đã Hiểu")
@@ -1655,7 +1664,7 @@ private fun PrologueDialogueCard(
 ) {
   Surface(
     shape = RoundedCornerShape(16.dp),
-    color = SanctuaryStone,
+    color = FantasySkin.Panel,
     modifier = modifier.border(1.5.dp, ArcaneViolet, RoundedCornerShape(16.dp)),
   ) {
     Column(modifier = Modifier.padding(16.dp)) {
@@ -1698,14 +1707,14 @@ private fun PrologueDialogueCard(
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
           Button(
             onClick = onSkip,
-            colors = ButtonDefaults.buttonColors(containerColor = EmeraldVitality.copy(alpha = 0.22f), contentColor = ParchmentLight),
+            colors = FantasySkin.buttonColors(containerColor = EmeraldVitality.copy(alpha = 0.22f), contentColor = ParchmentLight),
             modifier = Modifier.heightIn(min = 48.dp).testTag("skip_prologue_button"),
           ) {
             Text("Bỏ Qua", maxLines = 1)
           }
           Button(
             onClick = onNext,
-            colors = ButtonDefaults.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
+            colors = FantasySkin.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
             modifier = Modifier.heightIn(min = 48.dp).testTag("next_prologue_button"),
           ) {
             Text(if (prologueIndex < totalBeats - 1) "Tiếp Tục ▸" else "Bước Vào Sảnh", maxLines = 1)

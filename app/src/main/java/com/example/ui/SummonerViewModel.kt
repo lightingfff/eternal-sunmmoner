@@ -226,8 +226,8 @@ class SummonerViewModel(
   fun trainHeroWithFocus(hero: HeroRecord, focus: TrainingFocus) {
     val profile = uiState.value.profile ?: return
     if (_isBusyAction.value) return
+    _isBusyAction.value = true
     viewModelScope.launch {
-      _isBusyAction.value = true
       try {
         repository.trainHeroWithFocus(profile, hero, focus)
         _bannerFeedback.value = if (focus.isSkillUpgrade) {
@@ -246,8 +246,8 @@ class SummonerViewModel(
   fun equipItem(hero: HeroRecord, item: EquipmentRecord) {
     val state = uiState.value
     if (_isBusyAction.value) return
+    _isBusyAction.value = true
     viewModelScope.launch {
-      _isBusyAction.value = true
       try {
         repository.equipItemToHero(hero, item, state.heroes, state.equipment)
         _bannerFeedback.value = "Đã trang bị [${item.name}] cho ${hero.name}!"
@@ -262,8 +262,8 @@ class SummonerViewModel(
   fun unequipItem(hero: HeroRecord, slot: String) {
     val state = uiState.value
     if (_isBusyAction.value) return
+    _isBusyAction.value = true
     viewModelScope.launch {
-      _isBusyAction.value = true
       try {
         repository.unequipItemFromHero(hero, slot, state.equipment)
         val slotLabel = if (slot == "ARMOR") "Giáp Trụ" else "Vũ Khí"
@@ -278,8 +278,8 @@ class SummonerViewModel(
 
   fun assignHeroActivity(hero: HeroRecord, targetStatus: HeroStatusType) {
     if (_isBusyAction.value) return
+    _isBusyAction.value = true
     viewModelScope.launch {
-      _isBusyAction.value = true
       try {
         repository.assignHeroActivity(hero, targetStatus)
         val label = when (targetStatus) {
@@ -299,8 +299,8 @@ class SummonerViewModel(
   fun synthesizeNewGear() {
     val profile = uiState.value.profile ?: return
     if (_isBusyAction.value) return
+    _isBusyAction.value = true
     viewModelScope.launch {
-      _isBusyAction.value = true
       try {
         val crafted = repository.synthesizeEquipment(profile)
         _newlyForgedItem.value = crafted
@@ -316,8 +316,8 @@ class SummonerViewModel(
   fun enhanceGear(item: EquipmentRecord) {
     val profile = uiState.value.profile ?: return
     if (_isBusyAction.value) return
+    _isBusyAction.value = true
     viewModelScope.launch {
-      _isBusyAction.value = true
       try {
         repository.enhanceEquipment(profile, item)
         _bannerFeedback.value = "Đã cường hóa [${item.name}] lên +${item.level + 1}!"
@@ -332,8 +332,8 @@ class SummonerViewModel(
   fun recoverHero(hero: HeroRecord, instantWithResources: Boolean) {
     val profile = uiState.value.profile ?: return
     if (_isBusyAction.value) return
+    _isBusyAction.value = true
     viewModelScope.launch {
-      _isBusyAction.value = true
       try {
         repository.recoverInjuredHero(profile, hero, instantWithResources)
         _bannerFeedback.value = "${hero.name} đã hồi phục hoàn toàn và sẵn sàng chiến đấu!"
@@ -353,8 +353,8 @@ class SummonerViewModel(
     val state = uiState.value
     val profile = state.profile ?: return
     if (_isBusyAction.value) return
+    _isBusyAction.value = true
     viewModelScope.launch {
-      _isBusyAction.value = true
       try {
         repository.hostSanctuaryMealWithRecipe(profile, state.heroes, recipe)
         _bannerFeedback.value = "Đã phục vụ [${recipe.titleVi}]: ${recipe.subtitleVi}!"
@@ -369,8 +369,8 @@ class SummonerViewModel(
   fun unlockIslandExpansion(milestone: IslandExpansionMilestone) {
     val profile = uiState.value.profile ?: return
     if (_isBusyAction.value) return
+    _isBusyAction.value = true
     viewModelScope.launch {
-      _isBusyAction.value = true
       try {
         repository.unlockIslandExpansion(profile, milestone)
         _bannerFeedback.value = "Mở rộng Thánh Địa thành công: [${milestone.titleVi}] đã kết nối vĩnh viễn!"
@@ -395,8 +395,8 @@ class SummonerViewModel(
     if (_lastSettlement.value != null || _isBusyAction.value) return
 
     val squad = state.heroes.filter { it.inActiveSquad && !it.isCurrentlyInjured() }
+    _isBusyAction.value = true
     viewModelScope.launch {
-      _isBusyAction.value = true
       try {
         val result = repository.settleExpedition(
           profile = profile,
