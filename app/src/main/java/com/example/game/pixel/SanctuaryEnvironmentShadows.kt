@@ -7,7 +7,6 @@ import com.example.game.map.*
 /** Static alpha silhouettes projected once into world ground space, shared at every camera zoom. */
 object SanctuaryEnvironmentShadows {
   private val projection = Matrix()
-  private val bottomPadding = mutableMapOf<ImageBitmap, Int>()
   private val paths = mutableMapOf<ImageBitmap, Path>()
   private val island by lazy { Path().apply {
     SanctuaryIslandGeometry.POLYGON_VERTICES.forEachIndexed { i, p ->
@@ -56,7 +55,6 @@ object SanctuaryEnvironmentShadows {
     val bottom = (b.height - 1 downTo 0).firstOrNull { y ->
       (0 until b.width).any { x -> pixels[y*b.width+x] ushr 24 >= 128 }
     } ?: b.height - 1
-    bottomPadding[bitmap] = b.height - 1 - bottom
     Path().apply {
       for (y in 0 until b.height) {
         var x = 0
@@ -70,6 +68,19 @@ object SanctuaryEnvironmentShadows {
       }
     }
   }
+  fun DrawScope.drawCharacterShadow(bitmap: ImageBitmap, cx: Float, cy: Float, zoom: Float, pixelScale: Float) {
+    val bounds = ObliqueSpriteGeometry.bounds(bitmap)
+    val path = silhouette(bitmap)
+    projection.reset()
+    projection.values[0] = pixelScale
+    projection.values[1] = 0f
+    projection.values[4] = SanctuaryLight.SHADOW_DIR_X * pixelScale / SanctuaryLight.TAN_ELEV
+    projection.values[5] = SanctuaryLight.SHADOW_DIR_Y * pixelScale * ObliqueCamera.OBLIQUE_Y_SCALE / SanctuaryLight.TAN_ELEV
+    projection.values[12] = cx
+    projection.values[13] = cy + 6f*zoom - bounds.bottomPadding*pixelScale
+    withTransform({ transform(projection) }) { drawPath(path,Color(0x45111B26)) }
+    drawRect(Color(0x650C1720), androidx.compose.ui.geometry.Offset(cx-9f*zoom,cy-2f*zoom),androidx.compose.ui.geometry.Size(18f*zoom,4f*zoom))
+  }
   fun DrawScope.drawGroundShadows(obstacles: List<WorldObstacle>, camX: Float, camY: Float, zoom: Float) {
     withTransform({
       translate(size.width/2f-camX*zoom,size.height/2f-camY*zoom*ObliqueCamera.OBLIQUE_Y_SCALE)
@@ -78,19 +89,25 @@ object SanctuaryEnvironmentShadows {
       clipPath(island) {
         for (obs in obstacles) {
           val bitmap = sprite(obs) ?: continue
-          val height = SanctuaryShadowRegistry.heightFor(obs.propKind) * obs.scale
+          val bounds = ObliqueSpriteGeometry.bounds(bitmap)
+          val spriteScale = ObliqueSpriteGeometry.pixelScale(obs.propKind)
+          // Upright image span = vertical height + foreshortened depth of its base/crown.
+          // Derive both from the rendered scale, rather than a separate legacy height proxy.
+          val depth = if (obs.footprintDepthNorth > 0f) obs.footprintDepthNorth
+            else bitmap.width * spriteScale * (if (ObliqueSpriteGeometry.isTree(obs.propKind)) 0.5f else 0.35f)
+          val height = (bounds.visibleHeight * spriteScale - depth * ObliqueCamera.OBLIQUE_Y_SCALE).coerceAtLeast(8f) * obs.scale
           val path = silhouette(bitmap)
           val matrix = projection
           matrix.reset()
-          // x'=2*scale*x + lightX*h; y'=lightY*h. Sprite height maps to authored world height.
-          matrix.values[0] = 2f*obs.scale
+          // Project upright silhouette onto world ground; the camera then foreshortens ground Y.
+          matrix.values[0] = spriteScale*obs.scale
           matrix.values[1] = 0f
-          matrix.values[4] = SanctuaryLight.SHADOW_DIR_X * height / (bitmap.height*SanctuaryLight.TAN_ELEV)
-          matrix.values[5] = SanctuaryLight.SHADOW_DIR_Y * height / (bitmap.height*SanctuaryLight.TAN_ELEV)
+          matrix.values[4] = SanctuaryLight.SHADOW_DIR_X * height / (bounds.visibleHeight*SanctuaryLight.TAN_ELEV)
+          matrix.values[5] = SanctuaryLight.SHADOW_DIR_Y * height / (bounds.visibleHeight*SanctuaryLight.TAN_ELEV)
           matrix.values[12] = obs.x
           // Match the sprite's visible foot, including its transparent atlas padding.
-          val footOffset = if (obs.propKind == PropKind.OAK_TREE || obs.propKind == PropKind.MYSTIC_PLUM_TREE || obs.propKind == PropKind.PINE_SPIRIT_TREE) 8f else 6f
-          matrix.values[13] = obs.y + (footOffset - (bottomPadding[bitmap] ?: 0) * 2f) * obs.scale / ObliqueCamera.OBLIQUE_Y_SCALE
+          val visibleFootOffset = ObliqueSpriteGeometry.drawFootOffset(obs.propKind,bitmap) - bounds.bottomPadding * spriteScale
+          matrix.values[13] = obs.y + (visibleFootOffset * obs.scale - obs.elevationZ) / ObliqueCamera.OBLIQUE_Y_SCALE
           withTransform({ transform(matrix) }) {
             drawPath(path,Color(0xff111b26).copy(alpha=SanctuaryShadowRegistry.opacityFor(obs.propKind)))
           }
