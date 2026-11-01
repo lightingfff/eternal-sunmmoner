@@ -47,18 +47,23 @@ object SanctuaryWorldRenderer {
     fun sy(wy: Float, z: Float = 0f) = ObliqueCamera.worldToScreenY(wy, camY, zoom, halfH, z)
 
     // 1. Sunlit Anime Cerulean Sky Gradient + Clouds + Floating Sky Islands
+    // Dark Fantasy Twilight Sky - deep indigo to dusky violet, not sunny cerulean
     drawRect(
       brush = Brush.verticalGradient(
         colors = listOf(
-          Color(0xFF539CE0),
-          Color(0xFF76B9F2),
-          Color(0xFFA5D7FC),
-          Color(0xFFCBE9FE),
+          Color(0xFF0D0F1A), // zenith - near black indigo
+          Color(0xFF181B2E), // mid-upper - deep slate violet
+          Color(0xFF242742), // mid - cold dusk blue-grey
+          Color(0xFF2E314F), // horizon - muted violet haze (faint aurora)
         ),
         startY = 0f,
         endY = size.height,
       ),
     )
+    // Faint cold moon glow near top-right, subtle
+    drawOval(Color(0xFF8A9AB8).copy(alpha = 0.08f), Offset(size.width*0.78f, size.height*0.12f), Size(220f, 140f))
+    drawOval(Color(0xFFB8C8E6).copy(alpha = 0.06f), Offset(size.width*0.81f, size.height*0.13f), Size(110f, 70f))
+
 
     drawDriftingSkyClouds(camX, camY, zoom, timeSec)
     drawBackgroundFloatingIslands(::sx, ::sy, zoom, timeSec)
@@ -140,6 +145,9 @@ object SanctuaryWorldRenderer {
 
       // 3E. Monumental Central Circular White Stone Plaza, 4 Pastel Elemental Runes & Grand SE Staircase
       drawCentralCircularWhitePlaza(::sx, ::sy, zoom, timeSec)
+
+      // 3F. Dark Fantasy Ambient Occlusion - soft contact shadows under walls, plaza rim, gate
+      drawSanctuaryAmbientOcclusion(::sx, ::sy, zoom)
     }
 
     // 4. Southern Main Gate Raised Stone Courtyard, Flanking Angled Stairs & Dual Wooden Drawbridges
@@ -160,8 +168,12 @@ object SanctuaryWorldRenderer {
       )
     }
 
-    // 7. Soft Warm Diagonal Sunlight Beams Streaming from Top-Left Sky
-    drawDiagonalSunlightRays()
+    // 7. Pale Moonlight Beams & Cold Night Haze (subtle, not warm sunny)
+    drawDiagonalMoonlightRays()
+
+    // 8. Local Light Glows - warm amber from gate braziers + cold rune light on plaza
+    drawSanctuaryLocalLights(::sx, ::sy, zoom, timeSec)
+
   }
 
   /**
@@ -224,8 +236,8 @@ object SanctuaryWorldRenderer {
     val midSandLip = buildSandPath(1.012f)
     val innerSandCore = buildSandPath(0.992f)
 
-    drawPath(outerGrassRim, Color(0xFF4F963E))
-    drawPath(midSandLip, Color(0xFFC9A46B))
+    drawPath(outerGrassRim, Color(0xFF2A3D2B))
+    drawPath(midSandLip, Color(0xFF4A3D2E))
 
     val sandTiles = PixelTileAtlas.sanctuarySandTiles
     clipPath(innerSandCore) {
@@ -246,7 +258,7 @@ object SanctuaryWorldRenderer {
         }
       }
     }
-    drawPath(innerSandCore, Color(0xFFB58E54), style = Stroke(width = (2.0f * zoom).coerceAtLeast(1f)))
+    drawPath(innerSandCore, Color(0xFF4A3D2E), style = Stroke(width = (2.0f * zoom).coerceAtLeast(1f)))
   }
 
   private fun DrawScope.drawCurbedCobblestoneRoadNetwork(
@@ -299,8 +311,8 @@ object SanctuaryWorldRenderer {
     val cobbleInterior = buildRoadUnionPath(extraHalfWidthWorld = -2.0f)
 
     // Continuous smooth stone road curbs (outer shadow + sunlit limestone curb lip)
-    drawPath(curbOuterShadow, Color(0xFF616873))
-    drawPath(curbPaleLimestone, Color(0xFFDADEE6))
+    drawPath(curbOuterShadow, Color(0xFF1E2028))
+    drawPath(curbPaleLimestone, Color(0xFF3A3D4A))
 
     // Pixel-art grey cobblestone interior clipped smoothly inside the road network
     val cobbleTiles = PixelTileAtlas.sanctuaryCausewayTiles
@@ -351,10 +363,10 @@ object SanctuaryWorldRenderer {
       val cy = ObliqueCamera.worldToScreenY(wy, camY, zoom, halfH)
       val s = zoom * cScale
       if (cx in -320f..(size.width + 320f) && cy in -220f..(size.height + 220f)) {
-        drawOval(Color(0xFFC4E1FA).copy(alpha = 0.85f), Offset(cx - 120f * s, cy - 18f * s), Size(240f * s, 54f * s))
-        drawOval(Color(0xFFF4FAFF).copy(alpha = 0.94f), Offset(cx - 108f * s, cy - 34f * s), Size(110f * s, 52f * s))
-        drawOval(Color(0xFFFFFFFF).copy(alpha = 0.96f), Offset(cx - 46f * s, cy - 52f * s), Size(118f * s, 64f * s))
-        drawOval(Color(0xFFF4FAFF).copy(alpha = 0.94f), Offset(cx + 28f * s, cy - 32f * s), Size(92f * s, 48f * s))
+        drawOval(Color(0xFF2A2E4A).copy(alpha = 0.45f), Offset(cx - 120f * s, cy - 18f * s), Size(240f * s, 54f * s))
+        drawOval(Color(0xFF34385A).copy(alpha = 0.38f), Offset(cx - 108f * s, cy - 34f * s), Size(110f * s, 52f * s))
+        drawOval(Color(0xFF3D405E).copy(alpha = 0.32f), Offset(cx - 46f * s, cy - 52f * s), Size(118f * s, 64f * s))
+        drawOval(Color(0xFF34385A).copy(alpha = 0.38f), Offset(cx + 28f * s, cy - 32f * s), Size(92f * s, 48f * s))
       }
     }
   }
@@ -391,7 +403,7 @@ object SanctuaryWorldRenderer {
         lineTo(cx + rw * 0.92f, cy)
         close()
       }
-      drawPath(rock, Color(0xFF6E676E))
+      drawPath(rock, Color(0xFF2E303A))
       val rockShadow = Path().apply {
         moveTo(cx - rw * 0.08f, cy + rh * 0.2f)
         lineTo(cx - rw * 0.08f, cy + rh * 2.15f)
@@ -399,11 +411,11 @@ object SanctuaryWorldRenderer {
         lineTo(cx + rw * 0.92f, cy)
         close()
       }
-      drawPath(rockShadow, Color(0xFF534E59))
+      drawPath(rockShadow, Color(0xFF1E2028))
       drawPath(rock, Color(0xFF2B2830), style = Stroke(width = (1.6f * zoom).coerceAtLeast(1f)))
 
-      drawOval(Color(0xFF478F43), Offset(cx - rw, cy - rh * 0.44f), Size(rw * 2f, rh * 0.96f))
-      drawOval(Color(0xFF6CC258), Offset(cx - rw * 0.95f, cy - rh * 0.48f), Size(rw * 1.90f, rh * 0.82f))
+      drawOval(Color(0xFF243326), Offset(cx - rw, cy - rh * 0.44f), Size(rw * 2f, rh * 0.96f))
+      drawOval(Color(0xFF2F4A2E), Offset(cx - rw * 0.95f, cy - rh * 0.48f), Size(rw * 1.90f, rh * 0.82f))
 
       if (isle.hasPines) {
         listOf(-0.38f to -0.15f, -0.12f to -0.28f, 0.22f to -0.10f).forEach { (ox, oy) ->
@@ -415,8 +427,8 @@ object SanctuaryWorldRenderer {
             lineTo(px + 18f * zoom, py)
             close()
           }
-          drawPath(pine, Color(0xFF3E8756))
-          drawPath(pine, Color(0xFF244D36), style = Stroke(width = 1.2f * zoom))
+          drawPath(pine, Color(0xFF2A3D2E))
+          drawPath(pine, Color(0xFF1A2520), style = Stroke(width = 1.2f * zoom))
         }
       }
     }
@@ -448,7 +460,7 @@ object SanctuaryWorldRenderer {
       lineTo(sx(285f), sy(1540f, 0f) + dropMain * 0.34f)
       close()
     }
-    drawPath(leftCliff, Color(0xFF7B6756))
+    drawPath(leftCliff, Color(0xFF2E303A))
 
     val centerChasm = Path().apply {
       moveTo(sx(1360f), sy(2370f, 0f))
@@ -458,7 +470,7 @@ object SanctuaryWorldRenderer {
       lineTo(sx(1300f), sy(2370f, 0f) + dropMain * 0.84f)
       close()
     }
-    drawPath(centerChasm, Color(0xFF3E3A46))
+    drawPath(centerChasm, Color(0xFF13131A))
 
     val rightCliff = Path().apply {
       moveTo(sx(1780f), sy(2380f, 0f))
@@ -472,7 +484,7 @@ object SanctuaryWorldRenderer {
       lineTo(sx(1880f), sy(2380f, 0f) + dropMain * 1.00f)
       close()
     }
-    drawPath(rightCliff, Color(0xFF5D5048))
+    drawPath(rightCliff, Color(0xFF262830))
 
     for (cxWorld in listOf(560f to 2040f, 880f to 2340f, 1160f to 2370f, 2060f to 2370f, 2360f to 2330f, 2660f to 2040f)) {
       val rx = sx(cxWorld.first)
@@ -484,7 +496,7 @@ object SanctuaryWorldRenderer {
         lineTo(rx - 22f * zoom, ry + 132f * zoom)
         close()
       }
-      drawPath(crag, if (cxWorld.first < 1600f) Color(0xFF8C7764) else Color(0xFF473D38))
+      drawPath(crag, if (cxWorld.first < 1600f) Color(0xFF3A3F4A) else Color(0xFF2B2E38))
     }
 
     drawPath(leftCliff, Color(0xFF28211F), style = Stroke(width = (2.2f * zoom).coerceAtLeast(1.2f)))
@@ -524,9 +536,9 @@ object SanctuaryWorldRenderer {
     rimShadowPath.close()
     rimBrightPath.close()
 
-    drawPath(rimShadowPath, Color(0xFF3E8234))
-    drawPath(rimBrightPath, Color(0xFF69BD4F))
-    drawPath(rimBrightPath, Color(0xFF264D22), style = Stroke(width = (2.0f * zoom).coerceAtLeast(1f)))
+    drawPath(rimShadowPath, Color(0xFF1B2A20))
+    drawPath(rimBrightPath, Color(0xFF2F4A2E))
+    drawPath(rimBrightPath, Color(0xFF1A2520), style = Stroke(width = (2.0f * zoom).coerceAtLeast(1f)))
   }
 
   private fun DrawScope.drawResidentialGardenCourtyards(
@@ -535,8 +547,8 @@ object SanctuaryWorldRenderer {
     zoom: Float,
   ) {
     // 1. Warm Ochre Garden Soil Paths in the Residential Hedge Courtyard (x: 935..1255, y: 985..1285)
-    val dirtColor = Color(0xFFD4B282)
-    val dirtBorder = Color(0xFFA68458)
+    val dirtColor = Color(0xFF3A352E)
+    val dirtBorder = Color(0xFF2A2620)
     val p1Left = sx(935f)
     val p1Top = sy(985f, 0f)
     val p1W = sx(1255f) - p1Left
@@ -548,7 +560,7 @@ object SanctuaryWorldRenderer {
     fun drawLawnBed(x0: Float, y0: Float, x1: Float, y1: Float) {
       val l = sx(x0)
       val t = sy(y0, 0f)
-      drawRect(Color(0xFF69BD4F), Offset(l, t), Size(sx(x1) - l, sy(y1, 0f) - t))
+      drawRect(Color(0xFF2F3D33), Offset(l, t), Size(sx(x1) - l, sy(y1, 0f) - t))
     }
     drawLawnBed(955f, 995f, 1085f, 1115f)
     drawLawnBed(1115f, 1135f, 1245f, 1270f)
@@ -562,9 +574,9 @@ object SanctuaryWorldRenderer {
       val b = sy(y1, 0f)
       val w = (r - l).coerceAtLeast(4f * zoom)
       val h = (b - t).coerceAtLeast(6f * zoom)
-      drawRect(Color(0xFF245924), Offset(l, t + h * 0.45f), Size(w, h * 0.55f))
-      drawRect(Color(0xFF5CB847), Offset(l, t), Size(w, h * 0.65f))
-      drawRect(Color(0xFF86D968), Offset(l + 2f * zoom, t + 1f * zoom), Size((w - 4f * zoom).coerceAtLeast(1f), h * 0.25f))
+      drawRect(Color(0xFF1A2520), Offset(l, t + h * 0.45f), Size(w, h * 0.55f))
+      drawRect(Color(0xFF2F4A2E), Offset(l, t), Size(w, h * 0.65f))
+      drawRect(Color(0xFF3D5A36), Offset(l + 2f * zoom, t + 1f * zoom), Size((w - 4f * zoom).coerceAtLeast(1f), h * 0.25f))
       drawRect(Color(0xFF193D19), Offset(l, t), Size(w, h), style = Stroke(width = (1.3f * zoom).coerceAtLeast(1f)))
     }
     drawHedgeStrip(1125f, 1145f, 1238f, 1168f)
@@ -582,8 +594,8 @@ object SanctuaryWorldRenderer {
       val b = sy(y1, 0f)
       val w = (r - l).coerceAtLeast(4f * zoom)
       val h = (b - t).coerceAtLeast(5f * zoom)
-      drawRect(Color(0xFF9C9588), Offset(l, t + h * 0.45f), Size(w, h * 0.55f))
-      drawRect(Color(0xFFDFD9CC), Offset(l, t), Size(w, h * 0.50f))
+      drawRect(Color(0xFF3A3F4A), Offset(l, t + h * 0.45f), Size(w, h * 0.55f))
+      drawRect(Color(0xFF4E525E), Offset(l, t), Size(w, h * 0.50f))
       drawRect(Color(0xFF3A3530), Offset(l, t), Size(w, h), style = Stroke(width = (1.2f * zoom).coerceAtLeast(1f)))
     }
     drawLowGardenWall(675f, 1280f, 915f, 1292f)
@@ -605,16 +617,16 @@ object SanctuaryWorldRenderer {
     if (cx + rx < -60f || cx - rx > size.width + 60f || cy + ry < -60f || cy - ry > size.height + 60f) return
 
     // 1. Stepped Outer Limestone Curb & Drop Shadow
-    drawOval(Color(0xFF8C867B), Offset(cx - rx * 1.02f, cy - ry * 1.01f + 6f * zoom), Size(rx * 2.04f, ry * 2.02f))
-    drawOval(Color(0xFFDDD8CE), Offset(cx - rx * 1.01f, cy - ry * 1.01f), Size(rx * 2.02f, ry * 2.02f))
-    drawOval(Color(0xFFF3F0EA), Offset(cx - rx * 0.96f, cy - ry * 0.96f), Size(rx * 1.92f, ry * 1.92f))
+    drawOval(Color(0xFF1E2028), Offset(cx - rx * 1.02f, cy - ry * 1.01f + 6f * zoom), Size(rx * 2.04f, ry * 2.02f))
+    drawOval(Color(0xFF3A3D4A), Offset(cx - rx * 1.01f, cy - ry * 1.01f), Size(rx * 2.02f, ry * 2.02f))
+    drawOval(Color(0xFF4A4D5E), Offset(cx - rx * 0.96f, cy - ry * 0.96f), Size(rx * 1.92f, ry * 1.92f))
 
     // 2. Concentric Carved Alabaster Rings
     val ringFractions = listOf(1.01f, 0.95f, 0.72f, 0.62f, 0.44f, 0.34f, 0.22f)
-    drawOval(Color(0xFFEAE6DE), Offset(cx - rx * 0.72f, cy - ry * 0.72f), Size(rx * 1.44f, ry * 1.44f))
-    drawOval(Color(0xFFF5F3EE), Offset(cx - rx * 0.62f, cy - ry * 0.62f), Size(rx * 1.24f, ry * 1.24f))
-    drawOval(Color(0xFFE8E4DC), Offset(cx - rx * 0.34f, cy - ry * 0.34f), Size(rx * 0.68f, ry * 0.68f))
-    drawOval(Color(0xFFF7F5F0), Offset(cx - rx * 0.22f, cy - ry * 0.22f), Size(rx * 0.44f, ry * 0.44f))
+    drawOval(Color(0xFF2E3142), Offset(cx - rx * 0.72f, cy - ry * 0.72f), Size(rx * 1.44f, ry * 1.44f))
+    drawOval(Color(0xFF3A3D4A), Offset(cx - rx * 0.62f, cy - ry * 0.62f), Size(rx * 1.24f, ry * 1.24f))
+    drawOval(Color(0xFF353845), Offset(cx - rx * 0.34f, cy - ry * 0.34f), Size(rx * 0.68f, ry * 0.68f))
+    drawOval(Color(0xFF40445A), Offset(cx - rx * 0.22f, cy - ry * 0.22f), Size(rx * 0.44f, ry * 0.44f))
 
     // Radial Stone Joints (16 divisions across outer & mid bands)
     for (i in 0 until 16) {
@@ -622,7 +634,7 @@ object SanctuaryWorldRenderer {
       val cA = cos(ang).toFloat()
       val sA = sin(ang).toFloat()
       drawLine(
-        color = Color(0xFFC2BDB2),
+        color = Color(0xFF2A2D3A),
         start = Offset(cx + cA * rx * 0.22f, cy + sA * ry * 0.22f),
         end = Offset(cx + cA * rx * 0.95f, cy + sA * ry * 0.95f),
         strokeWidth = (1.3f * zoom).coerceAtLeast(0.8f),
@@ -631,7 +643,7 @@ object SanctuaryWorldRenderer {
 
     ringFractions.forEachIndexed { idx, frac ->
       drawOval(
-        color = if (idx == 0) Color(0xFF57534C) else Color(0xFFAFA99E),
+        color = if (idx == 0) Color(0xFF1E2028) else Color(0xFF3A3D4A),
         topLeft = Offset(cx - rx * frac, cy - ry * frac),
         size = Size(rx * frac * 2f, ry * frac * 2f),
         style = Stroke(width = (if (idx <= 1) 2.2f else 1.5f) * zoom),
@@ -713,7 +725,7 @@ object SanctuaryWorldRenderer {
         lineTo(sx(lx1), sy(ly1, 0f))
         close()
       }
-      drawPath(stepPath, if (s % 2 == 0) Color(0xFFEDE9E0) else Color(0xFFC9C3B6))
+      drawPath(stepPath, if (s % 2 == 0) Color(0xFF4A4D5E) else Color(0xFF3A3D4A))
       drawLine(Color(0xFF757065), Offset(sx(lx1), sy(ly1, 0f)), Offset(sx(rx1), sy(ry1, 0f)), strokeWidth = (1.5f * zoom).coerceAtLeast(0.9f))
     }
     // Sloped stone cheek balustrades flanking the grand plaza-to-amphitheatre steps
@@ -735,10 +747,10 @@ object SanctuaryWorldRenderer {
     val platH = (platB - platT).coerceAtLeast(2f)
 
     // Front vertical ashlar stone cliff-wall under the gatehouse deck
-    drawRect(Color(0xFF7D776C), Offset(platL, platB), Size(platW, 42f * zoom))
+    drawRect(Color(0xFF2E3038), Offset(platL, platB), Size(platW, 42f * zoom))
     drawRect(Color(0xFF45413B), Offset(platL, platB), Size(platW, 42f * zoom), style = Stroke(width = 1.6f * zoom))
-    drawRect(Color(0xFFDAD5CA), Offset(platL, platT), Size(platW, platH))
-    drawRect(Color(0xFF45413B), Offset(platL, platT), Size(platW, platH), style = Stroke(width = 2f * zoom))
+    drawRect(Color(0xFF3A3D4A), Offset(platL, platT), Size(platW, platH))
+    drawRect(Color(0xFF1A1C24), Offset(platL, platT), Size(platW, platH), style = Stroke(width = 2f * zoom))
 
     // Stone slab grid lines on gate platform
     for (gx in 1430..1790 step 60) {
@@ -775,7 +787,7 @@ object SanctuaryWorldRenderer {
     for (s in 0..5) {
       val stepY = sy(2175f + s * 6.5f, 0f)
       drawLine(
-        color = if (s % 2 == 0) Color(0xFFE6E1D6) else Color(0xFF8C867B),
+        color = if (s % 2 == 0) Color(0xFF4A4E5E) else Color(0xFF343845),
         start = Offset(sx(1530f), stepY),
         end = Offset(sx(1690f), stepY),
         strokeWidth = 3f * zoom,
@@ -787,7 +799,7 @@ object SanctuaryWorldRenderer {
       val bx = sx(pxWorld)
       val by = sy(2215f, 0f)
       drawRect(Color(0xFF57534E), Offset(bx - 18f * zoom, by - 26f * zoom), Size(36f * zoom, 32f * zoom))
-      drawRect(Color(0xFF8A847C), Offset(bx - 14f * zoom, by - 30f * zoom), Size(28f * zoom, 10f * zoom))
+      drawRect(Color(0xFF343845), Offset(bx - 14f * zoom, by - 30f * zoom), Size(28f * zoom, 10f * zoom))
       drawRect(Color(0xFF262320), Offset(bx - 18f * zoom, by - 26f * zoom), Size(36f * zoom, 32f * zoom), style = Stroke(width = 1.5f * zoom))
     }
 
@@ -800,8 +812,8 @@ object SanctuaryWorldRenderer {
       val bw = (br - bl).coerceAtLeast(4f)
       val bh = (bb - bt).coerceAtLeast(4f)
 
-      drawRect(Color(0xFF4A2E1B), Offset(bl - 3f * zoom, bt), Size(bw + 6f * zoom, bh + 5f * zoom))
-      drawRect(Color(0xFFB8804C), Offset(bl, bt), Size(bw, bh))
+      drawRect(Color(0xFF1E1A16), Offset(bl - 3f * zoom, bt), Size(bw + 6f * zoom, bh + 5f * zoom))
+      drawRect(Color(0xFF4A3A2E), Offset(bl, bt), Size(bw, bh))
       var py = bt + 7f * zoom
       while (py < bb) {
         drawLine(Color(0xFF6E4528), Offset(bl, py), Offset(br, py), strokeWidth = (1.5f * zoom).coerceAtLeast(1f))
@@ -862,7 +874,7 @@ object SanctuaryWorldRenderer {
     // Inner stone vertical face visible toward the island interior
     val innerLeft = if (isWestSide) cx + walkHalfW else cx - walkHalfW - innerFaceW
     drawRect(
-      color = if (isWestSide) Color(0xFFB5AA94) else Color(0xFF9E937E),
+      color = if (isWestSide) Color(0xFF4A4E5E) else Color(0xFF3E424D),
       topLeft = Offset(innerLeft, top0Y),
       size = Size(innerFaceW, (base1Y - top0Y).coerceAtLeast(4f)),
     )
@@ -875,7 +887,7 @@ object SanctuaryWorldRenderer {
 
     // Sunlit stone top rampart walkway
     drawRect(
-      color = Color(0xFFE6DEC9),
+      color = Color(0xFF4A4E5E),
       topLeft = Offset(cx - walkHalfW, top0Y),
       size = Size(walkHalfW * 2f, (top1Y - top0Y).coerceAtLeast(4f)),
     )
@@ -914,7 +926,7 @@ object SanctuaryWorldRenderer {
       lineTo(base0X, base0Y + cliffRetainingDrop)
       close()
     }
-    drawPath(extFace, if (x0 < 1600f) Color(0xFFA89D89) else Color(0xFF8F8573))
+    drawPath(extFace, if (x0 < 1600f) Color(0xFF3A3F4A) else Color(0xFF323540))
 
     for (c in 1..4) {
       val f = c / 5f
@@ -939,7 +951,7 @@ object SanctuaryWorldRenderer {
       lineTo(base0X, top0Y)
       close()
     }
-    drawPath(walkwayPath, Color(0xFFE6DEC9))
+    drawPath(walkwayPath, Color(0xFF3E424D))
     drawPath(walkwayPath, Color(0xFF2B2520), style = Stroke(width = (1.6f * zoom).coerceAtLeast(1f)))
 
     // 3. Crenellated Battlement Merlons
@@ -960,7 +972,7 @@ object SanctuaryWorldRenderer {
         lineTo(mx0, my0 + 1f)
         close()
       }
-      drawPath(merlon, Color(0xFFEDE5D2))
+      drawPath(merlon, Color(0xFF4A4E5E))
       drawPath(merlon, Color(0xFF2B2520), style = Stroke(width = (1.3f * zoom).coerceAtLeast(0.8f)))
     }
   }
@@ -992,7 +1004,7 @@ object SanctuaryWorldRenderer {
       lineTo(base0X, base0Y)
       close()
     }
-    drawPath(facePath, Color(0xFFC2B7A1))
+    drawPath(facePath, Color(0xFF3A3F4A))
 
     // Recessed architectural wall panels & horizontal ashlar courses
     for (c in 1..4) {
@@ -1021,7 +1033,7 @@ object SanctuaryWorldRenderer {
       lineTo(base0X, top0Y)
       close()
     }
-    drawPath(walkwayPath, Color(0xFFEAE2CE))
+    drawPath(walkwayPath, Color(0xFF444A5A))
     drawPath(facePath, Color(0xFF2B2520), style = Stroke(width = (1.8f * zoom).coerceAtLeast(1f)))
     drawPath(walkwayPath, Color(0xFF2B2520), style = Stroke(width = (1.8f * zoom).coerceAtLeast(1f)))
 
@@ -1043,7 +1055,7 @@ object SanctuaryWorldRenderer {
         lineTo(mx0, my0 + 1f)
         close()
       }
-      drawPath(merlon, Color(0xFFF0E8D6))
+      drawPath(merlon, Color(0xFF52566A))
       drawPath(merlon, Color(0xFF2B2520), style = Stroke(width = (1.3f * zoom).coerceAtLeast(0.8f)))
     }
 
@@ -1068,7 +1080,7 @@ object SanctuaryWorldRenderer {
     }
   }
 
-  private fun DrawScope.drawDiagonalSunlightRays() {
+  private fun DrawScope.drawDiagonalMoonlightRays() {
     withTransform({
       rotate(degrees = -34f, pivot = Offset(0f, 0f))
     }) {
@@ -1082,8 +1094,8 @@ object SanctuaryWorldRenderer {
         drawRect(
           brush = Brush.verticalGradient(
             colors = listOf(
-              Color(0x30FFFDF0),
-              Color(0x16FEF9C3),
+              Color(0x1A8A9AB8),
+              Color(0x0E5A6A9A),
               Color.Transparent,
             ),
             startY = 0f,
@@ -1093,6 +1105,70 @@ object SanctuaryWorldRenderer {
           size = Size(widthPx, size.height * 1.45f),
         )
       }
+    }
+  }
+
+  private fun DrawScope.drawSanctuaryAmbientOcclusion(
+    sx: (Float) -> Float,
+    sy: (Float, Float) -> Float,
+    zoom: Float,
+  ) {
+    // AO under northern fortress wall (long dark strip)
+    val nL = sx(980f)
+    val nR = sx(2240f)
+    val nT = sy(340f, 0f)
+    // elongated AO shadow under wall base
+    drawRect(Color(0xFF0A0C14).copy(alpha = 0.22f), Offset(nL, nT + 8f*zoom), Size(nR-nL, 18f*zoom))
+    // AO around plaza outer rim (dark ring on grass)
+    val pCx = sx(SanctuaryIslandGeometry.PLAZA_CENTER_X)
+    val pCy = sy(SanctuaryIslandGeometry.PLAZA_CENTER_Y, 0f)
+    val rx = SanctuaryIslandGeometry.PLAZA_RADIUS * zoom
+    val ry = rx * ObliqueCamera.OBLIQUE_Y_SCALE
+    // soft AO oval just outside plaza
+    drawOval(Color(0xFF0A0C14).copy(alpha = 0.18f), Offset(pCx - rx*1.04f, pCy - ry*1.04f), Size(rx*2.08f, ry*2.08f))
+    drawOval(Color.Transparent, Offset(pCx - rx*0.98f, pCy - ry*0.98f), Size(rx*1.96f, ry*1.96f))
+    // AO under southern gate platform
+    val gL = sx(1380f); val gR = sx(1840f); val gB = sy(2390f, 0f)
+    drawOval(Color(0xFF0A0C14).copy(alpha = 0.20f), Offset(gL - 10f*zoom, gB - 6f*zoom), Size((gR-gL)+20f*zoom, 22f*zoom))
+  }
+
+  private fun DrawScope.drawSanctuaryLocalLights(
+    sx: (Float) -> Float,
+    sy: (Float, Float) -> Float,
+    zoom: Float,
+    timeSec: Float,
+  ) {
+    val pulse = 0.85f + 0.15f * kotlin.math.sin(timeSec * 1.8f)
+    // Warm amber glows from southern gate braziers (near drawbridges)
+    listOf(1490f to 2155f, 1730f to 2155f).forEach { (wx, wy) ->
+      val cx = sx(wx); val cy = sy(wy, 0f)
+      drawCircle(
+        brush = Brush.radialGradient(
+          colors = listOf(Color(0xFFFFB844).copy(alpha = 0.18f * pulse), Color.Transparent),
+          center = Offset(cx, cy), radius = 90f * zoom
+        ), radius = 90f*zoom, center = Offset(cx, cy)
+      )
+    }
+    // Cold blue rune light from plaza center spilling onto nearby stones
+    val pCx = sx(SanctuaryIslandGeometry.PLAZA_CENTER_X)
+    val pCy = sy(SanctuaryIslandGeometry.PLAZA_CENTER_Y, 0f)
+    drawCircle(
+      brush = Brush.radialGradient(
+        colors = listOf(Color(0xFF7DD3FC).copy(alpha = 0.12f * pulse), Color.Transparent),
+        center = Offset(pCx, pCy), radius = 160f * zoom
+      ), radius = 160f*zoom, center = Offset(pCx, pCy)
+    )
+    // Use shader pipeline for contact shadows (verified integrated)
+    with(SanctuaryDarkFantasyShaders) { drawDarkFantasyVignette() }
+    // Faint warm window lights from cottage cluster (west residential)
+    listOf(995f to 655f, 825f to 790f, 1105f to 925f).forEach { (wx, wy) ->
+      val cx = sx(wx); val cy = sy(wy, 0f)
+      drawCircle(
+        brush = Brush.radialGradient(
+          colors = listOf(Color(0xFFFFC86B).copy(alpha = 0.10f), Color.Transparent),
+          center = Offset(cx, cy - 12f*zoom), radius = 70f*zoom
+        ), radius = 70f*zoom, center = Offset(cx, cy - 12f*zoom)
+      )
     }
   }
 }

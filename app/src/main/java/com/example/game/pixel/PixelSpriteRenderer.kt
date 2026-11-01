@@ -184,7 +184,7 @@ object PixelSpriteRenderer {
       if (wallBaseY > 0f) {
         val skyBrush = when (biome) {
           BiomeTheme.SANCTUARY_ASTRAL -> Brush.verticalGradient(
-            listOf(Color(0xFF09222D), Color(0xFF133F4E), Color(0xFF1E586A)),
+            listOf(Color(0xFF080C16), Color(0xFF101828), Color(0xFF1A1E33)),
             startY = vistaTop,
             endY = wallBaseY,
           )
@@ -519,17 +519,17 @@ object PixelSpriteRenderer {
     halfH: Float,
     alpha: Float = 0.52f,
   ) {
-    // Layer 1: Softer directional sunlight shadow cast down-right (+14% X, +8% Y)
+    // Layer 1: Directional moonlight shadow cast down-right (cold, sharp, longer)
     drawOval(
-      color = Color.Black.copy(alpha = (alpha * 0.54f).coerceIn(0f, 0.55f)),
-      topLeft = Offset(cx - halfW * 0.84f, footY - halfH * 0.72f),
-      size = Size(halfW * 2.18f, halfH * 1.88f),
+      color = Color(0xFF0A0C14).copy(alpha = (alpha * 0.58f).coerceIn(0f, 0.45f)),
+      topLeft = Offset(cx - halfW * 0.68f + 8f, footY - halfH * 0.60f + 6f),
+      size = Size(halfW * 2.35f, halfH * 1.65f),
     )
-    // Layer 2: Compact grounding contact occlusion directly beneath object base
+    // Layer 2: Contact AO directly beneath object (dense, small)
     drawOval(
-      color = Color.Black.copy(alpha = (alpha * 0.88f).coerceIn(0f, 0.72f)),
-      topLeft = Offset(cx - halfW * 0.90f, footY - halfH * 0.88f),
-      size = Size(halfW * 1.80f, halfH * 1.48f),
+      color = Color.Black.copy(alpha = (alpha * 0.90f).coerceIn(0f, 0.65f)),
+      topLeft = Offset(cx - halfW * 0.88f, footY - halfH * 0.85f),
+      size = Size(halfW * 1.75f, halfH * 1.35f),
     )
   }
 
@@ -1217,17 +1217,17 @@ object PixelSpriteRenderer {
   ) {
     if (biome == BiomeTheme.SANCTUARY_ASTRAL) {
       if (!particlesEnabled) return
-      // Gentle Sunlit Sakura Blossom Petals & Golden Daylight Motes drifting across the Sanctuary
-      val petalCount = 22
+      // Dark Fantasy: faint embers, cold mist motes & rare falling ash - sparse, desaturated
+      val petalCount = 14
       for (i in 0 until petalCount) {
         val seed = i * 43.3f
-        val px = ((seed * 31.7f + timeSec * (22f + (i % 4) * 6f)) % size.width.coerceAtLeast(1f))
-        val py = ((seed * 19.3f + timeSec * (14f + (i % 3) * 5f) + sin(timeSec * 1.8f + i) * 16f) % size.height.coerceAtLeast(1f))
-        val alpha = (0.48f + 0.36f * abs(sin(timeSec * 1.9f + i))).coerceIn(0.25f, 0.88f)
+        val px = ((seed * 31.7f + timeSec * (14f + (i % 3) * 4f)) % size.width.coerceAtLeast(1f))
+        val py = ((seed * 19.3f + timeSec * (9f + (i % 3) * 3f) + sin(timeSec * 1.2f + i) * 10f) % size.height.coerceAtLeast(1f))
+        val alpha = (0.18f + 0.16f * abs(sin(timeSec * 1.4f + i))).coerceIn(0.08f, 0.35f)
         val col = when (i % 3) {
-          0 -> Color(0xFFFBCFE8) // Soft sakura pink
-          1 -> Color(0xFFFFF1F2) // Blossom white
-          else -> Color(0xFFFEF9C3) // Warm sunlit mote
+          0 -> Color(0xFF8A7A97) // dusky ash-lavender
+          1 -> Color(0xFF6B7A8A) // cold mist blue-grey
+          else -> Color(0xFF9A6B3A) // faint ember amber very muted
         }
         drawOval(
           color = col.copy(alpha = alpha),
