@@ -1,0 +1,310 @@
+{
+  "entities": {
+    "MasterProfile": {
+      "title": "MasterProfile",
+      "description": "Stores the Summoner Master's Sanctuary progression, resources, unlocked facilities, and highest cleared Tower floor.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the owning Master."
+        },
+        "masterName": {
+          "type": "string",
+          "description": "Display title/name of the Summoner Master (no PII)."
+        },
+        "masterLevel": {
+          "type": "integer",
+          "description": "Current Master rank/level (1..100)."
+        },
+        "masterExp": {
+          "type": "integer",
+          "description": "Accumulated Master experience points."
+        },
+        "gold": {
+          "type": "integer",
+          "description": "Sanctuary Gold currency earned from Tower floors."
+        },
+        "manaCrystals": {
+          "type": "integer",
+          "description": "Arcane Mana Crystals used for Summoning rituals and skill upgrades."
+        },
+        "soulShards": {
+          "type": "integer",
+          "description": "Soul Shards earned from Tower missions for hero summoning and synthesis."
+        },
+        "rations": {
+          "type": "integer",
+          "description": "Sanctuary rations used in Restaurant and Hero Quarters recovery."
+        },
+        "ironOre": {
+          "type": "integer",
+          "description": "Forging material used in Synthesis Lab and Armory."
+        },
+        "arcaneEssence": {
+          "type": "integer",
+          "description": "Magical catalyst used in Synthesis Lab and Training Ground."
+        },
+        "highestClearedFloor": {
+          "type": "integer",
+          "description": "Highest Tower floor cleared by this Master."
+        },
+        "totalExpeditions": {
+          "type": "integer",
+          "description": "Total number of Tower expeditions attempted."
+        },
+        "unlockedFacilities": {
+          "type": "string",
+          "description": "Bounded list (<= 10) of unlocked Sanctuary facility keys."
+        },
+        "storyFlags": {
+          "type": "string",
+          "description": "Bounded list (<= 20) of seen manhwa story cutscene identifiers."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp. Clients must submit FieldValue.serverTimestamp()."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp. Clients must submit FieldValue.serverTimestamp()."
+        }
+      },
+      "required": [
+        "userId",
+        "masterName",
+        "masterLevel",
+        "masterExp",
+        "gold",
+        "manaCrystals",
+        "soulShards",
+        "rations",
+        "ironOre",
+        "arcaneEssence",
+        "highestClearedFloor",
+        "totalExpeditions",
+        "unlockedFacilities",
+        "storyFlags",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "HeroRecord": {
+      "title": "HeroRecord",
+      "description": "Individual autonomous Hero belonging to a Master inside the Sanctuary.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the owning Master."
+        },
+        "name": {
+          "type": "string",
+          "description": "Hero name."
+        },
+        "title": {
+          "type": "string",
+          "description": "Hero epithet/title."
+        },
+        "heroClass": {
+          "type": "string",
+          "enum": ["KNIGHT", "ARCHER", "MAGE", "ASSASSIN", "PRIEST", "BERSERKER"],
+          "description": "Combat role class."
+        },
+        "rarity": {
+          "type": "integer",
+          "description": "Star grade (1..5)."
+        },
+        "level": {
+          "type": "integer",
+          "description": "Hero combat level (1..100)."
+        },
+        "exp": {
+          "type": "integer",
+          "description": "Current experience points."
+        },
+        "maxHp": {
+          "type": "integer",
+          "description": "Base maximum health."
+        },
+        "attack": {
+          "type": "integer",
+          "description": "Base attack power."
+        },
+        "defense": {
+          "type": "integer",
+          "description": "Base defense stat."
+        },
+        "speed": {
+          "type": "integer",
+          "description": "Base movement and action speed."
+        },
+        "skillLevel": {
+          "type": "integer",
+          "description": "Signature active skill rank (1..20)."
+        },
+        "personality": {
+          "type": "string",
+          "enum": ["STOIC", "RECKLESS", "CALCULATING", "DEVOTED", "CYNICAL", "LOYAL"],
+          "description": "Personality archetype driving Lobby routines, barks, and AI traits."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["READY", "INJURED", "RESTING", "TRAINING"],
+          "description": "Current physical and Sanctuary status."
+        },
+        "injuryRecoveryUntilEpochSec": {
+          "type": "integer",
+          "description": "Epoch seconds until injury recovery finishes (0 when healthy)."
+        },
+        "morale": {
+          "type": "integer",
+          "description": "Current morale/stamina (0..100)."
+        },
+        "equippedWeaponId": {
+          "type": "string",
+          "description": "Equipped weapon document ID (empty string if none)."
+        },
+        "equippedArmorId": {
+          "type": "string",
+          "description": "Equipped armor document ID (empty string if none)."
+        },
+        "inActiveSquad": {
+          "type": "boolean",
+          "description": "Whether hero is assigned to the active Tower expedition squad."
+        },
+        "bondSummary": {
+          "type": "string",
+          "description": "Relationship note with fellow Sanctuary heroes."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp via FieldValue.serverTimestamp()."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp via FieldValue.serverTimestamp()."
+        }
+      },
+      "required": [
+        "userId",
+        "name",
+        "title",
+        "heroClass",
+        "rarity",
+        "level",
+        "exp",
+        "maxHp",
+        "attack",
+        "defense",
+        "speed",
+        "skillLevel",
+        "personality",
+        "status",
+        "injuryRecoveryUntilEpochSec",
+        "morale",
+        "equippedWeaponId",
+        "equippedArmorId",
+        "inActiveSquad",
+        "bondSummary",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "EquipmentRecord": {
+      "title": "EquipmentRecord",
+      "description": "Weapon or Armor forged or looted by the Master and managed in the Armory.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the owning Master."
+        },
+        "name": {
+          "type": "string",
+          "description": "Equipment item name."
+        },
+        "slot": {
+          "type": "string",
+          "enum": ["WEAPON", "ARMOR"],
+          "description": "Equipment slot category."
+        },
+        "rarity": {
+          "type": "integer",
+          "description": "Item star tier (1..5)."
+        },
+        "level": {
+          "type": "integer",
+          "description": "Enhancement level (1..50)."
+        },
+        "bonusHp": {
+          "type": "integer",
+          "description": "Bonus HP granted when equipped."
+        },
+        "bonusAttack": {
+          "type": "integer",
+          "description": "Bonus Attack granted when equipped."
+        },
+        "bonusDefense": {
+          "type": "integer",
+          "description": "Bonus Defense granted when equipped."
+        },
+        "bonusSpeed": {
+          "type": "integer",
+          "description": "Bonus Speed granted when equipped."
+        },
+        "iconType": {
+          "type": "string",
+          "description": "Visual pixel-art sprite identifier."
+        },
+        "equippedByHeroId": {
+          "type": "string",
+          "description": "Hero ID currently equipping this item (empty string if unequipped)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp via FieldValue.serverTimestamp()."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp via FieldValue.serverTimestamp()."
+        }
+      },
+      "required": [
+        "userId",
+        "name",
+        "slot",
+        "rarity",
+        "level",
+        "bonusHp",
+        "bonusAttack",
+        "bonusDefense",
+        "bonusSpeed",
+        "iconType",
+        "equippedByHeroId",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/MasterProfile" },
+      "description": "Per-user Summoner Master profile and Sanctuary resource state."
+    },
+    "/users/{userId}/heroes/{heroId}": {
+      "schema": { "$ref": "#/entities/HeroRecord" },
+      "description": "Per-user subcollection of summoned autonomous Heroes."
+    },
+    "/users/{userId}/equipment/{itemId}": {
+      "schema": { "$ref": "#/entities/EquipmentRecord" },
+      "description": "Per-user subcollection of Armory weapons and armor."
+    }
+  }
+}

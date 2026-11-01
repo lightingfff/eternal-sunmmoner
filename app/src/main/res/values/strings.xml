@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Eternal Summoner</string>
+    <string name="sign_in_google">Sign in with Google • Đồng Bộ Đám Mây</string>
+    <string name="continue_as_guest">Continue as Guest • Chơi Ngay (Khách)</string>
+    <string name="auth_subtitle">Bước vào Thánh Địa Dị Giới • Dẫn dắt đội quân Anh hùng chinh phục Tòa Tháp Vĩnh Hằng</string>
+    <string name="sanctuary_title">THE SANCTUARY</string>
+    <string name="restaurant_interior_title">NHÀ ĂN THÁNH ĐỊA</string>
+    <string name="interact_facility">Tương tác</string>
+    <string name="enter_tower_gate">Cổng Tháp</string>
+    <string name="deploy_squad">Xuất Chinh Vào Tháp</string>
+    <string name="return_to_sanctuary">Trở Về Thánh Địa</string>
+    <string name="settings_and_account">Cài đặt &amp; Tài khoản</string>
+</resources>

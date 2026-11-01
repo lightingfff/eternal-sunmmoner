@@ -1,0 +1,274 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Default-Deny Catch-All
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 2. Hardened Primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function parentUserReady(userId) {
+      return exists(/databases/$(database)/documents/users/$(userId)) ||
+             existsAfter(/databases/$(database)/documents/users/$(userId));
+    }
+
+    // 3. Entity Validation Blueprints
+    function isValidMasterProfile(data) {
+      return isSignedIn() &&
+             data.keys().hasAll([
+               'userId', 'masterName', 'masterLevel', 'masterExp',
+               'gold', 'manaCrystals', 'soulShards', 'rations',
+               'ironOre', 'arcaneEssence', 'highestClearedFloor',
+               'totalExpeditions', 'unlockedFacilities', 'storyFlags',
+               'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'masterName', 'masterLevel', 'masterExp',
+               'gold', 'manaCrystals', 'soulShards', 'rations',
+               'ironOre', 'arcaneEssence', 'highestClearedFloor',
+               'totalExpeditions', 'unlockedFacilities', 'storyFlags',
+               'createdAt', 'updatedAt'
+             ]) &&
+             data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.userId == request.auth.uid &&
+             data.masterName is string && data.masterName.size() >= 1 && data.masterName.size() <= 40 &&
+             data.masterLevel is int && data.masterLevel >= 1 && data.masterLevel <= 100 &&
+             data.masterExp is int && data.masterExp >= 0 && data.masterExp <= 10000000 &&
+             data.gold is int && data.gold >= 0 && data.gold <= 99999999 &&
+             data.manaCrystals is int && data.manaCrystals >= 0 && data.manaCrystals <= 9999999 &&
+             data.soulShards is int && data.soulShards >= 0 && data.soulShards <= 9999999 &&
+             data.rations is int && data.rations >= 0 && data.rations <= 99999 &&
+             data.ironOre is int && data.ironOre >= 0 && data.ironOre <= 99999 &&
+             data.arcaneEssence is int && data.arcaneEssence >= 0 && data.arcaneEssence <= 99999 &&
+             data.highestClearedFloor is int && data.highestClearedFloor >= 0 && data.highestClearedFloor <= 100 &&
+             data.totalExpeditions is int && data.totalExpeditions >= 0 && data.totalExpeditions <= 999999 &&
+             data.unlockedFacilities is list && data.unlockedFacilities.size() <= 10 &&
+             (data.unlockedFacilities.size() == 0 || (data.unlockedFacilities[0] is string && data.unlockedFacilities[0].size() <= 40)) &&
+             data.storyFlags is list && data.storyFlags.size() <= 20 &&
+             (data.storyFlags.size() == 0 || (data.storyFlags[0] is string && data.storyFlags[0].size() <= 50)) &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidHeroRecord(data) {
+      return isSignedIn() &&
+             data.keys().hasAll([
+               'userId', 'name', 'title', 'heroClass', 'rarity',
+               'level', 'exp', 'maxHp', 'attack', 'defense', 'speed',
+               'skillLevel', 'personality', 'status',
+               'injuryRecoveryUntilEpochSec', 'morale',
+               'equippedWeaponId', 'equippedArmorId', 'inActiveSquad',
+               'bondSummary', 'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'name', 'title', 'heroClass', 'rarity',
+               'level', 'exp', 'maxHp', 'attack', 'defense', 'speed',
+               'skillLevel', 'personality', 'status',
+               'injuryRecoveryUntilEpochSec', 'morale',
+               'equippedWeaponId', 'equippedArmorId', 'inActiveSquad',
+               'bondSummary', 'createdAt', 'updatedAt'
+             ]) &&
+             data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.userId == request.auth.uid &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 50 &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 80 &&
+             data.heroClass is string && data.heroClass.size() <= 20 &&
+             data.heroClass in ['KNIGHT', 'ARCHER', 'MAGE', 'ASSASSIN', 'PRIEST', 'BERSERKER'] &&
+             data.rarity is int && data.rarity >= 1 && data.rarity <= 5 &&
+             data.level is int && data.level >= 1 && data.level <= 100 &&
+             data.exp is int && data.exp >= 0 && data.exp <= 10000000 &&
+             data.maxHp is int && data.maxHp >= 50 && data.maxHp <= 100000 &&
+             data.attack is int && data.attack >= 5 && data.attack <= 50000 &&
+             data.defense is int && data.defense >= 0 && data.defense <= 50000 &&
+             data.speed is int && data.speed >= 20 && data.speed <= 500 &&
+             data.skillLevel is int && data.skillLevel >= 1 && data.skillLevel <= 20 &&
+             data.personality is string && data.personality.size() <= 20 &&
+             data.personality in ['STOIC', 'RECKLESS', 'CALCULATING', 'DEVOTED', 'CYNICAL', 'LOYAL'] &&
+             data.status is string && data.status.size() <= 20 &&
+             data.status in ['READY', 'INJURED', 'RESTING', 'TRAINING'] &&
+             data.injuryRecoveryUntilEpochSec is int &&
+             data.injuryRecoveryUntilEpochSec >= 0 && data.injuryRecoveryUntilEpochSec <= 4102444800 &&
+             data.morale is int && data.morale >= 0 && data.morale <= 100 &&
+             data.equippedWeaponId is string && data.equippedWeaponId.size() <= 128 &&
+             data.equippedArmorId is string && data.equippedArmorId.size() <= 128 &&
+             data.inActiveSquad is bool &&
+             data.bondSummary is string && data.bondSummary.size() <= 200 &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidEquipmentRecord(data) {
+      return isSignedIn() &&
+             data.keys().hasAll([
+               'userId', 'name', 'slot', 'rarity', 'level',
+               'bonusHp', 'bonusAttack', 'bonusDefense', 'bonusSpeed',
+               'iconType', 'equippedByHeroId', 'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'name', 'slot', 'rarity', 'level',
+               'bonusHp', 'bonusAttack', 'bonusDefense', 'bonusSpeed',
+               'iconType', 'equippedByHeroId', 'createdAt', 'updatedAt'
+             ]) &&
+             data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.userId == request.auth.uid &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 60 &&
+             data.slot is string && data.slot.size() <= 16 &&
+             data.slot in ['WEAPON', 'ARMOR'] &&
+             data.rarity is int && data.rarity >= 1 && data.rarity <= 5 &&
+             data.level is int && data.level >= 1 && data.level <= 50 &&
+             data.bonusHp is int && data.bonusHp >= 0 && data.bonusHp <= 50000 &&
+             data.bonusAttack is int && data.bonusAttack >= 0 && data.bonusAttack <= 10000 &&
+             data.bonusDefense is int && data.bonusDefense >= 0 && data.bonusDefense <= 10000 &&
+             data.bonusSpeed is int && data.bonusSpeed >= 0 && data.bonusSpeed <= 200 &&
+             data.iconType is string && data.iconType.size() >= 1 && data.iconType.size() <= 40 &&
+             data.equippedByHeroId is string && data.equippedByHeroId.size() <= 128 &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    // 4. Collection Security Rules
+    match /users/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+      allow list: if false;
+
+      allow create: if isValidMasterProfile(incoming()) &&
+                       isValidId(userId) &&
+                       request.auth.uid == userId;
+
+      allow update: if isValidMasterProfile(incoming()) &&
+                       isValidId(userId) &&
+                       request.auth.uid == userId &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt && (
+                         // Action: SanctuaryProgressionOrResourceSync
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'masterName', 'masterLevel', 'masterExp',
+                           'gold', 'manaCrystals', 'soulShards', 'rations',
+                           'ironOre', 'arcaneEssence', 'highestClearedFloor',
+                           'totalExpeditions', 'unlockedFacilities', 'storyFlags',
+                           'updatedAt'
+                         ])
+                       );
+
+      allow delete: if false;
+
+      match /heroes/{heroId} {
+        allow get: if isSignedIn() &&
+                      isValidId(userId) &&
+                      isValidId(heroId) &&
+                      request.auth.uid == userId &&
+                      existing().userId == request.auth.uid;
+
+        allow list: if isSignedIn() &&
+                       request.auth.uid == userId &&
+                       existing().userId == request.auth.uid;
+
+        allow create: if isValidHeroRecord(incoming()) &&
+                         isValidId(userId) &&
+                         isValidId(heroId) &&
+                         request.auth.uid == userId &&
+                         parentUserReady(userId);
+
+        allow update: if isValidHeroRecord(incoming()) &&
+                         isValidId(userId) &&
+                         isValidId(heroId) &&
+                         request.auth.uid == userId &&
+                         incoming().userId == existing().userId &&
+                         incoming().name == existing().name &&
+                         incoming().title == existing().title &&
+                         incoming().heroClass == existing().heroClass &&
+                         incoming().rarity == existing().rarity &&
+                         incoming().personality == existing().personality &&
+                         incoming().createdAt == existing().createdAt && (
+                           // Action 1: Training & Combat Progression
+                           incoming().diff(existing()).affectedKeys().hasOnly([
+                             'level', 'exp', 'maxHp', 'attack', 'defense',
+                             'speed', 'skillLevel', 'morale', 'bondSummary',
+                             'updatedAt'
+                           ]) ||
+                           // Action 2: Squad, Equipment, & Sanctuary Status
+                           incoming().diff(existing()).affectedKeys().hasOnly([
+                             'status', 'injuryRecoveryUntilEpochSec', 'morale',
+                             'inActiveSquad', 'equippedWeaponId', 'equippedArmorId',
+                             'updatedAt'
+                           ]) ||
+                           // Action 3: Post-Expedition Combined Settlement
+                           incoming().diff(existing()).affectedKeys().hasOnly([
+                             'level', 'exp', 'maxHp', 'attack', 'defense',
+                             'speed', 'skillLevel', 'status',
+                             'injuryRecoveryUntilEpochSec', 'morale',
+                             'equippedWeaponId', 'equippedArmorId',
+                             'inActiveSquad', 'bondSummary', 'updatedAt'
+                           ])
+                         );
+
+        allow delete: if isSignedIn() &&
+                         isValidId(userId) &&
+                         isValidId(heroId) &&
+                         request.auth.uid == userId &&
+                         existing().userId == request.auth.uid;
+      }
+
+      match /equipment/{itemId} {
+        allow get: if isSignedIn() &&
+                      isValidId(userId) &&
+                      isValidId(itemId) &&
+                      request.auth.uid == userId &&
+                      existing().userId == request.auth.uid;
+
+        allow list: if isSignedIn() &&
+                       request.auth.uid == userId &&
+                       existing().userId == request.auth.uid;
+
+        allow create: if isValidEquipmentRecord(incoming()) &&
+                         isValidId(userId) &&
+                         isValidId(itemId) &&
+                         request.auth.uid == userId &&
+                         parentUserReady(userId);
+
+        allow update: if isValidEquipmentRecord(incoming()) &&
+                         isValidId(userId) &&
+                         isValidId(itemId) &&
+                         request.auth.uid == userId &&
+                         incoming().userId == existing().userId &&
+                         incoming().slot == existing().slot &&
+                         incoming().iconType == existing().iconType &&
+                         incoming().createdAt == existing().createdAt && (
+                           // Action 1: Equip or Unequip
+                           incoming().diff(existing()).affectedKeys().hasOnly([
+                             'equippedByHeroId', 'updatedAt'
+                           ]) ||
+                           // Action 2: Synthesis Enhancement
+                           incoming().diff(existing()).affectedKeys().hasOnly([
+                             'name', 'rarity', 'level', 'bonusHp',
+                             'bonusAttack', 'bonusDefense', 'bonusSpeed',
+                             'equippedByHeroId', 'updatedAt'
+                           ])
+                         );
+
+        allow delete: if isSignedIn() &&
+                         isValidId(userId) &&
+                         isValidId(itemId) &&
+                         request.auth.uid == userId &&
+                         existing().userId == request.auth.uid;
+      }
+    }
+  }
+}

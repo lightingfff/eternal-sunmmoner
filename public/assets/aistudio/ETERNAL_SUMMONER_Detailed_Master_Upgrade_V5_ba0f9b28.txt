@@ -1,0 +1,378 @@
+ETERNAL SUMMONER
+MASTER EVOLUTION DIRECTIVE — DETAILED IMPLEMENTATION EDITION
+For Google AI Studio — Existing Android Game Project
+Version 5.0
+
+PURPOSE
+This is the full implementation brief for upgrading the existing ETERNAL SUMMONER game. It is deliberately written as a detailed production instruction, not as a short checklist or a concept proposal. Read the entire brief before changing code. The objective is to make the current game substantially more beautiful, more interactive, deeper to play, and closer in spirit to the manhwa-inspired experience already established by the project.
+
+The game already has a Sanctuary map whose overall composition is finally close to the desired reference. The current map is the foundation. Do not throw it away. The work must improve the existing game, not replace it with a new mock-up, a static illustration, or a different generic fantasy town.
+
+============================================================
+PART 1 — PROJECT AUDIT, SAFETY, AND NON-NEGOTIABLE RULES
+============================================================
+
+You are modifying the existing ETERNAL SUMMONER Android project in this workspace. Before implementation, inspect the actual source tree, app entry point, rendering engine, scene/map data, camera controls, hero entities, combat logic, save system, UI components, navigation, and build configuration. Determine what is genuinely implemented and what is only a visual placeholder. Do not infer functionality from labels or from a previous AI-generated completion report.
+
+Preserve the existing project structure wherever practical. Extend working systems instead of creating parallel systems with duplicate state. Do not create a second Sanctuary screen, a second hero database, a second save manager, or a second Tower flow if one already exists. If an existing component is broken, repair it in place where safe.
+
+The current Sanctuary map is approved as the base layout. Preserve its recognizable island shape, outer defensive wall, central circular plaza, surrounding buildings, connected stone paths, garden spaces, training grounds, portal/gate, and the relative positions that make the map recognizable. Improve the quality and functionality of these places without randomly rearranging them. The current map should remain recognizable after the upgrade.
+
+Do not replace the whole map with a single flat image. Do not make the scene a non-interactive screenshot. The environment must be composed of separate, addressable, layered game objects: ground, paths, walls, buildings, roofs, trees, flowers, props, water, characters, effects, and interaction points. These objects must retain collision, interaction, animation, depth ordering, and camera behavior.
+
+Do not delete or reset the player's existing heroes, levels, resources, equipment, missions, unlocked facilities, or saved progress. Add a safe migration path if the data model needs new fields. When a new field is introduced, assign a sensible default to old saves. Never replace a valid save with an empty default save simply because a new field is missing.
+
+Do not report a feature as complete merely because a class, data model, button, placeholder screen, or plan exists. A feature is complete only when it can be reached and used in the running game, produces a visible result, saves correctly when appropriate, and does not break existing features. If a feature cannot be completed in the current implementation pass, state exactly what is unfinished and why.
+
+The target is a real Android game that can be played on a touchscreen. Prioritize reliable implementation over impressive but fake claims. Keep the game responsive on mid-range Android devices.
+
+============================================================
+PART 2 — GAME IDENTITY AND MANHWA-INSPIRED DESIGN
+============================================================
+
+ETERNAL SUMMONER is a hero-management, base-development, and multi-floor tower-expedition RPG inspired by the broad premise and atmosphere of the manhwa Pick Me Up, Infinite Gacha. Use the reference to understand the intended fantasy: a Master manages summoned heroes, a living headquarters supports their daily lives and preparation, and a dangerous Tower presents successive floors with different environments, missions, enemies, and risks.
+
+The most important design principle is that the player is not simply controlling one adventurer walking through a fantasy village. The player acts as the external Master and strategic commander. The heroes are independent characters living in the Sanctuary and undertaking expeditions. The player observes them, selects them, assigns tasks, prepares parties, and gives tactical commands.
+
+Keep the work original. Create original character designs, names, dialogue, story events, maps, icons, sprites, and visual assets. Do not reproduce exact manhwa panels, exact dialogue, or copyrighted character artwork. Follow the broad gameplay structure and visual atmosphere, not copied assets.
+
+The desired experience should feel like a polished anime-inspired pixel-art RPG with a coherent world, readable systems, meaningful decisions, and a strong sense that the Sanctuary is a place where heroes actually live. The game should not feel like a collection of unrelated menus.
+
+============================================================
+PART 3 — THE CORE GAMEPLAY LOOP
+============================================================
+
+The main loop must connect the Sanctuary, hero management, preparation, Tower expeditions, rewards, recovery, and long-term expansion.
+
+A normal play session should work as follows. The player opens the Sanctuary and immediately sees heroes moving around or performing activities. The player taps a hero to inspect their identity, class, level, current activity, condition, equipment, and needs. The player may send that hero to train, rest, eat, craft, socialize, or join an expedition party. The player then visits the Tower Gate, reviews the next available floor and mission conditions, forms a party, checks equipment and roles, chooses tactical behavior, and begins the expedition. During the expedition, heroes fight autonomously while the player issues meaningful tactical orders. After success or retreat, the heroes return to the Sanctuary with rewards, injuries, fatigue, and progression updates. The player uses the rewards to improve heroes and facilities, unlock new island sections, and prepare for more difficult floors.
+
+Every part of this loop must affect another part. Training should improve expedition performance. Better equipment should change visible stats and combat effectiveness. The infirmary should shorten recovery. The dining hall should restore a relevant need or provide a temporary preparation bonus. Facility upgrades should unlock useful functions, not only change a level number. Tower rewards should provide materials that have a clear use in the Sanctuary.
+
+Avoid systems that exist only as decorative buttons. Every major facility and menu should have a practical gameplay purpose.
+
+============================================================
+PART 4 — SANCTUARY: KEEP THE MAP, MAKE IT FEEL ALIVE
+============================================================
+
+The Sanctuary is the player's headquarters and the central hub of the game. Preserve the current map composition and make the same spaces more convincing, detailed, and useful. It should feel like a functioning settlement or dimensional headquarters inspired by the reference, rather than an empty board with buildings placed on it.
+
+The central circular plaza is the visual and navigational heart of the Sanctuary. Preserve its circular geometry and make its surface read as carefully constructed stonework. Add subtle concentric engraved lines, small inlaid symbols, seams between stone slabs, edge bevels, gentle wear, and restrained magical accents. Its center may show a softly animated energy pattern or a subtle light pulse. The effect must remain tasteful and must not obscure the floor or characters. Heroes should be able to walk around the plaza, gather near it, and use it as a meeting point.
+
+The Tower Gate or dimensional portal must be visually important and immediately recognizable. Give it layered stone or metal construction, a recessed portal surface, animated energy, subtle particles, and light cast onto nearby ground. It must not be a flat blue rectangle. The gate should have a real interaction area. Tapping it opens the Tower interface with floor progression, mission details, party setup, and expedition launch. The gate's appearance should evolve as the player advances, but it must remain consistent with the current map.
+
+The surrounding paths must connect facilities in a logical way. Replace disconnected or visually broken road tiles with a coherent road network. The road surface should have individual stone slabs or cobbles, subtle color variation, edge transitions into grass, small cracks, occasional moss, and readable borders. The path must remain navigable and must not be covered by decorative objects that block heroes.
+
+The garden areas should be lush but organized. Distribute trees, shrubs, flowers, small rocks, benches, lanterns, and planted borders around the Dorms, Training Hall, and Central Plaza paths. Avoid placing vegetation randomly or covering important entrances. Use several plant sizes and silhouettes. A large sakura tree should have a distinct trunk, branching structure, layered blossom clusters, and a readable shadow. Smaller flower beds should use multiple flower shapes and foliage rather than repeating one identical stamp. Add a few wind or leaf animations, but keep them subtle and inexpensive to render.
+
+The training grounds should look actively used. Preserve the existing training area and improve it with target dummies, weapon racks, practice markers, sparring circles, training equipment, and visible heroes performing drills. Training objects must be placed with enough room for characters to move. Tapping the training area should open the training interface, where the player can assign heroes and select a training focus.
+
+The Dorms should communicate that heroes live there. Add a visible entrance, windows with warm interior light at appropriate times, a small outdoor sitting area, planted edges, and a readable building silhouette. The Dorms interaction should open the dormitory interface and allow the player to inspect residents, assign rooms if the system supports it, and view rest or recovery status.
+
+The Dining Hall should be more than a label on the map. It should have a clear entrance and a warm, inviting appearance. Heroes should occasionally enter, sit, eat, and leave. Tapping it should open the dining interface and show available meals, resource costs, and the effect of eating. If a full food crafting system does not yet exist, implement a small functional meal selection system rather than a fake shop screen.
+
+The Summoning Hall, Armory, Synthesis Chamber, Workshop, Hero Registry, and other already-present facilities should each have a distinct silhouette and visual identity. Their interaction points must open relevant screens. Do not make every building open the same generic panel.
+
+============================================================
+PART 5 — ENTERABLE BUILDINGS AND FULL INTERIORS
+============================================================
+
+A major priority is allowing the player to enter important buildings and see actual interiors. This is essential to making the Sanctuary feel like a real place rather than a decorative map.
+
+When the player taps a building, show a contextual interaction prompt near the selected building or in a clean fixed UI panel. The prompt should identify the facility and provide a clear Enter action. Do not require the Master to walk to the door. The Master remains an external commander. The player can enter a facility through a tap or interaction button.
+
+Entering a building should transition smoothly into a dedicated interior scene or interior view. Do not simply place a dark overlay over the outdoor map. The interior must be a separate playable space with its own floor, walls, furniture, props, lighting, characters, and interaction points. A short fade or camera transition is sufficient. Provide a clear Back/Exit control that returns to the exact previous outdoor camera position and selection state.
+
+Use a consistent interior art direction: the same pixel density, palette, outline quality, lighting direction, and 3/4 perspective as the outdoor Sanctuary. Interior rooms must not look like flat UI diagrams. They should have visible floor depth, wall thickness, corners, furniture volume, shadows, windows, doors, and layered objects.
+
+Dormitory interior: show a warm communal living space with beds or sleeping areas, storage, small tables, chairs, personal belongings, wall decorations, lamps, and individual hero details. Heroes assigned to rest should appear in the room or in an appropriate resting state. Tapping a hero inside the Dorms should open their profile. The room should show who is resting, who is recovering, and whether a room or bed is available. If the project has a recovery system, connect it to this room rather than inventing a disconnected duplicate.
+
+Dining Hall interior: create a believable dining room with a serving counter, kitchen or preparation area, tables, chairs, shelves, food props, warm lamps, and visible dining heroes. A hero assigned to eat should enter, approach an available seat, sit for a short period, and leave. The dining interface should allow the player to select a meal or ration if resources permit. Eating should restore a clearly defined need, morale, or preparation benefit. Show the cost before confirmation.
+
+Training Hall interior: create an indoor training space with practice targets, weapon stands, floor markings, sparring space, and training equipment. Heroes assigned to indoor training should perform a simple training animation loop. The player can choose a training category such as strength, agility, weapon skill, magic control, or defense, depending on the game's existing stats. Each category must affect a relevant stat or progression value. Show training duration or progress clearly.
+
+Armory interior: show weapon racks, armor stands, equipment tables, storage chests, and a blacksmith/workbench area. The player can inspect equipment, equip or unequip items, compare stat changes, and see which hero currently uses each item. Make the selected hero and item clearly identifiable. Avoid allowing the same unique item to be equipped by multiple heroes.
+
+Synthesis Chamber interior: show a magical workbench or synthesis device, ingredients/material slots, a result preview, and a clear crafting or synthesis action. The player should be able to see required materials before confirming. If the system supports recipes, display known recipes and locked recipes. A failed or unavailable synthesis must explain why; never silently consume materials.
+
+Summoning Hall interior: create a ceremonial but functional space with a summoning platform, magical circles, pillars, and controlled ambient light. The interface should show the game's existing recruitment/summoning rules and available resources. Do not introduce real-money gambling mechanics, deceptive odds, or paid loot-box systems. Keep recruitment within the fictional in-game progression and clearly display any resource cost.
+
+Hero Registry interior: show a library/archive or command gallery with records, portraits, class information, and party organization. Allow the player to inspect all owned heroes, sort and filter them, compare their roles, and form a party.
+
+Workshop interior: show workbenches, tools, storage, material containers, and crafting stations. Connect it to actual equipment improvement or facility production if supported by the game. If a function is not implemented, do not present a fake working button.
+
+Each interior must be built from reusable modular assets. Reuse wall, floor, furniture, light, and prop components where sensible, but give each facility a distinct layout and identity. The first implementation should prioritize the Dorms, Dining Hall, Training Hall, and Armory, then complete the remaining interiors. Do not claim all interiors are complete if only one has been implemented.
+
+============================================================
+PART 6 — HEROES, DAILY ROUTINES, AND SOCIAL LIFE
+============================================================
+
+Heroes should feel like individual residents, not static icons. Each hero should have a name, class, level, rarity or recruitment tier if the game already uses one, health, combat stats, equipment, current activity, and a readable status. A hero should be selectable from the outdoor map, an interior, or the roster UI.
+
+Give heroes simple autonomous routines that make the Sanctuary feel alive. Examples include walking between a facility and the plaza, training near a target, sitting at a table, resting in the Dorms, visiting the Armory, standing near the portal, or talking briefly to another hero. Use a small set of deterministic activity states and navigation targets instead of expensive or chaotic free-form simulation. Characters should not walk through walls, buildings, furniture, or water. If a route is blocked, they should select another reachable point or remain in a sensible idle state.
+
+Hero activity must be consistent with gameplay state. A hero currently assigned to an expedition must not simultaneously appear eating in the Dining Hall. A hero recovering in the infirmary should not be assigned to a Tower party unless the recovery system explicitly permits it. A hero assigned to training should show that activity in their profile.
+
+Create readable animations for idle, walk, sit, train, interact, and combat where the current art pipeline permits. Avoid a single static sprite sliding around without animation. Use directional animation states if available. Keep animations smooth and synchronized with movement.
+
+Hero selection should be easy on touchscreens. Tapping a hero selects them and opens a compact information card. The card should show portrait, name, class, level, health, current activity, and one or two useful actions. A separate details action opens the full profile. Tapping empty ground should not accidentally select a hero. Tapping a building should prioritize the building's interaction zone.
+
+============================================================
+PART 7 — ISLAND EXPANSION AND LONG-TERM SANCTUARY PROGRESSION
+============================================================
+
+The island should expand as the player progresses. This is a major long-term reward and should be visible in the world itself, not only represented by a level number.
+
+Use the existing Master level or Sanctuary level system if one already exists. Do not create two conflicting progression systems. If the game currently has only one level value, define a clear relationship and migrate safely. The island should unlock new buildable or explorable sections at meaningful milestones.
+
+At the beginning, the player sees the current Sanctuary layout and its accessible facilities. Later milestones may reveal a previously sealed terrace, an additional garden, a new dock platform, a research wing, a larger training area, a new residential wing, or a new connection to another floating land section. These should appear as physical expansions attached to the current island, not as unrelated maps that replace it.
+
+Before an expansion is unlocked, show a readable preview: the silhouette or distant outline of the new area, its name, the requirement, and what it will provide. The preview should communicate anticipation without blocking the current map. When the requirement is met, show a short unlock presentation and visibly connect the new area with a bridge, stairs, gate, or constructed path.
+
+Each expansion must have a gameplay purpose. For example:
+- A new garden terrace can provide additional recovery or morale activities.
+- An expanded Training Grounds can support more simultaneous trainees or advanced training.
+- A new workshop wing can unlock higher equipment tiers.
+- An expanded Dormitory can increase hero capacity or recovery slots.
+- A new research or synthesis wing can unlock recipes or utility systems.
+- A Flying Dock extension can support new expedition routes or special missions.
+
+Expansion costs must be clearly shown and must use resources that can actually be earned in the game. Do not add arbitrary premium currency requirements. Show the required level, materials, construction time if applicable, and the benefit before the player confirms. Once unlocked, preserve the expansion in the save file. Reopening the game must not make the island shrink back to its previous state.
+
+The island should remain visually coherent as it expands. Maintain the same architectural language, perspective, lighting, and material style. New sections should connect naturally to the existing wall, terrain, and paths. Avoid sudden floating platforms with no bridge or transition.
+
+============================================================
+PART 8 — TOWER: FLOOR-BY-FLOOR GAMEPLAY
+============================================================
+
+The Tower is the central challenge and must be a substantial playable mode. Do not reduce it to a list of floor buttons or a static preview image. The player should be able to inspect a floor, prepare a party, enter a real map, explore, fight, complete objectives, and return to the Sanctuary.
+
+Tower progression should be organized by floors. Each floor must have its own environment, terrain layout, visual identity, enemy group, objective, hazards, optional discoveries, and reward table. Do not create twenty floors by reusing the same map and changing only the background color. Prioritize a smaller number of genuinely distinct playable floors over a large number of fake placeholders.
+
+Floor 1 should be a broad green field or verdant steppe, matching the established manhwa-inspired direction. It should not be a generic stone corridor or a dark dungeon. The map should include open grassland, gentle elevation changes, scattered trees or rocks, patches of flowers, ruins or environmental landmarks where appropriate, and clear routes through the playable space. It should feel like entering a real outdoor region.
+
+The floor selection screen should show the current floor, unlocked floors, completion state, recommended party strength if the game has enough data to calculate it, known enemy types, mission objective, environmental conditions, and possible rewards. Locked floors should explain the unlock requirement. Do not show fabricated stats or enemy information that the player has not discovered.
+
+Before entering a floor, the player should form a party from owned heroes. Show each selected hero's class, level, health, equipment, and role. Prevent invalid selections such as duplicate selection of the same hero. If a hero is injured or otherwise unavailable, explain why. Provide a clear confirmation step before consuming expedition resources.
+
+Inside the Tower, use a real traversable map with collision and navigation. Heroes should move through the terrain, approach enemies, engage targets, use abilities, and respond to orders. Enemies should have simple but distinguishable behavior: some approach directly, some attack from range, some defend or support, and some guard objectives. Avoid making all enemies identical sprites with identical attack timing.
+
+Each floor needs a primary objective such as defeating a guardian, reaching an exit, protecting a point, collecting a required object, activating a mechanism, or surviving an encounter. The objective must be communicated clearly in the UI and in the world. Optional exploration can include chests, hidden paths, environmental clues, resource nodes, and side encounters. Optional content should reward exploration without making the main objective confusing.
+
+The first playable Tower slice should be complete end-to-end: floor briefing, party selection, map entry, movement, enemy encounters, tactical commands, objective completion, reward screen, and return to Sanctuary. Do this before generating a large catalogue of incomplete floors.
+
+============================================================
+PART 9 — COMBAT AND TACTICAL COMMANDS
+============================================================
+
+Combat should combine autonomous hero behavior with direct strategic commands from the Master. The player is not expected to manually control every hero or move a Master avatar around the battlefield.
+
+Heroes should automatically select reasonable targets, approach enemies, maintain their attack range, use basic attacks, and use skills when their conditions are met. Their behavior should reflect their class. A melee fighter should approach and engage at close range. An archer should try to maintain distance. A mage should use ranged abilities and avoid standing directly inside enemy groups. A support hero should prioritize healing or beneficial abilities when an ally needs them.
+
+The player should be able to tap a hero or party member and issue commands such as:
+- Focus a specific enemy.
+- Regroup at a selected position.
+- Retreat toward a safe point or exit.
+- Hold position.
+- Advance toward a selected point.
+- Protect a target or ally.
+- Use a special skill when the game supports manual skill activation.
+
+Commands must visibly affect behavior. A focus-target order should make the selected hero or party prioritize the chosen enemy. Regroup should cause the party to move toward the chosen location without blindly attacking distant enemies. Retreat should make heroes disengage and move toward the retreat point. Hold position should prevent unnecessary chasing. If an order cannot be executed, show a short explanation rather than silently ignoring it.
+
+The tactical UI must remain compact and readable on mobile. Do not cover the center of the battle with oversized panels. Use contextual command buttons around the selected hero or in a small bottom command strip. Provide clear icons and labels, with enough touch area for reliable use.
+
+Combat feedback must be readable. Show health changes, hit reactions, skill effects, cooldown feedback, status effects, and objective updates. Avoid excessive flashes or screen shake. Use restrained effects that preserve visibility of the battlefield.
+
+============================================================
+PART 10 — INJURY, RETREAT, FAILURE, AND RECOVERY
+============================================================
+
+Failure should matter without permanently destroying the player's roster. Use the agreed design direction: heroes who are defeated or badly injured require recovery time and may be unavailable for a period. Do not implement true permanent hero loss.
+
+At the end of a difficult or failed expedition, show which heroes were injured, which resources were gained or lost, whether the objective was completed, and what recovery is required. The player should understand the consequence before starting the next expedition.
+
+Recovery should be connected to the Sanctuary's Dormitory/Infirmary system. Injured heroes should appear in the appropriate recovery area or have a clear recovery status in the roster. Recovery may depend on time, resources, facility level, or available treatment slots, but the rules must be transparent. Do not create hidden penalties or consume resources without confirmation.
+
+Retreat should be a valid tactical decision. It should end the expedition safely when the party reaches the exit or when the player confirms retreat under the game's rules. The result screen should distinguish a successful mission, partial success, and failed mission. Rewards and penalties should follow clear rules.
+
+============================================================
+PART 11 — GRAPHICS: PREMIUM HIGH-DETAIL PIXEL ART
+============================================================
+
+The current map composition is correct, but the visual quality needs substantial improvement. The goal is not merely to add more colors or random pixels. The goal is a coherent, carefully rendered, high-detail pixel-art world with the depth and finish of a premium anime pixel-art RPG.
+
+Use the supplied Sanctuary reference image as the primary visual guide for the overall composition, atmosphere, architecture, vegetation placement, plaza, training grounds, and island presentation. Preserve the map layout while improving the rendering of every component.
+
+The art style should combine:
+- Crisp pixel edges and deliberate pixel clusters.
+- Rich but controlled color palettes.
+- Carefully layered highlights and shadows.
+- Readable material differences between stone, grass, wood, metal, cloth, water, leaves, and magical energy.
+- Detailed silhouettes that remain clear at normal mobile zoom.
+- A consistent pixel density across assets.
+- A 3/4 oblique perspective with visible height and volume.
+
+Do not use blurry painted textures, smooth vector gradients, low-resolution placeholder tiles, or crude square blocks. Do not simply enlarge old sprites. Recreate or refine assets at appropriate source resolutions. Ground tiles can use a 64x64 base where suitable, but larger objects must use larger canvases. Trees, buildings, statues, walls, portals, furniture, and hero sprites should not be forced into 64x64 boxes.
+
+Ground should have subtle variation and connected transitions. Grass must show deliberate clusters, blades, tiny flowers, color variation, and occasional patches of soil. Stone paths must have individual slab shapes, seams, edge bevels, small cracks, and moss in selected places. Avoid a repetitive checkerboard of identical tiles. Use tile variants and deterministic variation so the map looks natural but remains stable between sessions.
+
+Trees must have volume. Their trunks should have visible branching, bark shading, highlights, and a shadow at the base. Foliage should use multiple overlapping clusters with light and dark planes. Sakura trees should have distinct blossom clusters with layered pink values and a few scattered petals. Do not use a single round pink blob for every tree.
+
+Buildings must have convincing 3/4 depth. Show front and side walls, roof planes, roof edges, windows, doors, steps, foundation, trim, beams, and cast shadows. The building should look like a structure placed on the ground, not a flat icon. Roofs should have tile or shingle patterns where appropriate. Windows should have frames and controlled interior light. Doors should have depth, handles, and a visible entrance. Keep the architecture consistent with the existing Sanctuary reference.
+
+Props should be designed as individual objects with correct scale and contact shadows: benches, signs, barrels, crates, lanterns, training dummies, weapon racks, flower pots, fountains, railings, fences, pillars, and decorative stones. Do not scatter props randomly. Place them where they support the use and identity of the area.
+
+Characters must be more expressive and detailed. Improve head shape, hair silhouette, face readability, clothing layers, armor pieces, accessories, weapons, and class identity. Use a consistent character scale and outline treatment. Heroes should not look like tiny generic colored blocks. At the normal camera zoom, the player should be able to distinguish different classes and recognize selected heroes.
+
+Use separate animation frames or a practical sprite animation system for idle, walking, turning, sitting, training, interacting, attacking, casting, taking a hit, and recovering where appropriate. Avoid moving a static image across the map as the only animation.
+
+Use pixel-perfect rendering. Use nearest-neighbor sampling for pixel-art assets and avoid fractional scaling that causes shimmering or blurred edges. If the game uses a virtual resolution, scale it consistently. Keep the pixel grid stable during camera zoom. If smooth zoom is supported, use controlled scale steps or a rendering approach that preserves sharpness.
+
+============================================================
+PART 12 — TRUE 2.5D DEPTH, CAMERA, AND OCCLUSION
+============================================================
+
+The world must read as 3/4 oblique 2.5D, not as a flat overhead grid. The map already has the intended overall layout; improve how objects are drawn and how their height is communicated.
+
+Ground surfaces should be viewed from a consistent elevated oblique angle. Buildings must show roof planes and vertical facades. Walls must show top surfaces and front-facing sides. Stairs must show individual steps and a clear elevation transition. Trees must show trunk height and canopy volume. Bridges, platforms, and terraces must have visible thickness and side faces.
+
+Use layered rendering. Draw the ground and floor decals first, then low props, then characters and objects sorted by their ground contact point, then foreground objects that should overlap the character, and finally the fixed UI. Use a consistent foot-point or ground-anchor convention for all characters and props. Do not sort by the top-left corner of a sprite. Large sprites should have an explicit ground anchor so their visual height does not cause incorrect depth ordering.
+
+Implement occlusion correctly. When a hero walks behind a tree trunk, wall, building, or foreground prop, the object should visually cover the hero where appropriate. When the hero walks in front, the hero should appear in front. Building roofs may use a hide/fade behavior when the player enters the building or when a character is inside a structure, if the engine supports it. Do not let sprites draw through walls or appear on top of roofs incorrectly.
+
+Use collision shapes that correspond to the walkable ground footprint, not the full transparent sprite rectangle. A tree canopy should not block the entire area beneath it if the trunk is the only solid obstacle. A building should block movement through its walls but allow entry through its door. Furniture should have sensible collision boundaries.
+
+Camera controls must work on Android touchscreens. One-finger drag on empty ground pans the camera. Two-finger pinch zooms smoothly around the midpoint of the gesture. Tapping a hero selects the hero. Tapping a building opens its interaction prompt. Gesture handling must not confuse a tap with a pan. The HUD remains fixed and must not scale or move with the world. Provide a camera reset or recenter action. Respect map boundaries and prevent the camera from exposing large unintended empty regions.
+
+============================================================
+PART 13 — LIGHTING, SHADOWS, WEATHER, AND ATMOSPHERE
+============================================================
+
+Improve lighting and shadows across the entire Sanctuary and Tower. The current scene should feel illuminated by a consistent world light source, with objects grounded in the environment.
+
+Use a coherent directional sunlight model. Choose one main light direction and apply it consistently to buildings, trees, characters, walls, props, and terrain. Each object should cast a soft pixel-art shadow onto the ground. Shadows should have a clear direction and contact darkening near the object's base. Do not add random shadows pointing in different directions.
+
+Use layered shadow treatment: a compact contact shadow directly beneath the object, a larger softer directional shadow, and subtle ambient occlusion where objects meet the ground or walls. Keep the shadow style pixel-art friendly. Do not blur the entire scene. Pixel edges should remain crisp while shadow shapes can use controlled stepped gradients or a low-resolution shadow pass.
+
+Add warm interior light through selected windows and doors. The light should be subtle and should not look like a large opaque yellow square. The portal can cast a cool blue glow on nearby stone. Magical facilities can use small controlled accent lights. Keep lighting colors consistent with the source of light.
+
+Add restrained ambient effects: drifting sakura petals, a few floating dust motes near magical structures, gentle water movement, subtle portal particles, and occasional leaf movement. Effects must not obscure the map or reduce readability. Avoid constant full-screen sparkles.
+
+If weather or time-of-day is added, it must be subtle and must not break the color readability of the map. A soft morning/afternoon/evening lighting variation can make the Sanctuary feel alive, but the player must still be able to see roads, entrances, and characters. Do not prioritize a complex weather system over core gameplay.
+
+============================================================
+PART 14 — UI/UX REDESIGN: MAKE IT LOOK LIKE A REAL GAME
+============================================================
+
+The current UI is too rough and visually disconnected from the world. Redesign it as a cohesive premium fantasy RPG interface. It should feel deliberately art-directed, not like default HTML controls or generic development panels.
+
+Use a dark slate or deep navy foundation with carefully selected warm gold, pale ivory, cyan, and restrained violet accents. Use subtle borders, small corner ornaments, layered panels, clear hierarchy, and readable typography. Avoid excessive gradients, thick neon outlines, random colored rectangles, and oversized panels.
+
+The HUD should occupy only a modest portion of the screen so that the Sanctuary remains visible. Keep the top bar compact. It may show Master/Sanctuary level, a small experience indicator, key resources, and a few utility icons. Do not place a huge permanent row of facility buttons over the world. Facility interaction should be contextual: tap a building, then show a small clean prompt or panel for that building.
+
+The selected hero card should be attractive and useful. Show a portrait, name, class, level, health, activity, and a clear details action. Use a distinct but restrained class color. The card should not cover the hero or the most important part of the map. On smaller screens, adapt the layout rather than shrinking text until it becomes unreadable.
+
+The full hero profile should use a clear tab or section structure: Overview, Stats, Equipment, Skills, and Activity/Recovery. Do not cram all data into one long crowded panel. Each tab must contain real information and functional controls. Show stat changes when equipping an item. Show skill descriptions and cooldown or unlock requirements if the game supports them.
+
+Facility screens should share a consistent visual language but have their own identity. The Dorms should feel warm and calm. The Armory should feel practical and metallic. The Synthesis Chamber should feel magical. The Training Hall should feel active. The Dining Hall should feel welcoming. Use facility-specific accent colors and small decorative motifs without making the interface inconsistent.
+
+Tower screens need a strong information hierarchy. The floor name and number should be prominent. Mission objective, discovered enemies, hazards, rewards, party selection, and launch action should be easy to find. Avoid hiding the most important information in tiny text. The in-expedition HUD should show party health, objective progress, selected hero, and tactical commands without covering the battlefield.
+
+Buttons must have clear states: normal, pressed, disabled, selected, and loading where relevant. Buttons should visibly respond to touch. Disabled actions should explain why they are unavailable. Avoid buttons that appear interactive but do nothing.
+
+Use safe-area insets so that the HUD does not overlap Android status/navigation bars or device cutouts. Test portrait and landscape behavior if both are supported, but prioritize the existing landscape gameplay layout. Keep text sizes readable on a phone.
+
+============================================================
+PART 15 — SAVE DATA, PERFORMANCE, AND ANDROID RELIABILITY
+============================================================
+
+All new progression must persist. This includes unlocked interiors or facility states, island expansion milestones, facility levels, hero activities, recovery timers or progress, Tower floor completion, party setup if saved, and newly introduced resources. Use the existing save architecture if possible. Add versioned fields and safe defaults for older saves.
+
+Do not store only transient UI state as if it were permanent game progress. Do not overwrite a valid save because parsing a new optional field fails. If a migration fails, preserve the original data and report the problem.
+
+Optimize for Android. Use sprite atlases or cached bitmap resources where appropriate. Avoid loading the same large texture repeatedly. Avoid redrawing expensive static layers unnecessarily. Use culling so objects outside the camera view are not processed needlessly. Use chunked map rendering if the map becomes large. Reuse animation resources and avoid allocating large temporary objects every frame.
+
+Maintain stable frame pacing. Do not chase a nominal 60 FPS by removing essential visual quality without measuring. Test on a representative Android device or emulator. Check memory usage, texture sizes, input responsiveness, camera gestures, scene transitions, and save/load behavior.
+
+============================================================
+PART 16 — IMPLEMENTATION ORDER: DO NOT TRY TO FAKE EVERYTHING AT ONCE
+============================================================
+
+Work in controlled implementation stages. Each stage must result in something visible and testable in the actual game.
+
+Stage A — Audit and protect:
+Inspect the existing code and save structure. Record the real entry points and existing functional systems. Identify the smallest safe changes. Do not reset the project.
+
+Stage B — Visual foundation:
+Improve the current Sanctuary renderer, pixel density consistency, ground/path transitions, 3/4 building depth, character rendering, shadows, and lighting. Keep the same map composition. Verify that the map still loads and camera controls still work.
+
+Stage C — Contextual interactions:
+Make every major facility tappable. Add a contextual prompt and ensure each facility opens its correct screen. Remove or repair decorative buttons that do nothing.
+
+Stage D — First complete interiors:
+Implement the Dorms, Dining Hall, Training Hall, and Armory as actual enterable scenes with furniture, lighting, characters, navigation, and functional interactions. Add the transition back to the outdoor Sanctuary.
+
+Stage E — Hero routines and management:
+Connect hero activities to the facility systems. Ensure activity states are consistent and saved. Implement selection, profile, training assignment, dining, rest, and recovery flows.
+
+Stage F — Island expansion:
+Implement at least one complete expansion milestone, including preview, requirement, cost, unlock animation or transition, visible new area, functional connection, and save persistence. Build the data model so later expansions can be added cleanly.
+
+Stage G — Tower vertical slice:
+Implement one complete Tower floor from briefing through party selection, playable exploration, autonomous combat, tactical commands, objective completion, reward results, recovery, and return to Sanctuary. The first floor should be the verdant field/steppe environment.
+
+Stage H — UI polish and integration:
+Apply the visual design consistently to the HUD, hero profile, facility interfaces, Tower screens, and result screens. Ensure all controls remain usable on mobile.
+
+Stage I — Verification:
+Build the Android app. Run available unit tests. Test save migration, scene transitions, facility interactions, Tower flow, camera gestures, and performance. Fix regressions before declaring completion.
+
+Do not spend the entire implementation pass generating a huge plan. The audit should be concise and internal. Begin implementing the highest-priority playable slice after identifying the existing architecture.
+
+============================================================
+PART 17 — REQUIRED ACCEPTANCE TESTS
+============================================================
+
+The upgrade is not complete until these checks pass in the running app:
+
+1. The Sanctuary still has the same recognizable overall map layout.
+2. The camera can pan and zoom on Android without moving the HUD.
+3. Buildings, walls, trees, and props show convincing 3/4 depth and correct overlap.
+4. Ground and roads look connected, detailed, and free of obvious black gaps or broken tile seams.
+5. Tapping each implemented facility opens the correct contextual interaction.
+6. The Dorms can be entered and show a furnished interior.
+7. The Dining Hall can be entered and supports a real dining interaction.
+8. The Training Hall can be entered and supports a real training assignment.
+9. The Armory can be entered and supports real equipment inspection or management.
+10. Exiting an interior returns to the previous Sanctuary view without losing selection or camera context.
+11. Heroes have consistent activity states and do not appear in contradictory places.
+12. At least one island expansion can be unlocked, appears in the world, and remains unlocked after restarting.
+13. Tower Floor 1 can be entered and played, not merely previewed.
+14. The Tower floor has a clear objective and a functioning completion condition.
+15. Heroes fight autonomously and respond to focus, regroup, hold, and retreat commands.
+16. Expedition results update rewards, hero condition, and progression.
+17. Injured heroes have a clear recovery state and can recover through the Sanctuary system.
+18. New data persists after closing and reopening the app.
+19. Existing player progress is preserved.
+20. The Android build succeeds and no critical runtime errors are introduced.
+
+============================================================
+PART 18 — REQUIRED RESPONSE AFTER IMPLEMENTATION
+============================================================
+
+After making changes, provide a truthful implementation report with four sections:
+
+A. Actually implemented:
+Name each feature and the exact files or components changed. Distinguish fully working features from partial work.
+
+B. How to test:
+Give exact in-game steps the player can follow on Android to verify each feature.
+
+C. Verification:
+Report the actual build/test commands run and their real results. Do not invent successful builds, test counts, or performance measurements.
+
+D. Remaining work:
+List unfinished items honestly, including any feature that is only a placeholder. Do not call the entire upgrade complete if the acceptance tests have not passed.
+
+FINAL INSTRUCTION
+Start by inspecting the existing ETERNAL SUMMONER project and then implement this upgrade in the real game. Preserve the current Sanctuary map. Improve the gameplay and visual quality together. Prioritize real interactions and one complete playable Tower floor over a large number of empty screens. Do not return only another plan, summary, mock-up, or claim of completion. Make changes that the player can actually see and use.

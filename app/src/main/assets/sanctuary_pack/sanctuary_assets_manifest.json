@@ -1,0 +1,608 @@
+{
+  "version": "1.0",
+  "tile_size": 64,
+  "categories": {
+    "tiles": [
+      {
+        "id": "tile_grass_1",
+        "path": "sanctuary_pack/tiles/tile_grass_1.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 832,
+        "crop_y": 16,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_grass_2",
+        "path": "sanctuary_pack/tiles/tile_grass_2.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 896,
+        "crop_y": 16,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_grass_3",
+        "path": "sanctuary_pack/tiles/tile_grass_3.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 832,
+        "crop_y": 80,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_grass_4",
+        "path": "sanctuary_pack/tiles/tile_grass_4.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 896,
+        "crop_y": 80,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_grass_5",
+        "path": "sanctuary_pack/tiles/tile_grass_5.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 832,
+        "crop_y": 144,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_grass_6",
+        "path": "sanctuary_pack/tiles/tile_grass_6.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 896,
+        "crop_y": 144,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_grass_7",
+        "path": "sanctuary_pack/tiles/tile_grass_7.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 832,
+        "crop_y": 208,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_grass_8",
+        "path": "sanctuary_pack/tiles/tile_grass_8.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 896,
+        "crop_y": 208,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_stone_1",
+        "path": "sanctuary_pack/tiles/tile_stone_1.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 960,
+        "crop_y": 16,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_stone_2",
+        "path": "sanctuary_pack/tiles/tile_stone_2.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 1024,
+        "crop_y": 16,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_stone_3",
+        "path": "sanctuary_pack/tiles/tile_stone_3.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 1088,
+        "crop_y": 16,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_stone_4",
+        "path": "sanctuary_pack/tiles/tile_stone_4.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 960,
+        "crop_y": 80,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_stone_5",
+        "path": "sanctuary_pack/tiles/tile_stone_5.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 1024,
+        "crop_y": 80,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_stone_6",
+        "path": "sanctuary_pack/tiles/tile_stone_6.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 1088,
+        "crop_y": 80,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_garden_1",
+        "path": "sanctuary_pack/tiles/tile_garden_1.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 960,
+        "crop_y": 144,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_garden_2",
+        "path": "sanctuary_pack/tiles/tile_garden_2.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 1024,
+        "crop_y": 144,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_moss_stone_1",
+        "path": "sanctuary_pack/tiles/tile_moss_stone_1.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 960,
+        "crop_y": 208,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_moss_stone_2",
+        "path": "sanctuary_pack/tiles/tile_moss_stone_2.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 1024,
+        "crop_y": 208,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_water_1",
+        "path": "sanctuary_pack/tiles/tile_water_1.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 1088,
+        "crop_y": 144,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "tile_water_2",
+        "path": "sanctuary_pack/tiles/tile_water_2.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 1088,
+        "crop_y": 208,
+        "anchor_x": 32,
+        "anchor_y": 32
+      }
+    ],
+    "roads": [
+      {
+        "id": "road_straight_h",
+        "path": "sanctuary_pack/roads/road_straight_h.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 832,
+        "crop_y": 272,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "road_straight_v",
+        "path": "sanctuary_pack/roads/road_straight_v.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 896,
+        "crop_y": 272,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "road_corner_tl",
+        "path": "sanctuary_pack/roads/road_corner_tl.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 960,
+        "crop_y": 272,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "road_corner_tr",
+        "path": "sanctuary_pack/roads/road_corner_tr.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 1024,
+        "crop_y": 272,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "road_corner_bl",
+        "path": "sanctuary_pack/roads/road_corner_bl.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 1088,
+        "crop_y": 272,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "road_corner_br",
+        "path": "sanctuary_pack/roads/road_corner_br.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 1152,
+        "crop_y": 272,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "road_t_junction",
+        "path": "sanctuary_pack/roads/road_t_junction.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 832,
+        "crop_y": 336,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "road_cross",
+        "path": "sanctuary_pack/roads/road_cross.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 896,
+        "crop_y": 336,
+        "anchor_x": 32,
+        "anchor_y": 32
+      },
+      {
+        "id": "road_border_stone",
+        "path": "sanctuary_pack/roads/road_border_stone.png",
+        "width": 64,
+        "height": 64,
+        "crop_x": 960,
+        "crop_y": 336,
+        "anchor_x": 32,
+        "anchor_y": 32
+      }
+    ],
+    "vegetation": [
+      {
+        "id": "tree_oak_large",
+        "path": "sanctuary_pack/vegetation/tree_oak_large.png",
+        "width": 112,
+        "height": 128,
+        "crop_x": 832,
+        "crop_y": 400,
+        "anchor_x": 56,
+        "anchor_y": 120
+      },
+      {
+        "id": "tree_sakura_large",
+        "path": "sanctuary_pack/vegetation/tree_sakura_large.png",
+        "width": 112,
+        "height": 128,
+        "crop_x": 948,
+        "crop_y": 400,
+        "anchor_x": 56,
+        "anchor_y": 120
+      },
+      {
+        "id": "tree_pine_large",
+        "path": "sanctuary_pack/vegetation/tree_pine_large.png",
+        "width": 96,
+        "height": 128,
+        "crop_x": 1064,
+        "crop_y": 400,
+        "anchor_x": 48,
+        "anchor_y": 120
+      },
+      {
+        "id": "tree_mystic_plum",
+        "path": "sanctuary_pack/vegetation/tree_mystic_plum.png",
+        "width": 96,
+        "height": 128,
+        "crop_x": 1164,
+        "crop_y": 400,
+        "anchor_x": 48,
+        "anchor_y": 120
+      },
+      {
+        "id": "tree_small_oak",
+        "path": "sanctuary_pack/vegetation/tree_small_oak.png",
+        "width": 64,
+        "height": 80,
+        "crop_x": 832,
+        "crop_y": 532,
+        "anchor_x": 32,
+        "anchor_y": 72
+      },
+      {
+        "id": "tree_small_sakura",
+        "path": "sanctuary_pack/vegetation/tree_small_sakura.png",
+        "width": 64,
+        "height": 80,
+        "crop_x": 900,
+        "crop_y": 532,
+        "anchor_x": 32,
+        "anchor_y": 72
+      },
+      {
+        "id": "bush_flowering_pink",
+        "path": "sanctuary_pack/vegetation/bush_flowering_pink.png",
+        "width": 56,
+        "height": 56,
+        "crop_x": 968,
+        "crop_y": 532,
+        "anchor_x": 28,
+        "anchor_y": 48
+      },
+      {
+        "id": "bush_green_dense",
+        "path": "sanctuary_pack/vegetation/bush_green_dense.png",
+        "width": 56,
+        "height": 56,
+        "crop_x": 1028,
+        "crop_y": 532,
+        "anchor_x": 28,
+        "anchor_y": 48
+      },
+      {
+        "id": "flower_cluster_lavender",
+        "path": "sanctuary_pack/vegetation/flower_cluster_lavender.png",
+        "width": 40,
+        "height": 40,
+        "crop_x": 1088,
+        "crop_y": 532,
+        "anchor_x": 20,
+        "anchor_y": 32
+      },
+      {
+        "id": "flower_cluster_rose",
+        "path": "sanctuary_pack/vegetation/flower_cluster_rose.png",
+        "width": 40,
+        "height": 40,
+        "crop_x": 1132,
+        "crop_y": 532,
+        "anchor_x": 20,
+        "anchor_y": 32
+      }
+    ],
+    "props": [
+      {
+        "id": "fountain_sanctuary_water",
+        "path": "sanctuary_pack/props/fountain_sanctuary_water.png",
+        "width": 96,
+        "height": 112,
+        "crop_x": 1264,
+        "crop_y": 616,
+        "anchor_x": 48,
+        "anchor_y": 104
+      },
+      {
+        "id": "stone_stairs_grand",
+        "path": "sanctuary_pack/props/stone_stairs_grand.png",
+        "width": 80,
+        "height": 112,
+        "crop_x": 1192,
+        "crop_y": 16,
+        "anchor_x": 40,
+        "anchor_y": 104
+      },
+      {
+        "id": "rock_boulder_large",
+        "path": "sanctuary_pack/props/rock_boulder_large.png",
+        "width": 56,
+        "height": 44,
+        "crop_x": 1088,
+        "crop_y": 592,
+        "anchor_x": 28,
+        "anchor_y": 36
+      },
+      {
+        "id": "rock_boulder_medium",
+        "path": "sanctuary_pack/props/rock_boulder_medium.png",
+        "width": 44,
+        "height": 36,
+        "crop_x": 1148,
+        "crop_y": 592,
+        "anchor_x": 22,
+        "anchor_y": 28
+      },
+      {
+        "id": "street_lantern_gold",
+        "path": "sanctuary_pack/props/street_lantern_gold.png",
+        "width": 32,
+        "height": 72,
+        "crop_x": 1272,
+        "crop_y": 336,
+        "anchor_x": 16,
+        "anchor_y": 64
+      },
+      {
+        "id": "stone_pillar_gothic",
+        "path": "sanctuary_pack/props/stone_pillar_gothic.png",
+        "width": 40,
+        "height": 96,
+        "crop_x": 1024,
+        "crop_y": 704,
+        "anchor_x": 20,
+        "anchor_y": 88
+      },
+      {
+        "id": "brazier_fire_stand",
+        "path": "sanctuary_pack/props/brazier_fire_stand.png",
+        "width": 32,
+        "height": 80,
+        "crop_x": 1068,
+        "crop_y": 704,
+        "anchor_x": 16,
+        "anchor_y": 72
+      },
+      {
+        "id": "crystal_mana_cluster",
+        "path": "sanctuary_pack/props/crystal_mana_cluster.png",
+        "width": 36,
+        "height": 68,
+        "crop_x": 1376,
+        "crop_y": 816,
+        "anchor_x": 18,
+        "anchor_y": 60
+      },
+      {
+        "id": "fence_wooden_gate",
+        "path": "sanctuary_pack/props/fence_wooden_gate.png",
+        "width": 64,
+        "height": 48,
+        "crop_x": 1376,
+        "crop_y": 416,
+        "anchor_x": 32,
+        "anchor_y": 40
+      }
+    ],
+    "buildings": [
+      {
+        "id": "building_central_plaza",
+        "path": "sanctuary_pack/buildings/building_central_plaza.png",
+        "width": 150,
+        "height": 140,
+        "crop_x": 12,
+        "crop_y": 536,
+        "anchor_x": 75,
+        "anchor_y": 132
+      },
+      {
+        "id": "building_summoning_hall",
+        "path": "sanctuary_pack/buildings/building_summoning_hall.png",
+        "width": 148,
+        "height": 140,
+        "crop_x": 166,
+        "crop_y": 536,
+        "anchor_x": 74,
+        "anchor_y": 132
+      },
+      {
+        "id": "building_training_hall",
+        "path": "sanctuary_pack/buildings/building_training_hall.png",
+        "width": 148,
+        "height": 140,
+        "crop_x": 318,
+        "crop_y": 536,
+        "anchor_x": 74,
+        "anchor_y": 132
+      },
+      {
+        "id": "building_dorms_residential",
+        "path": "sanctuary_pack/buildings/building_dorms_residential.png",
+        "width": 148,
+        "height": 140,
+        "crop_x": 470,
+        "crop_y": 536,
+        "anchor_x": 74,
+        "anchor_y": 132
+      },
+      {
+        "id": "building_armory_shop",
+        "path": "sanctuary_pack/buildings/building_armory_shop.png",
+        "width": 148,
+        "height": 140,
+        "crop_x": 622,
+        "crop_y": 536,
+        "anchor_x": 74,
+        "anchor_y": 132
+      },
+      {
+        "id": "building_dining_hall",
+        "path": "sanctuary_pack/buildings/building_dining_hall.png",
+        "width": 150,
+        "height": 140,
+        "crop_x": 12,
+        "crop_y": 708,
+        "anchor_x": 75,
+        "anchor_y": 132
+      },
+      {
+        "id": "building_synthesis_lab",
+        "path": "sanctuary_pack/buildings/building_synthesis_lab.png",
+        "width": 148,
+        "height": 140,
+        "crop_x": 166,
+        "crop_y": 708,
+        "anchor_x": 74,
+        "anchor_y": 132
+      },
+      {
+        "id": "building_flying_dock",
+        "path": "sanctuary_pack/buildings/building_flying_dock.png",
+        "width": 158,
+        "height": 140,
+        "crop_x": 318,
+        "crop_y": 708,
+        "anchor_x": 79,
+        "anchor_y": 132
+      },
+      {
+        "id": "building_supply_warehouse",
+        "path": "sanctuary_pack/buildings/building_supply_warehouse.png",
+        "width": 148,
+        "height": 140,
+        "crop_x": 480,
+        "crop_y": 708,
+        "anchor_x": 74,
+        "anchor_y": 132
+      },
+      {
+        "id": "building_main_gate",
+        "path": "sanctuary_pack/buildings/building_main_gate.png",
+        "width": 152,
+        "height": 140,
+        "crop_x": 632,
+        "crop_y": 708,
+        "anchor_x": 76,
+        "anchor_y": 132
+      }
+    ],
+    "waterfalls": [
+      {
+        "id": "waterfall_cliff_terraced",
+        "path": "sanctuary_pack/waterfalls/waterfall_cliff_terraced.png",
+        "width": 138,
+        "height": 320,
+        "crop_x": 1390,
+        "crop_y": 16,
+        "anchor_x": 69,
+        "anchor_y": 160
+      }
+    ]
+  }
+}
