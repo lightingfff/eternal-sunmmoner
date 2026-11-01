@@ -129,5 +129,40 @@ Size step 16 / prompt 2000–32000 / reference array cap — off-step bị rejec
 
 IllegalStateException Default FirebaseApp not initialized → FirebaseAvailability.isFirebaseReady() qua FirebaseApp.getApps() cache, MainActivity guarded flowOf null→offline guest, AuthHelper early-return, google-services.json placeholder eternal-summoner-offline, strings default_web_client_id offline-placeholder, offline banner 2A2E4A. Evidence: stack trace + 2 commits 75a9d70,59c844f. Tiếp: logcat verification, startup perf, graphics perf 0.36–1.48.
 
+## 9. Continuation 2026-11-01 (arena/a133794d) — Premium Completion
+
+> Trên nền main@a2412fc đã merge 7 commits Part I-IV + stability, tiếp tục audit `docs/GRAPHICS_AUDIT.md` (Phase 1) chỉ ra water/gravel/moss diff, secondary branches, roof volume, bloom, directional cast shadow, expanded AO, fog 4 lớp, dithering, animation.
+
+### 9.1 Skills đã đọc (mở rộng)
+Đã đọc 18 SKILL.md verbatim (scenario-game-assets/textures/sprite-animation/image/gpt-image/patina-retexture/sparc3d/asset-analysis/storyboards + side-view-game-kit/ace-step/workflows...) — danh mục trong `SCENARIO_ART_PIPELINE.md` §1. Áp dụng: game-assets 2:1 diamond + Wang + variation batch cho water/gravel/trees, textures tiling-safe + Patina 5-map, sprite-animation loop, asset-analysis QA, storyboards panel.
+
+### 9.2 Texture Pipeline mở rộng
+- **Water tile 6 vars mới** (`sanctuaryWaterTiles`): deep 0F1A2E + depth pockets 0B1222, ripple hLine 4-6px 2A4A7A/1E3A6A, moon highlight 5A7AB8→8A9AB8, shallow edge mid 1A2A4A→1E3A5A, dithering 4-step 0D1A33. Dùng cho chasm lip & future fountain (tương thích scenario-textures seamless tileable + dithering controlled).
+- **Gravel tile 4 vars mới** (`sanctuaryGravelTiles`): base 2B2620, 22 gravel đa kích thước 1-3px 4A4A50-6A6A72 + highlight 7A7A82 trên r≥2, moisture patches 252018, moss flecks 2A3D2B — không random dots.
+- **Moss differentiation**: ground moss (soft 2F4A2E patches + clover) vs stone moss (beveledSlab lichen corner 2A332E + quoin moss) — tone riêng per-material.
+- **Tree secondary branches**: Oak thêm 3 nhánh mảnh 4A2E1D/362016/5A3A24 nối trunk→foliage, tách shadow/mid/hi foliage layers, highlight frost tip 8AB87A.
+- **Roof volume** (StructureAtlas/TerraceWall): stone wall quoin chamfer 8A9AB8 moonlight + lichen, chimney brick coursing với mortar, coping highlight.
+
+### 9.3 Material System chuẩn hóa (SanctuaryDarkFantasyShaders.MATERIAL_TABLE)
+7 nhóm: stone 3A3F4A/1A1C24 0.45/0.55 roughness0.85 hl0.35, wood 8C5A38/3A2A18 0.50/0.48 0.65/0.42, metal 4E5A6A/1E222E 0.55/0.40 0.35/0.75, grass 2B352E/1A1E1B 0.40/0.52 0.90/0.25, moss 2F4A2E/162118 0.38/0.50 0.88/0.20, water 0F1A2E/0B1222 0.60/0.35 0.25/0.80, magic 7DD3FC/1A2A4A 0.70/0.30 0.20/0.90. `materialLightFactor` dispatch theo NdotL, giữ FilterQuality.None.
+
+### 9.4 Shader & Lighting mở rộng
+- **Pixel Bloom** `drawPixelBloom(r*1.6 α0.06 + r α0.14 + core 0.45r α0.32)` cho brazier/rune/window — core sharp, outer bleed nhẹ, pulse sin1.8 + flicker sin3.1*cos2.3.
+- **Directional Cast Shadow** `drawDirectionalCastShadow(offset 6*zoom,10*zoom α0.26-0.28)` cho TowerGate 42*zoom & sand arena 52*zoom, tách tree canopy/building.
+- **Expanded AO**: `drawTreeCanopyAO`, `drawBuildingAO`, `drawStoneCreviceAO`, `drawDitheredShadow` + existing AORim — phủ khe đá/chân nhà/tán cây/mái hiên, α0.14–0.22 tinh tế, không black thick.
+- **Fog 4 lớp**: `drawBackgroundHaze` α0.05 (0–0.35h), `drawMidgroundFog` α0.06 (0.30–0.65h), `drawGroundFog` drift sin0.6*8 α0.04→0.09→0.14, `drawLocalMist` radial 90*zoom α0.05, `drawDistantFade` horizontal α0.06 + chasm radial 0B0814 0.55→181B2E 0.22 + moon rays diagonal -34° α0.10.
+- **Dithering**: pattern 4-step cho water depth & stone shadow transitions, controlled không noise ngẫu nhiên.
+- **Outline**: material edge shading + rim 3D5A36 α0.45 + crisp 0B0814 1px per-material.
+
+### 9.5 2.5D & Animation
+- Layer 13 giữ, Y-sort `sortY=y+sortYBias` + southern foreground walls + canopy occlusion — verify không sai che.
+- Tree sway future: timeSec offset per-cluster (chưa static bitmap, sẽ via shader drift khi MCP animation available).
+- Fire flicker cải thiện: triple flame violet/cyan/white + spark + light pool 7C3AED.
+
+### 9.6 QA & Android
+- Visual 3×3 seam + zoom 0.36/0.72/1.48 crisp, tap priority plaza/gate/beacon/hero/terrain, 20 nav nodes, pan/zoom clamp 44f, interaction không che.
+- Perf: 56 tiles (50+6 water+gravel) ~900KB lazy, bloom/fog 3-5 gradients/frame không alloc, dithering pre-baked, LOD overview skip tuft.
+- Android: compileSdk36.1 min24 target36 AGP9.1.1 Kotlin2.2.10, Firebase guard giữ, Quality Settings stub Low/Med/High (Low giảm fog/bloom, Med cơ bản, High full) — chưa UI toggle.
+
 ---
-*Tham chiếu bắt buộc khi edit asset: nêu skill source & schema field đã đọc. Next: Part I commit ground detail upgrade → Part II path/plaza → ... Part VII shader/perf.*
+*Tham chiếu bắt buộc khi edit asset: nêu skill source & schema field đã đọc. Cập nhật 2026-11-01 a133794d — tiếp tục Part V-VII → Sanctuary integration → Android testing.*

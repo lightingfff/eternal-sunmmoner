@@ -666,12 +666,16 @@ object PixelStructureAtlas {
     c.fillRect(38, 112, 16, 7, 0xFF633E2B.toInt())
     c.fillRect(62, 115, 14, 7, 0xFF26160F.toInt())
     c.hLine(34, 124, 44, 0xFF1A120E.toInt())
-    // Upper spreading boughs with highlight
+    // Upper spreading boughs with highlight + secondary branches
     for (i in 0..14) {
       c.fillRect(46 - i, 78 - i, 7, 5, 0xFF4D2F21.toInt())
       c.fillRect(58 + i, 78 - i, 7, 5, 0xFF362016.toInt())
       if (i < 6) c.set(46 - i, 77 - i, 0xFF7A5A3E.toInt())
     }
+    // Secondary branches — thin, connecting trunk to outer foliage masses
+    c.fillRect(38, 58, 8, 2, 0xFF4A2E1D.toInt()); c.fillRect(40, 57, 6, 1, 0xFF6A4A32.toInt())
+    c.fillRect(68, 60, 8, 2, 0xFF362016.toInt()); c.fillRect(66, 59, 6, 1, 0xFF4A2E1D.toInt())
+    c.fillRect(44, 42, 6, 2, 0xFF5A3A24.toInt())
     // Ground AO oval under ancient oak
     c.fillEllipse(56, 128, 22, 6, 0xFF0A0C14.toInt())
 

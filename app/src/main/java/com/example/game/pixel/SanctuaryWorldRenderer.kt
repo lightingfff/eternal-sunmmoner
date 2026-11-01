@@ -1123,23 +1123,32 @@ object SanctuaryWorldRenderer {
     sy: (Float, Float) -> Float,
     zoom: Float,
   ) {
-    // AO under northern fortress wall (long dark strip)
-    val nL = sx(980f)
-    val nR = sx(2240f)
-    val nT = sy(340f, 0f)
-    // elongated AO shadow under wall base
-    drawRect(Color(0xFF0A0C14).copy(alpha = 0.22f), Offset(nL, nT + 8f*zoom), Size(nR-nL, 18f*zoom))
-    // AO around plaza outer rim (dark ring on grass)
-    val pCx = sx(SanctuaryIslandGeometry.PLAZA_CENTER_X)
-    val pCy = sy(SanctuaryIslandGeometry.PLAZA_CENTER_Y, 0f)
-    val rx = SanctuaryIslandGeometry.PLAZA_RADIUS * zoom
-    val ry = rx * ObliqueCamera.OBLIQUE_Y_SCALE
-    // soft AO oval just outside plaza
-    drawOval(Color(0xFF0A0C14).copy(alpha = 0.18f), Offset(pCx - rx*1.04f, pCy - ry*1.04f), Size(rx*2.08f, ry*2.08f))
-    drawOval(Color.Transparent, Offset(pCx - rx*0.98f, pCy - ry*0.98f), Size(rx*1.96f, ry*1.96f))
-    // AO under southern gate platform
-    val gL = sx(1380f); val gR = sx(1840f); val gB = sy(2390f, 0f)
-    drawOval(Color(0xFF0A0C14).copy(alpha = 0.20f), Offset(gL - 10f*zoom, gB - 6f*zoom), Size((gR-gL)+20f*zoom, 22f*zoom))
+    with(SanctuaryDarkFantasyShaders) {
+      // AO under northern fortress wall (long dark strip) + stone crevice
+      val nL = sx(980f)
+      val nR = sx(2240f)
+      val nT = sy(340f, 0f)
+      drawRect(Color(0xFF0A0C14).copy(alpha = 0.22f), Offset(nL, nT + 8f*zoom), Size(nR-nL, 18f*zoom))
+      drawStoneCreviceAO(cx = (nL+nR)/2, cy = nT+9f*zoom, rx=(nR-nL)*0.45f, ry=6f*zoom, alpha=0.14f)
+      // AO around plaza outer rim (dark ring + crevice between stones)
+      val pCx = sx(SanctuaryIslandGeometry.PLAZA_CENTER_X)
+      val pCy = sy(SanctuaryIslandGeometry.PLAZA_CENTER_Y, 0f)
+      val rx = SanctuaryIslandGeometry.PLAZA_RADIUS * zoom
+      val ry = rx * ObliqueCamera.OBLIQUE_Y_SCALE
+      drawOval(Color(0xFF0A0C14).copy(alpha = 0.18f), Offset(pCx - rx*1.04f, pCy - ry*1.04f), Size(rx*2.08f, ry*2.08f))
+      drawOval(Color.Transparent, Offset(pCx - rx*0.98f, pCy - ry*0.98f), Size(rx*1.96f, ry*1.96f))
+      // AO under southern gate platform
+      val gL = sx(1380f); val gR = sx(1840f); val gB = sy(2390f, 0f)
+      drawOval(Color(0xFF0A0C14).copy(alpha = 0.20f), Offset(gL - 10f*zoom, gB - 6f*zoom), Size((gR-gL)+20f*zoom, 22f*zoom))
+      // Building foot AO — Tower Gate, Summoning Hall, Dorms etc.
+      drawBuildingAO(sx(1960f)-40f*zoom, sy(635f,0f)-6f*zoom, 80f*zoom, 14f*zoom, alpha=0.18f)
+      drawBuildingAO(sx(2380f)-50f*zoom, sy(1930f,0f)-6f*zoom, 90f*zoom, 12f*zoom, alpha=0.16f)
+      // Tree canopy AO — oak/pine clusters produce subtle darkening under foliage mass
+      drawTreeCanopyAO(sx(750f), sy(920f,0f), 28f*zoom, 10f*zoom, alpha=0.16f)
+      drawTreeCanopyAO(sx(1280f), sy(640f,0f), 22f*zoom, 8f*zoom, alpha=0.14f)
+      // Dithered shadow transition for dark stone near plaza staircase
+      drawDitheredShadow(sx(2180f), sy(1760f,0f), 60f*zoom, 18f*zoom, alpha=0.10f)
+    }
   }
 
   private fun DrawScope.drawSanctuaryLocalLights(
@@ -1149,40 +1158,35 @@ object SanctuaryWorldRenderer {
     timeSec: Float,
   ) {
     val pulse = 0.85f + 0.15f * kotlin.math.sin(timeSec * 1.8f)
-    // Warm amber glows from southern gate braziers (near drawbridges)
-    listOf(1490f to 2155f, 1730f to 2155f).forEach { (wx, wy) ->
-      val cx = sx(wx); val cy = sy(wy, 0f)
-      drawCircle(
-        brush = Brush.radialGradient(
-          colors = listOf(Color(0xFFFFB844).copy(alpha = 0.18f * pulse), Color.Transparent),
-          center = Offset(cx, cy), radius = 90f * zoom
-        ), radius = 90f*zoom, center = Offset(cx, cy)
-      )
-    }
-    // Cold blue rune light from plaza center spilling onto nearby stones
-    val pCx = sx(SanctuaryIslandGeometry.PLAZA_CENTER_X)
-    val pCy = sy(SanctuaryIslandGeometry.PLAZA_CENTER_Y, 0f)
-    drawCircle(
-      brush = Brush.radialGradient(
-        colors = listOf(Color(0xFF7DD3FC).copy(alpha = 0.12f * pulse), Color.Transparent),
-        center = Offset(pCx, pCy), radius = 160f * zoom
-      ), radius = 160f*zoom, center = Offset(pCx, pCy)
-    )
-    // Shader pipeline — vignette + volumetric fog + chasm depth + AO
+    val flicker = 0.90f + 0.10f * kotlin.math.sin(timeSec * 3.1f + 1.7f) * kotlin.math.cos(timeSec * 2.3f)
     with(SanctuaryDarkFantasyShaders) {
+      // Warm amber braziers — radial falloff + pixel bloom (core sharp, outer soft)
+      listOf(1490f to 2155f, 1730f to 2155f).forEach { (wx, wy) ->
+        val cx = sx(wx); val cy = sy(wy, 0f)
+        drawCircle(brush = Brush.radialGradient(listOf(Color(0xFFFFB844).copy(alpha = 0.18f * pulse * flicker), Color.Transparent), center = Offset(cx, cy), radius = 90f * zoom), radius = 90f*zoom, center = Offset(cx, cy))
+        drawPixelBloom(cx, cy, 22f*zoom, Color(0xFFFFB844), intensity=0.9f*pulse, pulse=flicker)
+      }
+      // Cold rune plaza — bloom + radial
+      val pCx = sx(SanctuaryIslandGeometry.PLAZA_CENTER_X); val pCy = sy(SanctuaryIslandGeometry.PLAZA_CENTER_Y, 0f)
+      drawCircle(brush = Brush.radialGradient(listOf(Color(0xFF7DD3FC).copy(alpha = 0.12f * pulse), Color.Transparent), center = Offset(pCx, pCy), radius = 160f * zoom), radius = 160f*zoom, center = Offset(pCx, pCy))
+      drawPixelBloom(pCx, pCy, 28f*zoom, Color(0xFF7DD3FC), intensity=0.7f*pulse)
+      // Shader pipeline — vignette + 4 fog layers + chasm depth
       drawDarkFantasyVignette()
+      drawBackgroundHaze(alpha=0.05f)
+      drawMidgroundFog(alpha=0.06f)
       drawGroundFog(timeSec, baseY = size.height * 0.68f)
       drawChasmDepth(center = Offset(size.width*0.5f, size.height*0.78f), radius = size.width*0.42f)
-    }
-    // Faint warm window lights from cottage cluster (west residential)
-    listOf(995f to 655f, 825f to 790f, 1105f to 925f).forEach { (wx, wy) ->
-      val cx = sx(wx); val cy = sy(wy, 0f)
-      drawCircle(
-        brush = Brush.radialGradient(
-          colors = listOf(Color(0xFFFFC86B).copy(alpha = 0.10f), Color.Transparent),
-          center = Offset(cx, cy - 12f*zoom), radius = 70f*zoom
-        ), radius = 70f*zoom, center = Offset(cx, cy - 12f*zoom)
-      )
+      drawLocalMist(pCx-40f*zoom, pCy+20f*zoom, 90f*zoom, alpha=0.05f)
+      drawDistantFade(alpha=0.06f)
+      // Faint warm window lights — bloom per cottage
+      listOf(995f to 655f, 825f to 790f, 1105f to 925f).forEach { (wx, wy) ->
+        val cx = sx(wx); val cy = sy(wy, 0f)
+        drawCircle(brush = Brush.radialGradient(listOf(Color(0xFFFFC86B).copy(alpha = 0.10f), Color.Transparent), center = Offset(cx, cy - 12f*zoom), radius = 70f*zoom), radius = 70f*zoom, center = Offset(cx, cy - 12f*zoom))
+        drawPixelBloom(cx, cy-12f*zoom, 14f*zoom, Color(0xFFFFC86B), intensity=0.6f)
+      }
+      // Directional cast shadows for large landmarks — moonlight 0.35,-0.45,0.82 down-right
+      drawDirectionalCastShadow(sx(1960f), sy(635f,0f), 42f*zoom, 18f*zoom, zoom, alpha=0.26f)
+      drawDirectionalCastShadow(sx(890f), sy(1790f,0f), 52f*zoom, 20f*zoom, zoom, alpha=0.20f)
     }
   }
 }
