@@ -47,17 +47,34 @@ jobs:
         with:
           gradle-version: '9.3.1'
 
+      - name: Restore cached debug keystore (preserve install signature)
+        uses: actions/cache@v4
+        with:
+          path: debug.keystore
+          key: debug-keystore-v1
+
       - name: Generate debug keystore
         run: |
-          keytool -genkeypair -v \
-            -keystore debug.keystore \
-            -storepass android \
-            -alias androiddebugkey \
-            -keypass android \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -dname "CN=Android Debug,O=Android,C=US"
+          if [ -f debug.keystore ]; then
+            echo "Reusing cached debug.keystore — preserves signature for app updates (avoids 'App not installed / corrupted' on reinstall)"
+            keytool -list -v -keystore debug.keystore -storepass android -alias androiddebugkey | head -n 5 || true
+          else
+            echo "No cached keystore — generating new debug.keystore"
+            keytool -genkeypair -v \
+              -keystore debug.keystore \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+          ls -lh debug.keystore
+          sha256sum debug.keystore | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Validate assets (PNG CRC, manifest SHA, package consistency)
+        run: python3 tools/validate_assets.py
 
       - name: Add temporary Google Sign-In resource
         run: |

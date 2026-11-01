@@ -17,3 +17,7 @@ local.properties
 .env
 debug.keystore
 *-debug.log
+# AI Studio temporary media — not runtime assets, was previously tracked and bloated clone/APK
+.aistudio/artifacts/
+.aistudio/.tempmediaStorage/
+

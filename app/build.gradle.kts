@@ -69,6 +69,14 @@ android {
     includeInApk = false
     includeInBundle = true
   }
+  // Keep build-generated preview out of APK (3.5 MB, not referenced at runtime); original backed up to docs/backup_assets/
+  packaging {
+    resources {
+      excludes += "sanctuary_pack/preview_contact_sheet.png"
+      excludes += "/sanctuary_pack/preview_contact_sheet.png"
+      excludes += "**/preview_contact_sheet.png"
+    }
+  }
 }
 
 tasks.withType<Test> {
