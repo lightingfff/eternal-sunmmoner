@@ -153,4 +153,72 @@ object SanctuaryDarkFantasyShaders {
       center = Offset(cx, cy)
     )
   }
+
+  /**
+   * Volumetric ground fog — low-lying indigo haze pooling in chasm and wall foot,
+   * animated via time-driven drift for living depth without obscuring gameplay.
+   */
+  fun DrawScope.drawGroundFog(
+    time: Float = 0f,
+    baseY: Float = size.height * 0.72f
+  ) {
+    val drift = (kotlin.math.sin(time * 0.6f) * 8f)
+    drawRect(
+      brush = Brush.verticalGradient(
+        colors = listOf(
+          Color.Transparent,
+          Color(0xFF242742).copy(alpha = 0.04f),
+          Color(0xFF1A1F33).copy(alpha = 0.09f),
+          Color(0xFF0D0F1A).copy(alpha = 0.14f)
+        ),
+        startY = baseY + drift,
+        endY = size.height
+      )
+    )
+  }
+
+  /**
+   * Chasm depth — radial darkness under floating island, stronger at center void.
+   */
+  fun DrawScope.drawChasmDepth(
+    center: Offset = Offset(size.width * 0.5f, size.height * 0.55f),
+    radius: Float = size.width * 0.45f
+  ) {
+    drawCircle(
+      brush = Brush.radialGradient(
+        colors = listOf(
+          Color(0xFF0B0814).copy(alpha = 0.55f),
+          Color(0xFF181B2E).copy(alpha = 0.22f),
+          Color.Transparent
+        ),
+        center = center,
+        radius = radius
+      ),
+      radius = radius,
+      center = center
+    )
+  }
+
+  /**
+   * AO rim for stepped plaza curb and staircase cheek walls — darkens crevice
+   * only, preserves limestone face brightness.
+   */
+  fun DrawScope.drawAORim(
+    cx: Float,
+    cy: Float,
+    rx: Float,
+    ry: Float,
+    alpha: Float = 0.20f
+  ) {
+    drawOval(
+      color = Color.Black.copy(alpha = alpha),
+      topLeft = Offset(cx - rx, cy - ry),
+      size = Size(rx * 2, ry * 2)
+    )
+    drawOval(
+      color = Color(0xFF1A1C24).copy(alpha = alpha * 0.5f),
+      topLeft = Offset(cx - rx * 0.92f, cy - ry * 0.92f),
+      size = Size(rx * 1.84f, ry * 1.84f)
+    )
+  }
 }

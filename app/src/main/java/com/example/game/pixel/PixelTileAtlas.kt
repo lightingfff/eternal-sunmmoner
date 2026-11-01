@@ -293,89 +293,129 @@ object PixelTileAtlas {
     val baseLawn = 0xFF2B352E.toInt() // cold mossy stone-green base, not neon
     c.fillRect(0, 0, TILE_PX, TILE_PX, baseLawn)
 
-    // Large organic shadow + moss patches with subtle variation (seamless-safe away from borders)
-    val patchCols = intArrayOf(0xFF25302A.toInt(), 0xFF2F3D33.toInt(), 0xFF232E28.toInt(), 0xFF334739.toInt(), 0xFF1F2A24.toInt())
-    repeat(9) { idx ->
+    // V2 Premium: 11 organic moss/shadow patches + secondary highlight veins (seamless-safe interior)
+    val patchCols = intArrayOf(0xFF25302A.toInt(), 0xFF2F3D33.toInt(), 0xFF232E28.toInt(), 0xFF334739.toInt(), 0xFF1F2A24.toInt(), 0xFF1B2620.toInt())
+    repeat(11) { idx ->
       val cx = 8 + rng.nextInt(48)
       val cy = 8 + rng.nextInt(48)
       val col = patchCols[rng.nextInt(patchCols.size)]
-      c.fillEllipse(cx, cy, 8 + rng.nextInt(9), 5 + rng.nextInt(5), col)
+      c.fillEllipse(cx, cy, 7 + rng.nextInt(9), 4 + rng.nextInt(6), col)
+      // inner highlight vein on larger patches
+      if (idx % 3 == 0) c.fillEllipse(cx + 2, cy - 1, 3 + rng.nextInt(2), 2, 0xFF3A4E3E.toInt())
     }
-    // Subtle earth exposure - trampled / bare soil where heroes walk
-    val dirtPatches = intArrayOf(0xFF2E2A24.toInt(), 0xFF3A352E.toInt(), 0xFF2A2620.toInt())
+    // Earth exposure - trampled bare soil with irregular edges
+    val dirtPatches = intArrayOf(0xFF2E2A24.toInt(), 0xFF3A352E.toInt(), 0xFF2A2620.toInt(), 0xFF3E342A.toInt())
     if (variant % 3 == 0) {
-      repeat(2) {
+      repeat(3) {
         val cx = 12 + rng.nextInt(40)
         val cy = 12 + rng.nextInt(40)
-        c.fillEllipse(cx, cy, 6 + rng.nextInt(5), 4 + rng.nextInt(3), dirtPatches[rng.nextInt(dirtPatches.size)])
+        val col = dirtPatches[rng.nextInt(dirtPatches.size)]
+        c.fillEllipse(cx, cy, 6 + rng.nextInt(6), 4 + rng.nextInt(3), col)
+        c.fillEllipse(cx + rng.nextInt(3) - 1, cy + 1, 3, 2, 0xFF252018.toInt())
       }
+    } else if (variant % 5 == 1) {
+      // subtle single worn spot on other variants
+      val cx = 18 + rng.nextInt(28)
+      val cy = 18 + rng.nextInt(28)
+      c.fillEllipse(cx, cy, 5, 3, 0xFF2E2A24.toInt())
     }
-    // Fine stone grit - cold slate pebbles embedded in moss
-    repeat(18) {
+    // Fine stone grit - cold slate pebbles + slate shards embedded in moss
+    repeat(26) {
       val sx = 4 + rng.nextInt(56)
       val sy = 4 + rng.nextInt(56)
-      c.set(sx, sy, if (rng.nextInt(3)==0) 0xFF3A3F45.toInt() else 0xFF4A4D55.toInt())
+      val col = when (rng.nextInt(4)) {
+        0 -> 0xFF3A3F45.toInt()
+        1 -> 0xFF4A4D55.toInt()
+        2 -> 0xFF353A42.toInt()
+        else -> 0xFF5A5F6E.toInt()
+      }
+      c.set(sx, sy, col)
+      if (rng.nextInt(6) == 0 && sx < 63) c.set(sx + 1, sy, 0xFF2A2E34.toInt())
     }
 
-    // Dark fantasy foliage specks - muted, dusty greens with depth (shadow-mid-highlight)
+    // Dark fantasy foliage specks - 7-tone depth with clustered micro-detail (shadow-mid-highlight + frost)
     val deepShadow = 0xFF162118.toInt()
     val midMoss = 0xFF2A3D2B.toInt()
     val mutedMid = 0xFF344E35.toInt()
     val mossLight = 0xFF3D5A36.toInt()
-    val mossHi = 0xFF4A6B3E.toInt() // still desaturated, never neon
-    repeat(110) {
+    val mossHi = 0xFF4A6B3E.toInt()
+    val frostTip = 0xFF5A7A52.toInt()
+    val earthUnder = 0xFF1E2620.toInt()
+    repeat(135) {
       val gx = 2 + rng.nextInt(60)
       val gy = 2 + rng.nextInt(60)
-      val col = when (rng.nextInt(6)) {
+      val roll = rng.nextInt(8)
+      val col = when (roll) {
         0 -> deepShadow
-        1 -> midMoss
-        2,3 -> mutedMid
-        4 -> mossLight
-        else -> mossHi
+        1 -> earthUnder
+        2 -> midMoss
+        3, 4 -> mutedMid
+        5 -> mossLight
+        6 -> mossHi
+        else -> frostTip
       }
       c.set(gx, gy, col)
-      if (rng.nextInt(5)==0 && gx < 62) c.set(gx+1, gy, midMoss)
+      if (rng.nextInt(4) == 0 && gx < 62) c.set(gx + 1, gy, midMoss)
+      if (roll == 6 && rng.nextInt(3) == 0 && gy > 2) c.set(gx, gy - 1, mossLight)
     }
 
-    // Thicker, stiffer grass tufts - clumped, wind-bent, with AO at base
-    repeat(12) {
+    // Premium wind-bent tufts - 3-stem clumped with AO base + highlight tip + bent lean
+    repeat(15) {
       val tx = 6 + rng.nextInt(52)
       val ty = 10 + rng.nextInt(48)
-      // AO shadow under tuft
-      c.hLine(tx - 1, ty+1, 4, 0xFF1A1E1B.toInt())
-      c.hLine(tx - 1, ty, 3, deepShadow)
-      c.vLine(tx - 1, ty - 2, 2, mossLight)
-      c.vLine(tx, ty - 3, 4, mossHi)
-      c.vLine(tx + 1, ty - 1, 2, mutedMid)
+      val lean = if (rng.nextBoolean()) 1 else 0
+      c.hLine(tx - 1, ty + 1, 5, 0xFF1A1E1B.toInt()) // AO contact shadow
+      c.hLine(tx - 1, ty, 4, deepShadow)
+      c.vLine(tx - 1 + lean, ty - 2, 3, mossLight)
+      c.vLine(tx + lean, ty - 4, 5, mossHi)
+      c.vLine(tx + 1 + lean, ty - 2, 3, mutedMid)
+      if (rng.nextInt(3) == 0) c.set(tx + lean, ty - 5, frostTip) // sun catch tip
     }
 
-    // Rare, desaturated wildflowers - dusty lavender / muted rose, sparse
+    // Micro clover / fern flecks - 3-pixel clusters for close-zoom readability
+    repeat(6) {
+      val cx = 8 + rng.nextInt(48)
+      val cy = 8 + rng.nextInt(48)
+      c.set(cx, cy, 0xFF2E4A32.toInt())
+      c.set(cx + 1, cy, 0xFF3D5A36.toInt())
+      c.set(cx, cy + 1, 0xFF253A28.toInt())
+    }
+
+    // Rare desaturated wildflowers - dusty lavender / dried rose with petal structure
     if (variant == 2 || variant == 5 || variant == 7) {
       repeat(2) { fIdx ->
         val fx = 11 + (variant * 13 + fIdx * 17) % 42
         val fy = 11 + (variant * 11 + fIdx * 19) % 42
         if ((variant + fIdx) % 2 == 0) {
-          // dusky lavender / heather, not pink neon
-          c.set(fx, fy, 0xFF8A7A97.toInt())
-          c.set(fx + 1, fy, 0xFF6E6080.toInt())
+          c.set(fx - 1, fy, 0xFF8A7A97.toInt())
+          c.set(fx + 1, fy, 0xFF8A7A97.toInt())
+          c.set(fx, fy - 1, 0xFF9A8AAE.toInt())
+          c.set(fx, fy, 0xFF6E6080.toInt())
           c.set(fx, fy + 1, 0xFF5A4E6A.toInt())
         } else {
-          // dried rose / burgundy
-          c.set(fx, fy, 0xFF9A6570.toInt())
-          c.set(fx + 1, fy, 0xFF7A4A52.toInt())
+          c.set(fx - 1, fy, 0xFF9A6570.toInt())
+          c.set(fx + 1, fy, 0xFF9A6570.toInt())
+          c.set(fx, fy - 1, 0xFFB08088.toInt())
+          c.set(fx, fy, 0xFF7A4A52.toInt())
         }
-        // tiny dark stem
-        c.set(fx, fy+2, 0xFF1E2A1F.toInt())
+        c.set(fx, fy + 2, 0xFF1E2A1F.toInt())
+        if (rng.nextInt(2) == 0) c.set(fx + 1, fy + 2, 0xFF2A3A2E.toInt())
       }
     }
-    // Fallen leaf litter near old trees on some tiles
+    // Fallen leaf litter + tiny mushroom caps near old trees
     if (variant == 1 || variant == 6) {
-      repeat(3) {
+      repeat(4) {
         val lx = 14 + rng.nextInt(36)
         val ly = 14 + rng.nextInt(36)
         c.set(lx, ly, 0xFF5A4630.toInt())
-        c.set(lx+1, ly, 0xFF4A3520.toInt())
+        c.set(lx + 1, ly, 0xFF4A3520.toInt())
+        c.set(lx, ly + 1, 0xFF3E2E1E.toInt())
       }
+      // pale mushroom dot
+      val mx = 18 + rng.nextInt(28)
+      val my = 18 + rng.nextInt(28)
+      c.set(mx, my, 0xFFC2B8A8.toInt())
+      c.set(mx, my + 1, 0xFF8A7A6A.toInt())
     }
     return c.toImageBitmap()
   }
@@ -389,31 +429,49 @@ object PixelTileAtlas {
     val sandHi = 0xFF7A6B55.toInt()
     c.fillRect(0, 0, TILE_PX, TILE_PX, sandBase)
 
-    // Variation patches - trampled, darker center
-    repeat(5) { idx ->
+    // V2: layered trampled earth with moisture variation + compacted ridges
+    repeat(7) { idx ->
       val cx = 10 + rng.nextInt(44)
       val cy = 10 + rng.nextInt(44)
-      val col = if (idx % 2 == 0) sandMid else 0xFF4E3E2E.toInt()
-      c.fillEllipse(cx, cy, 9 + rng.nextInt(7), 5 + rng.nextInt(4), col)
+      val col = when (idx % 3) {
+        0 -> sandMid
+        1 -> 0xFF4E3E2E.toInt()
+        else -> 0xFF524A3A.toInt()
+      }
+      c.fillEllipse(cx, cy, 8 + rng.nextInt(8), 5 + rng.nextInt(5), col)
+      if (idx % 2 == 0) c.fillEllipse(cx + 3, cy + 1, 4, 2, 0xFF6B5C45.toInt())
     }
-    // Stone grit + pebbles in sand
-    repeat(55) {
+    // Stone grit + pebbles + slate shards in sand
+    repeat(65) {
       val sx = 2 + rng.nextInt(60)
       val sy = 2 + rng.nextInt(60)
-      c.set(sx, sy, if (rng.nextBoolean()) sandHi else 0xFF3E3328.toInt())
+      val col = when (rng.nextInt(3)) {
+        0 -> sandHi
+        1 -> 0xFF3E3328.toInt()
+        else -> 0xFF8A7A6A.toInt()
+      }
+      c.set(sx, sy, col)
+      if (rng.nextInt(8) == 0) c.set(sx + 1, sy, 0xFF4A3D2E.toInt())
     }
-    // Sparring scuff arcs & footprints - subtle directional marks
+    // Sparring scuff arcs, footprints & weapon drag - directional story marks
     if (variant == 1 || variant == 4) {
       val px = 18 + variant * 5
       val py = 22 + variant * 4
-      c.hLine(px, py, 7, 0xFF4A3D2E.toInt())
-      c.hLine(px + 1, py + 1, 6, 0xFF7A6B55.toInt())
-      // deeper gouge
-      c.set(px+3, py+2, 0xFF3A2E24.toInt())
+      c.hLine(px, py, 9, 0xFF4A3D2E.toInt())
+      c.hLine(px + 1, py + 1, 7, 0xFF7A6B55.toInt())
+      c.hLine(px + 2, py + 2, 5, 0xFF3A2E24.toInt())
+      // second scuff perpendicular
+      c.vLine(px + 5, py - 2, 4, 0xFF5A4A3A.toInt())
     }
-    // Dark moss at edges near grass transition
+    // Moss/grass encroachment at arena edge
     if (variant % 2 == 0) {
-      c.fillEllipse(6, 8, 5, 3, 0xFF2A3D2B.toInt())
+      c.fillEllipse(6, 8, 6, 3, 0xFF2A3D2B.toInt())
+      c.fillEllipse(7, 7, 3, 2, 0xFF3D5A36.toInt())
+    }
+    // Tiny puddle sheen on compacted variant
+    if (variant == 3) {
+      c.hLine(28, 34, 6, 0xFF6B6A5A.toInt())
+      c.hLine(29, 35, 4, 0xFF8A8A7A.toInt())
     }
     return c.toImageBitmap()
   }
@@ -442,17 +500,26 @@ object PixelTileAtlas {
         val cw = 20 + ((variant + r * 3 + idx) % 3) * 6
         val base = bases[(variant + r + idx) % bases.size]
         c.beveledSlab(curX, curY, cw, rh, base, hi, sh, mortar, rng, hi, sh)
-        // crack / age line
-        if (rng.nextInt(7)==0) c.vLine(curX + cw/2, curY+3, rh-6, 0xFF1E2026.toInt())
+        // Age: vertical crack + chip + lichen
+        if (rng.nextInt(6) == 0) c.vLine(curX + cw / 2, curY + 3, rh - 6, 0xFF1E2026.toInt())
+        if (rng.nextInt(10) == 0) c.set(curX + 3, curY + 4, 0xFF252830.toInt()) // chip
+        if ((variant + r + idx) % 7 == 0) c.set(curX + cw - 4, curY + rh - 4, 0xFF2A332E.toInt()) // lichen in corner
+        // chisel tool mark
+        if (rng.nextInt(9) == 0) c.hLine(curX + 4, curY + rh / 2, 4, 0xFF4A4F5C.toInt())
         curX += cw
         idx++
       }
       curY += rh
     }
-    // Occasional rune scratch
-    if (variant==3 || variant==7) {
-      c.hLine(18, 30, 9, 0xFF6B7A9A.toInt())
-      c.set(22,31, 0xFF7CA8C8.toInt())
+    // Rune scratch with glow + secondary moss vein
+    if (variant == 3 || variant == 7) {
+      c.hLine(18, 30, 10, 0xFF6B7A9A.toInt())
+      c.set(22, 31, 0xFF7CA8C8.toInt())
+      c.set(23, 31, 0xFF4A6080.toInt())
+    }
+    if (variant == 1 || variant == 5) {
+      c.fillEllipse(12, 14, 4, 2, 0xFF2A332E.toInt())
+      c.set(13, 13, 0xFF3D5A36.toInt())
     }
     return c.toImageBitmap()
   }
@@ -485,8 +552,12 @@ object PixelTileAtlas {
           base, hi, sh, mortar, rng,
           0xFF5A5F6E.toInt(), 0xFF1E2024.toInt(),
         )
-        // moss in cracks on some stones
-        if ((variant+row+colIdx)%5==0) c.set(px+2, py+2, 0xFF2A332E.toInt())
+        // Moss in grout + wear chip
+        if ((variant + row + colIdx) % 5 == 0) {
+          c.set(px + 2, py + 2, 0xFF2A332E.toInt())
+          c.set(px + 3, py + 3, 0xFF1E2A1F.toInt())
+        }
+        if (rng.nextInt(12) == 0) c.set(px + cw / 2, py + rh / 2, 0xFF525663.toInt()) // light wear spot
         c.set(px + 1, py + 1, mortar)
         c.set(px + cw - 2, py + 1, mortar)
         px += cw
@@ -494,8 +565,12 @@ object PixelTileAtlas {
       }
       py += rh
     }
-    // Age cracks across tiles
-    if (variant==2) c.hLine(8, 30, 14, 0xFF1E2026.toInt())
+    // Age cracks + puddle sheen
+    if (variant == 2) c.hLine(8, 30, 16, 0xFF1E2026.toInt())
+    if (variant == 5) {
+      c.hLine(10, 42, 8, 0xFF2A2E3A.toInt())
+      c.set(14, 43, 0xFF4A4F5C.toInt())
+    }
     return c.toImageBitmap()
   }
 
@@ -521,8 +596,12 @@ object PixelTileAtlas {
       py += rh
     }
     if (variant % 2 == 0) {
-      c.fillCircle(12 + variant * 8, 14, 2, 0xFF2A332E.toInt())
+      c.fillCircle(12 + variant * 8, 14, 3, 0xFF2A332E.toInt())
       c.set(12 + variant * 8, 13, 0xFF3D5A36.toInt())
+      c.set(13 + variant * 8, 14, 0xFF1E2A1F.toInt())
+    }
+    if (variant == 1 || variant == 3) {
+      c.vLine(6, 8, 4, 0xFF1E2026.toInt())
     }
     return c.toImageBitmap()
   }
