@@ -40,7 +40,11 @@ fun attemptSilentGoogleSignIn(
   onAuthSuccess: () -> Unit,
   onUnauthenticated: () -> Unit,
 ) {
-  if (Firebase.auth.currentUser != null) {
+  if (!FirebaseAvailability.isFirebaseReady(context)) {
+    onUnauthenticated()
+    return
+  }
+  if (try { Firebase.auth.currentUser != null } catch (_: Exception) { false }) {
     onAuthSuccess()
     return
   }
@@ -87,6 +91,10 @@ fun performInteractiveGoogleSignIn(
   onAuthError: (String) -> Unit,
   onAuthCancelled: () -> Unit,
 ) {
+  if (!FirebaseAvailability.isFirebaseReady(context)) {
+    onAuthError("Firebase chưa cấu hình — ứng dụng đang chạy chế độ Khách ngoại tuyến. Vui lòng cấu hình google-services.json để bật Cloud Sync.")
+    return
+  }
   val clientId = try {
     context.getString(R.string.default_web_client_id)
   } catch (e: Exception) {
@@ -131,7 +139,7 @@ fun signOutSummoner(
   scope: CoroutineScope,
   onComplete: () -> Unit,
 ) {
-  Firebase.auth.signOut()
+  try { Firebase.auth.signOut() } catch (_: Exception) { /* offline mode — no Firebase */ }
   scope.launch {
     try {
       credentialManager.clearCredentialState(ClearCredentialStateRequest())
