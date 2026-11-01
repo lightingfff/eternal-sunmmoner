@@ -191,6 +191,222 @@ data class SanctuaryZoneZone(
   val colorArgb: Long,
 )
 
+/** 2.5D depth band derived from world Y (north→south = back→fore). */
+enum class DepthBand { BACK, MID, FORE }
+
+/** Doorway-authored entrance for an enterable facility building. */
+data class SanctuaryHouseEntrance(
+  val facility: FacilityType,
+  val obstacleId: String,
+  val doorWorldX: Float,
+  val doorWorldY: Float,
+  val facingDeg: Float = 180f,
+  val outsideSpawnX: Float,
+  val outsideSpawnY: Float,
+  val triggerRadius: Float = 44f,
+  val doorWidth: Float = 36f,
+  val interiorSceneId: String,
+)
+
+/**
+ * Single source of truth for door-forward interaction (replaces zone-center 30px-north bias).
+ * Door world positions are south-face arch centers; outsideSpawn is 14–18px south (guaranteed
+ * outside collision after doorway cutout). Training ground uses south arena gate.
+ */
+object SanctuaryHouseEntrances {
+  val ENTRIES: Map<FacilityType, SanctuaryHouseEntrance> = mapOf(
+    FacilityType.HERO_QUARTERS to SanctuaryHouseEntrance(
+      facility = FacilityType.HERO_QUARTERS,
+      obstacleId = "building_hero_quarters",
+      doorWorldX = 823f,
+      doorWorldY = 790f,
+      outsideSpawnX = 823f,
+      outsideSpawnY = 808f,
+      interiorSceneId = "dormitory",
+    ),
+    FacilityType.RESTAURANT to SanctuaryHouseEntrance(
+      facility = FacilityType.RESTAURANT,
+      obstacleId = "building_restaurant",
+      doorWorldX = 1103f,
+      doorWorldY = 925f,
+      outsideSpawnX = 1103f,
+      outsideSpawnY = 943f,
+      interiorSceneId = "restaurant",
+    ),
+    FacilityType.ARMORY to SanctuaryHouseEntrance(
+      facility = FacilityType.ARMORY,
+      obstacleId = "building_armory",
+      doorWorldX = 993f,
+      doorWorldY = 655f,
+      outsideSpawnX = 993f,
+      outsideSpawnY = 673f,
+      interiorSceneId = "armory",
+    ),
+    FacilityType.TRAINING_GROUND to SanctuaryHouseEntrance(
+      facility = FacilityType.TRAINING_GROUND,
+      obstacleId = "sand_training_south_patch",
+      doorWorldX = 890f,
+      doorWorldY = 1942f,
+      outsideSpawnX = 890f,
+      outsideSpawnY = 1960f,
+      triggerRadius = 52f,
+      doorWidth = 48f,
+      interiorSceneId = "training_hall",
+    ),
+  )
+
+  fun forFacility(facility: FacilityType): SanctuaryHouseEntrance? = ENTRIES[facility]
+  fun findByObstacleId(obstacleId: String): SanctuaryHouseEntrance? =
+    ENTRIES.values.firstOrNull { it.obstacleId == obstacleId }
+
+  /** Returns the facility whose doorway trigger contains world point (wx,wy), or null. */
+  fun facilityAtDoorway(wx: Float, wy: Float, zoom: Float = 1f): FacilityType? {
+    // Zoom-clamped trigger to keep thumb target stable across 0.36–1.48 zoom.
+    for (e in ENTRIES.values) {
+      val r = e.triggerRadius * zoom.coerceIn(0.9f, 1.2f)
+      val dx = wx - e.doorWorldX
+      val dy = wy - e.doorWorldY
+      if (dx * dx + dy * dy <= r * r) return e.facility
+    }
+    return null
+  }
+
+  fun doorwayCutoutFor(obstacleId: String): SanctuaryHouseEntrance? = findByObstacleId(obstacleId)
+}
+
+/** Unified moonlight for true directional shadows. */
+object SanctuaryLight {
+  const val AZIMUTH_DEG: Float = 142f
+  const val ELEVATION_DEG: Float = 48f
+  const val COLOR_ARGB: Long = 0xFFE8E0C8L
+  // Shadow cast direction (toward SE) normalized in world XY.
+  val SHADOW_DIR_X: Float = 0.615f // sin(142°)
+  val SHADOW_DIR_Y: Float = 0.788f // -cos(142°) positive south
+  val TAN_ELEV: Float = 1.1106f // tan(48°)
+  fun shadowWorldOffset(heightPx: Float): Pair<Float, Float> {
+    val len = heightPx / TAN_ELEV
+    return (SHADOW_DIR_X * len) to (SHADOW_DIR_Y * len)
+  }
+}
+
+enum class ShadowSilhouette { RECT, ELLIPSE, CUSTOM_POLYGON, IMPOSTOR_ELLIPSE }
+
+data class ShadowCaster(
+  val id: String,
+  val heightPx: Float,
+  val footprintRX: Float,
+  val footprintRY: Float,
+  val silhouette: ShadowSilhouette,
+  val opacity: Float,
+  val softnessPx: Float = 6f,
+  val receivesShadows: Boolean = true,
+)
+
+object SanctuaryShadowRegistry {
+  /** Authored height / silhouette per PropKind (world units before scale). */
+  fun heightFor(kind: PropKind): Float = when (kind) {
+    PropKind.FACILITY_HERO_QUARTERS, PropKind.FACILITY_RESTAURANT, PropKind.FACILITY_ARMORY -> 118f
+    PropKind.FACILITY_SYNTHESIS_LAB -> 110f
+    PropKind.FACILITY_TOWER_GATE, PropKind.TOWER_PORTAL_GATE -> 145f
+    PropKind.FACILITY_SUMMONING_HALL -> 132f
+    PropKind.FACILITY_HERO_REGISTRY -> 92f
+    PropKind.FLOOR_VISTA_ARCH -> 88f
+    PropKind.MEDIEVAL_TOWNHOUSE_A, PropKind.MEDIEVAL_TOWNHOUSE_B -> 96f
+    PropKind.SANCTUARY_COTTAGE_BROWN, PropKind.SANCTUARY_COTTAGE_SLATE -> 84f
+    PropKind.FORTRESS_CORNER_TOWER, PropKind.SOUTHERN_GATE_TOWER -> 68f
+    PropKind.TERRACE_CLIFF_WALL -> 18f
+    PropKind.TERRACE_GRAND_STAIRS -> 14f
+    PropKind.STONE_BALUSTRADE_RAIL -> 16f
+    PropKind.SAKURA_BLOSSOM_TREE -> 86f
+    PropKind.OAK_TREE -> 78f
+    PropKind.MYSTIC_PLUM_TREE -> 74f
+    PropKind.PINE_SPIRIT_TREE, PropKind.CYPRESS_CONIFER_TREE -> 62f
+    PropKind.GARDEN_HEDGE_BUSH, PropKind.FOREST_CANOPY_BUSH -> 22f
+    PropKind.MOSSY_BOULDER -> 18f
+    PropKind.STREET_LANTERN -> 38f
+    PropKind.WOODEN_BENCH_34 -> 14f
+    PropKind.ARCANE_BOOKSHELF_34 -> 32f
+    PropKind.BARREL_CLUSTER -> 16f
+    PropKind.STONE_RETAINING_WALL -> 18f
+    PropKind.TAVERN_COUNTER_BAR -> 32f
+    PropKind.ARCANE_BRAZIER -> 28f
+    PropKind.TRAINING_DUMMY -> 42f
+    PropKind.WEAPON_RACK -> 34f
+    else -> 24f
+  }
+  fun silhouetteFor(kind: PropKind): ShadowSilhouette = when (kind) {
+    PropKind.OAK_TREE, PropKind.MYSTIC_PLUM_TREE, PropKind.PINE_SPIRIT_TREE,
+    PropKind.SAKURA_BLOSSOM_TREE, PropKind.CYPRESS_CONIFER_TREE,
+    PropKind.GARDEN_HEDGE_BUSH, PropKind.FOREST_CANOPY_BUSH, PropKind.MOSSY_BOULDER -> ShadowSilhouette.ELLIPSE
+    PropKind.FACILITY_TOWER_GATE, PropKind.TOWER_PORTAL_GATE -> ShadowSilhouette.CUSTOM_POLYGON
+    else -> ShadowSilhouette.RECT
+  }
+  fun opacityFor(kind: PropKind): Float = when (kind) {
+    PropKind.FACILITY_TOWER_GATE, PropKind.TOWER_PORTAL_GATE -> 0.38f
+    PropKind.FACILITY_HERO_QUARTERS, PropKind.FACILITY_RESTAURANT, PropKind.FACILITY_ARMORY,
+    PropKind.FACILITY_SYNTHESIS_LAB, PropKind.MEDIEVAL_TOWNHOUSE_A, PropKind.MEDIEVAL_TOWNHOUSE_B,
+    PropKind.SANCTUARY_COTTAGE_BROWN, PropKind.SANCTUARY_COTTAGE_SLATE -> 0.36f
+    PropKind.FORTRESS_CORNER_TOWER, PropKind.SOUTHERN_GATE_TOWER,
+    PropKind.TERRACE_CLIFF_WALL, PropKind.STONE_BALUSTRADE_RAIL -> 0.32f
+    PropKind.SAKURA_BLOSSOM_TREE, PropKind.OAK_TREE, PropKind.MYSTIC_PLUM_TREE,
+    PropKind.PINE_SPIRIT_TREE -> 0.28f
+    PropKind.MOSSY_BOULDER -> 0.34f
+    PropKind.STREET_LANTERN, PropKind.ARCANE_BRAZIER -> 0.30f
+    else -> 0.32f
+  }
+  fun casterFor(obs: WorldObstacle): ShadowCaster {
+    val h = heightFor(obs.propKind) * obs.scale
+    val rx = (if (obs.footprintHalfW > 0f) obs.footprintHalfW else obs.radius).coerceAtLeast(8f)
+    val ry = if (obs.footprintDepthNorth > 0f) obs.footprintDepthNorth * ObliqueCamera.GROUND_ELLIPSE_RATIO else rx * ObliqueCamera.GROUND_ELLIPSE_RATIO
+    return ShadowCaster(
+      id = obs.id,
+      heightPx = h,
+      footprintRX = rx,
+      footprintRY = ry,
+      silhouette = silhouetteFor(obs.propKind),
+      opacity = opacityFor(obs.propKind),
+    )
+  }
+  fun build(obstacles: List<WorldObstacle>): Map<String, ShadowCaster> =
+    obstacles.associate { it.id to casterFor(it) }
+}
+
+// ---------------------------------------------------------------------------
+// House doorway helpers & depth band derivation (preserves baseline geometry)
+// ---------------------------------------------------------------------------
+
+/** Depth band for atmosphere / sorting (Y-based, north→south = back→fore). */
+fun WorldObstacle.depthBand(): DepthBand = when {
+  y < 520f -> DepthBand.BACK
+  y < 1760f -> DepthBand.MID
+  else -> DepthBand.FORE
+}
+
+/**
+ * Returns true if world position (wx,wy) is inside the doorway cutout of [obs].
+ * Cutout is a south-edge slit centered at doorWorldX, width = doorWidth, depth 14px south.
+ * Entity radius is accounted for externally — check uses doorWidth/2 + radius.
+ */
+fun isInsideDoorwayCutout(wx: Float, wy: Float, obs: WorldObstacle, entityRadius: Float = 12f): Boolean {
+  val entrance = SanctuaryHouseEntrances.doorwayCutoutFor(obs.id) ?: return false
+  val halfW = entrance.doorWidth * 0.5f + entityRadius
+  val dx = wx - entrance.doorWorldX
+  if (abs(dx) > halfW) return false
+  // Gap from 3px inside the wall (north) to 12px outside (south) — allows stepping through.
+  val gapNorth = entrance.doorWorldY - 3f - entityRadius
+  val gapSouth = entrance.doorWorldY + 14f + entityRadius
+  if (wy < gapNorth || wy > gapSouth) return false
+  // Must be near south edge (within footprint's south strip):
+  if (wy < obs.y - 8f) return false // not yet near south edge
+  return true
+}
+
+/** Screen-space helpers share ObliqueCamera — single-call delegation (no duplicate math). */
+fun screenX(worldX: Float, camX: Float, zoom: Float, halfW: Float): Float =
+  ObliqueCamera.worldToScreenX(worldX, camX, zoom, halfW)
+fun screenY(worldY: Float, camY: Float, zoom: Float, halfH: Float, z: Float = 0f): Float =
+  ObliqueCamera.worldToScreenY(worldY, camY, zoom, halfH, z)
+
 enum class EnemyArchetype(
   val nameVi: String,
   val titleVi: String,
@@ -520,6 +736,8 @@ object CollisionPhysics {
 
     for (obs in obstacles) {
       if (!obs.blocksMovement) continue
+      // Doorway cutout — allow stepping through the south-face arch without collision.
+      if (isInsideDoorwayCutout(rx, ry, obs, entityRadius)) continue
       if (obs.footprintHalfW > 0f && obs.footprintDepthNorth > 0f) {
         val left = obs.x - obs.footprintHalfW
         val right = obs.x + obs.footprintHalfW
@@ -579,5 +797,35 @@ object CollisionPhysics {
       ry = ry.coerceIn(marginWall + entityRadius, mapHeight - marginWall - entityRadius)
     }
     return rx to ry
+  }
+
+  /** Returns true if (x,y) with radius would collide with any blocking obstacle (doorway cutout respected). */
+  fun wouldCollide(
+    x: Float,
+    y: Float,
+    entityRadius: Float,
+    obstacles: List<WorldObstacle>,
+  ): Boolean {
+    for (obs in obstacles) {
+      if (!obs.blocksMovement) continue
+      if (isInsideDoorwayCutout(x, y, obs, entityRadius)) continue
+      if (obs.footprintHalfW > 0f && obs.footprintDepthNorth > 0f) {
+        val left = obs.x - obs.footprintHalfW
+        val right = obs.x + obs.footprintHalfW
+        val top = obs.y - obs.footprintDepthNorth
+        val bottom = obs.y
+        val closestX = x.coerceIn(left, right)
+        val closestY = y.coerceIn(top, bottom)
+        val dx = x - closestX
+        val dy = y - closestY
+        if (dx * dx + dy * dy < entityRadius * entityRadius) return true
+      } else {
+        val dx = x - obs.x
+        val dy = y - obs.y
+        val minD = entityRadius + obs.radius
+        if (dx * dx + dy * dy < minD * minD) return true
+      }
+    }
+    return false
   }
 }
