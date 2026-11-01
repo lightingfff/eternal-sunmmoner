@@ -66,6 +66,8 @@ object SanctuaryWorldRenderer {
 
 
     drawDriftingSkyClouds(camX, camY, zoom, timeSec)
+    val daylight = ((com.example.game.world.WorldEnvironment.lighting.ambientIntensity-.73f)/.27f).coerceIn(0f,1f)
+    drawRect(com.example.game.world.WorldEnvironment.lighting.skyTint.copy(alpha=daylight*.26f))
     drawBackgroundFloatingIslands(::sx, ::sy, zoom, timeSec)
 
     // 2. Faceted Rocky Cliff Underside & Lush Green Grass Rim Beneath the 8-Sided Island Polygon

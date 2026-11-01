@@ -68,9 +68,9 @@ object PixelSpriteRenderer {
       scale(scaleX = 1f, scaleY = ellipseRatio, pivot = Offset(cx, cy))
     }) {
       val stops = if (midColor != null) {
-        listOf(innerColor, midColor, Color.Transparent)
+        listOf(innerColor.copy(alpha=(innerColor.alpha*com.example.game.world.WorldEnvironment.lighting.localLightIntensity).coerceAtMost(.6f)), midColor, Color.Transparent)
       } else {
-        listOf(innerColor, Color.Transparent)
+        listOf(innerColor.copy(alpha=(innerColor.alpha*com.example.game.world.WorldEnvironment.lighting.localLightIntensity).coerceAtMost(.6f)), Color.Transparent)
       }
       drawCircle(
         brush = Brush.radialGradient(colors = stops, center = Offset(cx, cy), radius = radiusX),
@@ -763,13 +763,13 @@ object PixelSpriteRenderer {
         } else {
           PixelStructureAtlas.sakuraTreeSpriteB
         }
-        drawCrispSprite(bmp, cx + sway, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, bmp) * s, 2.0f * s)
+        drawCrispSprite(bmp, cx, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, bmp) * s, 2.0f * s)
       }
 
       PropKind.CYPRESS_CONIFER_TREE -> {
         val sway = sin(timeSec * 1.9f + obs.x * 0.02f) * 1.2f * s
         if (renderShadow) drawDirectionalShadow34(cx + 6f * s, cy, 34f * s, 11f * s, alpha = 0.34f)
-        drawCrispSprite(PixelStructureAtlas.cypressConiferSprite, cx + sway, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.cypressConiferSprite) * s, 2.0f * s)
+        drawCrispSprite(PixelStructureAtlas.cypressConiferSprite, cx, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.cypressConiferSprite) * s, 2.0f * s)
       }
 
       PropKind.GARDEN_HEDGE_BUSH -> {
@@ -898,20 +898,20 @@ object PixelSpriteRenderer {
       PropKind.OAK_TREE -> {
         val sway = sin(timeSec * 1.9f + obs.x * 0.015f) * 2.0f * s
         if (renderShadow) drawDirectionalShadow34(cx + 8f * s, cy, 82f * s, 22f * s, alpha = 0.50f)
-        drawCrispSprite(PixelStructureAtlas.oakTreeSprite, cx + sway, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.oakTreeSprite) * s, 2.05f * s)
+        drawCrispSprite(PixelStructureAtlas.oakTreeSprite, cx, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.oakTreeSprite) * s, 2.05f * s)
       }
 
       PropKind.MYSTIC_PLUM_TREE -> {
         val sway = sin(timeSec * 1.8f + obs.x * 0.015f) * 2.0f * s
         if (renderShadow) drawDirectionalShadow34(cx + 8f * s, cy, 78f * s, 20f * s, alpha = 0.50f)
         drawForeshortenedGlow(cx, cy - 12f * s, 88f * s, Color(0xFFD946EF).copy(alpha = 0.16f))
-        drawCrispSprite(PixelStructureAtlas.mysticPlumTreeSprite, cx + sway, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.mysticPlumTreeSprite) * s, 2.05f * s)
+        drawCrispSprite(PixelStructureAtlas.mysticPlumTreeSprite, cx, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.mysticPlumTreeSprite) * s, 2.05f * s)
       }
 
       PropKind.PINE_SPIRIT_TREE -> {
         val sway = sin(timeSec * 2.0f + obs.x * 0.02f) * 1.6f * s
         if (renderShadow) drawDirectionalShadow34(cx + 6f * s, cy, 62f * s, 17f * s, alpha = 0.50f)
-        drawCrispSprite(PixelStructureAtlas.spiritPineSprite, cx + sway, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.spiritPineSprite) * s, 2.0f * s)
+        drawCrispSprite(PixelStructureAtlas.spiritPineSprite, cx, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.spiritPineSprite) * s, 2.0f * s)
       }
 
       PropKind.FOREST_CANOPY_BUSH -> {

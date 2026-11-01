@@ -280,9 +280,9 @@ object SanctuaryLight {
   const val ELEVATION_DEG: Float = 48f
   const val COLOR_ARGB: Long = 0xFFE8E0C8L
   // Shadow cast direction (toward SE) normalized in world XY.
-  val SHADOW_DIR_X: Float = 0.615f // sin(142°)
-  val SHADOW_DIR_Y: Float = 0.788f // -cos(142°) positive south
-  val TAN_ELEV: Float = 1.1106f // tan(48°)
+  val SHADOW_DIR_X: Float get() = com.example.game.world.WorldEnvironment.lighting.directionX // sin(142°)
+  val SHADOW_DIR_Y: Float get() = com.example.game.world.WorldEnvironment.lighting.directionY // -cos(142°) positive south
+  val TAN_ELEV: Float get() = 1.1106f / com.example.game.world.WorldEnvironment.lighting.shadowLength // tan(48°)
   fun shadowWorldOffset(heightPx: Float): Pair<Float, Float> {
     val len = heightPx / TAN_ELEV
     return (SHADOW_DIR_X * len) to (SHADOW_DIR_Y * len)
