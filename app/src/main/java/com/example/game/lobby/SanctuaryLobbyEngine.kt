@@ -632,9 +632,7 @@ class SanctuaryLobbyEngine {
 
   fun enterFacilityInterior(facility: FacilityType) {
     if (facility !in ENTERABLE_FACILITIES) return
-    val now = System.currentTimeMillis()
-    if (now - lastTransitionMs < TRANSITION_DEBOUNCE_MS) return
-    lastTransitionMs = now
+    if (activeInterior == facility) return
     if (!isInsideInterior) {
       savedExteriorX = camX
       savedExteriorY = camY
@@ -653,25 +651,13 @@ class SanctuaryLobbyEngine {
 
   fun exitFacilityInterior() {
     if (!isInsideInterior) return
-    val now = System.currentTimeMillis()
-    if (now - lastTransitionMs < TRANSITION_DEBOUNCE_MS) return
-    lastTransitionMs = now
+
     val exitedFrom = activeInterior
     activeInterior = null
-    // Restore saved exterior; fallback to doorway outsideSpawn if saved pos is blocked or too far.
-    val exteriorObstacles = TowerFloorCatalog.buildSanctuaryMap().obstacles
-    val wouldCollideSaved = CollisionPhysics.wouldCollide(savedExteriorX, savedExteriorY, 16f, exteriorObstacles)
-    val doorway = exitedFrom?.let { SanctuaryHouseEntrances.forFacility(it) }
-    if (wouldCollideSaved && doorway != null) {
-      camX = doorway.outsideSpawnX
-      camY = doorway.outsideSpawnY
-      zoom = savedExteriorZoom.coerceIn(0.52f, 0.92f)
-    } else {
-      camX = savedExteriorX
-      camY = savedExteriorY
-      zoom = savedExteriorZoom
-    }
-    // Guarantee outsideSpawn validity even if saved pos was okay but far from door — keep saved for spatial continuity.
+    // The external Master's camera is not a colliding world actor.
+    camX = savedExteriorX
+    camY = savedExteriorY
+    zoom = savedExteriorZoom
     selectedHeroId = savedSelectedHeroId
     selectedFacility = savedSelectedFacility ?: exitedFrom
     isNearRestaurantExit = false
