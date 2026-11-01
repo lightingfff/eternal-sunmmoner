@@ -42,7 +42,8 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MeetingRoom
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material3.Button
+import com.example.ui.components.FantasyButton as Button
+import com.example.ui.components.FantasySkin
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -127,7 +128,7 @@ fun ContextualFacilityPromptCard(
 
   Surface(
     shape = RoundedCornerShape(14.dp),
-    color = SanctuaryStone.copy(alpha = 0.96f),
+    color = FantasySkin.Panel.copy(alpha = 0.96f),
     border = BorderStroke(1.5.dp, accent.copy(alpha = 0.85f)),
     tonalElevation = 8.dp,
     modifier = modifier
@@ -180,7 +181,7 @@ fun ContextualFacilityPromptCard(
               .testTag("enter_facility_interior_button"),
             shape = RoundedCornerShape(10.dp),
             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = accent, contentColor = ObsidianVoid),
+            colors = FantasySkin.buttonColors(containerColor = accent, contentColor = ObsidianVoid),
           ) {
             Icon(Icons.Default.MeetingRoom, contentDescription = null, modifier = Modifier.size(16.dp))
             Spacer(modifier = Modifier.width(5.dp))
@@ -214,7 +215,7 @@ fun ContextualFacilityPromptCard(
               .testTag("open_facility_panel_button"),
             shape = RoundedCornerShape(10.dp),
             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
+            colors = FantasySkin.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
           ) {
             Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(15.dp))
             Spacer(modifier = Modifier.width(5.dp))
@@ -246,7 +247,7 @@ fun SelectedHeroCompactCard(
 
   Surface(
     shape = RoundedCornerShape(14.dp),
-    color = SanctuaryStone.copy(alpha = 0.96f),
+    color = FantasySkin.Panel.copy(alpha = 0.96f),
     border = BorderStroke(1.2.dp, classAccent.copy(alpha = 0.85f)),
     modifier = modifier
       .widthIn(max = 390.dp)
@@ -309,7 +310,7 @@ fun SelectedHeroCompactCard(
           modifier = Modifier
             .heightIn(min = 36.dp)
             .testTag("open_hero_profile_button"),
-          colors = ButtonDefaults.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
+          colors = FantasySkin.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
           shape = RoundedCornerShape(8.dp),
         ) {
           Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.size(14.dp))
@@ -402,7 +403,7 @@ fun HeroFullProfileModal(
 
     Surface(
       shape = RoundedCornerShape(18.dp),
-      color = SanctuaryStone,
+      color = FantasySkin.Panel,
       tonalElevation = 10.dp,
       modifier = Modifier
         .fillMaxSize()
@@ -623,7 +624,7 @@ private fun HeroOverviewTab(
         .fillMaxWidth()
         .heightIn(min = 48.dp)
         .testTag("profile_toggle_squad_button"),
-      colors = ButtonDefaults.buttonColors(
+      colors = FantasySkin.buttonColors(
         containerColor = if (hero.inActiveSquad) EmeraldVitality else SummonerGold,
         contentColor = ObsidianVoid,
       ),
@@ -730,7 +731,7 @@ private fun HeroStatsTab(
         .fillMaxWidth()
         .heightIn(min = 48.dp)
         .testTag("profile_train_focus_button"),
-      colors = ButtonDefaults.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
+      colors = FantasySkin.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
     ) {
       Icon(Icons.Default.FitnessCenter, contentDescription = null, modifier = Modifier.size(16.dp))
       Spacer(modifier = Modifier.width(6.dp))
@@ -876,7 +877,7 @@ private fun HeroEquipmentTab(
             modifier = Modifier
               .heightIn(min = 46.dp)
               .testTag("profile_equip_${item.id}"),
-            colors = ButtonDefaults.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
+            colors = FantasySkin.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
           ) {
             Text(if (alreadyEquippedHere) "Đã Mặc" else "Trang Bị", maxLines = 1)
           }
@@ -995,7 +996,7 @@ private fun HeroSkillsTab(
         .fillMaxWidth()
         .heightIn(min = 48.dp)
         .testTag("profile_upgrade_skill_button"),
-      colors = ButtonDefaults.buttonColors(containerColor = ArcaneViolet, contentColor = Color.White),
+      colors = FantasySkin.buttonColors(containerColor = ArcaneViolet, contentColor = Color.White),
     ) {
       Text("Nâng Cấp Kỹ Năng ($manaCost Mana + 1 Tinh Hoa)", fontWeight = FontWeight.Bold)
     }
@@ -1050,7 +1051,7 @@ private fun HeroActivityRecoveryTab(
           .fillMaxWidth()
           .heightIn(min = 48.dp)
           .testTag("profile_recover_button"),
-        colors = ButtonDefaults.buttonColors(
+        colors = FantasySkin.buttonColors(
           containerColor = if (remInjurySec == 0L) EmeraldVitality else AmberWarning,
           contentColor = ObsidianVoid,
         ),
@@ -1158,7 +1159,7 @@ fun IslandExpansionModal(
   ) {
     Surface(
       shape = RoundedCornerShape(18.dp),
-      color = SanctuaryStone,
+      color = FantasySkin.Panel,
       tonalElevation = 10.dp,
       modifier = Modifier
         .fillMaxSize()
@@ -1296,7 +1297,7 @@ fun IslandExpansionModal(
                         .weight(1f)
                         .heightIn(min = 46.dp)
                         .testTag("unlock_expansion_${milestone.name.lowercase()}"),
-                      colors = ButtonDefaults.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
+                      colors = FantasySkin.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
                     ) {
                       Text(
                         text = when {

@@ -32,7 +32,8 @@ import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.VerifiedUser
-import androidx.compose.material3.Button
+import com.example.ui.components.FantasyButton as Button
+import com.example.ui.components.FantasySkin
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -91,7 +92,7 @@ fun SettingsAndAccountModal(
   ) {
     Surface(
       shape = RoundedCornerShape(18.dp),
-      color = SanctuaryStone,
+      color = FantasySkin.Panel,
       tonalElevation = 12.dp,
       modifier = Modifier
         .fillMaxWidth()
@@ -214,7 +215,7 @@ fun SettingsAndAccountModal(
                 .heightIn(min = 48.dp)
                 .testTag("link_google_account_button"),
               shape = RoundedCornerShape(10.dp),
-              colors = ButtonDefaults.buttonColors(
+              colors = FantasySkin.buttonColors(
                 containerColor = PortalCyan,
                 contentColor = ObsidianVoid,
               ),

@@ -43,7 +43,8 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material3.Button
+import com.example.ui.components.FantasyButton as Button
+import com.example.ui.components.FantasySkin
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -160,7 +161,7 @@ fun SanctuaryFacilityModalOverlay(
         .heightIn(max = 680.dp)
         .border(1.5.dp, accentColor.copy(alpha = 0.72f), RoundedCornerShape(18.dp)),
       shape = RoundedCornerShape(18.dp),
-      color = SanctuaryStone,
+      color = FantasySkin.Panel,
       tonalElevation = 10.dp,
     ) {
       Column(
@@ -389,7 +390,7 @@ private fun SummoningHallContent(
           onClick = onSummonHero,
           enabled = !isBusy && canSummon,
           modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("summon_ritual_button"),
-          colors = ButtonDefaults.buttonColors(containerColor = ArcaneViolet, contentColor = Color.White),
+          colors = FantasySkin.buttonColors(containerColor = ArcaneViolet, contentColor = Color.White),
         ) {
           Icon(Icons.Default.AutoFixHigh, contentDescription = null, modifier = Modifier.size(16.dp))
           Spacer(modifier = Modifier.width(6.dp))
@@ -403,13 +404,14 @@ private fun SummoningHallContent(
         Column(
           modifier = Modifier
             .fillMaxWidth()
+            .testTag("summon_result")
             .clip(RoundedCornerShape(14.dp))
-            .background(Color(0xFF281948))
+            .background(FantasySkin.Panel)
             .border(1.5.dp, SummonerGold, RoundedCornerShape(14.dp))
             .padding(12.dp),
         ) {
           Text(
-            text = "★ ANH HÙNG MỚI XUẤT HIỆN • ${"★".repeat(newlySummoned.rarity.toInt())}",
+            text = "★ TRIỆU HỒI THÀNH CÔNG • ${"★".repeat(newlySummoned.rarity.toInt())}",
             style = MaterialTheme.typography.labelMedium,
             color = SummonerGold,
           )
@@ -419,6 +421,7 @@ private fun SummoningHallContent(
             Column(modifier = Modifier.weight(1f)) {
               Text("${newlySummoned.name} — ${newlySummoned.title}", style = MaterialTheme.typography.titleSmall, color = ParchmentLight)
               Text("${newlySummoned.classType.labelVi} • ${newlySummoned.personalityType.labelVi}", style = MaterialTheme.typography.bodySmall, color = PortalCyan)
+              Text("Đã lưu vào Anh hùng • mở Hồ sơ để nâng cấp và trang bị.",style=MaterialTheme.typography.labelSmall,color=FantasySkin.Gold)
               Text("«${newlySummoned.personalityType.sampleQuoteVi}»", style = MaterialTheme.typography.bodySmall, color = RuneSilver)
             }
           }
@@ -592,7 +595,7 @@ private fun TrainingGroundContent(
             onClick = { onTrainHeroWithFocus(hero, selectedFocus) },
             enabled = !isBusy && !injured && profile.gold >= levelGoldCost,
             modifier = Modifier.heightIn(min = 48.dp).testTag("train_level_${hero.id}"),
-            colors = ButtonDefaults.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
+            colors = FantasySkin.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
           ) {
             Icon(Icons.Default.FitnessCenter, contentDescription = null, modifier = Modifier.size(15.dp))
             Spacer(modifier = Modifier.width(5.dp))
@@ -797,7 +800,7 @@ private fun ArmoryContent(
               modifier = Modifier
                 .heightIn(min = 48.dp)
                 .testTag("armory_equip_${item.id}"),
-              colors = ButtonDefaults.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
+              colors = FantasySkin.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
             ) {
               Text(if (alreadyOnSelected) "Đã Mặc" else "Trang Bị", maxLines = 1)
             }
@@ -895,7 +898,7 @@ private fun SynthesisLabContent(
           onClick = onSynthesizeGear,
           enabled = !isBusy && canSynthesize,
           modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("synthesize_gear_button"),
-          colors = ButtonDefaults.buttonColors(containerColor = EmeraldVitality, contentColor = ObsidianVoid),
+          colors = FantasySkin.buttonColors(containerColor = EmeraldVitality, contentColor = ObsidianVoid),
         ) {
           Text("Dung Hợp Chế Tác (3 Quặng • 2 Tinh Hoa • 120 Vàng)", maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
@@ -1052,7 +1055,7 @@ private fun HeroQuartersContent(
             modifier = Modifier
               .heightIn(min = 48.dp)
               .testTag("recover_hero_${hero.id}"),
-            colors = ButtonDefaults.buttonColors(
+            colors = FantasySkin.buttonColors(
               containerColor = if (remSec == 0L) EmeraldVitality else AmberWarning,
               contentColor = ObsidianVoid,
             ),
@@ -1165,7 +1168,7 @@ private fun RestaurantContent(
           onClick = { onHostMealWithRecipe(selectedRecipe) },
           enabled = !isBusy && canAffordMeal,
           modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("host_meal_button"),
-          colors = ButtonDefaults.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
+          colors = FantasySkin.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
         ) {
           Text(
             text = "Phục Vụ ${selectedRecipe.titleVi} (${selectedRecipe.rationCost} Khẩu Phần • ${selectedRecipe.goldCost} Vàng)",

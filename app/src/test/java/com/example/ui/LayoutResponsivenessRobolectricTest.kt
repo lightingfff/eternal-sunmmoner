@@ -9,8 +9,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -349,6 +351,8 @@ class LayoutResponsivenessRobolectricTest {
     composeTestRule.mainClock.advanceTimeBy(64L)
 
     // Enter Playable Restaurant Interior!
+    composeTestRule.onNodeWithTag("quick_commands_toggle").performClick()
+    composeTestRule.mainClock.advanceTimeBy(300L)
     composeTestRule.onNodeWithTag("enter_restaurant_interior_button").performClick()
     composeTestRule.mainClock.advanceTimeBy(64L)
 
@@ -674,6 +678,8 @@ class LayoutResponsivenessRobolectricTest {
     // Toggle back to gameplay zoom and enter Playable 3/4 Restaurant Interior!
     composeTestRule.onNodeWithTag("camera_reset_button").performClick()
     composeTestRule.mainClock.advanceTimeBy(80L)
+    composeTestRule.onNodeWithTag("quick_commands_toggle").performClick()
+    composeTestRule.mainClock.advanceTimeBy(300L)
     composeTestRule.onNodeWithTag("enter_restaurant_interior_button").performClick()
     composeTestRule.mainClock.advanceTimeBy(160L)
     composeTestRule.waitForIdle()
@@ -771,7 +777,7 @@ class LayoutResponsivenessRobolectricTest {
       if(mode=="team") {
         val hero=state.heroes.first { !it.isCurrentlyInjured() }
         val previous=hero.inActiveSquad
-        composeTestRule.onNodeWithTag("assign_${hero.id}").performClick()
+        composeTestRule.onNodeWithTag("assign_${hero.id}").performScrollTo().performClick()
         composeTestRule.runOnIdle { assertEquals(!previous,state.heroes.first {it.id==hero.id}.inActiveSquad) }
       }
       composeTestRule.onNodeWithTag("close_hero_management").performClick()
@@ -795,10 +801,33 @@ class LayoutResponsivenessRobolectricTest {
     composeTestRule.onNodeWithTag("nav_heroes").performClick()
     composeTestRule.mainClock.advanceTimeBy(160)
     composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("inspect_${initial.heroes.first().id}").performClick()
+    composeTestRule.onNodeWithTag("inspect_${initial.heroes.first().id}").performScrollTo().performClick()
     composeTestRule.mainClock.advanceTimeBy(160)
     composeTestRule.waitForIdle()
     saveViewScreenshot(android.view.inspector.WindowInspector.getGlobalWindowViews().last(),"build/visual_screenshots/p2/hero_details.png")
+  }
+
+  @Test fun `saved expedition rewards use readable fantasy summary`() {
+    val context=org.robolectric.RuntimeEnvironment.getApplication()
+    val manager=com.example.data.local.LocalGuestSaveManager(context)
+    val snapshot=kotlinx.coroutines.runBlocking { manager.startOrResumeGuestSession("Master Rewards") }
+    val result=kotlinx.coroutines.runBlocking {
+      com.example.data.local.LocalGuestDataSource(manager).settleExpedition(snapshot.profile,
+        snapshot.heroes.filter { it.inActiveSquad },emptySet(),1,true)
+    }
+    var host: View?=null
+    composeTestRule.setContent {
+      host=LocalView.current
+      EternalSummonerTheme {
+        com.example.ui.components.FantasyPanel {
+          com.example.ui.components.RewardSummary(result.goldEarned,result.manaEarned,result.shardsEarned,result.oreEarned,result.essenceEarned)
+        }
+      }
+    }
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("CHIẾN LỢI PHẨM ĐÃ LƯU").assertExists()
+    assertTrue(manager.guestSnapshot.value!!.profile.highestClearedFloor>=1)
+    host?.let { saveViewScreenshot(it,"build/visual_screenshots/p2/rewards_component.png") }
   }
 
 }

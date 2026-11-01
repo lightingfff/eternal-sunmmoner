@@ -391,6 +391,8 @@ class MasterEvolutionV5AcceptanceRobolectricTest {
     }
     composeTestRule.mainClock.advanceTimeBy(64L)
 
+    composeTestRule.onNodeWithTag("quick_commands_toggle").performClick()
+    composeTestRule.mainClock.advanceTimeBy(300L)
     composeTestRule.onNodeWithTag("hero_chip_h_knight").performScrollTo().performClick()
     composeTestRule.mainClock.advanceTimeBy(64L)
     composeTestRule.onNodeWithTag("selected_hero_compact_card").assertIsDisplayed()
