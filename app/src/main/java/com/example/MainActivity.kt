@@ -64,6 +64,7 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    com.example.game.pixel.SanctuaryArtAssets.init(applicationContext)
     // Crash fix: Thread.setDefaultUncaughtExceptionHandler to log FATAL without silent exit
     val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
     Thread.setDefaultUncaughtExceptionHandler { t, e ->

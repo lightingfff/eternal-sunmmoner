@@ -28,16 +28,20 @@ object PixelStructureAtlas {
   val sanctuaryCottageSlate: ImageBitmap by lazy { buildSanctuaryCottage(useBlueSlate = true) }
   val fortressCornerTowerSprite: ImageBitmap by lazy { buildFortressTower(isGatehouse = false) }
   val southernGateTowerSprite: ImageBitmap by lazy { buildFortressTower(isGatehouse = true) }
-  val sakuraTreeSpriteA: ImageBitmap by lazy { buildSakuraCherryTree(largeVariant = true) }
-  val sakuraTreeSpriteB: ImageBitmap by lazy { buildSakuraCherryTree(largeVariant = false) }
-  val cypressConiferSprite: ImageBitmap by lazy { buildCypressConifer() }
-  val gardenHedgeBushSprite: ImageBitmap by lazy { buildGardenHedgeBush() }
+  val sakuraTreeSpriteA: ImageBitmap get() = SanctuaryArtAssets.image("canopy_a") ?: sakuraTreeSpriteAFallback
+  private val sakuraTreeSpriteAFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(0, 114, 132) }
+  val sakuraTreeSpriteB: ImageBitmap get() = SanctuaryArtAssets.image("canopy_b") ?: sakuraTreeSpriteBFallback
+  private val sakuraTreeSpriteBFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(1, 96, 114) }
+  val cypressConiferSprite: ImageBitmap get() = SanctuaryArtAssets.image("cypress") ?: cypressConiferSpriteFallback
+  private val cypressConiferSpriteFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(2, 48, 88) }
+  val gardenHedgeBushSprite: ImageBitmap by lazy { SanctuaryVegetation.shrub() }
   val trainingStrikingPostSprite: ImageBitmap by lazy { buildTrainingStrikingPost() }
   val terraceCliffWallSprite: ImageBitmap by lazy { buildTerraceCliffWall() }
   val terraceGrandStairsSprite: ImageBitmap by lazy { buildTerraceGrandStairs() }
   val stoneBalustradeSprite: ImageBitmap by lazy { buildStoneBalustradeRail() }
   val streetLanternFrames: List<ImageBitmap> by lazy { (0..2).map { buildStreetLantern(it) } }
-  val barrelClusterSprite: ImageBitmap by lazy { buildBarrelCluster() }
+  val barrelClusterSprite: ImageBitmap get() = SanctuaryArtAssets.image("barrels") ?: barrelClusterSpriteFallback
+  private val barrelClusterSpriteFallback: ImageBitmap by lazy { buildBarrelCluster() }
   val woodenBenchSprite: ImageBitmap by lazy { buildWoodenBench34() }
   val arcaneBookshelfSprite: ImageBitmap by lazy { buildArcaneBookshelf34() }
   val stoneRetainingWallSprite: ImageBitmap by lazy { buildStoneRetainingWall() }
@@ -49,15 +53,20 @@ object PixelStructureAtlas {
   val tavernLongTableSprite: ImageBitmap by lazy { buildTavernLongTable() }
 
   // Monumental Statues, Columns, Braziers & Multi-Layered 3/4 Trees
-  val obsidianColumnSprite: ImageBitmap by lazy { buildObsidianColumn() }
+  val obsidianColumnSprite: ImageBitmap get() = SanctuaryArtAssets.image("pillar") ?: obsidianColumnSpriteFallback
+  private val obsidianColumnSpriteFallback: ImageBitmap by lazy { buildObsidianColumn() }
   val royalStatueSprite: ImageBitmap by lazy { buildRoyalStatue() }
-  val oakTreeSprite: ImageBitmap by lazy { buildAncientOakTree() }
-  val spiritPineSprite: ImageBitmap by lazy { buildSpiritPine() }
-  val mysticPlumTreeSprite: ImageBitmap by lazy { buildMysticPlumTree() }
-  val forestBushSprite: ImageBitmap by lazy { buildForestCanopyBush() }
+  val oakTreeSprite: ImageBitmap get() = SanctuaryArtAssets.image("oak") ?: oakTreeSpriteFallback
+  private val oakTreeSpriteFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(0, 112, 136) }
+  val spiritPineSprite: ImageBitmap get() = SanctuaryArtAssets.image("pine") ?: spiritPineSpriteFallback
+  private val spiritPineSpriteFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(2, 96, 128) }
+  val mysticPlumTreeSprite: ImageBitmap get() = SanctuaryArtAssets.image("twisted") ?: mysticPlumTreeSpriteFallback
+  private val mysticPlumTreeSpriteFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(3, 112, 132) }
+  val forestBushSprite: ImageBitmap by lazy { SanctuaryVegetation.shrub() }
   val ruinArchSprite: ImageBitmap by lazy { buildAncientRuinArch() }
   val monolithSprite: ImageBitmap by lazy { buildAncientMonolith() }
-  val mossyBoulderSprite: ImageBitmap by lazy { buildMossyBoulder() }
+  val mossyBoulderSprite: ImageBitmap get() = SanctuaryArtAssets.image("boulder") ?: boulderFallback
+  private val boulderFallback by lazy { buildMossyBoulder() }
   val brazierFrames: List<ImageBitmap> by lazy { (0..2).map { buildArcaneBrazier(it) } }
 
   private fun buildMedievalTownhouse(variant: Int): ImageBitmap {

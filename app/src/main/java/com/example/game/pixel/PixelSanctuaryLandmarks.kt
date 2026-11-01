@@ -319,6 +319,13 @@ internal object PixelSanctuaryLandmarks {
       c.vLine(x, topY, totalWallH - 5, creamSunlit)
       c.vLine(x, botY - 5, 5, stoneBase)
       c.set(x, botY - 5, stoneHi)
+      // Recessed masonry courses on the lit wall, following its oblique slope.
+      for (row in 5 until totalWallH - 5) {
+        val course = row / 7
+        if (row % 7 == 0) c.set(x, topY + row, 0xFF292F38.toInt())
+        else if ((dx + course * 8) % 17 == 0) c.set(x, topY + row, 0xFF303640.toInt())
+        else if (row % 7 == 1) c.set(x, topY + row, 0xFF505660.toInt())
+      }
       // Horizontal waist timber beam
       val midBeamY = topY + totalWallH / 2
       c.vLine(x, midBeamY, 3, timberDark)
@@ -357,6 +364,11 @@ internal object PixelSanctuaryLandmarks {
 
       c.vLine(x, gablePeakTopY, (botY - gablePeakTopY - 5).coerceAtLeast(2), creamGable)
       c.vLine(x, botY - 5, 5, 0xFF706B62.toInt())
+      for (row in 4 until totalWallH - 5) {
+        if (row % 7 == 0 || (gx + row / 7 * 8) % 17 == 0)
+          c.set(x, eaveBaseY + row, 0xFF252A33.toInt())
+        else if (row % 7 == 1) c.set(x, eaveBaseY + row, 0xFF414650.toInt())
+      }
       // Horizontal tie-beams at eave level and mid-story
       c.vLine(x, eaveBaseY, 3, timberDark)
       c.vLine(x, eaveBaseY + totalWallH / 2, 3, timberDark)
@@ -395,6 +407,14 @@ internal object PixelSanctuaryLandmarks {
         }
         c.fillRect(px, py, 2, 2, col)
       }
+    }
+
+    // Thick eave fascia: lit top, dark soffit and exposed rafter ends.
+    for (dx in -3..sideW+2) {
+      val y = leftEaveY + dx * sideDrop / sideW.coerceAtLeast(1) + 3
+      c.vLine(leftX+dx, y, 3, 0xFF22262C.toInt())
+      c.set(leftX+dx, y, ridgeCol)
+      if (dx % 9 == 0) c.fillRect(leftX+dx, y+2, 2, 3, timberWarm)
     }
 
     // Crisp overhanging A-frame bargeboard rafters on the SE triangular gable peak!

@@ -323,6 +323,7 @@ object SanctuaryShadowRegistry {
     PropKind.PINE_SPIRIT_TREE, PropKind.CYPRESS_CONIFER_TREE -> 62f
     PropKind.GARDEN_HEDGE_BUSH, PropKind.FOREST_CANOPY_BUSH -> 22f
     PropKind.MOSSY_BOULDER -> 18f
+    PropKind.OBSIDIAN_COLUMN, PropKind.RUINED_PILLAR -> 84f
     PropKind.STREET_LANTERN -> 38f
     PropKind.WOODEN_BENCH_34 -> 14f
     PropKind.ARCANE_BOOKSHELF_34 -> 32f
