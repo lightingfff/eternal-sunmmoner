@@ -206,6 +206,7 @@ fun SanctuaryLobbyScreen(
   var activeInteriorState by remember { mutableStateOf<FacilityType?>(null) }
   val insideInterior = activeInteriorState != null
   val insideRestaurantState = activeInteriorState == FacilityType.RESTAURANT
+  var managementMode by remember { mutableStateOf<String?>(null) }
   var promptedFacility by remember { mutableStateOf<FacilityType?>(null) }
   var inspectingHeroId by remember { mutableStateOf<String?>(null) }
   var showExpansionModal by remember { mutableStateOf(false) }
@@ -778,102 +779,18 @@ fun SanctuaryLobbyScreen(
         else -> "Tầng ${profile?.highestClearedFloor ?: 0}"
       }
 
-      Surface(
-        shape = RoundedCornerShape(12.dp),
-        color = SanctuaryStone.copy(alpha = 0.92f),
-        modifier = Modifier
-          .fillMaxWidth()
-          .border(1.dp, SummonerGold.copy(alpha = 0.50f), RoundedCornerShape(12.dp)),
-      ) {
-        Row(
-          modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-          val iconBtnSize = if (isNarrowScreen) 32.dp else 40.dp
-          val maxLeftWidth = if (isNarrowScreen) 110.dp else 210.dp
-
-          // Top-Left: Master Profile & Level Crest
-          Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(if (isNarrowScreen) 4.dp else 8.dp),
-            modifier = Modifier.widthIn(max = maxLeftWidth),
-          ) {
-            PixelHeroPortraitAvatar(heroClass = HeroClassType.MAGE, sizeDp = if (isNarrowScreen) 28.dp else 34.dp)
-            Column {
-              Text(
-                text = "${profile?.masterName ?: "Master"} • Lv.${profile?.masterLevel ?: 1}",
-                style = if (isNarrowScreen) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelLarge,
-                color = SummonerGold,
-                maxLines = 1,
-                softWrap = false,
-                overflow = TextOverflow.Ellipsis,
-              )
-              if (!isNarrowScreen) {
-                Text(
-                  text = "$locationTag • $modeBadge${if (feastActive) " • ★Buff" else ""}",
-                  style = MaterialTheme.typography.labelSmall,
-                  color = if (feastActive) EmeraldVitality else PortalCyan,
-                  maxLines = 1,
-                  softWrap = false,
-                  overflow = TextOverflow.Ellipsis,
-                )
-              }
-            }
+      com.example.ui.components.FantasyPanel(Modifier.fillMaxWidth()) {
+        Row(Modifier.padding(horizontal=10.dp,vertical=2.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+          PixelHeroPortraitAvatar(heroClass=HeroClassType.MAGE,sizeDp=28.dp)
+          Column(Modifier.weight(1f)) {
+            Text("Lv.${profile?.masterLevel ?: 1} • ${profile?.masterName ?: "Master"}",color=SummonerGold,maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.labelMedium)
+            Text("Mục tiêu: chinh phục tầng ${(profile?.highestClearedFloor ?: 0)+1}",color=RuneSilver,style=MaterialTheme.typography.labelSmall,maxLines=1)
           }
-
-          // Top-Center: Resource Pills
-          Row(
-            horizontalArrangement = Arrangement.spacedBy(if (isNarrowScreen) 2.dp else 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 2.dp),
-          ) {
-            ResourcePillBadge("Vàng", profile?.gold ?: 0L, SummonerGold)
-            if (!isNarrowScreen) {
-              ResourcePillBadge("Mana", profile?.manaCrystals ?: 0L, PortalCyan)
-              ResourcePillBadge("Hồn", profile?.soulShards ?: 0L, ArcaneViolet)
-              if (isWideScreen) {
-                ResourcePillBadge("Khẩu Phần", profile?.rations ?: 0L, EmeraldVitality)
-              }
-            }
-          }
-
-          // Top-Right: 5 Compact Action Icon Buttons
-          Row(
-            horizontalArrangement = Arrangement.spacedBy(1.dp),
-            verticalAlignment = Alignment.CenterVertically,
-          ) {
-            IconButton(
-              onClick = { onOpenFacility(FacilityType.ARMORY) },
-              modifier = Modifier.size(iconBtnSize).testTag("quick_inventory_button"),
-            ) {
-              Icon(Icons.Default.Backpack, contentDescription = "Túi Đồ Trang Bị", tint = SummonerGold, modifier = Modifier.size(if (isNarrowScreen) 18.dp else 22.dp))
-            }
-            IconButton(
-              onClick = { onOpenFacility(FacilityType.SUMMONING_HALL) },
-              modifier = Modifier.size(iconBtnSize).testTag("quick_heroes_button"),
-            ) {
-              Icon(Icons.Default.Groups, contentDescription = "Anh Hùng & Đội Hình", tint = ArcaneViolet, modifier = Modifier.size(if (isNarrowScreen) 18.dp else 22.dp))
-            }
-            IconButton(
-              onClick = { showChronicleModal = true },
-              modifier = Modifier.size(iconBtnSize).testTag("quick_notifications_button"),
-            ) {
-              Icon(Icons.Default.Notifications, contentDescription = "Thông Báo & Nhật Ký", tint = PortalCyan, modifier = Modifier.size(if (isNarrowScreen) 18.dp else 22.dp))
-            }
-            IconButton(
-              onClick = onOpenSettings,
-              modifier = Modifier.size(iconBtnSize).testTag("open_settings_button"),
-            ) {
-              Icon(Icons.Default.Settings, contentDescription = "Cài Đặt & Tài Khoản", tint = RuneSilver, modifier = Modifier.size(if (isNarrowScreen) 18.dp else 22.dp))
-            }
-            IconButton(
-              onClick = { showPauseMapModal = true },
-              modifier = Modifier.size(iconBtnSize).testTag("pause_game_button"),
-            ) {
-              Icon(Icons.Default.Pause, contentDescription = "Tạm Dừng & Bản Đồ", tint = SummonerGold, modifier = Modifier.size(if (isNarrowScreen) 18.dp else 22.dp))
-            }
-          }
+          ResourcePillBadge("Vàng",profile?.gold ?: 0L,SummonerGold)
+          if(!isNarrowScreen) ResourcePillBadge("Hồn",profile?.soulShards ?: 0L,ArcaneViolet)
+          IconButton({showChronicleModal=true},Modifier.size(48.dp).testTag("quick_notifications_button")) {Icon(Icons.Default.Notifications,"Nhật ký",tint=RuneSilver)}
+          IconButton(onOpenSettings,Modifier.size(48.dp).testTag("open_settings_button")) {Icon(Icons.Default.Settings,"Cài đặt",tint=RuneSilver)}
+          IconButton({showPauseMapModal=true},Modifier.size(48.dp).testTag("pause_game_button")) {Icon(Icons.Default.Pause,"Bản đồ",tint=SummonerGold)}
         }
       }
 
@@ -945,6 +862,7 @@ fun SanctuaryLobbyScreen(
         border = BorderStroke(1.dp, SummonerGold.copy(alpha = 0.60f)),
         modifier = Modifier
           .align(Alignment.BottomStart)
+          .padding(bottom=54.dp)
           .testTag("camera_controls_bar"),
       ) {
         Row(
@@ -1015,6 +933,7 @@ fun SanctuaryLobbyScreen(
       Column(
         modifier = Modifier
           .align(Alignment.BottomEnd)
+          .padding(bottom=54.dp)
           .padding(start = if (isNarrowScreen) 168.dp else 184.dp)
           .widthIn(max = maxPanelWidth)
           .testTag("hero_command_panel"),
@@ -1210,6 +1129,22 @@ fun SanctuaryLobbyScreen(
         }
       }
     }
+
+    com.example.ui.components.SanctuaryManagementNav(
+      modifier=Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(horizontal=10.dp,vertical=4.dp).widthIn(max=640.dp),
+      onNavigate={ destination ->
+        managementMode=null
+        when(destination) {
+          "heroes", "team" -> { onCloseFacility(); managementMode=destination }
+          "summon" -> onOpenFacility(FacilityType.SUMMONING_HALL)
+          "tower" -> onOpenFacility(FacilityType.TOWER_GATE)
+          "inventory" -> onOpenFacility(FacilityType.ARMORY)
+        }
+      },
+    )
+    if(managementMode!=null) com.example.ui.components.HeroManagementDialog(
+      heroes=state.heroes,teamMode=managementMode=="team",busy=state.isBusyAction,
+      onClose={managementMode=null},onInspect={managementMode=null;inspectingHeroId=it.id},onToggle=onToggleSquad)
 
     // 4. Active Sanctuary Facility Modal
     val openFacility = state.activeFacilityModal

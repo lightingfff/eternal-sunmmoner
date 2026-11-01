@@ -9,6 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -736,4 +738,67 @@ class LayoutResponsivenessRobolectricTest {
     hostView?.let { saveViewScreenshot(it, "$artifactDir/sanctuary_master_43_overview.png") }
     assertTrue(File("$artifactDir/sanctuary_master_43_overview.png").exists())
   }
+  @Test
+  @Config(qualifiers = "w800dp-h360dp-land-xhdpi")
+  fun `management navigation opens roster team summon and hero details`() {
+    val initial=buildRichSampleState()
+    var state by mutableStateOf(initial)
+    var tower by mutableStateOf(false)
+    var host: View?=null
+    composeTestRule.mainClock.autoAdvance=false
+    composeTestRule.setContent {
+      host=LocalView.current
+      EternalSummonerTheme {
+        if(tower) FloorSelectionScreen(state=state,onSelectFloor={},onBackToLobby={tower=false})
+        else SanctuaryLobbyScreen(state=state,onOpenFacility={if(it==FacilityType.TOWER_GATE) tower=true else state=state.copy(activeFacilityModal=it)},
+          onCloseFacility={state=state.copy(activeFacilityModal=null)},onSummonHero={},onTrainHero={_,_->},
+          onEquipItem={_,_->},onSynthesizeGear={},onEnhanceGear={},onRecoverHero={_,_->},onHostMeal={},
+          onToggleSquad={ hero -> state=state.copy(heroes=state.heroes.map { if(it.id==hero.id) it.copy(inActiveSquad=!it.inActiveSquad) else it }) },
+          onCompletePrologue={},onSignOut={})
+      }
+    }
+    composeTestRule.mainClock.advanceTimeBy(160)
+    composeTestRule.waitForIdle()
+    host?.let { saveViewScreenshot(it,"build/visual_screenshots/p2/hud.png") }
+    for(mode in listOf("heroes","team")) {
+      composeTestRule.onNodeWithTag("nav_$mode").performClick()
+      composeTestRule.mainClock.advanceTimeBy(160)
+    composeTestRule.waitForIdle()
+      composeTestRule.onNodeWithTag("hero_management_dialog").assertExists()
+      val dialogView=android.view.inspector.WindowInspector.getGlobalWindowViews().last()
+      assertTrue("Expected a separate dialog window",dialogView !== host?.rootView)
+      saveViewScreenshot(dialogView,"build/visual_screenshots/p2/$mode.png")
+      if(mode=="team") {
+        val hero=state.heroes.first { !it.isCurrentlyInjured() }
+        val previous=hero.inActiveSquad
+        composeTestRule.onNodeWithTag("assign_${hero.id}").performClick()
+        composeTestRule.runOnIdle { assertEquals(!previous,state.heroes.first {it.id==hero.id}.inActiveSquad) }
+      }
+      composeTestRule.onNodeWithTag("close_hero_management").performClick()
+    }
+    composeTestRule.onNodeWithTag("nav_summon").performClick()
+    composeTestRule.mainClock.advanceTimeBy(160)
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("summon_ritual_button").assertExists()
+    host?.let { saveViewScreenshot(it,"build/visual_screenshots/p2/summon.png") }
+    composeTestRule.runOnIdle { state=state.copy(activeFacilityModal=null) }
+    composeTestRule.mainClock.advanceTimeBy(160)
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("nav_tower").performClick()
+    composeTestRule.mainClock.advanceTimeBy(160)
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("back_to_lobby_button").assertExists()
+    host?.let { saveViewScreenshot(it,"build/visual_screenshots/p2/tower.png") }
+    composeTestRule.onNodeWithTag("back_to_lobby_button").performClick()
+    composeTestRule.mainClock.advanceTimeBy(160)
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("nav_heroes").performClick()
+    composeTestRule.mainClock.advanceTimeBy(160)
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("inspect_${initial.heroes.first().id}").performClick()
+    composeTestRule.mainClock.advanceTimeBy(160)
+    composeTestRule.waitForIdle()
+    saveViewScreenshot(android.view.inspector.WindowInspector.getGlobalWindowViews().last(),"build/visual_screenshots/p2/hero_details.png")
+  }
+
 }

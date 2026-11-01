@@ -202,8 +202,8 @@ class SummonerViewModel(
     val state = uiState.value
     val profile = state.profile ?: return
     if (_isBusyAction.value) return
+    _isBusyAction.value = true
     viewModelScope.launch {
-      _isBusyAction.value = true
       try {
         val hero = repository.summonNewHero(profile, state.heroes)
         _newlySummonedHero.value = hero
