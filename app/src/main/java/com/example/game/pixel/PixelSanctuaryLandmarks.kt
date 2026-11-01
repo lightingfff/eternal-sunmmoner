@@ -324,11 +324,19 @@ internal object PixelSanctuaryLandmarks {
       c.vLine(x, midBeamY, 3, timberDark)
       c.vLine(x, topY, 3, timberDark)
     }
-    // Vertical timber posts & diagonal braces on SW side wall
+    // Vertical timber posts & diagonal braces + grain etch
     listOf(0, sideW / 3, (sideW * 2) / 3, sideW - 2).forEach { dx ->
       val x = leftX + dx
       val topY = leftEaveY + (dx * sideDrop) / sideW.coerceAtLeast(1)
       c.fillRect(x, topY, 3, totalWallH - 4, timberDark)
+      c.vLine(x + 1, topY + 4, totalWallH - 10, timberWarm)
+    }
+    // Plaster grain speckles — subtle cold stone dust
+    for (dx in 6 until sideW - 6 step 9) {
+      val x = leftX + dx + (dx % 7)
+      val y = leftEaveY + (dx * sideDrop) / sideW.coerceAtLeast(1) + totalWallH / 3
+      c.set(x, y, 0xFF3A3F4A.toInt())
+      c.set(x + 2, y + 3, 0xFF2A2D38.toInt())
     }
 
     // Two warm mullioned windows along SW side wall
@@ -401,26 +409,35 @@ internal object PixelSanctuaryLandmarks {
       c.set(x, rafterY - 1, ridgeCol)
     }
 
-    // 4. Tall Warm Terracotta Brick Chimney Rising Through the Pitched Roof Slope!
+    // 4. Brick-coursed chimney with mortar + cap highlight + smoke wisp
     val chimX = if (chimneyLeft) leftX + sideW / 3 + 6 else leftX + (sideW * 2) / 3
     val chimBaseY = roofTopY + 18
-    c.fillRect(chimX, chimBaseY - 22, 13, 24, 0xFF9E523C.toInt())
-    c.fillRect(chimX + 1, chimBaseY - 21, 5, 22, 0xFFBD6B52.toInt())
-    c.fillRect(chimX + 8, chimBaseY - 21, 4, 22, 0xFF783A2A.toInt())
+    c.fillRect(chimX, chimBaseY - 22, 13, 24, 0xFF7A3520.toInt())
+    c.fillRect(chimX + 1, chimBaseY - 21, 5, 22, 0xFF9E523C.toInt())
+    c.fillRect(chimX + 8, chimBaseY - 21, 4, 22, 0xFF4A2012.toInt())
+    // brick mortar lines
+    for (my in chimBaseY - 18..chimBaseY step 4) {
+      c.hLine(chimX, my, 13, 0xFF4A2012.toInt())
+      c.hLine(chimX + 6, my + 2, 7, 0xFF8A4A32.toInt())
+    }
     c.fillRect(chimX - 2, chimBaseY - 25, 17, 4, 0xFF6B3224.toInt())
-    c.hLine(chimX - 2, chimBaseY - 25, 17, 0xFFD4856A.toInt())
+    c.hLine(chimX - 2, chimBaseY - 25, 17, 0xFFC48A60.toInt())
+    c.fillEllipse(chimX + 6, chimBaseY - 26, 3, 2, 0xFF2A2E4A.toInt()) // smoke puff
+    c.fillEllipse(chimX + 8, chimBaseY - 29, 2, 1, 0xFF4A4D55.toInt())
 
-    // 5. Lush Green Garden Shrubs & Blossoms along the SW Sunlit Base
+    // 5. Garden shrubs — desaturated dark fantasy greens + dusty blossoms + AO base
     if (hasFlowerGardenTrim) {
       listOf(14, sideW / 2, sideW - 10).forEachIndexed { idx, bDx ->
         val bx = leftX + bDx
         val by = leftEaveY + (bDx * sideDrop) / sideW.coerceAtLeast(1) + totalWallH - 4
+        c.fillEllipse(bx, by + 2, 10, 3, 0xFF0F1A14.toInt()) // AO under shrub
         c.drawOrganicLeafCluster(
           bx, by, 13, 6,
-          0xFF245728.toInt(), 0xFF478F41.toInt(), 0xFF6CC254.toInt(), 0xFF9EE376.toInt(), seed = leftX + idx * 17,
+          0xFF1A2E1F.toInt(), 0xFF2A3D2B.toInt(), 0xFF3D5A36.toInt(), 0xFF4A6B3E.toInt(), seed = leftX + idx * 17,
         )
-        c.set(bx - 3, by - 2, 0xFFF472B6.toInt())
-        c.set(bx + 4, by - 1, 0xFFFEF08A.toInt())
+        c.set(bx - 3, by - 2, 0xFF8A7A97.toInt()) // dusty lavender
+        c.set(bx + 4, by - 1, 0xFF9A6570.toInt()) // dried rose
+        c.set(bx, by - 3, 0xFF6B7A3E.toInt()) // highlight fleck
       }
     }
   }
