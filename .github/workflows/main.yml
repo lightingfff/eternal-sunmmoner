@@ -1,4 +1,3 @@
-
 name: Build Eternal Summoner APK
 
 on:
@@ -6,9 +5,13 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 permissions:
-  contents: read
+  contents: write
+  actions: read
 
 jobs:
   build:
@@ -19,19 +22,24 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Set up Java 17
+      - name: Set up Java 21
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
 
       - name: Install Android SDK packages
         run: |
           SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager | head -n 1)
+          # yes exits with SIGPIPE after sdkmanager closes stdin; preserve sdkmanager's status.
+          set +o pipefail
           yes | "$SDKMANAGER" --licenses
+          license_status=${PIPESTATUS[1]}
+          set -o pipefail
+          test "$license_status" -eq 0
           "$SDKMANAGER" --install \
             "platform-tools" \
-            "platforms;android-36" \
+            "platforms;android-36.1" \
             "build-tools;36.0.0"
 
       - name: Set up Gradle
@@ -63,9 +71,96 @@ jobs:
       - name: Build APK
         run: gradle :app:assembleDebug
 
+      - name: Verify signed APK and package Android-compatible ZIP
+        run: |
+          set -euo pipefail
+          echo "== apksigner verify =="
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose app/build/outputs/apk/debug/app-debug.apk
+          echo "== unzip -t APK (zip integrity) =="
+          unzip -t app/build/outputs/apk/debug/app-debug.apk
+          echo "== package portable ZIP (STORE, no recompression) =="
+          python3 tools/package_apk.py --apk app/build/outputs/apk/debug/app-debug.apk --output app/build/apk-distribution | tee "$RUNNER_TEMP/apk-report.json"
+          echo "== APK report =="
+          cat "$RUNNER_TEMP/apk-report.json"
+          echo "--- APK report ---" >> "$GITHUB_STEP_SUMMARY"
+          cat "$RUNNER_TEMP/apk-report.json" >> "$GITHUB_STEP_SUMMARY"
+          echo "== local files =="
+          ls -lh app/build/apk-distribution/
+          sha256sum app/build/apk-distribution/* | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Upload APK
+        id: upload
         uses: actions/upload-artifact@v4
         with:
           name: Eternal-Summoner-APK
-          path: app/build/outputs/apk/debug/*.apk
+          path: |
+            app/build/apk-distribution/Eternal-Summoner-debug.apk
+            app/build/apk-distribution/Eternal-Summoner-Android.zip
+            app/build/apk-distribution/SHA256SUMS
+          compression-level: 0
           if-no-files-found: error
+
+      - name: Download and verify the actual uploaded artifact ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/Eternal-Summoner-APK.zip"
+          extracted="$RUNNER_TEMP/verified-apk-artifact"
+          echo "Downloading artifact $ARTIFACT_ID via GH API..."
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip" > "$archive"
+          echo "== outer artifact ZIP test =="
+          unzip -t "$archive"
+          ls -lh "$archive" | tee -a "$GITHUB_STEP_SUMMARY"
+          sha256sum "$archive" | tee -a "$GITHUB_STEP_SUMMARY"
+          mkdir -p "$extracted"
+          unzip -q "$archive" -d "$extracted"
+          ls -lh "$extracted" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "== verify inner APK + portable ZIP + checksums =="
+          python3 tools/package_apk.py --verify "$extracted"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$extracted/Eternal-Summoner-debug.apk"
+          unzip -t "$extracted/Eternal-Summoner-debug.apk"
+          unzip -t "$extracted/Eternal-Summoner-Android.zip"
+          echo '✅ Uploaded artifact downloaded successfully; outer ZIP CRC, APK contents, signature and SHA-256 all verified.' | tee -a "$GITHUB_STEP_SUMMARY"
+
+  release:
+    name: Publish direct APK to Release (bypass artifact ZIP)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download artifact for Release
+        uses: actions/download-artifact@v4
+        with:
+          name: Eternal-Summoner-APK
+          path: dist
+
+      - name: List artifacts
+        run: |
+          ls -lh dist/
+          sha256sum dist/* | tee SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Create GitHub Release with direct APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-${{ github.run_number }}-${{ github.sha }}
+          name: Eternal Summoner APK #${{ github.run_number }}
+          body: |
+            Direct APK download — no nested ZIP extraction needed.
+            - `Eternal-Summoner-debug.apk` — installable APK (signed debug)
+            - `Eternal-Summoner-Android.zip` — portable ZIP (STORE, Android-compatible) containing APK + SHA256
+            - `SHA256SUMS` — SHA-256 for both files
+
+            **Install:** Download `Eternal-Summoner-debug.apk` directly and install. Verify SHA-256 against `SHA256SUMS`.
+            Built from `${{ github.sha }}` — workflow `${{ github.run_id }}`.
+          files: |
+            dist/Eternal-Summoner-debug.apk
+            dist/Eternal-Summoner-Android.zip
+            dist/SHA256SUMS
+            SHA256SUMS.txt
+          generate_release_notes: false
