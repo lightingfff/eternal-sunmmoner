@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "origin": "Original ETERNAL SUMMONER art; authored polygon/cluster recipes in tools/generate_premium_slice.py; no external art",
+  "frame": [
+    64,
+    96
+  ],
+  "pivot": [
+    32,
+    90
+  ],
+  "world_pixel_scale": 1.08,
+  "directions": [
+    "front_right",
+    "front_left",
+    "back_right",
+    "back_left"
+  ],
+  "clips": {
+    "idle": [
+      0.36,
+      0.18,
+      0.36
+    ],
+    "walk": [
+      0.1,
+      0.08,
+      0.12,
+      0.1,
+      0.08,
+      0.12
+    ],
+    "attack": [
+      0.12,
+      0.1,
+      0.08,
+      0.18
+    ],
+    "skill": [
+      0.16,
+      0.14,
+      0.09,
+      0.13,
+      0.2
+    ],
+    "hit": [
+      0.11,
+      0.17
+    ],
+    "rest": [
+      1.0
+    ],
+    "defeat": [
+      0.12,
+      0.18,
+      0.3
+    ]
+  },
+  "contact_seconds": {
+    "attack": 0.22,
+    "skill": 0.3
+  },
+  "assets": {
+    "kaelen": {
+      "file": "kaelen.png",
+      "size": [
+        1536,
+        384
+      ],
+      "sha256": "50356e1922ae7add0ebb987b5f76d6bb60df5b276540e11875d3624c5eb43a5b"
+    },
+    "goblin_raider": {
+      "file": "goblin_raider.png",
+      "size": [
+        1536,
+        384
+      ],
+      "sha256": "6b09c4db344dc92a74eed89a7111e28ce617f752b9861d0a92a57f3c26a210b4"
+    },
+    "armory": {
+      "file": "armory.png",
+      "size": [
+        190,
+        166
+      ],
+      "sha256": "3b03aac65f04d57e74e490ed9b1a7ca67ef1fe10c71101ffa010b0e3cfc954d9"
+    },
+    "smithy_verge": {
+      "file": "smithy_verge.png",
+      "size": [
+        128,
+        96
+      ],
+      "sha256": "dc5d920a5ee7fc73e128b15b5a95ebb327a6bdfce109c255d190c89d70fa9ac2"
+    }
+  },
+  "sample": {
+    "armory_anchor": [
+      995,
+      655
+    ],
+    "verge_top_left": [
+      950,
+      720
+    ],
+    "verge_world_size": [
+      256,
+      192
+    ]
+  }
+}

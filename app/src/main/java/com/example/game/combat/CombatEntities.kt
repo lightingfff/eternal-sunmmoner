@@ -23,6 +23,8 @@ class HeroCombatUnit(
   var anchorY: Float,
   val formationIndex: Int,
 ) {
+  val premiumSample: Boolean = name == "Kaelen" && heroClass == HeroClassType.KNIGHT
+  val contactAttack = ContactAttackTimeline()
   var facingRight: Boolean = true
   var isMoving: Boolean = false
   var attackCooldown: Float = 0f
@@ -48,6 +50,8 @@ class EnemyCombatUnit(
   var x: Float,
   var y: Float,
 ) {
+  val contactAttack = ContactAttackTimeline()
+  var pendingAttackDamage: Int = 0
   var facingRight: Boolean = false
   var isMoving: Boolean = false
   var attackCooldown: Float = 0.6f

@@ -146,6 +146,7 @@ object SanctuaryWorldRenderer {
       )
 
       // 3E. Monumental Central Circular White Stone Plaza, 4 Pastel Elemental Runes & Grand SE Staircase
+      with(PremiumSliceRenderer) { drawSmithyVerge(camX,camY,zoom) }
       drawCentralCircularWhitePlaza(::sx, ::sy, zoom, timeSec)
 
       // 3F. Dark Fantasy Ambient Occlusion - soft contact shadows under walls, plaza rim, gate

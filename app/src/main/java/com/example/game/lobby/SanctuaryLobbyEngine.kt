@@ -457,13 +457,21 @@ class SanctuaryLobbyEngine {
     ),
   )
 
+  private var renderedActors: List<LobbyHeroActor>? = null
+  private var renderedScene: FacilityType? = null
   val heroActors: List<LobbyHeroActor>
-    get() = when (activeInterior) {
-      FacilityType.RESTAURANT -> interiorActors + restaurantInteriorKeepers
-      FacilityType.HERO_QUARTERS -> interiorActors + dormitoryKeepers
-      FacilityType.TRAINING_GROUND -> interiorActors + trainingInteriorKeepers
-      FacilityType.ARMORY -> interiorActors + armoryInteriorKeepers
-      else -> actors.values.toList() + exteriorKeepers
+    get() {
+      if (renderedActors == null || renderedScene != activeInterior) {
+        renderedScene = activeInterior
+        renderedActors = when (activeInterior) {
+          FacilityType.RESTAURANT -> interiorActors + restaurantInteriorKeepers
+          FacilityType.HERO_QUARTERS -> interiorActors + dormitoryKeepers
+          FacilityType.TRAINING_GROUND -> interiorActors + trainingInteriorKeepers
+          FacilityType.ARMORY -> interiorActors + armoryInteriorKeepers
+          else -> actors.values.toList() + exteriorKeepers
+        }
+      }
+      return renderedActors!!
     }
 
   fun syncExpansions(expansions: Set<IslandExpansionMilestone>) {
@@ -674,6 +682,7 @@ class SanctuaryLobbyEngine {
   }
 
   private fun rebuildActiveInteriorActors() {
+    renderedActors = null
     interiorActors.clear()
     val interior = activeInterior ?: return
     val nowSec = lastSyncEpochSec
@@ -859,6 +868,7 @@ class SanctuaryLobbyEngine {
   }
 
   fun syncHeroes(heroes: List<HeroRecord>, nowEpochSec: Long) {
+    renderedActors = null
     cachedRoster = heroes
     lastSyncEpochSec = nowEpochSec
 

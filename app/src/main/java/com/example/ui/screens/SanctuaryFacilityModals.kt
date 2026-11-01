@@ -462,7 +462,7 @@ private fun SummoningHallContent(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
       ) {
-        PixelHeroPortraitAvatar(heroClass = hero.classType, sizeDp = 46.dp)
+        PixelHeroPortraitAvatar(heroName = hero.name, heroClass = hero.classType, sizeDp = 46.dp)
         Column(modifier = Modifier.weight(1f)) {
           Text(
             text = "${hero.name} (${"★".repeat(hero.rarity.toInt())}) • Lv.${hero.level}",
@@ -579,7 +579,7 @@ private fun TrainingGroundContent(
           .padding(12.dp),
       ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-          PixelHeroPortraitAvatar(heroClass = hero.classType, sizeDp = 46.dp)
+          PixelHeroPortraitAvatar(heroName = hero.name, heroClass = hero.classType, sizeDp = 46.dp)
           Column(modifier = Modifier.weight(1f)) {
             Text(
               text = "${hero.name} — Lv.${hero.level}${if (inTraining) " • [Đang Tập Võ]" else ""}",
@@ -1036,7 +1036,7 @@ private fun HeroQuartersContent(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
       ) {
-        PixelHeroPortraitAvatar(heroClass = hero.classType, sizeDp = 46.dp)
+        PixelHeroPortraitAvatar(heroName = hero.name, heroClass = hero.classType, sizeDp = 46.dp)
         Column(modifier = Modifier.weight(1f)) {
           Text("${hero.name} • Sĩ khí ${hero.morale}%", style = MaterialTheme.typography.titleSmall, color = ParchmentLight)
           Text(

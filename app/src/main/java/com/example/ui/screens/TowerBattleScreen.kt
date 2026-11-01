@@ -478,6 +478,8 @@ fun TowerBattleScreen(
               shieldOrAuraColor = aura,
               isInjuredResting = false,
               timeSec = animTimeSec,
+              heroName = h.name,
+              skillAnimation = h.premiumSample && h.contactAttack.skill,
             )
           }
           is BattleDrawable.Enemy -> {
@@ -1307,7 +1309,7 @@ private fun SquadSkillHorizontalBar(
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-          PixelHeroPortraitAvatar(heroClass = hero.heroClass, sizeDp = 30.dp)
+          PixelHeroPortraitAvatar(heroName = hero.name, heroClass = hero.heroClass, sizeDp = 30.dp)
           Column(modifier = Modifier.weight(1f)) {
             Row(
               modifier = Modifier.fillMaxWidth(),

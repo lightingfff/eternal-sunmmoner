@@ -625,13 +625,15 @@ object PixelSpriteRenderer {
     zoom: Float,
     timeSec: Float,
     highestClearedFloor: Int = 0,
-    renderShadow: Boolean = true,
+    renderShadow: Boolean? = true,
   ) {
     val cx = ObliqueCamera.worldToScreenX(obs.x, camX, zoom, size.width / 2f)
     val cy = ObliqueCamera.worldToScreenY(obs.y, camY, zoom, size.height / 2f, obs.elevationZ)
     val s = zoom * obs.scale
     if (cx < -380f || cx > size.width + 380f || cy < -400f || cy > size.height + 380f) return
 
+    // null selects the existing projected-shadow pass, after camera culling.
+    val legacyShadow = renderShadow ?: (SanctuaryEnvironmentShadows.sprite(obs) == null)
     when (obs.propKind) {
       PropKind.FACILITY_TOWER_GATE, PropKind.TOWER_PORTAL_GATE -> {
         val pulse = 0.88f + 0.12f * sin(timeSec * 3.2f)
@@ -640,7 +642,7 @@ object PixelSpriteRenderer {
           highestClearedFloor >= 1 -> Color(0xFF38BDF8)
           else -> Color(0xFF60A5FA)
         }
-        if (renderShadow) drawDirectionalShadow34(cx + 12f * s, cy - 6f * s, 218f * s, 38f * s, alpha = 0.36f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 12f * s, cy - 6f * s, 218f * s, 38f * s, alpha = 0.36f)
         // Radiant portal light spilling down the monolith staircase onto nearby stone!
         drawForeshortenedGlow(
           cx = cx,
@@ -674,7 +676,7 @@ object PixelSpriteRenderer {
       }
 
       PropKind.FACILITY_SUMMONING_HALL -> {
-        if (renderShadow) drawDirectionalShadow34(cx + 12f * s, cy - 8f * s, 238f * s, 44f * s, alpha = 0.32f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 12f * s, cy - 8f * s, 238f * s, 44f * s, alpha = 0.32f)
         drawCrispSprite(PixelStructureAtlas.summoningHallStructure, cx, cy + 6f * s, 2.0f * s)
         // Gentle azure starlight motes over the classical amphitheatre summoning stage
         for (w in 0..3) {
@@ -686,78 +688,78 @@ object PixelSpriteRenderer {
       }
 
       PropKind.FACILITY_HERO_REGISTRY -> {
-        if (renderShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 168f * s, 30f * s, alpha = 0.34f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 168f * s, 30f * s, alpha = 0.34f)
         drawCrispSprite(PixelStructureAtlas.heroRegistryStructure, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.FACILITY_TRAINING_GROUND -> {
-        if (renderShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 176f * s, 32f * s, alpha = 0.34f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 176f * s, 32f * s, alpha = 0.34f)
         drawCrispSprite(PixelStructureAtlas.trainingGroundStructure, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.FACILITY_ARMORY -> {
-        if (renderShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 174f * s, 30f * s, alpha = 0.34f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 174f * s, 30f * s, alpha = 0.34f)
         drawForeshortenedGlow(cx + 6f * s, cy + 8f * s, 72f * s, Color(0xFFFB923C).copy(alpha = 0.18f))
         drawCrispSprite(PixelStructureAtlas.armoryStructure, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.FACILITY_SYNTHESIS_LAB -> {
-        if (renderShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 172f * s, 30f * s, alpha = 0.34f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 172f * s, 30f * s, alpha = 0.34f)
         drawForeshortenedGlow(cx, cy + 6f * s, 68f * s, Color(0xFF34D399).copy(alpha = 0.15f))
         drawCrispSprite(PixelStructureAtlas.synthesisLabStructure, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.FACILITY_HERO_QUARTERS -> {
-        if (renderShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 182f * s, 32f * s, alpha = 0.34f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 182f * s, 32f * s, alpha = 0.34f)
         // Warm cozy residential interior window & doorway glow on ground!
         drawForeshortenedGlow(cx, cy + 10f * s, 76f * s, Color(0xFFFDE68A).copy(alpha = 0.22f))
         drawCrispSprite(PixelStructureAtlas.heroQuartersStructure, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.FACILITY_RESTAURANT -> {
-        if (renderShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 188f * s, 32f * s, alpha = 0.34f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 188f * s, 32f * s, alpha = 0.34f)
         drawForeshortenedGlow(cx, cy + 10f * s, 82f * s, Color(0xFFFBBF24).copy(alpha = 0.24f))
         drawCrispSprite(PixelStructureAtlas.restaurantStructure, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.FLOOR_VISTA_ARCH -> {
-        if (renderShadow) drawDirectionalShadow34(cx + 6f * s, cy - 4f * s, 138f * s, 24f * s, alpha = 0.32f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 6f * s, cy - 4f * s, 138f * s, 24f * s, alpha = 0.32f)
         drawCrispSprite(PixelStructureAtlas.floorVistaArchStructure, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.MEDIEVAL_TOWNHOUSE_A -> {
-        if (renderShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 134f * s, 25f * s, alpha = 0.34f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 134f * s, 25f * s, alpha = 0.34f)
         drawCrispSprite(PixelStructureAtlas.medievalTownhouseA, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.MEDIEVAL_TOWNHOUSE_B -> {
-        if (renderShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 126f * s, 24f * s, alpha = 0.34f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 126f * s, 24f * s, alpha = 0.34f)
         drawCrispSprite(PixelStructureAtlas.medievalTownhouseB, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.SANCTUARY_COTTAGE_BROWN -> {
-        if (renderShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 114f * s, 22f * s, alpha = 0.34f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 114f * s, 22f * s, alpha = 0.34f)
         drawCrispSprite(PixelStructureAtlas.sanctuaryCottageBrown, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.SANCTUARY_COTTAGE_SLATE -> {
-        if (renderShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 114f * s, 22f * s, alpha = 0.34f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 114f * s, 22f * s, alpha = 0.34f)
         drawCrispSprite(PixelStructureAtlas.sanctuaryCottageSlate, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.FORTRESS_CORNER_TOWER -> {
-        if (renderShadow) drawDirectionalShadow34(cx + 6f * s, cy, 48f * s, 14f * s, alpha = 0.36f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 6f * s, cy, 48f * s, 14f * s, alpha = 0.36f)
         drawCrispSprite(PixelStructureAtlas.fortressCornerTowerSprite, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.SOUTHERN_GATE_TOWER -> {
-        if (renderShadow) drawDirectionalShadow34(cx + 8f * s, cy, 58f * s, 16f * s, alpha = 0.40f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy, 58f * s, 16f * s, alpha = 0.40f)
         drawCrispSprite(PixelStructureAtlas.southernGateTowerSprite, cx, cy + 8f * s, 2.0f * s)
       }
 
       PropKind.SAKURA_BLOSSOM_TREE -> {
         val sway = sin(timeSec * 1.7f + obs.x * 0.015f) * 1.8f * s
-        if (renderShadow) drawDirectionalShadow34(cx + 10f * s, cy, 70f * s, 18f * s, alpha = 0.32f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 10f * s, cy, 70f * s, 18f * s, alpha = 0.32f)
         val bmp = if ((obs.id.hashCode() and 1) == 0) {
           PixelStructureAtlas.sakuraTreeSpriteA
         } else {
@@ -768,22 +770,22 @@ object PixelSpriteRenderer {
 
       PropKind.CYPRESS_CONIFER_TREE -> {
         val sway = sin(timeSec * 1.9f + obs.x * 0.02f) * 1.2f * s
-        if (renderShadow) drawDirectionalShadow34(cx + 6f * s, cy, 34f * s, 11f * s, alpha = 0.34f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 6f * s, cy, 34f * s, 11f * s, alpha = 0.34f)
         drawCrispSprite(PixelStructureAtlas.cypressConiferSprite, cx, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.cypressConiferSprite) * s, 2.0f * s)
       }
 
       PropKind.GARDEN_HEDGE_BUSH -> {
-        if (renderShadow) drawDirectionalShadow34(cx + 4f * s, cy, 34f * s, 9f * s, alpha = 0.30f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 4f * s, cy, 34f * s, 9f * s, alpha = 0.30f)
         drawCrispSprite(PixelStructureAtlas.gardenHedgeBushSprite, cx, cy + 4f * s, 1.9f * s)
       }
 
       PropKind.TRAINING_STRIKING_POST -> {
-        if (renderShadow) drawDirectionalShadow34(cx + 8f * s, cy, 24f * s, 8f * s, alpha = 0.36f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy, 24f * s, 8f * s, alpha = 0.36f)
         drawCrispSprite(PixelStructureAtlas.trainingStrikingPostSprite, cx, cy + 4f * s, 2.0f * s)
       }
 
       PropKind.TERRACE_CLIFF_WALL -> {
-        if (renderShadow) drawDirectionalShadow34(cx, cy, 158f * s, 18f * s, alpha = 0.42f)
+        if (legacyShadow) drawDirectionalShadow34(cx, cy, 158f * s, 18f * s, alpha = 0.42f)
         drawCrispSprite(PixelStructureAtlas.terraceCliffWallSprite, cx, cy + 4f * s, 2.0f * s)
       }
 
@@ -792,17 +794,17 @@ object PixelSpriteRenderer {
       }
 
       PropKind.STONE_BALUSTRADE_RAIL -> {
-        if (renderShadow) drawDirectionalShadow34(cx, cy, 104f * s, 14f * s, alpha = 0.44f)
+        if (legacyShadow) drawDirectionalShadow34(cx, cy, 104f * s, 14f * s, alpha = 0.44f)
         drawCrispSprite(PixelStructureAtlas.stoneBalustradeSprite, cx, cy + 4f * s, 2.0f * s)
       }
 
       PropKind.WOODEN_BENCH_34 -> {
-        if (renderShadow) drawDirectionalShadow34(cx, cy, 52f * s, 11f * s, alpha = 0.45f)
+        if (legacyShadow) drawDirectionalShadow34(cx, cy, 52f * s, 11f * s, alpha = 0.45f)
         drawCrispSprite(PixelStructureAtlas.woodenBenchSprite, cx, cy + 4f * s, 2.0f * s)
       }
 
       PropKind.ARCANE_BOOKSHELF_34 -> {
-        if (renderShadow) drawDirectionalShadow34(cx, cy, 50f * s, 13f * s, alpha = 0.50f)
+        if (legacyShadow) drawDirectionalShadow34(cx, cy, 50f * s, 13f * s, alpha = 0.50f)
         drawCrispSprite(PixelStructureAtlas.arcaneBookshelfSprite, cx, cy + 4f * s, 2.0f * s)
       }
 
@@ -816,27 +818,27 @@ object PixelSpriteRenderer {
           innerColor = Color(0xFFFBBF24).copy(alpha = glowAlpha),
           midColor = Color(0xFFD97706).copy(alpha = glowAlpha * 0.45f),
         )
-        if (renderShadow) drawDirectionalShadow34(cx, cy, 16f * s, 6f * s, alpha = 0.50f)
+        if (legacyShadow) drawDirectionalShadow34(cx, cy, 16f * s, 6f * s, alpha = 0.50f)
         drawCrispSprite(PixelStructureAtlas.streetLanternFrames[frameIdx], cx, cy + 4f * s, 2.0f * s)
       }
 
       PropKind.BARREL_CLUSTER -> {
-        if (renderShadow) drawDirectionalShadow34(cx, cy, 44f * s, 11f * s, alpha = 0.48f)
+        if (legacyShadow) drawDirectionalShadow34(cx, cy, 44f * s, 11f * s, alpha = 0.48f)
         drawCrispSprite(PixelStructureAtlas.barrelClusterSprite, cx, cy + 4f * s, 2.0f * s)
       }
 
       PropKind.STONE_RETAINING_WALL -> {
-        if (renderShadow) drawDirectionalShadow34(cx, cy, 78f * s, 14f * s, alpha = 0.48f)
+        if (legacyShadow) drawDirectionalShadow34(cx, cy, 78f * s, 14f * s, alpha = 0.48f)
         drawCrispSprite(PixelStructureAtlas.stoneRetainingWallSprite, cx, cy + 4f * s, 2.0f * s)
       }
 
       PropKind.TAVERN_COUNTER_BAR -> {
-        if (renderShadow) drawDirectionalShadow34(cx, cy, 152f * s, 22f * s, alpha = 0.50f)
+        if (legacyShadow) drawDirectionalShadow34(cx, cy, 152f * s, 22f * s, alpha = 0.50f)
         drawCrispSprite(PixelStructureAtlas.tavernCounterSprite, cx, cy + 8f * s, 2.05f * s)
       }
 
       PropKind.TAVERN_SHELF_BARRELS -> {
-        if (renderShadow) drawDirectionalShadow34(cx, cy, 98f * s, 16f * s, alpha = 0.48f)
+        if (legacyShadow) drawDirectionalShadow34(cx, cy, 98f * s, 16f * s, alpha = 0.48f)
         drawCrispSprite(PixelStructureAtlas.tavernShelfBarrelsSprite, cx, cy + 6f * s, 2.0f * s)
       }
 
@@ -854,7 +856,7 @@ object PixelSpriteRenderer {
       }
 
       PropKind.TAVERN_LONG_TABLE, PropKind.BANQUET_TABLE -> {
-        if (renderShadow) drawDirectionalShadow34(cx, cy, 102f * s, 20f * s, alpha = 0.46f)
+        if (legacyShadow) drawDirectionalShadow34(cx, cy, 102f * s, 20f * s, alpha = 0.46f)
         drawForeshortenedGlow(cx + 32f * s, cy - 18f * s, 68f * s, Color(0xFFFBBF24).copy(alpha = 0.20f))
         drawCrispSprite(PixelStructureAtlas.tavernLongTableSprite, cx, cy + 8f * s, 2.0f * s)
       }
@@ -872,12 +874,12 @@ object PixelSpriteRenderer {
       }
 
       PropKind.ROYAL_STATUE -> {
-        if (renderShadow) drawDirectionalShadow34(cx, cy, 42f * s, 12f * s, alpha = 0.52f)
+        if (legacyShadow) drawDirectionalShadow34(cx, cy, 42f * s, 12f * s, alpha = 0.52f)
         drawCrispSprite(PixelStructureAtlas.royalStatueSprite, cx, cy + 4f * s, 2.0f * s)
       }
 
       PropKind.OBSIDIAN_COLUMN, PropKind.RUINED_PILLAR -> {
-        if (renderShadow) drawDirectionalShadow34(cx, cy, 38f * s, 13f * s, alpha = 0.56f)
+        if (legacyShadow) drawDirectionalShadow34(cx, cy, 38f * s, 13f * s, alpha = 0.56f)
         drawCrispSprite(PixelStructureAtlas.obsidianColumnSprite, cx, cy + 4f * s, 2.0f * s)
       }
 
@@ -891,47 +893,47 @@ object PixelSpriteRenderer {
           innerColor = Color(0xFF38BDF8).copy(alpha = lightPulse),
           midColor = Color(0xFF8B5CF6).copy(alpha = lightPulse * 0.5f),
         )
-        if (renderShadow) drawDirectionalShadow34(cx, cy, 24f * s, 8f * s, alpha = 0.50f)
+        if (legacyShadow) drawDirectionalShadow34(cx, cy, 24f * s, 8f * s, alpha = 0.50f)
         drawCrispSprite(PixelStructureAtlas.brazierFrames[frameIdx], cx, cy + 4f * s, 1.95f * s)
       }
 
       PropKind.OAK_TREE -> {
         val sway = sin(timeSec * 1.9f + obs.x * 0.015f) * 2.0f * s
-        if (renderShadow) drawDirectionalShadow34(cx + 8f * s, cy, 82f * s, 22f * s, alpha = 0.50f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy, 82f * s, 22f * s, alpha = 0.50f)
         drawCrispSprite(PixelStructureAtlas.oakTreeSprite, cx, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.oakTreeSprite) * s, 2.05f * s)
       }
 
       PropKind.MYSTIC_PLUM_TREE -> {
         val sway = sin(timeSec * 1.8f + obs.x * 0.015f) * 2.0f * s
-        if (renderShadow) drawDirectionalShadow34(cx + 8f * s, cy, 78f * s, 20f * s, alpha = 0.50f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy, 78f * s, 20f * s, alpha = 0.50f)
         drawForeshortenedGlow(cx, cy - 12f * s, 88f * s, Color(0xFFD946EF).copy(alpha = 0.16f))
         drawCrispSprite(PixelStructureAtlas.mysticPlumTreeSprite, cx, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.mysticPlumTreeSprite) * s, 2.05f * s)
       }
 
       PropKind.PINE_SPIRIT_TREE -> {
         val sway = sin(timeSec * 2.0f + obs.x * 0.02f) * 1.6f * s
-        if (renderShadow) drawDirectionalShadow34(cx + 6f * s, cy, 62f * s, 17f * s, alpha = 0.50f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 6f * s, cy, 62f * s, 17f * s, alpha = 0.50f)
         drawCrispSprite(PixelStructureAtlas.spiritPineSprite, cx, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.spiritPineSprite) * s, 2.0f * s)
       }
 
       PropKind.FOREST_CANOPY_BUSH -> {
         val sway = sin(timeSec * 2.5f + obs.y * 0.03f) * 1.4f * s
-        if (renderShadow) drawDirectionalShadow34(cx, cy, 46f * s, 11f * s, alpha = 0.44f)
+        if (legacyShadow) drawDirectionalShadow34(cx, cy, 46f * s, 11f * s, alpha = 0.44f)
         drawCrispSprite(PixelStructureAtlas.forestBushSprite, cx + sway, cy + 4f * s, 2.0f * s)
       }
 
       PropKind.ANCIENT_RUIN_ARCH -> {
-        if (renderShadow) drawDirectionalShadow34(cx, cy, 88f * s, 19f * s, alpha = 0.52f)
+        if (legacyShadow) drawDirectionalShadow34(cx, cy, 88f * s, 19f * s, alpha = 0.52f)
         drawCrispSprite(PixelStructureAtlas.ruinArchSprite, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.ANCIENT_MONOLITH, PropKind.SUMMON_OBELISK -> {
-        if (renderShadow) drawDirectionalShadow34(cx, cy, 32f * s, 10f * s, alpha = 0.50f)
+        if (legacyShadow) drawDirectionalShadow34(cx, cy, 32f * s, 10f * s, alpha = 0.50f)
         drawCrispSprite(PixelStructureAtlas.monolithSprite, cx, cy + 4f * s, 2.0f * s)
       }
 
       PropKind.MOSSY_BOULDER -> {
-        if (renderShadow) drawDirectionalShadow34(cx, cy, 38f * s, 11f * s, alpha = 0.46f)
+        if (legacyShadow) drawDirectionalShadow34(cx, cy, 38f * s, 11f * s, alpha = 0.46f)
         drawCrispSprite(PixelStructureAtlas.mossyBoulderSprite, cx, cy + 4f * s, 1.95f * s)
       }
 
@@ -980,7 +982,7 @@ object PixelSpriteRenderer {
 
       PropKind.TRAINING_DUMMY -> {
         val wobble = sin(timeSec * 5.5f + obs.y) * 1.4f * s
-        if (renderShadow) drawDirectionalShadow34(cx + 6f * s, cy, 18f * s, 6f * s, alpha = 0.36f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 6f * s, cy, 18f * s, 6f * s, alpha = 0.36f)
         // Base cross-stand on sand
         drawRect(Color(0xFF2B1B10), Offset(cx - 12f * s, cy - 4f * s), Size(24f * s, 6f * s))
         drawRect(Color(0xFF8C5A32), Offset(cx - 10f * s, cy - 3f * s), Size(20f * s, 4f * s))
@@ -998,7 +1000,7 @@ object PixelSpriteRenderer {
       }
 
       PropKind.WEAPON_RACK -> {
-        if (renderShadow) drawDirectionalShadow34(cx + 6f * s, cy, 34f * s, 8f * s, alpha = 0.36f)
+        if (legacyShadow) drawDirectionalShadow34(cx + 6f * s, cy, 34f * s, 8f * s, alpha = 0.36f)
         // A-frame wooden side posts & horizontal crossbar
         drawRect(Color(0xFF2B1B10), Offset(cx - 32f * s, cy - 34f * s), Size(7f * s, 36f * s))
         drawRect(Color(0xFF2B1B10), Offset(cx + 25f * s, cy - 34f * s), Size(7f * s, 36f * s))
@@ -1026,7 +1028,7 @@ object PixelSpriteRenderer {
       }
 
       PropKind.RECOVERY_BED -> {
-        if (renderShadow) drawDirectionalShadow34(cx, cy, 26f * s, 10f * s)
+        if (legacyShadow) drawDirectionalShadow34(cx, cy, 26f * s, 10f * s)
         drawRect(Color(0xFF47362B), Offset(cx - 24f * s, cy - 22f * s), Size(48f * s, 24f * s))
         drawRect(Color(0xFFE2E8F0), Offset(cx - 20f * s, cy - 19f * s), Size(14f * s, 16f * s))
         drawRect(Color(0xFF2563EB), Offset(cx - 5f * s, cy - 19f * s), Size(25f * s, 16f * s))
@@ -1140,12 +1142,16 @@ object PixelSpriteRenderer {
     isInjuredResting: Boolean,
     timeSec: Float,
     facingNorth: Boolean = false,
+    heroName: String? = null,
+    skillAnimation: Boolean = false,
   ) {
     val cx = ObliqueCamera.worldToScreenX(worldX, camX, zoom, size.width / 2f)
     val cy = ObliqueCamera.worldToScreenY(worldY, camY, zoom, size.height / 2f)
     if (cx < -120f || cx > size.width + 120f || cy < -150f || cy > size.height + 120f) return
 
-    val pixelScale = 1.85f * zoom
+    val premium = if (!isMaster && heroName == "Kaelen" && heroClass == HeroClassType.KNIGHT)
+      PremiumActorAtlas.get("kaelen") else null
+    val pixelScale = (premium?.worldPixelScale ?: 1.85f) * zoom
 
     // Foreshortened 3/4 Sovereign Sigil / Shield Barrier Ellipse on Ground
     if (shieldOrAuraColor != null) {
@@ -1157,13 +1163,18 @@ object PixelSpriteRenderer {
       )
     }
 
+    if (premium != null) with(PremiumSliceRenderer) {
+      drawSkillGround(cx,cy,zoom,attackAnimProgress,skillAnimation)
+    }
+    val frameBmp = premium?.frame(facingRight,facingNorth,isMoving,attackAnimProgress,
+      skillAnimation,hurtFlash,isInjuredResting,timeSec) ?: run {
     val sheet = if (isMaster) {
       PixelCharacterAtlas.masterSprites
     } else {
       PixelCharacterAtlas.heroSheet(heroClass)
     }
 
-    val frameBmp = sheet.selectFrame(
+    sheet.selectFrame(
       facingRight = facingRight,
       isMoving = isMoving,
       attackProgress = attackAnimProgress,
@@ -1173,19 +1184,23 @@ object PixelSpriteRenderer {
       seed = (worldX * 0.01f + worldY * 0.01f),
       facingNorth = facingNorth,
     )
+    }
 
     with(SanctuaryEnvironmentShadows) {
-      drawCharacterShadow(frameBmp, cx, cy, zoom, pixelScale)
+      drawCharacterShadow(frameBmp, cx, cy, zoom, pixelScale, premium?.pivotY)
     }
 
     drawCrispSprite(
       bmp = frameBmp,
       cx = cx,
-      footY = cy + 6f * zoom,
+      footY = if (premium == null) cy + 6f * zoom else cy + (frameBmp.height-premium.pivotY)*pixelScale,
       pixelScale = pixelScale,
     )
 
-    if (attackAnimProgress > 0.08f && !isMaster) {
+    if (premium != null) with(PremiumSliceRenderer) {
+      drawContactTrail(cx,cy,zoom,facingRight,attackAnimProgress,skillAnimation)
+    }
+    if (premium == null && attackAnimProgress > 0.08f && !isMaster) {
       val slashColor = when (heroClass) {
         HeroClassType.KNIGHT -> Color(0xFF38BDF8)
         HeroClassType.ARCHER -> Color(0xFFFDE047)
@@ -1242,10 +1257,16 @@ object PixelSpriteRenderer {
     if (cx < -150f || cx > size.width + 150f || cy < -180f || cy > size.height + 150f) return
 
     val scaleMult = if (archetype.isBoss) 2.0f else 1.85f
-    val p = scaleMult * zoom
+    val premium = if (archetype == EnemyArchetype.FIELD_GOBLIN_RAIDER) PremiumActorAtlas.get("goblin_raider") else null
+    val p = (premium?.worldPixelScale ?: scaleMult) * zoom
 
     if (deathAnimProgress > 0f) {
       val fade = (1f - deathAnimProgress).coerceIn(0f, 1f)
+      if (premium != null) {
+        val bmp = premium.frame(facingRight,false,false,0f,false,0f,false,timeSec,deathAnimProgress)
+        drawCrispSprite(bmp,cx,cy+(bmp.height-premium.pivotY)*p,p,fade)
+        return
+      }
       val dropY = deathAnimProgress * 14f * zoom
       val sheet = PixelCharacterAtlas.enemySheet(archetype)
       val bmp = if (facingRight) sheet.hurtRight else sheet.hurtLeft
@@ -1272,8 +1293,8 @@ object PixelSpriteRenderer {
       )
     }
 
-    val sheet = PixelCharacterAtlas.enemySheet(archetype)
-    val frameBmp = sheet.selectFrame(
+    val frameBmp = premium?.frame(facingRight,false,isMoving,attackAnimProgress,
+      false,hurtFlash,false,timeSec) ?: PixelCharacterAtlas.enemySheet(archetype).selectFrame(
       facingRight = facingRight,
       isMoving = isMoving,
       attackProgress = attackAnimProgress,
@@ -1283,13 +1304,13 @@ object PixelSpriteRenderer {
       seed = worldX * 0.02f,
     )
     with(SanctuaryEnvironmentShadows) {
-      drawCharacterShadow(frameBmp, cx, cy, zoom, p)
+      drawCharacterShadow(frameBmp, cx, cy, zoom, p, premium?.pivotY)
     }
 
     drawCrispSprite(
       bmp = frameBmp,
       cx = cx,
-      footY = cy + 6f * zoom,
+      footY = if (premium == null) cy + 6f * zoom else cy + (frameBmp.height-premium.pivotY)*p,
       pixelScale = p,
     )
 

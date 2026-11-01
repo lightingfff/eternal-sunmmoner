@@ -61,7 +61,7 @@ private val Ink=Color(0xf51b222b)
             FantasyPanel(Modifier.fillMaxWidth()) {
               Column(Modifier.padding(10.dp)) {
                 Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)) {
-                  PixelHeroPortraitAvatar(heroClass=hero.classType,sizeDp=42.dp)
+                  PixelHeroPortraitAvatar(heroName=hero.name,heroClass=hero.classType,sizeDp=42.dp)
                   Column(Modifier.weight(1f)) {
                     Text("${hero.name} • Lv.${hero.level}",color=Color(0xffece5d5),maxLines=1,overflow=TextOverflow.Ellipsis)
                     Text("${"★".repeat(hero.rarity.toInt().coerceIn(1,6))} • ${hero.classType.labelVi}",color=Gold,style=MaterialTheme.typography.labelSmall)

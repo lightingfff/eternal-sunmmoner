@@ -8,6 +8,7 @@ import com.example.game.map.*
 object SanctuaryEnvironmentShadows {
   private val projection = Matrix()
   private val paths = mutableMapOf<ImageBitmap, Path>()
+  internal val cachedSilhouetteCount get() = paths.size
   private val island by lazy { Path().apply {
     SanctuaryIslandGeometry.POLYGON_VERTICES.forEachIndexed { i, p ->
       if (i == 0) moveTo(p.first,p.second) else lineTo(p.first,p.second)
@@ -68,7 +69,7 @@ object SanctuaryEnvironmentShadows {
       }
     }
   }
-  fun DrawScope.drawCharacterShadow(bitmap: ImageBitmap, cx: Float, cy: Float, zoom: Float, pixelScale: Float) {
+  fun DrawScope.drawCharacterShadow(bitmap: ImageBitmap, cx: Float, cy: Float, zoom: Float, pixelScale: Float, groundPivotY: Int? = null) {
     val bounds = ObliqueSpriteGeometry.bounds(bitmap)
     val path = silhouette(bitmap)
     projection.reset()
@@ -76,18 +77,27 @@ object SanctuaryEnvironmentShadows {
     projection.values[1] = 0f
     projection.values[4] = SanctuaryLight.SHADOW_DIR_X * pixelScale / SanctuaryLight.TAN_ELEV
     projection.values[5] = SanctuaryLight.SHADOW_DIR_Y * pixelScale * ObliqueCamera.OBLIQUE_Y_SCALE / SanctuaryLight.TAN_ELEV
-    projection.values[12] = cx
-    projection.values[13] = cy + 6f*zoom - bounds.bottomPadding*pixelScale
+    val pivotDelta = if (groundPivotY == null) 0f else (groundPivotY - bounds.bottom).toFloat()
+    projection.values[12] = cx + projection.values[4]*pivotDelta
+    projection.values[13] = if (groundPivotY == null) cy + 6f*zoom - bounds.bottomPadding*pixelScale
+      else cy + projection.values[5]*pivotDelta
     withTransform({ transform(projection) }) { drawPath(path,Color(0xff111b26).copy(alpha=.27f*com.example.game.world.WorldEnvironment.lighting.shadowStrength)) }
-    drawRect(Color(0x650C1720), androidx.compose.ui.geometry.Offset(cx-9f*zoom,cy-2f*zoom),androidx.compose.ui.geometry.Size(18f*zoom,4f*zoom))
+    drawLine(Color(0x250C1720), androidx.compose.ui.geometry.Offset(cx-13f*zoom,cy),androidx.compose.ui.geometry.Offset(cx+13f*zoom,cy),4f*zoom)
+    drawLine(Color(0x450C1720), androidx.compose.ui.geometry.Offset(cx-9f*zoom,cy),androidx.compose.ui.geometry.Offset(cx+9f*zoom,cy),2f*zoom)
   }
   fun DrawScope.drawGroundShadows(obstacles: List<WorldObstacle>, camX: Float, camY: Float, zoom: Float) {
+    // Conservative envelope covers the largest existing atlas and the full time-dependent
+    // shadow length. Test BEFORE sprite lookup: offscreen objects must not decode assets.
+    val halfWorldW = size.width/(2f*zoom)
+    val halfWorldH = size.height/(2f*zoom*ObliqueCamera.OBLIQUE_Y_SCALE)
     withTransform({
       translate(size.width/2f-camX*zoom,size.height/2f-camY*zoom*ObliqueCamera.OBLIQUE_Y_SCALE)
       scale(zoom,zoom*ObliqueCamera.OBLIQUE_Y_SCALE,androidx.compose.ui.geometry.Offset.Zero)
     }) {
       clipPath(island) {
         for (obs in obstacles) {
+          val reach = 500f*obs.scale*(1f+1f/SanctuaryLight.TAN_ELEV)+kotlin.math.abs(obs.elevationZ)/ObliqueCamera.OBLIQUE_Y_SCALE
+          if (kotlin.math.abs(obs.x-camX)>halfWorldW+reach || kotlin.math.abs(obs.y-camY)>halfWorldH+reach) continue
           val bitmap = sprite(obs) ?: continue
           val bounds = ObliqueSpriteGeometry.bounds(bitmap)
           val spriteScale = ObliqueSpriteGeometry.pixelScale(obs.propKind)
