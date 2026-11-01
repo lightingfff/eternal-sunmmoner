@@ -289,110 +289,147 @@ object PixelTileAtlas {
   private fun createSanctuarySunlitGrassTile(variant: Int): ImageBitmap {
     val c = PixelCanvas(TILE_PX, TILE_PX)
     val rng = Random(7100 + variant * 173)
-    val baseLawn = 0xFF69BD4F.toInt()
+    // Dark Fantasy: desaturated ancient moss-forest floor - muted greens, stone, earth
+    val baseLawn = 0xFF2B352E.toInt() // cold mossy stone-green base, not neon
     c.fillRect(0, 0, TILE_PX, TILE_PX, baseLawn)
 
-    // Soft organic sunlit & shaded grass patches (kept away from 2px borders so edges tile seamlessly!)
-    repeat(7) { idx ->
-      val cx = 9 + rng.nextInt(46)
-      val cy = 9 + rng.nextInt(46)
-      val patchCol = if (idx % 2 == 0) 0xFF74C758.toInt() else 0xFF5FB046.toInt()
-      c.fillEllipse(cx, cy, 9 + rng.nextInt(7), 5 + rng.nextInt(4), patchCol)
+    // Large organic shadow + moss patches with subtle variation (seamless-safe away from borders)
+    val patchCols = intArrayOf(0xFF25302A.toInt(), 0xFF2F3D33.toInt(), 0xFF232E28.toInt(), 0xFF334739.toInt(), 0xFF1F2A24.toInt())
+    repeat(9) { idx ->
+      val cx = 8 + rng.nextInt(48)
+      val cy = 8 + rng.nextInt(48)
+      val col = patchCols[rng.nextInt(patchCols.size)]
+      c.fillEllipse(cx, cy, 8 + rng.nextInt(9), 5 + rng.nextInt(5), col)
+    }
+    // Subtle earth exposure - trampled / bare soil where heroes walk
+    val dirtPatches = intArrayOf(0xFF2E2A24.toInt(), 0xFF3A352E.toInt(), 0xFF2A2620.toInt())
+    if (variant % 3 == 0) {
+      repeat(2) {
+        val cx = 12 + rng.nextInt(40)
+        val cy = 12 + rng.nextInt(40)
+        c.fillEllipse(cx, cy, 6 + rng.nextInt(5), 4 + rng.nextInt(3), dirtPatches[rng.nextInt(dirtPatches.size)])
+      }
+    }
+    // Fine stone grit - cold slate pebbles embedded in moss
+    repeat(18) {
+      val sx = 4 + rng.nextInt(56)
+      val sy = 4 + rng.nextInt(56)
+      c.set(sx, sy, if (rng.nextInt(3)==0) 0xFF3A3F45.toInt() else 0xFF4A4D55.toInt())
     }
 
-    val bladeShadow = 0xFF4B9638.toInt()
-    val bladeMid = 0xFF5DAE44.toInt()
-    val bladeBright = 0xFF84D462.toInt()
-    val bladeSun = 0xFF9EE376.toInt()
-
-    // Fine pixel-art grass texture specks
-    repeat(95) {
+    // Dark fantasy foliage specks - muted, dusty greens with depth (shadow-mid-highlight)
+    val deepShadow = 0xFF162118.toInt()
+    val midMoss = 0xFF2A3D2B.toInt()
+    val mutedMid = 0xFF344E35.toInt()
+    val mossLight = 0xFF3D5A36.toInt()
+    val mossHi = 0xFF4A6B3E.toInt() // still desaturated, never neon
+    repeat(110) {
       val gx = 2 + rng.nextInt(60)
       val gy = 2 + rng.nextInt(60)
-      val col = when (rng.nextInt(5)) {
-        0 -> bladeShadow
-        1, 2 -> bladeMid
-        3 -> bladeBright
-        else -> bladeSun
+      val col = when (rng.nextInt(6)) {
+        0 -> deepShadow
+        1 -> midMoss
+        2,3 -> mutedMid
+        4 -> mossLight
+        else -> mossHi
       }
       c.set(gx, gy, col)
+      if (rng.nextInt(5)==0 && gx < 62) c.set(gx+1, gy, midMoss)
     }
 
-    // Crisp 3-blade anime grass tufts
-    repeat(10) {
+    // Thicker, stiffer grass tufts - clumped, wind-bent, with AO at base
+    repeat(12) {
       val tx = 6 + rng.nextInt(52)
-      val ty = 8 + rng.nextInt(48)
-      c.hLine(tx - 1, ty, 3, bladeShadow)
-      c.vLine(tx - 1, ty - 2, 2, bladeBright)
-      c.vLine(tx, ty - 3, 3, bladeSun)
-      c.vLine(tx + 1, ty - 2, 2, bladeBright)
+      val ty = 10 + rng.nextInt(48)
+      // AO shadow under tuft
+      c.hLine(tx - 1, ty+1, 4, 0xFF1A1E1B.toInt())
+      c.hLine(tx - 1, ty, 3, deepShadow)
+      c.vLine(tx - 1, ty - 2, 2, mossLight)
+      c.vLine(tx, ty - 3, 4, mossHi)
+      c.vLine(tx + 1, ty - 1, 2, mutedMid)
     }
 
-    // Delicate fallen pink sakura petals & tiny white meadow blossoms on select variants
-    if (variant % 2 == 1) {
-      repeat(3) { fIdx ->
-        val fx = 10 + (variant * 13 + fIdx * 17) % 44
-        val fy = 10 + (variant * 11 + fIdx * 19) % 44
+    // Rare, desaturated wildflowers - dusty lavender / muted rose, sparse
+    if (variant == 2 || variant == 5 || variant == 7) {
+      repeat(2) { fIdx ->
+        val fx = 11 + (variant * 13 + fIdx * 17) % 42
+        val fy = 11 + (variant * 11 + fIdx * 19) % 42
         if ((variant + fIdx) % 2 == 0) {
-          c.set(fx, fy, 0xFFF9A8D4.toInt())
-          c.set(fx + 1, fy, 0xFFFCE7F3.toInt())
-          c.set(fx, fy + 1, 0xFFF472B6.toInt())
+          // dusky lavender / heather, not pink neon
+          c.set(fx, fy, 0xFF8A7A97.toInt())
+          c.set(fx + 1, fy, 0xFF6E6080.toInt())
+          c.set(fx, fy + 1, 0xFF5A4E6A.toInt())
         } else {
-          c.set(fx, fy, 0xFFFFFFFF.toInt())
-          c.set(fx + 1, fy, 0xFFFEF08A.toInt())
+          // dried rose / burgundy
+          c.set(fx, fy, 0xFF9A6570.toInt())
+          c.set(fx + 1, fy, 0xFF7A4A52.toInt())
         }
+        // tiny dark stem
+        c.set(fx, fy+2, 0xFF1E2A1F.toInt())
+      }
+    }
+    // Fallen leaf litter near old trees on some tiles
+    if (variant == 1 || variant == 6) {
+      repeat(3) {
+        val lx = 14 + rng.nextInt(36)
+        val ly = 14 + rng.nextInt(36)
+        c.set(lx, ly, 0xFF5A4630.toInt())
+        c.set(lx+1, ly, 0xFF4A3520.toInt())
       }
     }
     return c.toImageBitmap()
   }
 
-  /**
-   * 64x64 Warm Sunlit Golden-Sand Training Arena Tile with subtle sparring scuffs and fine pebbles.
-   */
   private fun createSanctuaryTrainingSandTile(variant: Int): ImageBitmap {
     val c = PixelCanvas(TILE_PX, TILE_PX)
     val rng = Random(7600 + variant * 131)
-    val sandBase = 0xFFEBC992.toInt()
+    // Ancient training ground: compacted earth & worn sand, darker than sunny beach
+    val sandBase = 0xFF5C4E3A.toInt() // cold trodden earth-brown
+    val sandMid = 0xFF6B5C45.toInt()
+    val sandHi = 0xFF7A6B55.toInt()
     c.fillRect(0, 0, TILE_PX, TILE_PX, sandBase)
 
-    repeat(6) { idx ->
+    // Variation patches - trampled, darker center
+    repeat(5) { idx ->
       val cx = 10 + rng.nextInt(44)
       val cy = 10 + rng.nextInt(44)
-      val col = if (idx % 2 == 0) 0xFFF2D4A2.toInt() else 0xFFE1BE85.toInt()
-      c.fillEllipse(cx, cy, 10 + rng.nextInt(6), 5 + rng.nextInt(4), col)
+      val col = if (idx % 2 == 0) sandMid else 0xFF4E3E2E.toInt()
+      c.fillEllipse(cx, cy, 9 + rng.nextInt(7), 5 + rng.nextInt(4), col)
     }
-
-    repeat(70) {
+    // Stone grit + pebbles in sand
+    repeat(55) {
       val sx = 2 + rng.nextInt(60)
       val sy = 2 + rng.nextInt(60)
-      c.set(sx, sy, if (rng.nextBoolean()) 0xFFF7E0B5.toInt() else 0xFFD1AE76.toInt())
+      c.set(sx, sy, if (rng.nextBoolean()) sandHi else 0xFF3E3328.toInt())
     }
-
-    // Subtle footwork arc / pebble detail
+    // Sparring scuff arcs & footprints - subtle directional marks
     if (variant == 1 || variant == 4) {
       val px = 18 + variant * 5
       val py = 22 + variant * 4
-      c.hLine(px, py, 7, 0xFFCca76E.toInt())
-      c.hLine(px + 1, py + 1, 6, 0xFFF6DFB4.toInt())
+      c.hLine(px, py, 7, 0xFF4A3D2E.toInt())
+      c.hLine(px + 1, py + 1, 6, 0xFF7A6B55.toInt())
+      // deeper gouge
+      c.set(px+3, py+2, 0xFF3A2E24.toInt())
+    }
+    // Dark moss at edges near grass transition
+    if (variant % 2 == 0) {
+      c.fillEllipse(6, 8, 5, 3, 0xFF2A3D2B.toInt())
     }
     return c.toImageBitmap()
   }
 
-  /**
-   * 64x64 Crisp Pale-Alabaster & Warm Limestone Sanctuary Plaza Slab Tile.
-   */
   private fun createSanctuaryStoneTile(variant: Int): ImageBitmap {
     val c = PixelCanvas(TILE_PX, TILE_PX)
     val rng = Random(1000 + variant * 137)
-    val mortar = 0xFFC5BFB4.toInt()
+    val mortar = 0xFF1A1E24.toInt() // deep cold mortar, not warm beige
     val bases = intArrayOf(
-      0xFFEDE9E1.toInt(),
-      0xFFF3EFE8.toInt(),
-      0xFFE6E1D8.toInt(),
-      0xFFEAE6DE.toInt(),
+      0xFF3A3F4A.toInt(), // cold stone blue-grey
+      0xFF444A56.toInt(),
+      0xFF353A45.toInt(),
+      0xFF40454F.toInt(),
     )
-    val hi = 0xFFFAF8F5.toInt()
-    val sh = 0xFFD5CFC4.toInt()
+    val hi = 0xFF5A5F6E.toInt()
+    val sh = 0xFF23262E.toInt()
 
     val rowHeights = intArrayOf(16, 16, 16, 16)
     var curY = 0
@@ -405,32 +442,35 @@ object PixelTileAtlas {
         val cw = 20 + ((variant + r * 3 + idx) % 3) * 6
         val base = bases[(variant + r + idx) % bases.size]
         c.beveledSlab(curX, curY, cw, rh, base, hi, sh, mortar, rng, hi, sh)
+        // crack / age line
+        if (rng.nextInt(7)==0) c.vLine(curX + cw/2, curY+3, rh-6, 0xFF1E2026.toInt())
         curX += cw
         idx++
       }
       curY += rh
     }
+    // Occasional rune scratch
+    if (variant==3 || variant==7) {
+      c.hLine(18, 30, 9, 0xFF6B7A9A.toInt())
+      c.set(22,31, 0xFF7CA8C8.toInt())
+    }
     return c.toImageBitmap()
   }
 
-  /**
-   * 64x64 Rounded Pale-Ash Grey Cobblestone Street Tile matching the Sanctuary avenues.
-   */
   private fun createSanctuaryGreyCobbleTile(variant: Int): ImageBitmap {
     val c = PixelCanvas(TILE_PX, TILE_PX)
     val rng = Random(2200 + variant * 97)
-    val mortar = 0xFF75726C.toInt()
+    val mortar = 0xFF1B1E24.toInt() // near-black cold grout
     val cobblePalette = intArrayOf(
-      0xFFB6B3AD.toInt(),
-      0xFFC4C1BA.toInt(),
-      0xFFA7A49E.toInt(),
-      0xFFCECBC4.toInt(),
-      0xFF9C9993.toInt(),
+      0xFF3E424D.toInt(), // weathered cold grey
+      0xFF4B4F5C.toInt(),
+      0xFF383C46.toInt(),
+      0xFF525663.toInt(),
+      0xFF2F333E.toInt(),
     )
-    val hi = 0xFFDFDDD7.toInt()
-    val sh = 0xFF8A8780.toInt()
+    val hi = 0xFF5E636F.toInt()
+    val sh = 0xFF252830.toInt()
 
-    // 8 foreshortened staggered rows summing to full 64px height
     val rowHeights = intArrayOf(8, 8, 8, 8, 8, 8, 8, 8)
     var py = 0
     for (row in rowHeights.indices) {
@@ -443,8 +483,10 @@ object PixelTileAtlas {
         c.beveledSlab(
           px, py, cw, rh,
           base, hi, sh, mortar, rng,
-          0xFFD4D1CA.toInt(), 0xFF918E87.toInt(),
+          0xFF5A5F6E.toInt(), 0xFF1E2024.toInt(),
         )
+        // moss in cracks on some stones
+        if ((variant+row+colIdx)%5==0) c.set(px+2, py+2, 0xFF2A332E.toInt())
         c.set(px + 1, py + 1, mortar)
         c.set(px + cw - 2, py + 1, mortar)
         px += cw
@@ -452,13 +494,15 @@ object PixelTileAtlas {
       }
       py += rh
     }
+    // Age cracks across tiles
+    if (variant==2) c.hLine(8, 30, 14, 0xFF1E2026.toInt())
     return c.toImageBitmap()
   }
 
   private fun createSanctuaryCurbTile(variant: Int): ImageBitmap {
     val c = PixelCanvas(TILE_PX, TILE_PX)
     val rng = Random(2600 + variant * 61)
-    val mortar = 0xFF5E5B55.toInt()
+    val mortar = 0xFF1A1E24.toInt()
     val rowHeights = intArrayOf(16, 16, 16, 16)
     var py = 0
     for (r in rowHeights.indices) {
@@ -467,9 +511,9 @@ object PixelTileAtlas {
       var idx = 0
       while (px < TILE_PX) {
         val cw = 16 + ((idx + r) % 2) * 6
-        val base = if ((r + idx + variant) % 2 == 0) 0xFF9E9B94.toInt() else 0xFF8F8C85.toInt()
-        val hi = 0xFFBAB7B0.toInt()
-        val sh = 0xFF73706A.toInt()
+        val base = if ((r + idx + variant) % 2 == 0) 0xFF3E424D.toInt() else 0xFF383C46.toInt()
+        val hi = 0xFF525663.toInt()
+        val sh = 0xFF1E2026.toInt()
         c.beveledSlab(px, py, cw, rh, base, hi, sh, mortar, rng, hi, sh)
         px += cw
         idx++
@@ -477,8 +521,8 @@ object PixelTileAtlas {
       py += rh
     }
     if (variant % 2 == 0) {
-      c.fillCircle(12 + variant * 8, 14, 2, 0xFF69BD4F.toInt())
-      c.set(12 + variant * 8, 13, 0xFF84D462.toInt())
+      c.fillCircle(12 + variant * 8, 14, 2, 0xFF2A332E.toInt())
+      c.set(12 + variant * 8, 13, 0xFF3D5A36.toInt())
     }
     return c.toImageBitmap()
   }

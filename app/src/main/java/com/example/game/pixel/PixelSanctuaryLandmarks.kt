@@ -30,8 +30,8 @@ internal object PixelSanctuaryLandmarks {
 
     val obsDark = 0xFF1A1F28.toInt()
     val obsShadow = 0xFF262D3A.toInt()
-    val obsMid = 0xFF364050.toInt()
-    val obsLight = 0xFF4A5669.toInt()
+    val obsMid = 0xFF2A3042.toInt()
+    val obsLight = 0xFF3A4052.toInt()
     val obsChamfer = 0xFF647287.toInt()
     val portalDeep = 0xFF0369A1.toInt()
     val portalMid = 0xFF0EA5E9.toInt()
@@ -187,11 +187,11 @@ internal object PixelSanctuaryLandmarks {
     val cx = 138
     val cy = 122
 
-    val stoneBright = 0xFFF2EFE8.toInt()
-    val stoneLight = 0xFFE4DFD4.toInt()
-    val stoneMid = 0xFFCCC6B8.toInt()
-    val stoneShadow = 0xFF9E9789.toInt()
-    val stoneDark = 0xFF6E685D.toInt()
+    val stoneBright = 0xFF3E424D.toInt()
+    val stoneLight = 0xFF343844.toInt()
+    val stoneMid = 0xFF2A2D38.toInt()
+    val stoneShadow = 0xFF1E2028.toInt()
+    val stoneDark = 0xFF1A1C24.toInt()
     val runeOuter = 0xFF60A5FA.toInt()
     val runeInner = 0xFFBAE6FD.toInt()
 
@@ -282,18 +282,18 @@ internal object PixelSanctuaryLandmarks {
     chimneyLeft: Boolean = true,
     hasFlowerGardenTrim: Boolean = true,
   ) {
-    val creamSunlit = 0xFFF4ECDC.toInt()
-    val creamGable = 0xFFDECFC0.toInt()
-    val timberDark = 0xFF432A1B.toInt()
-    val timberWarm = 0xFF6B462E.toInt()
-    val stoneBase = 0xFF8C867B.toInt()
-    val stoneHi = 0xFFB8B2A6.toInt()
+    val creamSunlit = 0xFF3A3F4A.toInt() // dark fantasy cold stone plaster
+    val creamGable = 0xFF323540.toInt()
+    val timberDark = 0xFF1B120E.toInt()
+    val timberWarm = 0xFF2A1B12.toInt()
+    val stoneBase = 0xFF2E3038.toInt()
+    val stoneHi = 0xFF4A4E5E.toInt()
 
-    val roofDark = if (useBlueSlateRoof) 0xFF2A3B52.toInt() else 0xFF472C1B.toInt()
-    val roofMid = if (useBlueSlateRoof) 0xFF415B7A.toInt() else 0xFF6E472D.toInt()
-    val roofLight = if (useBlueSlateRoof) 0xFF58789E.toInt() else 0xFF8C5D3D.toInt()
-    val roofHi = if (useBlueSlateRoof) 0xFF789BC2.toInt() else 0xFFAD7650.toInt()
-    val ridgeCol = if (useBlueSlateRoof) 0xFFA2C0E0.toInt() else 0xFFCC966C.toInt()
+    val roofDark = if (useBlueSlateRoof) 0xFF1E2430.toInt() else 0xFF2A1B14.toInt()
+    val roofMid = if (useBlueSlateRoof) 0xFF2E3440.toInt() else 0xFF3A2520.toInt()
+    val roofLight = if (useBlueSlateRoof) 0xFF404A5E.toInt() else 0xFF4E3528.toInt()
+    val roofHi = if (useBlueSlateRoof) 0xFF556080.toInt() else 0xFF5A3D2E.toInt()
+    val ridgeCol = if (useBlueSlateRoof) 0xFF6A7088.toInt() else 0xFF6B4A32.toInt()
 
     val totalWallH = (upperH + lowerH) * 72 / 100
     val sideW = (bodyW * 56) / 100

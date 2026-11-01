@@ -112,11 +112,11 @@ object PixelStructureAtlas {
     val topY = 18
     val botY = h - 14
 
-    val stoneSun = 0xFFEAE1CF.toInt()
-    val stoneLight = 0xFFD8CEBA.toInt()
-    val stoneMid = 0xFFBEB39E.toInt()
-    val stoneShadow = 0xFF998E7A.toInt()
-    val stoneDark = 0xFF736A59.toInt()
+    val stoneSun = 0xFF4A4E5E.toInt()
+    val stoneLight = 0xFF3A3F4A.toInt()
+    val stoneMid = 0xFF2F333E.toInt()
+    val stoneShadow = 0xFF1E2028.toInt()
+    val stoneDark = 0xFF23262E.toInt()
     val mortar = 0xFF5C5446.toInt()
 
     // Cylindrical / octagonal stone shaft with vertical sun-to-shadow shading & horizontal courses
@@ -185,10 +185,10 @@ object PixelStructureAtlas {
       c.fillRect(cx + 3 + i, trunkY + 4 - i, 6, 4, 0xFF3E261B.toInt())
     }
 
-    val sh = 0xFFBE185D.toInt()
-    val mid = 0xFFEC4899.toInt()
-    val br = 0xFFF9A8D4.toInt()
-    val hi = 0xFFFCE7F3.toInt()
+    val sh = 0xFF5A2540.toInt() // dark plum shadow
+    val mid = 0xFF7A3358.toInt()
+    val br = 0xFF9A6570.toInt() // muted dusty rose
+    val hi = 0xFFB88A95.toInt()
 
     if (largeVariant) {
       c.drawOrganicLeafCluster(cx - 26, 62, 23, 17, sh, mid, br, hi, seed = 1701)
@@ -225,9 +225,9 @@ object PixelStructureAtlas {
       val halfW = (2 + (sin(t * 2.5f).coerceAtLeast(0.15f) * 15f)).toInt()
       for (dx in -halfW..halfW) {
         val col = when {
-          dx < -halfW / 3 -> 0xFF7AD15B.toInt()
-          dx < halfW / 3 -> 0xFF4B9E3B.toInt()
-          else -> 0xFF286927.toInt()
+          dx < -halfW / 3 -> 0xFF3D5A36.toInt()
+          dx < halfW / 3 -> 0xFF2A3D2B.toInt()
+          else -> 0xFF1A2520.toInt()
         }
         c.set(cx + dx, ry, col)
       }
@@ -242,7 +242,7 @@ object PixelStructureAtlas {
     val c = PixelCanvas(w, h)
     c.drawOrganicLeafCluster(
       w / 2, 20, 18, 12,
-      0xFF215726.toInt(), 0xFF3E8C38.toInt(), 0xFF66BA4E.toInt(), 0xFF9EE376.toInt(), seed = 1802,
+      0xFF1A2520.toInt(), 0xFF2A3D2B.toInt(), 0xFF3D5A36.toInt(), 0xFF4A6B3E.toInt(), seed = 1802,
     )
     c.applyCrispOutline(0xFF142E15.toInt())
     return c.toImageBitmap()
@@ -649,10 +649,10 @@ object PixelStructureAtlas {
       c.fillRect(58 + i, 78 - i, 7, 5, 0xFF362016.toInt())
     }
 
-    val sh = 0xFF122C36.toInt()
-    val mid = 0xFF215736.toInt()
-    val br = 0xFF488F3E.toInt()
-    val hi = 0xFF9FD64B.toInt()
+    val sh = 0xFF0F1A1F.toInt()
+    val mid = 0xFF1A2E1F.toInt()
+    val br = 0xFF2F4A2E.toInt()
+    val hi = 0xFF3D5A36.toInt()
 
     // Back shadow & lower bough leaf clusters
     c.drawOrganicLeafCluster(30, 62, 24, 18, sh, mid, br, hi, seed = 701)
@@ -684,10 +684,10 @@ object PixelStructureAtlas {
       c.fillRect(56 + i, 76 - i, 6, 5, 0xFF2A1930.toInt())
     }
 
-    val sh = 0xFF281347.toInt()
-    val mid = 0xFF581C87.toInt()
-    val br = 0xFF9333EA.toInt()
-    val hi = 0xFFE879F9.toInt()
+    val sh = 0xFF1A0F2A.toInt()
+    val mid = 0xFF3A1F5A.toInt()
+    val br = 0xFF5A2F7A.toInt()
+    val hi = 0xFF7A4E9A.toInt()
 
     c.drawOrganicLeafCluster(30, 60, 22, 16, sh, mid, br, hi, seed = 721)
     c.drawOrganicLeafCluster(78, 62, 22, 16, sh, mid, br, hi, seed = 722)
@@ -711,10 +711,10 @@ object PixelStructureAtlas {
         val span = (22 - ry) * maxSpan / 22
         val jag = if (ry % 4 == 0) 2 else 0
         val col = when {
-          ry < 5 -> 0xFF102A38.toInt()
-          ry < 11 -> 0xFF1B4954.toInt()
-          ry < 17 -> 0xFF2D706E.toInt()
-          else -> 0xFF63B084.toInt()
+          ry < 5 -> 0xFF0C1A22.toInt()
+          ry < 11 -> 0xFF132A2E.toInt()
+          ry < 17 -> 0xFF1B3A2E.toInt()
+          else -> 0xFF2F4A2E.toInt()
         }
         c.hLine(44 - span - jag, baseY - ry, (span + jag) * 2, col)
       }
@@ -727,7 +727,7 @@ object PixelStructureAtlas {
     val w = 56
     val h = 44
     val c = PixelCanvas(w, h)
-    c.drawOrganicLeafCluster(28, 24, 24, 15, 0xFF143538.toInt(), 0xFF286638.toInt(), 0xFF589C3E.toInt(), 0xFFA8DB4D.toInt(), seed = 740)
+    c.drawOrganicLeafCluster(28, 24, 24, 15, 0xFF0F1E1B.toInt(), 0xFF1E2F24.toInt(), 0xFF2A3D2B.toInt(), 0xFF3D5A36.toInt(), seed = 740)
     listOf(18 to 20, 31 to 17, 37 to 25).forEach { (fx, fy) ->
       c.set(fx, fy, 0xFFFEF08A.toInt())
       c.set(fx + 1, fy, 0xFFF59E0B.toInt())
