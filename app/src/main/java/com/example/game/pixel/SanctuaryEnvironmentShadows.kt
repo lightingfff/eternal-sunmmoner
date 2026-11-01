@@ -78,7 +78,7 @@ object SanctuaryEnvironmentShadows {
     projection.values[5] = SanctuaryLight.SHADOW_DIR_Y * pixelScale * ObliqueCamera.OBLIQUE_Y_SCALE / SanctuaryLight.TAN_ELEV
     projection.values[12] = cx
     projection.values[13] = cy + 6f*zoom - bounds.bottomPadding*pixelScale
-    withTransform({ transform(projection) }) { drawPath(path,Color(0x45111B26)) }
+    withTransform({ transform(projection) }) { drawPath(path,Color(0xff111b26).copy(alpha=.27f*com.example.game.world.WorldEnvironment.lighting.shadowStrength)) }
     drawRect(Color(0x650C1720), androidx.compose.ui.geometry.Offset(cx-9f*zoom,cy-2f*zoom),androidx.compose.ui.geometry.Size(18f*zoom,4f*zoom))
   }
   fun DrawScope.drawGroundShadows(obstacles: List<WorldObstacle>, camX: Float, camY: Float, zoom: Float) {
@@ -109,7 +109,7 @@ object SanctuaryEnvironmentShadows {
           val visibleFootOffset = ObliqueSpriteGeometry.drawFootOffset(obs.propKind,bitmap) - bounds.bottomPadding * spriteScale
           matrix.values[13] = obs.y + (visibleFootOffset * obs.scale - obs.elevationZ) / ObliqueCamera.OBLIQUE_Y_SCALE
           withTransform({ transform(matrix) }) {
-            drawPath(path,Color(0xff111b26).copy(alpha=SanctuaryShadowRegistry.opacityFor(obs.propKind)))
+            drawPath(path,Color(0xff111b26).copy(alpha=SanctuaryShadowRegistry.opacityFor(obs.propKind)*com.example.game.world.WorldEnvironment.lighting.shadowStrength))
           }
         }
       }

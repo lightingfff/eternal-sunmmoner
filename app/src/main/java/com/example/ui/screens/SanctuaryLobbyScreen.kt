@@ -189,6 +189,7 @@ fun SanctuaryLobbyScreen(
 ) {
   val artContext = androidx.compose.ui.platform.LocalContext.current
   remember(artContext) { com.example.game.pixel.SanctuaryArtAssets.init(artContext) }
+  remember(artContext) { com.example.game.world.WorldEnvironment.init(artContext) }
   val lobbyEngine = remember { SanctuaryLobbyEngine() }
   val textMeasurer = rememberTextMeasurer()
   val focusRequester = remember { FocusRequester() }
@@ -447,6 +448,7 @@ fun SanctuaryLobbyScreen(
       val halfW = size.width / 2f
       val halfH = size.height / 2f
       val (camX, camY) = computeLobbyCam(halfW, halfH)
+      com.example.game.world.WorldEnvironment.update(indoors=lobbyEngine.isInsideInterior)
       val layout = lobbyEngine.mapLayout
       val highestClearedFloorInt = (profile?.highestClearedFloor ?: 0L).toInt()
 
@@ -488,6 +490,7 @@ fun SanctuaryLobbyScreen(
         )
       }
 
+      if (!lobbyEngine.isInsideInterior) with(com.example.game.pixel.LivingWorldRenderer) { drawWeather(camX,camY,zoom,false) }
       // Y-Sorted 2.5D Architecture, Trees, Furnishings, and Autonomous 3/4 Anime Heroes
       val drawables = buildList {
         layout.obstacles.forEach { add(LobbyDrawableItem.Prop(it)) }
@@ -559,6 +562,11 @@ fun SanctuaryLobbyScreen(
         )
       }
 
+      if (!lobbyEngine.isInsideInterior) with(com.example.game.pixel.LivingWorldRenderer) {
+        drawWorldGrade()
+        drawLocalLights(layout.obstacles,camX,camY,zoom)
+        drawWeather(camX,camY,zoom,true)
+      }
       val topHudSafePx = (if (isWideScreen) 64.dp else 112.dp).toPx()
 
       val placedTagRects = mutableListOf<androidx.compose.ui.geometry.Rect>()
