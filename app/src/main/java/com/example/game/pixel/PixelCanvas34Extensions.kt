@@ -127,8 +127,9 @@ fun PixelCanvas.drawRoofDormer34(
 }
 
 /**
- * Paints a multi-course hand-laid 3/4 ashlar stone wall with corner quoins, mortar shadows,
- * eave under-shadow, and a stepped stone foundation plinth.
+ * V3 PREMIUM 3/4 ashlar masonry — hand-laid staggered courses (6px), distinct per-stone tone,
+ * beveled highlight/shadow, recessed mortar, selective tool marks/cracks, chamfered quoins with lichen, AO eave, plinth coping.
+ * Large: course rhythm; Medium: individual stone faces; Small: crack/moss/highlight reinforcing masonry.
  */
 fun PixelCanvas.drawStoneWall34(
   x: Int,
@@ -145,54 +146,46 @@ fun PixelCanvas.drawStoneWall34(
 ) {
   val rng = Random(seed)
   fillRect(x, y, w, h, mortar)
-
-  // Staggered horizontal ashlar courses (6px tall per course)
-  var cy = y
-  var rowIdx = 0
+  // Staggered courses with per-stone variation
+  var cy = y; var rowIdx=0
   while (cy < y + h - 5) {
     val ch = 6.coerceAtMost(y + h - cy)
-    var cx = x - ((rowIdx % 2) * 5)
-    var colIdx = 0
+    var cx = x - ((rowIdx % 2) * 5 + (seed % 3))
+    var colIdx=0
     while (cx < x + w) {
-      val bw = 10 + ((rowIdx + colIdx) % 3) * 3
-      val bx0 = cx.coerceAtLeast(x)
-      val bx1 = (cx + bw - 1).coerceAtMost(x + w - 1)
+      val bw = 10 + ((rowIdx*2 + colIdx + seed%3) % 3) * 3 + rng.nextInt(2)
+      val bx0 = cx.coerceAtLeast(x); val bx1 = (cx + bw - 1).coerceAtMost(x + w - 1)
       if (bx1 > bx0 + 1 && ch > 2) {
+        // base varies slightly per stone within stoneBase/Alt for organic quarried look
         val base = if ((rowIdx + colIdx) % 2 == 0) stoneBase else stoneAlt
-        fillRect(bx0, cy + 1, bx1 - bx0, ch - 1, base)
+        // subtle tonal shift for stone face
+        val faceCol = if (rng.nextInt(5)==0) (base - 0x00101010) else base
+        fillRect(bx0, cy + 1, bx1 - bx0, ch - 1, faceCol)
         hLine(bx0, cy + 1, bx1 - bx0, stoneHi)
         hLine(bx0, cy + ch - 1, bx1 - bx0, stoneShadow)
-        if (rng.nextBoolean()) {
-          set((bx0 + bx1) / 2, cy + ch / 2, if (rng.nextBoolean()) stoneHi else stoneShadow)
-        }
+        // tool mark / mineral fleck
+        if (rng.nextInt(6)==0) hLine(bx0+2, cy+ch/2, 3, stoneHi)
+        if (rng.nextInt(8)==0) set((bx0+bx1)/2, cy+ch/2, if (rng.nextBoolean()) stoneHi else stoneShadow)
+        // vertical joint darkening
+        set(bx1, cy+1, stoneShadow)
       }
-      cx += bw
-      colIdx++
-    }
-    cy += ch
-    rowIdx++
+      cx += bw; colIdx++
+    }; cy+=ch; rowIdx++
   }
-
-  // Heavy Corner Quoins with chamfer highlight
+  // Heavy corner quoins — alternating depth, chamfer moonlight, shadow lip, sparse lichen
   for (qy in y until (y + h - 4) step 6) {
-    val qw = if ((qy / 6) % 2 == 0) 6 else 4
-    fillRect(x, qy, qw, 5, stoneHi)
-    hLine(x, qy, qw, 0xFF8A9AB8.toInt()) // moonlight chamfer
-    hLine(x, qy + 4, qw, stoneShadow)
-    fillRect(x + w - qw, qy, qw, 5, stoneAlt)
-    hLine(x + w - qw, qy + 4, qw, stoneShadow)
-    // lichen on quoin
-    if ((qy / 6) % 3 == 0) set(x + qw - 1, qy + 2, 0xFF2A3D2B.toInt())
+    val qw = if ((qy/6)%2==0) 6 else 4
+    fillRect(x, qy, qw, 5, stoneHi); hLine(x, qy, qw, 0xFF8A9AB8.toInt()); hLine(x, qy+4, qw, stoneShadow)
+    fillRect(x + w - qw, qy, qw, 5, stoneAlt); hLine(x + w - qw, qy+4, qw, stoneShadow)
+    if ((qy/6)%3==0) { set(x+qw-1, qy+2, 0xFF2A3D2B.toInt()); set(x+qw-2, qy+2, 0xFF1E2A1F.toInt()) }
+    if ((qy/6)%4==1) set(x+2, qy+2, 0xFF6B7A9A.toInt()) // chisel nick highlight
   }
-
-  // Cast AO + eave shadow along top of wall
-  fillRect(x, y, w, 3, stoneShadow)
-  hLine(x, y, w, 0xFF4A4E5E.toInt())
-
-  // Stepped Stone Foundation Plinth with highlight coping
-  fillRect(x - 2, y + h - 5, w + 4, 5, stoneShadow)
-  hLine(x - 2, y + h - 5, w + 4, stoneHi)
-  hLine(x - 2, y + h - 1, w + 4, 0xFF1A1C24.toInt())
+  // AO + eave shadow along top, with highlight lip
+  fillRect(x, y, w, 3, stoneShadow); hLine(x, y, w, 0xFF4A4E5E.toInt()); hLine(x, y+1, w, 0xFF2A2E3A.toInt())
+  // Stepped foundation plinth with coping highlight + bottom AO
+  fillRect(x - 2, y + h - 5, w + 4, 5, stoneShadow); hLine(x - 2, y + h - 5, w + 4, stoneHi); hLine(x - 2, y + h - 1, w + 4, 0xFF1A1C24.toInt())
+  // subtle weathering streak below window level
+  if (h>24) hLine(x+4, y+12, w-8, 0xFF1E1C28.toInt())
 
   // 2.5D Oblique Right-Side Shaded Wall Return
   if (sideDepthPx > 0) {
@@ -356,7 +349,8 @@ fun PixelCanvas.drawScallopedAwning34(
 }
 
 /**
- * Paints organic, pixel-clustered multi-shade foliage tufts instead of smooth geometric circles!
+ * V3 PREMIUM foliage — scalloped organic depth via layered sub-tufts, shadow pockets, sunlit crown, leaf-tip texture.
+ * Large: silhouette lobes; Medium: per-lobe highlight/shadow; Small: individual leaf pixels reinforcing volume.
  */
 fun PixelCanvas.drawOrganicLeafCluster(
   cx: Int,
@@ -370,34 +364,24 @@ fun PixelCanvas.drawOrganicLeafCluster(
   seed: Int = 77,
 ) {
   val rng = Random(seed)
-  // Base irregular cluster silhouette made of overlapping sub-tufts
-  val offsets = listOf(
-    0 to 2, -rx / 2 to 3, rx / 2 to 3,
-    -rx / 3 to -ry / 3, rx / 3 to -ry / 3, 0 to -ry / 2,
-  )
-  offsets.forEach { (ox, oy) ->
-    fillEllipse(cx + ox, cy + oy + 2, (rx * 0.62f).toInt().coerceAtLeast(3), (ry * 0.62f).toInt().coerceAtLeast(3), deepShadow)
-  }
-  offsets.forEach { (ox, oy) ->
-    fillEllipse(cx + ox, cy + oy, (rx * 0.58f).toInt().coerceAtLeast(3), (ry * 0.56f).toInt().coerceAtLeast(3), midShade)
-  }
-  // Sunlit upper-left & crown leaf clusters
-  fillEllipse(cx - rx / 5, cy - ry / 4, (rx * 0.55f).toInt().coerceAtLeast(3), (ry * 0.48f).toInt().coerceAtLeast(2), brightLeaf)
-  fillEllipse(cx + rx / 5, cy - ry / 5, (rx * 0.42f).toInt().coerceAtLeast(2), (ry * 0.40f).toInt().coerceAtLeast(2), brightLeaf)
-  fillEllipse(cx - rx / 4, cy - ry / 2 + 2, (rx * 0.36f).toInt().coerceAtLeast(2), (ry * 0.30f).toInt().coerceAtLeast(2), crownHi)
-
-  // Handcrafted individual pixel leaf tips for crisp pixel-art texture
-  repeat((rx * ry) / 14) {
-    val lx = cx + rng.nextInt(rx * 2 - 2) - (rx - 1)
-    val ly = cy + rng.nextInt(ry * 2 - 2) - (ry - 1)
+  // Shadow base — 6 overlapping lobes for scalloped silhouette
+  val offsets = listOf(0 to 2, -rx/2 to 3, rx/2 to 3, -rx/3 to -ry/3, rx/3 to -ry/3, 0 to -ry/2)
+  offsets.forEach { (ox, oy) -> fillEllipse(cx+ox, cy+oy+2, (rx*0.62f).toInt().coerceAtLeast(3), (ry*0.62f).toInt().coerceAtLeast(3), deepShadow) }
+  offsets.forEach { (ox, oy) -> fillEllipse(cx+ox, cy+oy, (rx*0.58f).toInt().coerceAtLeast(3), (ry*0.56f).toInt().coerceAtLeast(3), midShade) }
+  // Sun pockets: upper-left + crown + side lobe, with inner highlight vein
+  fillEllipse(cx - rx/5, cy - ry/4, (rx*0.55f).toInt().coerceAtLeast(3), (ry*0.48f).toInt().coerceAtLeast(2), brightLeaf)
+  fillEllipse(cx + rx/5, cy - ry/5, (rx*0.42f).toInt().coerceAtLeast(2), (ry*0.40f).toInt().coerceAtLeast(2), brightLeaf)
+  fillEllipse(cx - rx/4, cy - ry/2 + 2, (rx*0.36f).toInt().coerceAtLeast(2), (ry*0.30f).toInt().coerceAtLeast(2), crownHi)
+  // deep pocket shadow between lobes for depth
+  if (rx > 10) fillEllipse(cx, cy+ry/3, (rx*0.28f).toInt(), 2, deepShadow)
+  // leaf-tip texture — individual pixels reinforcing lobe form, density tuned per size
+  repeat((rx*ry)/12 + 2) {
+    val lx = cx + rng.nextInt(rx*2-2) - (rx-1); val ly = cy + rng.nextInt(ry*2-2) - (ry-1)
     if ((get(lx, ly) ushr 24) > 128) {
-      val c = when {
-        ly < cy - ry / 3 -> crownHi
-        ly < cy + 1 -> brightLeaf
-        else -> deepShadow
-      }
-      set(lx, ly, c)
-      if (lx + 1 < width && (get(lx + 1, ly) ushr 24) > 128) set(lx + 1, ly, c)
+      val c = when { ly < cy - ry/3 -> crownHi; ly < cy+1 -> brightLeaf; else -> deepShadow }
+      set(lx, ly, c); if (lx+1 < width && (get(lx+1, ly) ushr 24) > 128 && rng.nextBoolean()) set(lx+1, ly, c)
+      // occasional 2-high leaf spike at crown
+      if (ly < cy - ry/3 && rng.nextInt(8)==0 && ly>1) set(lx, ly-1, crownHi)
     }
   }
 }
