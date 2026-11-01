@@ -153,11 +153,11 @@ object PixelStructureAtlas {
     c.fillEllipse(cx, topY, rx - 3, 8, stoneMid)
     c.strokeEllipse(cx, topY, rx + 4, 12, mortar, thickness = 1)
 
-    // Crenellated Battlement Merlons around the crown!
+    // Crenellated Battlement Merlons around the crown — cold stone, not warm beige
     for (mx in (cx - rx - 2)..(cx + rx - 6) step 11) {
       c.fillRect(mx, topY - 8, 7, 9, stoneSun)
       c.fillRect(mx + 5, topY - 8, 2, 9, stoneShadow)
-      c.hLine(mx, topY - 8, 7, 0xFFF7F2E7.toInt())
+      c.hLine(mx, topY - 8, 7, 0xFF8A9AB8.toInt())
     }
 
     c.applyCrispOutline(0xFF241F1B.toInt())
