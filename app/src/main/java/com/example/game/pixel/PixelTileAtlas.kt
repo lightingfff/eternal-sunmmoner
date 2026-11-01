@@ -249,6 +249,14 @@ object PixelTileAtlas {
     (0 until 4).map { variant -> createSanctuaryCurbTile(variant) }
   }
 
+  val sanctuaryWaterTiles: List<ImageBitmap> by lazy {
+    (0 until 6).map { variant -> createSanctuaryWaterTile(variant) }
+  }
+
+  val sanctuaryGravelTiles: List<ImageBitmap> by lazy {
+    (0 until 4).map { variant -> createSanctuaryGravelTile(variant) }
+  }
+
   // Handcrafted Foreshortened 3/4 Central Astrolabe Medallion (224 x 152)
   val astrolabePlazaMedallion: ImageBitmap by lazy { createAstrolabePlazaMedallion() }
 
@@ -908,6 +916,87 @@ object PixelTileAtlas {
     }
     if (variant == 2) {
       c.hLine(6, 16, 9, 0xFFBE123C.toInt())
+    }
+    return c.toImageBitmap()
+  }
+
+  private fun createSanctuaryWaterTile(variant: Int): ImageBitmap {
+    val c = PixelCanvas(TILE_PX, TILE_PX)
+    val rng = Random(9000 + variant * 211)
+    // Dark Fantasy void-water: deep navy base + depth variation
+    val deepWater = 0xFF0F1A2E.toInt()
+    val midWater = 0xFF1A2A4A.toInt()
+    val shallowEdge = 0xFF1E3A5A.toInt()
+    c.fillRect(0, 0, TILE_PX, TILE_PX, deepWater)
+    // Depth variation — darker pockets
+    repeat(5) {
+      val cx = 8 + rng.nextInt(48)
+      val cy = 8 + rng.nextInt(48)
+      c.fillEllipse(cx, cy, 10 + rng.nextInt(8), 6 + rng.nextInt(5), 0xFF0B1222.toInt())
+    }
+    // Subtle ripples — pixel wave patterns (2px horizontal streaks)
+    repeat(12) {
+      val rx = 4 + rng.nextInt(56)
+      val ry = 6 + rng.nextInt(52)
+      val len = 4 + rng.nextInt(6)
+      val col = if (rng.nextInt(3) == 0) 0xFF2A4A7A.toInt() else 0xFF1E3A6A.toInt()
+      c.hLine(rx, ry, len, col)
+      if (rng.nextInt(3) == 0) c.hLine(rx + 2, ry + 1, len - 2, 0xFF1A2E5A.toInt())
+    }
+    // Reflection highlights — moonlight on water
+    repeat(8) {
+      val sx = 6 + rng.nextInt(52)
+      val sy = 6 + rng.nextInt(52)
+      c.set(sx, sy, 0xFF5A7AB8.toInt())
+      if (rng.nextInt(2) == 0) c.set(sx + 1, sy, 0xFF8A9AB8.toInt())
+    }
+    // Edge shallow variation for chasm lip
+    if (variant % 2 == 0) {
+      c.fillEllipse(32, 12, 14, 6, midWater)
+      c.fillEllipse(33, 11, 8, 3, shallowEdge)
+    }
+    // Dithering for depth transition
+    if (variant == 1 || variant == 4) {
+      for (x in 0 until TILE_PX step 4) {
+        for (y in 0 until TILE_PX step 4) {
+          if ((x + y + variant) % 8 == 0) c.set(x, y, 0xFF0D1A33.toInt())
+        }
+      }
+    }
+    return c.toImageBitmap()
+  }
+
+  private fun createSanctuaryGravelTile(variant: Int): ImageBitmap {
+    val c = PixelCanvas(TILE_PX, TILE_PX)
+    val rng = Random(9200 + variant * 167)
+    val baseEarth = 0xFF2B2620.toInt()
+    val baseMid = 0xFF3A342E.toInt()
+    c.fillRect(0, 0, TILE_PX, TILE_PX, baseEarth)
+    // Varied gravel sizes — not random dots
+    val gravelCols = intArrayOf(0xFF4A4A50.toInt(), 0xFF5A5A62.toInt(), 0xFF3E3E46.toInt(), 0xFF6A6A72.toInt(), 0xFF35353E.toInt())
+    repeat(22) {
+      val gx = 4 + rng.nextInt(56)
+      val gy = 4 + rng.nextInt(56)
+      val r = 1 + rng.nextInt(3)
+      val col = gravelCols[rng.nextInt(gravelCols.size)]
+      if (r == 1) c.set(gx, gy, col)
+      else c.fillEllipse(gx, gy, r, r, col)
+      // highlight on large gravel
+      if (r >= 2 && rng.nextBoolean()) c.set(gx - 1, gy - 1, 0xFF7A7A82.toInt())
+    }
+    // Moisture/darker patches
+    repeat(4) {
+      val cx = 10 + rng.nextInt(44)
+      val cy = 10 + rng.nextInt(44)
+      c.fillEllipse(cx, cy, 6 + rng.nextInt(4), 4 + rng.nextInt(3), 0xFF252018.toInt())
+    }
+    // Small moss flecks in cracks
+    if (variant % 2 == 0) {
+      repeat(3) {
+        val mx = 8 + rng.nextInt(48)
+        val my = 8 + rng.nextInt(48)
+        c.set(mx, my, 0xFF2A3D2B.toInt())
+      }
     }
     return c.toImageBitmap()
   }
