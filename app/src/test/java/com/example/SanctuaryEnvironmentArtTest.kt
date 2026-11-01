@@ -27,7 +27,7 @@ class SanctuaryEnvironmentArtTest {
   @org.junit.Before fun loadRuntimeAssets() {
     SanctuaryArtAssets.init(org.robolectric.RuntimeEnvironment.getApplication())
   }
-  private val out = File("build/visual_screenshots/p03").apply { mkdirs() }
+  private val out = File("build/visual_screenshots/oblique").apply { mkdirs() }
   @Test fun environmentDetailsAtMultipleZooms() {
     val kinds = listOf(PropKind.SAKURA_BLOSSOM_TREE, PropKind.OAK_TREE, PropKind.MYSTIC_PLUM_TREE,
       PropKind.PINE_SPIRIT_TREE, PropKind.SANCTUARY_COTTAGE_SLATE, PropKind.FACILITY_ARMORY,
@@ -59,18 +59,39 @@ class SanctuaryEnvironmentArtTest {
       }
     }
   }
+  @Test fun obliqueProjectionAndAnchorsRemainConsistent() {
+    assertEquals(0.72f, ObliqueCamera.OBLIQUE_Y_SCALE, 0f)
+    for (zoom in listOf(0.65f,1f,1.6f)) {
+      val foot = ObliqueCamera.worldToScreenY(1400f,1280f,zoom,320f)
+      val raised = ObliqueCamera.worldToScreenY(1400f,1280f,zoom,320f,100f)
+      assertEquals("Vertical height must not be flattened onto ground Y",100f*zoom,foot-raised,0.001f)
+      val bitmap = PixelStructureAtlas.oakTreeSprite
+      val padding = ObliqueSpriteGeometry.bounds(bitmap).bottomPadding
+      assertEquals("Tree visible root stays on projected ground",0f,
+        ObliqueSpriteGeometry.drawFootOffset(PropKind.OAK_TREE,bitmap)-padding*ObliqueSpriteGeometry.pixelScale(PropKind.OAK_TREE),0.001f)
+    }
+  }
   @Test fun characterBehindCanopy() {
     val obs = WorldObstacle("occlusion",1500f,1400f,24f,propKind=PropKind.SAKURA_BLOSSOM_TREE,occludesUpperCanopy=true)
     val images = mutableListOf<ImageBitmap>()
+    val baseline = IntArray(640*640)
     for (withCanopy in listOf(false,true)) {
       val image = Bitmap.createBitmap(640,640,Bitmap.Config.ARGB_8888).asImageBitmap()
       CanvasDrawScope().draw(Density(1f),LayoutDirection.Ltr,Canvas(image),Size(640f,640f)) {
         drawRect(Color(0xff37483e))
         drawGroundShadows(listOf(obs),1500f,1280f,1.6f)
-        drawProp(obs,1500f,1280f,1.6f,0f,renderShadow=false)
-        // Place hero at the projected crown to verify that the foreground canopy masks him.
-        drawCharacterSprite(1500f,1250f,1500f,1280f,1.6f,false,HeroClassType.KNIGHT,true,false,0f,0f,1f,null,false,0f)
-        if (withCanopy) drawUpperCanopyOcclusionPass(listOf(obs),1500f,1280f,1.6f,0f)
+        fun hero() = drawCharacterSprite(1535f,1340f,1500f,1280f,1.6f,false,HeroClassType.KNIGHT,true,false,0f,0f,1f,null,false,0f)
+        if (!withCanopy) {
+          // Diagnostic unoccluded reference; final capture below uses actual world-Y order.
+          drawProp(obs,1500f,1280f,1.6f,0f,renderShadow=false)
+          image.asAndroidBitmap().getPixels(baseline,0,640,0,0,640,640)
+          hero()
+        } else {
+          // Hero is north of the tree: hero first, then tree, matching SanctuaryLobbyScreen.
+          hero()
+          drawProp(obs,1500f,1280f,1.6f,0f,renderShadow=false)
+          drawUpperCanopyOcclusionPass(listOf(obs),1500f,1280f,1.6f,0f)
+        }
       }
       images.add(image)
       File(out,"occlusion_${withCanopy}.png").outputStream().use { image.asAndroidBitmap().compress(Bitmap.CompressFormat.PNG,100,it) }
@@ -79,5 +100,7 @@ class SanctuaryEnvironmentArtTest {
     images[0].asAndroidBitmap().getPixels(a,0,640,0,0,640,640)
     images[1].asAndroidBitmap().getPixels(b,0,640,0,0,640,640)
     assertTrue("Canopy foreground must affect pixels over the actor",a.indices.count { a[it] != b[it] } > 50)
+    val visibleBody = (270..385).sumOf { y -> (330..420).count { x -> b[y*640+x] != baseline[y*640+x] } }
+    assertTrue("Canopy must only partially hide the hero, not erase him",visibleBody > 20)
   }
 }

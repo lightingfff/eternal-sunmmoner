@@ -763,13 +763,13 @@ object PixelSpriteRenderer {
         } else {
           PixelStructureAtlas.sakuraTreeSpriteB
         }
-        drawCrispSprite(bmp, cx + sway, cy + 6f * s, 2.0f * s)
+        drawCrispSprite(bmp, cx + sway, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, bmp) * s, 2.0f * s)
       }
 
       PropKind.CYPRESS_CONIFER_TREE -> {
         val sway = sin(timeSec * 1.9f + obs.x * 0.02f) * 1.2f * s
         if (renderShadow) drawDirectionalShadow34(cx + 6f * s, cy, 34f * s, 11f * s, alpha = 0.34f)
-        drawCrispSprite(PixelStructureAtlas.cypressConiferSprite, cx + sway, cy + 4f * s, 2.0f * s)
+        drawCrispSprite(PixelStructureAtlas.cypressConiferSprite, cx + sway, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.cypressConiferSprite) * s, 2.0f * s)
       }
 
       PropKind.GARDEN_HEDGE_BUSH -> {
@@ -898,20 +898,20 @@ object PixelSpriteRenderer {
       PropKind.OAK_TREE -> {
         val sway = sin(timeSec * 1.9f + obs.x * 0.015f) * 2.0f * s
         if (renderShadow) drawDirectionalShadow34(cx + 8f * s, cy, 82f * s, 22f * s, alpha = 0.50f)
-        drawCrispSprite(PixelStructureAtlas.oakTreeSprite, cx + sway, cy + 8f * s, 2.05f * s)
+        drawCrispSprite(PixelStructureAtlas.oakTreeSprite, cx + sway, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.oakTreeSprite) * s, 2.05f * s)
       }
 
       PropKind.MYSTIC_PLUM_TREE -> {
         val sway = sin(timeSec * 1.8f + obs.x * 0.015f) * 2.0f * s
         if (renderShadow) drawDirectionalShadow34(cx + 8f * s, cy, 78f * s, 20f * s, alpha = 0.50f)
         drawForeshortenedGlow(cx, cy - 12f * s, 88f * s, Color(0xFFD946EF).copy(alpha = 0.16f))
-        drawCrispSprite(PixelStructureAtlas.mysticPlumTreeSprite, cx + sway, cy + 8f * s, 2.05f * s)
+        drawCrispSprite(PixelStructureAtlas.mysticPlumTreeSprite, cx + sway, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.mysticPlumTreeSprite) * s, 2.05f * s)
       }
 
       PropKind.PINE_SPIRIT_TREE -> {
         val sway = sin(timeSec * 2.0f + obs.x * 0.02f) * 1.6f * s
         if (renderShadow) drawDirectionalShadow34(cx + 6f * s, cy, 62f * s, 17f * s, alpha = 0.50f)
-        drawCrispSprite(PixelStructureAtlas.spiritPineSprite, cx + sway, cy + 8f * s, 2.0f * s)
+        drawCrispSprite(PixelStructureAtlas.spiritPineSprite, cx + sway, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.spiritPineSprite) * s, 2.0f * s)
       }
 
       PropKind.FOREST_CANOPY_BUSH -> {
@@ -1082,15 +1082,15 @@ object PixelSpriteRenderer {
       when (obs.propKind) {
         PropKind.OAK_TREE -> {
           val sway = sin(timeSec * 1.9f + obs.x * 0.015f) * 2.0f * s
-          drawCrispUpperCanopyPortion(PixelStructureAtlas.oakTreeSprite, cx + sway, cy + 8f * s, 2.05f * s, topFraction = 0.54f, alpha = 1f)
+          drawCrispUpperCanopyPortion(PixelStructureAtlas.oakTreeSprite, cx + sway, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.oakTreeSprite) * s, 2.05f * s, topFraction = 0.54f, alpha = 1f)
         }
         PropKind.MYSTIC_PLUM_TREE -> {
           val sway = sin(timeSec * 1.8f + obs.x * 0.015f) * 2.0f * s
-          drawCrispUpperCanopyPortion(PixelStructureAtlas.mysticPlumTreeSprite, cx + sway, cy + 8f * s, 2.05f * s, topFraction = 0.54f, alpha = 1f)
+          drawCrispUpperCanopyPortion(PixelStructureAtlas.mysticPlumTreeSprite, cx + sway, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.mysticPlumTreeSprite) * s, 2.05f * s, topFraction = 0.54f, alpha = 1f)
         }
         PropKind.PINE_SPIRIT_TREE -> {
           val sway = sin(timeSec * 2.0f + obs.x * 0.02f) * 1.6f * s
-          drawCrispUpperCanopyPortion(PixelStructureAtlas.spiritPineSprite, cx + sway, cy + 8f * s, 2.0f * s, topFraction = 0.52f, alpha = 1f)
+          drawCrispUpperCanopyPortion(PixelStructureAtlas.spiritPineSprite, cx + sway, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.spiritPineSprite) * s, 2.0f * s, topFraction = 0.52f, alpha = 1f)
         }
         PropKind.SAKURA_BLOSSOM_TREE -> {
           val sway = sin(timeSec * 1.7f + obs.x * 0.015f) * 1.8f * s
@@ -1099,7 +1099,7 @@ object PixelSpriteRenderer {
           } else {
             PixelStructureAtlas.sakuraTreeSpriteB
           }
-          drawCrispUpperCanopyPortion(bmp, cx + sway, cy + 6f * s, 2.0f * s, topFraction = 0.56f, alpha = 1f)
+          drawCrispUpperCanopyPortion(bmp, cx + sway, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, bmp) * s, 2.0f * s, topFraction = 0.56f, alpha = 1f)
         }
         else -> Unit
       }
@@ -1147,19 +1147,6 @@ object PixelSpriteRenderer {
 
     val pixelScale = 1.85f * zoom
 
-    val shadowLength = 58f * zoom / SanctuaryLight.TAN_ELEV
-    drawLine(Color(0x45111B26), Offset(cx, cy),
-      Offset(cx + SanctuaryLight.SHADOW_DIR_X * shadowLength,
-        cy + SanctuaryLight.SHADOW_DIR_Y * shadowLength * ObliqueCamera.OBLIQUE_Y_SCALE),
-      strokeWidth = 12f * zoom, cap = StrokeCap.Round)
-
-    // Foreshortened 3/4 Elliptical Ground Contact Shadow
-    drawOval(
-      color = Color(0x7C000000),
-      topLeft = Offset(cx - 22f * zoom, cy - 6.5f * zoom),
-      size = Size(44f * zoom, 13f * zoom),
-    )
-
     // Foreshortened 3/4 Sovereign Sigil / Shield Barrier Ellipse on Ground
     if (shieldOrAuraColor != null) {
       drawOval(
@@ -1186,6 +1173,10 @@ object PixelSpriteRenderer {
       seed = (worldX * 0.01f + worldY * 0.01f),
       facingNorth = facingNorth,
     )
+
+    with(SanctuaryEnvironmentShadows) {
+      drawCharacterShadow(frameBmp, cx, cy, zoom, pixelScale)
+    }
 
     drawCrispSprite(
       bmp = frameBmp,
@@ -1267,8 +1258,7 @@ object PixelSpriteRenderer {
       return
     }
 
-    val shadowW = (if (archetype.isBoss) 72f else 44f) * zoom
-    drawOval(Color(0x78000000), Offset(cx - shadowW / 2f, cy - 6.5f * zoom), Size(shadowW, 14f * zoom))
+
 
     if (isTargetMarked) {
       val pulse = 0.85f + 0.15f * sin(timeSec * 8f)
@@ -1292,6 +1282,10 @@ object PixelSpriteRenderer {
       timeSec = timeSec,
       seed = worldX * 0.02f,
     )
+    with(SanctuaryEnvironmentShadows) {
+      drawCharacterShadow(frameBmp, cx, cy, zoom, p)
+    }
+
     drawCrispSprite(
       bmp = frameBmp,
       cx = cx,

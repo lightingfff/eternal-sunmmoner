@@ -282,8 +282,8 @@ internal object PixelSanctuaryLandmarks {
     chimneyLeft: Boolean = true,
     hasFlowerGardenTrim: Boolean = true,
   ) {
-    val creamSunlit = 0xFF3A3F4A.toInt() // dark fantasy cold stone plaster
-    val creamGable = 0xFF323540.toInt()
+    val creamSunlit = 0xFF4C5860.toInt() // dark fantasy cold stone plaster
+    val creamGable = 0xFF2C3742.toInt()
     val timberDark = 0xFF1B120E.toInt()
     val timberWarm = 0xFF2A1B12.toInt()
     val stoneBase = 0xFF2E3038.toInt()
