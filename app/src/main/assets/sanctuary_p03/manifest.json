@@ -1,0 +1,680 @@
+{
+  "version": 1,
+  "light": "upper-left; world SanctuaryLight",
+  "logical_pixel_scale": 1,
+  "generator": "tools/generate_sanctuary_art.py",
+  "assets": [
+    {
+      "id": "verge",
+      "path": "verge.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "SanctuaryWorldRenderer; transparent terrain transition clusters",
+      "sha256": "bc49320184f26cfda314a6ae5c7b5a0fe601bdd3d9c13d4bf46df46f4fe26dec"
+    },
+    {
+      "id": "grass_0",
+      "path": "grass_0.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "b0fe3e6cb6112bb51557797cbea2c211a71d8c81c71fa05972c7a430acf14924"
+    },
+    {
+      "id": "grass_1",
+      "path": "grass_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "d9c1a0ec50f5da5b78f9615e7f82a35a224f720c6488ee04fc0ed49f3379732f"
+    },
+    {
+      "id": "grass_2",
+      "path": "grass_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "ad6ddc7f49f1919623045f2b135dd6cfb0a3a61e9827d38bd4ca4976b039a953"
+    },
+    {
+      "id": "grass_3",
+      "path": "grass_3.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "5e4161157adaaecece2a9c4e490094fb9bd37e47f1b9f6833f16213a06377120"
+    },
+    {
+      "id": "grass_4",
+      "path": "grass_4.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "2870f9db29671bcbf5ecede3dc091b346f723610270b92c889861f560a314f12"
+    },
+    {
+      "id": "grass_5",
+      "path": "grass_5.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "c726b4a5d7d886f74f8392d20196aecbdd805f35d5534984861e53ca7e78fa90"
+    },
+    {
+      "id": "grass_6",
+      "path": "grass_6.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "9a6fd1b2eade38e42b84762c400c2cabaef1a0189c9bc14c291914bff81f17e4"
+    },
+    {
+      "id": "grass_7",
+      "path": "grass_7.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "df3e308689d54a3a8bfe5eff6d609471cf590a22bbc569f7e1aeb66735c98b13"
+    },
+    {
+      "id": "flagstone_0",
+      "path": "flagstone_0.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.flagstone; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "6a1cff9df5fa8794441987f83388987fbeacb71a5bbe65d3c34ccd46a4fd48e6"
+    },
+    {
+      "id": "flagstone_1",
+      "path": "flagstone_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.flagstone; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "7d34ebf2ae17af33d6aa9526f89078d6580a42c8cf12467e6e7c3baab88b36c3"
+    },
+    {
+      "id": "flagstone_2",
+      "path": "flagstone_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.flagstone; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "996ad3568fc559a2e4af6b64467daf56d4dff2050410f0423e1d7ca86319b8b1"
+    },
+    {
+      "id": "flagstone_3",
+      "path": "flagstone_3.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.flagstone; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "2c95eec56cd01518c5cb289f6f5c02230ba2a97df07add82a59757a5e76fd1c7"
+    },
+    {
+      "id": "flagstone_4",
+      "path": "flagstone_4.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.flagstone; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "da543b3053032272d66de1988ea745c9be46f1fc1f5e72971877d6b9860fb190"
+    },
+    {
+      "id": "flagstone_5",
+      "path": "flagstone_5.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.flagstone; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "5b5cc2b6f89ca0c7aeeca3552b6213fc39581d0767d25d4e34be5781145255f2"
+    },
+    {
+      "id": "flagstone_6",
+      "path": "flagstone_6.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.flagstone; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "48d31fa6d3c8c4d8d03a91b510695f8b425d97986108a8a6233b63835b368f82"
+    },
+    {
+      "id": "flagstone_7",
+      "path": "flagstone_7.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.flagstone; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "c8bb13a9bc7b7f3315ffcb0c9cbba0288b4f5af208cc66f09d712ca3353b1be8"
+    },
+    {
+      "id": "cobble_0",
+      "path": "cobble_0.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.cobble; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "987efebb89759cc02870673dac470a451177cf163815487f5f67a478efc71c5b"
+    },
+    {
+      "id": "cobble_1",
+      "path": "cobble_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.cobble; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "48416abca0bf8ebf35aa3a649b99222e27ad29b90f1a9d5810269835b3f4b733"
+    },
+    {
+      "id": "cobble_2",
+      "path": "cobble_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.cobble; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "b74a134d4b16a7e0ce717cfcc3940ee05a0dbe4d8ffe8be327ee59a114d4192d"
+    },
+    {
+      "id": "cobble_3",
+      "path": "cobble_3.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.cobble; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "2a68ab2789769f85aefd3f93575633c7164aaffca67bf31caa0d2b2a02003023"
+    },
+    {
+      "id": "cobble_4",
+      "path": "cobble_4.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.cobble; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "5adcf4674bc5a4f63b47d3438d4baa9dcede466b2a7c1c199f2f7b6281f18425"
+    },
+    {
+      "id": "cobble_5",
+      "path": "cobble_5.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.cobble; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "2addd57f12804eea9e2027abcd113a3535f0ee3915034483097b59c73fe97363"
+    },
+    {
+      "id": "soil_0",
+      "path": "soil_0.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.soil; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "37a0b6251c522d115b802d65df73044160218bc80d2cda92ff87fcd395fccc74"
+    },
+    {
+      "id": "soil_1",
+      "path": "soil_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.soil; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "bb191d8220aa4871a128612a4ec04724768881ec4592e665d5ab022b6614ec4a"
+    },
+    {
+      "id": "soil_2",
+      "path": "soil_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.soil; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "05b73f20a0d40d26499524efb0ed6b339e064c02efe24f47e5b4b059b815506c"
+    },
+    {
+      "id": "soil_3",
+      "path": "soil_3.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.soil; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "8eb88e6390f720e07112859441b597edc53f2a891b3bcb2c3f889298289ffea4"
+    },
+    {
+      "id": "soil_4",
+      "path": "soil_4.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.soil; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "f7feaedad646f04935c189f1939261db5e6e31c4628a016818e9e56e1ea3fa89"
+    },
+    {
+      "id": "soil_5",
+      "path": "soil_5.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.soil; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "a39343eec1650c6be8c5d2098d0288d7f76ad4a7bb6303f4444eda37995cc985"
+    },
+    {
+      "id": "gravel_0",
+      "path": "gravel_0.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.gravel; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "1ca532f8091eb699436591efc24dd97f93fe1f1d132bc9acd06cbd76944d1e80"
+    },
+    {
+      "id": "gravel_1",
+      "path": "gravel_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.gravel; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "6c5e81b08be9cd87883c818cc1ffcaf7a5997e5da822c6281e932eba3bce3928"
+    },
+    {
+      "id": "gravel_2",
+      "path": "gravel_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.gravel; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "1791dc46299cc4aa3922820b80cd6c680c0ede4069963ffbd545ef6ff4fec6b1"
+    },
+    {
+      "id": "gravel_3",
+      "path": "gravel_3.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.gravel; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "c404335c181f0e78627b4ae9a2ca2d29af13c13b7b996cfba4d5dccd4c16aa69"
+    },
+    {
+      "id": "wood_0",
+      "path": "wood_0.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.wood; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "36b13e7c234a49fefed29f3a4a07945fb4fc55af5fb873be7c4b7984914aceb8"
+    },
+    {
+      "id": "wood_1",
+      "path": "wood_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.wood; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "4ae5246b0db396c622107991fa4b2f820883c8916ed1d805f17d2ed7ad45774f"
+    },
+    {
+      "id": "wood_2",
+      "path": "wood_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.wood; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "ea139730f2a0f598782264046685f26f7373798f9a82cc1864cb1ec181191d92"
+    },
+    {
+      "id": "wood_3",
+      "path": "wood_3.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.wood; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "c0bab37b3946d82760d724292691fef3bc384d7a89620d1d9edc53896f71f8e6"
+    },
+    {
+      "id": "wood_4",
+      "path": "wood_4.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.wood; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "49bb7c81b1b5df819be7c1ed70266512b1a20c43cf8408d5598c4484c2cb6a24"
+    },
+    {
+      "id": "wood_5",
+      "path": "wood_5.png",
+      "size": [
+        64,
+        64
+      ],
+      "ground_anchor": [
+        32,
+        64
+      ],
+      "runtime_usage": "PixelTileAtlas.wood; 64 world units; nearest-neighbor oblique ground",
+      "sha256": "25e3a51dc681c26a91a2b590e876c92573555a7439a41e0bde63cfc92cbd2cbf"
+    },
+    {
+      "id": "boulder",
+      "path": "boulder.png",
+      "size": [
+        48,
+        38
+      ],
+      "ground_anchor": [
+        24,
+        35
+      ],
+      "runtime_usage": "PixelStructureAtlas.mossyBoulderSprite; existing obstacle anchors and shadow silhouette",
+      "sha256": "6abfbc6333190c75373698ebd829f8e5802b9651ca0540a1eced759b5e458078"
+    },
+    {
+      "id": "canopy_a",
+      "path": "canopy_a.png",
+      "size": [
+        114,
+        132
+      ],
+      "ground_anchor": [
+        57,
+        124
+      ],
+      "runtime_usage": "PixelStructureAtlas; existing tree position/scale; silhouette shadows",
+      "sha256": "c7f35ea681eff667da52af939b5e48d24cfa3c7937159fd122b9fb0cd16e51c0"
+    },
+    {
+      "id": "canopy_b",
+      "path": "canopy_b.png",
+      "size": [
+        96,
+        114
+      ],
+      "ground_anchor": [
+        48,
+        107
+      ],
+      "runtime_usage": "PixelStructureAtlas; existing tree position/scale; silhouette shadows",
+      "sha256": "ae452536bc8c4b6c580290d9454b3bd4bc787666cfc4f30e5823eb9c9bf73b1b"
+    },
+    {
+      "id": "oak",
+      "path": "oak.png",
+      "size": [
+        112,
+        136
+      ],
+      "ground_anchor": [
+        56,
+        128
+      ],
+      "runtime_usage": "PixelStructureAtlas; existing tree position/scale; silhouette shadows",
+      "sha256": "0e0b90adcbd2bc8fb11957fc1fefde7ea9e816ebd9b6a010f1b149da35e871d6"
+    },
+    {
+      "id": "twisted",
+      "path": "twisted.png",
+      "size": [
+        112,
+        132
+      ],
+      "ground_anchor": [
+        56,
+        124
+      ],
+      "runtime_usage": "PixelStructureAtlas; existing tree position/scale; silhouette shadows",
+      "sha256": "c739f681811a0ad765fb4645f32e3260b5622f5af7c1f49a65d965d0c3c7204b"
+    },
+    {
+      "id": "pine",
+      "path": "pine.png",
+      "size": [
+        96,
+        128
+      ],
+      "ground_anchor": [
+        48,
+        120
+      ],
+      "runtime_usage": "PixelStructureAtlas; existing tree position/scale; silhouette shadows",
+      "sha256": "d421e5b36eb1fdb5a73c7028f5a3904536d15d8a432b1c005310c755af847b7a"
+    },
+    {
+      "id": "cypress",
+      "path": "cypress.png",
+      "size": [
+        48,
+        88
+      ],
+      "ground_anchor": [
+        24,
+        83
+      ],
+      "runtime_usage": "PixelStructureAtlas; existing tree position/scale; silhouette shadows",
+      "sha256": "bbe28b4efdf599966abf6c1ea7dc48798eaa52eb9422c8bc77ddc3584b4598bb"
+    },
+    {
+      "id": "pillar",
+      "path": "pillar.png",
+      "size": [
+        44,
+        92
+      ],
+      "ground_anchor": [
+        22,
+        89
+      ],
+      "runtime_usage": "PixelStructureAtlas.obsidianColumnSprite; existing column footprint",
+      "sha256": "a5255315c78784a1c5f6817d2d39a890e7492b5f940cbe4af9e754508ebdc322"
+    },
+    {
+      "id": "barrels",
+      "path": "barrels.png",
+      "size": [
+        52,
+        44
+      ],
+      "ground_anchor": [
+        26,
+        40
+      ],
+      "runtime_usage": "PixelStructureAtlas.barrelClusterSprite; existing props and shadow silhouette",
+      "sha256": "320fb2a5f02a5b917cc564bb8fa5efcb29c48c48d78b072d7112fe4caa904412"
+    }
+  ]
+}

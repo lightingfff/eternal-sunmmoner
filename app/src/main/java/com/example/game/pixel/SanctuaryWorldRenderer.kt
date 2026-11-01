@@ -258,7 +258,31 @@ object SanctuaryWorldRenderer {
         }
       }
     }
-    drawPath(innerSandCore, Color(0xFF4A3D2E), style = Stroke(width = (2.0f * zoom).coerceAtLeast(1f)))
+    // Ground-only transition band: embedded rock at the soil rim, tuft silhouettes intrude inward.
+    clipPath(outerGrassRim) {
+      clipPath(innerSandCore, androidx.compose.ui.graphics.ClipOp.Difference) {
+        drawMaterialBand(PixelTileAtlas.sanctuaryGravelTiles, sx, sy, zoom, 6..21, 23..33)
+      }
+    }
+    SanctuaryArtAssets.image("verge")?.let { fringe ->
+      clipPath(innerSandCore) {
+        clipPath(buildSandPath(0.94f), androidx.compose.ui.graphics.ClipOp.Difference) {
+          drawMaterialBand(listOf(fringe), sx, sy, zoom, 6..21, 23..33)
+        }
+      }
+    }
+  }
+
+  private fun DrawScope.drawMaterialBand(
+    tiles: List<androidx.compose.ui.graphics.ImageBitmap>,
+    sx: (Float) -> Float, sy: (Float, Float) -> Float, zoom: Float,
+    columns: IntRange, rows: IntRange,
+  ) {
+    for (ty in rows) for (tx in columns) {
+      val index = ((tx * 73856093 xor ty * 19349663) and 0x7fffffff) % tiles.size
+      drawImage(tiles[index], dstOffset=IntOffset(sx(tx*64f).roundToInt(),sy(ty*64f,0f).roundToInt()),
+        dstSize=IntSize((64*zoom).roundToInt().coerceAtLeast(1)+1,(64*zoom*ObliqueCamera.OBLIQUE_Y_SCALE).roundToInt().coerceAtLeast(1)+1),filterQuality=FilterQuality.None)
+    }
   }
 
   private fun DrawScope.drawCurbedCobblestoneRoadNetwork(
@@ -336,6 +360,13 @@ object SanctuaryWorldRenderer {
             dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
             filterQuality = FilterQuality.None,
           )
+        }
+      }
+    }
+    SanctuaryArtAssets.image("verge")?.let { fringe ->
+      clipPath(cobbleInterior) {
+        clipPath(buildRoadUnionPath(-12f), androidx.compose.ui.graphics.ClipOp.Difference) {
+          drawMaterialBand(listOf(fringe), sx, sy, zoom, startTx..endTx, startTy..endTy)
         }
       }
     }
@@ -631,12 +662,22 @@ object SanctuaryWorldRenderer {
     drawOval(Color(0xFF3A3D4A), Offset(cx - rx * 1.01f, cy - ry * 1.01f), Size(rx * 2.02f, ry * 2.02f))
     drawOval(Color(0xFF4A4D5E), Offset(cx - rx * 0.96f, cy - ry * 0.96f), Size(rx * 1.92f, ry * 1.92f))
 
+    val plazaClip = Path().apply { addOval(androidx.compose.ui.geometry.Rect(cx-rx*0.95f,cy-ry*0.95f,cx+rx*0.95f,cy+ry*0.95f)) }
+    clipPath(plazaClip) {
+      val tiles = PixelTileAtlas.sanctuaryStoneTiles
+      for (ty in 10..28) for (tx in 21..39) {
+        val image = tiles[((tx * 73856093 xor ty * 19349663) and 0x7fffffff) % tiles.size]
+        drawImage(image, dstOffset=IntOffset(sx(tx*64f).roundToInt(),sy(ty*64f,0f).roundToInt()),
+          dstSize=IntSize((64*zoom).roundToInt()+1,(64*zoom*ObliqueCamera.OBLIQUE_Y_SCALE).roundToInt()+1),filterQuality=FilterQuality.None)
+      }
+    }
+
     // 2. Concentric Carved Alabaster Rings
     val ringFractions = listOf(1.01f, 0.95f, 0.72f, 0.62f, 0.44f, 0.34f, 0.22f)
-    drawOval(Color(0xFF2E3142), Offset(cx - rx * 0.72f, cy - ry * 0.72f), Size(rx * 1.44f, ry * 1.44f))
-    drawOval(Color(0xFF3A3D4A), Offset(cx - rx * 0.62f, cy - ry * 0.62f), Size(rx * 1.24f, ry * 1.24f))
-    drawOval(Color(0xFF353845), Offset(cx - rx * 0.34f, cy - ry * 0.34f), Size(rx * 0.68f, ry * 0.68f))
-    drawOval(Color(0xFF40445A), Offset(cx - rx * 0.22f, cy - ry * 0.22f), Size(rx * 0.44f, ry * 0.44f))
+    drawOval(Color(0xFF2E3142).copy(alpha = 0.38f), Offset(cx - rx * 0.72f, cy - ry * 0.72f), Size(rx * 1.44f, ry * 1.44f))
+    drawOval(Color(0xFF3A3D4A).copy(alpha = 0.38f), Offset(cx - rx * 0.62f, cy - ry * 0.62f), Size(rx * 1.24f, ry * 1.24f))
+    drawOval(Color(0xFF353845).copy(alpha = 0.38f), Offset(cx - rx * 0.34f, cy - ry * 0.34f), Size(rx * 0.68f, ry * 0.68f))
+    drawOval(Color(0xFF40445A).copy(alpha = 0.38f), Offset(cx - rx * 0.22f, cy - ry * 0.22f), Size(rx * 0.44f, ry * 0.44f))
 
     // Radial Stone Joints (16 divisions across outer & mid bands)
     for (i in 0 until 16) {

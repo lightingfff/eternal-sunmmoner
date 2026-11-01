@@ -167,6 +167,17 @@ class PixelCanvas(val width: Int, val height: Int) {
     hLine(x, y + h - 2, w, timberDark)
     hLine(x, y + h / 2, w, timberDark)
     hLine(x + 1, y + h / 2 - 1, w - 2, timberHi)
+    // Weathering follows construction: plaster under the eaves, grain along structural beams.
+    for (row in 4 until h - 3 step 5) {
+      val start = x + 5 + (row * 3 % 7)
+      hLine(start, y + row, (w / 5).coerceAtLeast(2), plasterShadow)
+    }
+    for (row in 4 until h - 3) {
+      if (row % 7 != 0) {
+        set(x + 1, y + row, timberHi)
+        set(x + w - 2, y + row, timberHi)
+      }
+    }
     val step = (w / 4).coerceAtLeast(8)
     var sx = x + step
     while (sx < x + w - 5) {
@@ -229,20 +240,24 @@ object PixelTileAtlas {
   const val TILE_PX = 64
 
   // Reference-Accurate Sunlit Anime Sanctuary Lawn, Sand, Alabaster Stone & Grey Cobble Tiles (64x64)
-  val sanctuaryGrassTiles: List<ImageBitmap> by lazy {
-    (0 until 8).map { variant -> createSanctuarySunlitGrassTile(variant) }
+  val sanctuaryGrassTiles: List<ImageBitmap> get() = SanctuaryArtAssets.tiles("grass", 8) ?: sanctuaryGrassTilesFallback
+  private val sanctuaryGrassTilesFallback: List<ImageBitmap> by lazy {
+    (0 until 8).map { variant -> SanctuaryMaterials.grass(variant) }
   }
 
-  val sanctuarySandTiles: List<ImageBitmap> by lazy {
-    (0 until 6).map { variant -> createSanctuaryTrainingSandTile(variant) }
+  val sanctuarySandTiles: List<ImageBitmap> get() = SanctuaryArtAssets.tiles("soil", 6) ?: sanctuarySandTilesFallback
+  private val sanctuarySandTilesFallback: List<ImageBitmap> by lazy {
+    (0 until 6).map { variant -> SanctuaryMaterials.soil(variant) }
   }
 
-  val sanctuaryStoneTiles: List<ImageBitmap> by lazy {
-    (0 until 8).map { variant -> createSanctuaryStoneTile(variant) }
+  val sanctuaryStoneTiles: List<ImageBitmap> get() = SanctuaryArtAssets.tiles("flagstone", 8) ?: sanctuaryStoneTilesFallback
+  private val sanctuaryStoneTilesFallback: List<ImageBitmap> by lazy {
+    (0 until 8).map { variant -> SanctuaryMaterials.stone(variant, large = true) }
   }
 
-  val sanctuaryCausewayTiles: List<ImageBitmap> by lazy {
-    (0 until 6).map { variant -> createSanctuaryGreyCobbleTile(variant) }
+  val sanctuaryCausewayTiles: List<ImageBitmap> get() = SanctuaryArtAssets.tiles("cobble", 6) ?: sanctuaryCausewayTilesFallback
+  private val sanctuaryCausewayTilesFallback: List<ImageBitmap> by lazy {
+    (0 until 6).map { variant -> SanctuaryMaterials.stone(variant, large = false) }
   }
 
   val sanctuaryRoadCurbTiles: List<ImageBitmap> by lazy {
@@ -253,16 +268,18 @@ object PixelTileAtlas {
     (0 until 6).map { variant -> createSanctuaryWaterTile(variant) }
   }
 
-  val sanctuaryGravelTiles: List<ImageBitmap> by lazy {
-    (0 until 4).map { variant -> createSanctuaryGravelTile(variant) }
+  val sanctuaryGravelTiles: List<ImageBitmap> get() = SanctuaryArtAssets.tiles("gravel", 4) ?: sanctuaryGravelTilesFallback
+  private val sanctuaryGravelTilesFallback: List<ImageBitmap> by lazy {
+    (0 until 4).map { variant -> SanctuaryMaterials.soil(variant, gravel = true) }
   }
 
   // Handcrafted Foreshortened 3/4 Central Astrolabe Medallion (224 x 152)
   val astrolabePlazaMedallion: ImageBitmap by lazy { createAstrolabePlazaMedallion() }
 
   // Restaurant Interior 3/4 Oak Planks & Irregular Stone Walkway
-  val tavernWoodPlankTiles: List<ImageBitmap> by lazy {
-    (0 until 6).map { variant -> createTavernWoodPlankTile(variant) }
+  val tavernWoodPlankTiles: List<ImageBitmap> get() = SanctuaryArtAssets.tiles("wood", 6) ?: tavernWoodPlankTilesFallback
+  private val tavernWoodPlankTilesFallback: List<ImageBitmap> by lazy {
+    (0 until 6).map { variant -> SanctuaryMaterials.wood(variant) }
   }
 
   val tavernFlagstoneAisleTiles: List<ImageBitmap> by lazy {

@@ -187,6 +187,8 @@ fun SanctuaryLobbyScreen(
   onHostMealWithRecipe: (SanctuaryMealRecipe) -> Unit = { _ -> onHostMeal() },
   onUnlockExpansion: (IslandExpansionMilestone) -> Unit = {},
 ) {
+  val artContext = androidx.compose.ui.platform.LocalContext.current
+  remember(artContext) { com.example.game.pixel.SanctuaryArtAssets.init(artContext) }
   val lobbyEngine = remember { SanctuaryLobbyEngine() }
   val textMeasurer = rememberTextMeasurer()
   val focusRequester = remember { FocusRequester() }
@@ -492,6 +494,11 @@ fun SanctuaryLobbyScreen(
         lobbyEngine.heroActors.forEach { add(LobbyDrawableItem.HeroNpc(it)) }
       }.sortedBy { it.sortY }
 
+      if (!lobbyEngine.isInsideInterior) {
+        with(com.example.game.pixel.SanctuaryEnvironmentShadows) {
+          drawGroundShadows(layout.obstacles, camX, camY, zoom)
+        }
+      }
       drawables.forEach { item ->
         when (item) {
           is LobbyDrawableItem.Prop -> drawProp(
@@ -501,6 +508,7 @@ fun SanctuaryLobbyScreen(
             zoom = zoom,
             timeSec = animTimeSec,
             highestClearedFloor = highestClearedFloorInt,
+            renderShadow = lobbyEngine.isInsideInterior || com.example.game.pixel.SanctuaryEnvironmentShadows.sprite(item.obs) == null,
           )
           is LobbyDrawableItem.Master -> {} // External Commander is observing from outside world
           is LobbyDrawableItem.HeroNpc -> {

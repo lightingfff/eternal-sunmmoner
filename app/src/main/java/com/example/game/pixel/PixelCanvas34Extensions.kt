@@ -291,9 +291,12 @@ fun PixelCanvas.drawPanedWindow34(
     fillRect(x + w + 1, y, 3, h, 0xFF42281B.toInt())
   }
   fillRect(x - 1, y - 1, w + 2, h + 2, 0xFF2B1810.toInt())
-  fillRect(x, y, w, h, glowTint)
+  fillRect(x, y, w, h, 0xFF131D25.toInt())
+  fillRect(x + 2, y + 2, w - 3, h - 3, glowTint)
+  hLine(x - 1, y - 2, w + 2, 0xFF798078.toInt())
+  vLine(x, y, h, 0xFF596166.toInt())
   if (w >= 6 && h >= 6) {
-    fillRect(x + 2, y + 2, w - 4, h - 4, coreTint)
+    fillRect(x + 3, y + 3, w - 6, h - 6, coreTint)
   }
   // Lead/wood mullions
   vLine(x + w / 2, y, h, 0xFF3B2218.toInt())
@@ -374,14 +377,22 @@ fun PixelCanvas.drawOrganicLeafCluster(
   fillEllipse(cx - rx/4, cy - ry/2 + 2, (rx*0.36f).toInt().coerceAtLeast(2), (ry*0.30f).toInt().coerceAtLeast(2), crownHi)
   // deep pocket shadow between lobes for depth
   if (rx > 10) fillEllipse(cx, cy+ry/3, (rx*0.28f).toInt(), 2, deepShadow)
-  // leaf-tip texture — individual pixels reinforcing lobe form, density tuned per size
-  repeat((rx*ry)/12 + 2) {
-    val lx = cx + rng.nextInt(rx*2-2) - (rx-1); val ly = cy + rng.nextInt(ry*2-2) - (ry-1)
-    if ((get(lx, ly) ushr 24) > 128) {
-      val c = when { ly < cy - ry/3 -> crownHi; ly < cy+1 -> brightLeaf; else -> deepShadow }
-      set(lx, ly, c); if (lx+1 < width && (get(lx+1, ly) ushr 24) > 128 && rng.nextBoolean()) set(lx+1, ly, c)
-      // occasional 2-high leaf spike at crown
-      if (ly < cy - ry/3 && rng.nextInt(8)==0 && ly>1) set(lx, ly-1, crownHi)
+  // Connected leaf sprays follow each lobe; keep its silhouette and dark underside intact.
+  // A few grouped leaves read as foliage at zoom-out, unlike independent bright flecks.
+  repeat((rx * ry) / 45 + 2) {
+    val lx = cx + rng.nextInt((rx * 2 - 6).coerceAtLeast(1)) - rx + 3
+    val ly = cy + rng.nextInt((ry * 2 - 6).coerceAtLeast(1)) - ry + 3
+    val surface = get(lx, ly)
+    if (surface == midShade || surface == brightLeaf || surface == crownHi) {
+      val lit = if (ly < cy - ry / 3) crownHi else brightLeaf
+      for (step in 0..3) {
+        val px = lx + step
+        val py = ly - step / 2
+        // Do not paint outside this lobe or into another object's transparent border.
+        if (get(px, py) == surface) set(px, py, lit)
+        if (get(px, py + 1) == surface) set(px, py + 1, midShade)
+      }
+      if (get(lx + 1, ly - 1) == surface) set(lx + 1, ly - 1, lit)
     }
   }
 }
