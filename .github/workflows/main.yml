@@ -91,19 +91,29 @@ jobs:
       - name: Verify signed APK and package Android-compatible ZIP
         run: |
           set -euo pipefail
-          echo "== apksigner verify =="
+          echo "== apksigner verify (distributed APK) =="
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose app/build/outputs/apk/debug/app-debug.apk
+          echo "== file type check (must be ZIP archive, not HTML) =="
+          file app/build/outputs/apk/debug/app-debug.apk | tee -a "$GITHUB_STEP_SUMMARY"
+          if head -c 200 app/build/outputs/apk/debug/app-debug.apk | grep -qi "<html"; then echo "FAIL: APK is HTML error page"; exit 1; fi
           echo "== unzip -t APK (zip integrity) =="
           unzip -t app/build/outputs/apk/debug/app-debug.apk
-          echo "== package portable ZIP (STORE, no recompression) =="
+          echo "== package portable ZIP (STORE, no recompression) for artifact ==="
           python3 tools/package_apk.py --apk app/build/outputs/apk/debug/app-debug.apk --output app/build/apk-distribution | tee "$RUNNER_TEMP/apk-report.json"
-          echo "== APK report =="
+          echo "== APK report (BYTES + SHA-256) =="
           cat "$RUNNER_TEMP/apk-report.json"
           echo "--- APK report ---" >> "$GITHUB_STEP_SUMMARY"
           cat "$RUNNER_TEMP/apk-report.json" >> "$GITHUB_STEP_SUMMARY"
-          echo "== local files =="
-          ls -lh app/build/apk-distribution/
-          sha256sum app/build/apk-distribution/* | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "== exact bytes and SHA-256 (record for user) =="
+          stat -c '%n %s bytes' app/build/apk-distribution/Eternal-Summoner-debug.apk | tee -a "$GITHUB_STEP_SUMMARY"
+          sha256sum app/build/apk-distribution/Eternal-Summoner-debug.apk | tee -a "$GITHUB_STEP_SUMMARY"
+          stat -c '%n %s bytes' app/build/apk-distribution/Eternal-Summoner-Android.zip | tee -a "$GITHUB_STEP_SUMMARY"
+          sha256sum app/build/apk-distribution/Eternal-Summoner-Android.zip | tee -a "$GITHUB_STEP_SUMMARY"
+          ls -lh app/build/apk-distribution/ | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "== aapt badging (package ID, version, SDK, ABIs) =="
+          "$ANDROID_HOME/build-tools/36.0.0/aapt dump badging app/build/apk-distribution/Eternal-Summoner-debug.apk | head -n 30" || "$ANDROID_HOME/build-tools/36.0.0/aapt2 dump badging app/build/apk-distribution/Eternal-Summoner-debug.apk | head -n 30" || true
+          echo "== manifest check =="
+          ls "$ANDROID_HOME/cmdline-tools"/*/bin/apkanalyzer 2>/dev/null | head -1 | xargs -I{} sh -c '{} manifest print app/build/apk-distribution/Eternal-Summoner-debug.apk 2>&1 | head -n 30' || true
 
       - name: Upload APK
         id: upload
@@ -125,17 +135,23 @@ jobs:
           set -euo pipefail
           archive="$RUNNER_TEMP/Eternal-Summoner-APK.zip"
           extracted="$RUNNER_TEMP/verified-apk-artifact"
-          echo "Downloading artifact $ARTIFACT_ID via GH API..."
+          echo "Downloading artifact $ARTIFACT_ID via GH API (exact bytes)..."
           gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip" > "$archive"
-          echo "== outer artifact ZIP test =="
+          echo "== outer artifact ZIP test (must be ZIP, not HTML) =="
+          file "$archive" | tee -a "$GITHUB_STEP_SUMMARY"
+          if head -c 500 "$archive" | grep -qi "<html"; then echo "FAIL: artifact is HTML error page (incomplete upload/auth)"; cat "$archive" | head -c 2000; exit 1; fi
           unzip -t "$archive"
-          ls -lh "$archive" | tee -a "$GITHUB_STEP_SUMMARY"
+          stat -c '%n %s bytes' "$archive" | tee -a "$GITHUB_STEP_SUMMARY"
           sha256sum "$archive" | tee -a "$GITHUB_STEP_SUMMARY"
           mkdir -p "$extracted"
           unzip -q "$archive" -d "$extracted"
           ls -lh "$extracted" | tee -a "$GITHUB_STEP_SUMMARY"
-          echo "== verify inner APK + portable ZIP + checksums =="
-          python3 tools/package_apk.py --verify "$extracted"
+          stat -c '%n %s bytes' "$extracted/Eternal-Summoner-debug.apk" | tee -a "$GITHUB_STEP_SUMMARY"
+          sha256sum "$extracted/Eternal-Summoner-debug.apk" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "== verify inner APK SHA matches build (detect truncated download) =="
+          grep "Eternal-Summoner-debug.apk" "$extracted/SHA256SUMS" | tee -a "$GITHUB_STEP_SUMMARY"
+          (cd "$extracted" && sha256sum -c SHA256SUMS --ignore-missing) || (echo "FAIL: SHA-256 mismatch — truncated download, duplicate '(1)' file, or HTML saved as APK"; exit 1)
+          echo "== apksigner verify extracted APK =="
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$extracted/Eternal-Summoner-debug.apk"
           unzip -t "$extracted/Eternal-Summoner-debug.apk"
           unzip -t "$extracted/Eternal-Summoner-Android.zip"
@@ -159,8 +175,9 @@ jobs:
       - name: List artifacts
         run: |
           ls -lh dist/
+          stat -c '%n %s bytes' dist/* | tee -a "$GITHUB_STEP_SUMMARY"
           sha256sum dist/* | tee SHA256SUMS.txt
-          cat SHA256SUMS.txt
+          cat SHA256SUMS.txt | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Create GitHub Release with direct APK
         uses: softprops/action-gh-release@v2
@@ -169,11 +186,11 @@ jobs:
           name: Eternal Summoner APK #${{ github.run_number }}
           body: |
             Direct APK download — no nested ZIP extraction needed.
-            - `Eternal-Summoner-debug.apk` — installable APK (signed debug)
-            - `Eternal-Summoner-Android.zip` — portable ZIP (STORE, Android-compatible) containing APK + SHA256
-            - `SHA256SUMS` — SHA-256 for both files
+            - `Eternal-Summoner-debug.apk` — installable APK (signed debug, 33-34 MB). Download this file directly and install.
+            - `Eternal-Summoner-Android.zip` — portable ZIP (STORE) containing APK + SHA256 for extraction test.
+            - `SHA256SUMS` — SHA-256 for both files. Verify: `sha256sum -c SHA256SUMS`
 
-            **Install:** Download `Eternal-Summoner-debug.apk` directly and install. Verify SHA-256 against `SHA256SUMS`.
+            **Install:** Download `Eternal-Summoner-debug.apk` (not the Actions artifact ZIP) from this Release. If you downloaded from Actions, you must EXTRACT the ZIP first — do not rename .zip to .apk.
             Built from `${{ github.sha }}` — workflow `${{ github.run_id }}`.
           files: |
             dist/Eternal-Summoner-debug.apk
