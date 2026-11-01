@@ -19,7 +19,11 @@ import com.example.game.map.EnemyArchetype
 import com.example.game.map.ObliqueCamera
 import com.example.game.map.PathSegment
 import com.example.game.map.PropKind
+import com.example.game.map.SanctuaryHouseEntrances
+import com.example.game.map.SanctuaryLight
+import com.example.game.map.SanctuaryShadowRegistry
 import com.example.game.map.SanctuaryZoneZone
+import com.example.game.map.ShadowCaster
 import com.example.game.map.TerrainPatch
 import com.example.game.map.WorldObstacle
 import com.example.game.tower.TowerFloorCatalog
@@ -512,6 +516,44 @@ object PixelSpriteRenderer {
     )
   }
 
+  /** Unified directional contact + cast shadow (shadow-stack spec §3.1) — replaces fixed generic ellipse. */
+  private fun DrawScope.drawCastersShadow(
+    cx: Float,
+    footY: Float,
+    caster: ShadowCaster,
+    zoom: Float,
+    alphaOverride: Float? = null,
+  ) {
+    val baseAlpha = alphaOverride ?: caster.opacity
+    if (baseAlpha < 0.02f) return
+    // Contact AO pinned at foot
+    val contactRX = caster.footprintRX * zoom * 0.92f
+    val contactRY = caster.footprintRY * zoom * 0.62f
+    val rx = (caster.footprintRX * 0.92f + caster.softnessPx * 0.35f) * zoom
+    val ryForCast = (caster.heightPx * 0.14f + caster.footprintRY * 0.42f) * zoom
+    val (offWx, offWy) = SanctuaryLight.shadowWorldOffset(caster.heightPx)
+    val offX = offWx * zoom
+    val offY = offWy * zoom * ObliqueCamera.OBLIQUE_Y_SCALE
+    // Layer 1 outer halo (soft penumbra)
+    drawOval(
+      color = Color(0xFF0A0C14).copy(alpha = (baseAlpha * 0.38f).coerceIn(0f, 0.32f)),
+      topLeft = Offset(cx - rx + offX - 2f * zoom, footY - ryForCast + offY - 1f * zoom),
+      size = Size(rx * 2.25f + 6f * zoom, ryForCast * 1.55f + 4f * zoom),
+    )
+    // Layer 2 core cast
+    drawOval(
+      color = Color(0xFF0A0C14).copy(alpha = (baseAlpha * 0.58f).coerceIn(0f, 0.40f)),
+      topLeft = Offset(cx - rx * 0.86f + offX, footY - ryForCast * 0.72f + offY),
+      size = Size(rx * 2.05f, ryForCast * 1.45f),
+    )
+    // Layer 3 contact AO (dense, pinned)
+    drawOval(
+      color = Color.Black.copy(alpha = (baseAlpha * 1.15f).coerceIn(0f, 0.58f)),
+      topLeft = Offset(cx - contactRX * 0.90f, footY - contactRY * 0.70f),
+      size = Size(contactRX * 1.85f, contactRY * 1.35f),
+    )
+  }
+
   private fun DrawScope.drawDirectionalShadow34(
     cx: Float,
     footY: Float,
@@ -519,13 +561,18 @@ object PixelSpriteRenderer {
     halfH: Float,
     alpha: Float = 0.52f,
   ) {
-    // Layer 1: Directional moonlight shadow cast down-right (cold, sharp, longer)
+    // Legacy delegator — map hand-tuned halfW/halfH to height-proxy for directional offset.
+    val heightProxy = (halfW * 1.05f + halfH * 1.6f).coerceAtLeast(12f)
+    val rx = halfW * 0.92f
+    val ry = halfH * 1.10f
+    val (offWx, offWy) = SanctuaryLight.shadowWorldOffset(heightProxy)
+    val offX = offWx * 0.28f // scale to screen; proxy already screen-sized
+    val offY = offWy * 0.28f * ObliqueCamera.OBLIQUE_Y_SCALE
     drawOval(
       color = Color(0xFF0A0C14).copy(alpha = (alpha * 0.58f).coerceIn(0f, 0.45f)),
-      topLeft = Offset(cx - halfW * 0.68f + 8f, footY - halfH * 0.60f + 6f),
-      size = Size(halfW * 2.35f, halfH * 1.65f),
+      topLeft = Offset(cx - rx * 0.68f + offX, footY - ry * 0.60f + offY),
+      size = Size(rx * 2.35f, ry * 1.65f),
     )
-    // Layer 2: Contact AO directly beneath object (dense, small)
     drawOval(
       color = Color.Black.copy(alpha = (alpha * 0.90f).coerceIn(0f, 0.65f)),
       topLeft = Offset(cx - halfW * 0.88f, footY - halfH * 0.85f),
@@ -962,6 +1009,15 @@ object PixelSpriteRenderer {
         with(InteriorWorldRenderer) {
           drawCustomProp34(obs, cx, cy, s, timeSec)
         }
+      }
+    }
+    // Doorway ground indicator for enterable houses (subtle amber threshold bloom at arch)
+    SanctuaryHouseEntrances.findByObstacleId(obs.id)?.let { entrance ->
+      val doorCx = ObliqueCamera.worldToScreenX(entrance.doorWorldX, camX, zoom, size.width / 2f)
+      val doorCy = ObliqueCamera.worldToScreenY(entrance.doorWorldY, camY, zoom, size.height / 2f)
+      if (doorCx > -60f && doorCx < size.width + 60f && doorCy > -60f && doorCy < size.height + 60f) {
+        val doorGlowAlpha = 0.14f + 0.06f * sin(timeSec * 2.0f + obs.x * 0.01f)
+        drawForeshortenedGlow(doorCx, doorCy + 4f * s, 22f * s * zoom.coerceIn(0.6f, 1f), Color(0xFFF5B841).copy(alpha = doorGlowAlpha))
       }
     }
   }

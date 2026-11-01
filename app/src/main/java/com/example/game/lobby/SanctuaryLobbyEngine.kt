@@ -10,6 +10,7 @@ import com.example.data.model.HeroStatusType
 import com.example.data.model.IslandExpansionMilestone
 import com.example.data.model.PersonalityType
 import com.example.game.map.CollisionPhysics
+import com.example.game.map.SanctuaryHouseEntrances
 import com.example.game.map.SanctuaryIslandGeometry
 import com.example.game.tower.GeneratedMapLayout
 import com.example.game.tower.TowerFloorCatalog
@@ -91,6 +92,10 @@ private object SanctuaryNavGraph {
     1610f to 2120f, // 17: Southern Fortified Main Gate Forecourt
     1080f to 1660f, // 18: SW Golden-Sand Training Arena Entrance
     855f to 1815f,  // 19: SW Golden-Sand Training Arena Center
+    823f to 808f,   // 20: Hero Quarters doorway (south-face arch)
+    1103f to 943f,  // 21: Restaurant doorway (south-face arch)
+    993f to 673f,   // 22: Armory doorway (south-face arch)
+    890f to 1960f,  // 23: Training arena south gate
   )
 
   private val edges: Map<Int, List<Int>> = buildMap {
@@ -134,6 +139,12 @@ private object SanctuaryNavGraph {
     link(16, 17)
     link(16, 18)
     link(18, 19)
+    // Doorway leaves (do not alter core 20-node topology, only extend)
+    link(7, 20)
+    link(8, 21)
+    link(8, 22)
+    link(9, 22)
+    link(19, 23)
   }
 
   private fun nearestNode(x: Float, y: Float): Int =
@@ -239,6 +250,8 @@ class SanctuaryLobbyEngine {
   private var savedExteriorZoom: Float = 0.88f
   private var savedSelectedHeroId: String? = null
   private var savedSelectedFacility: FacilityType? = null
+  private var lastTransitionMs: Long = 0L
+  private val TRANSITION_DEBOUNCE_MS: Long = 600L
 
   var nearbyFacility: FacilityType? = null
   var isNearRestaurantExit: Boolean = false
@@ -538,6 +551,12 @@ class SanctuaryLobbyEngine {
       }
       return null
     }
+    // Priority 1: doorway trigger (door south-face arch) — fixes 30px north bias
+    val doorwayFac = SanctuaryHouseEntrances.facilityAtDoorway(worldX, worldY, zoom)
+    if (doorwayFac != null) {
+      selectedFacility = doorwayFac
+      return doorwayFac
+    }
     val zone = TowerFloorCatalog.SANCTUARY_ZONES.minByOrNull { hypot(worldX - it.centerX, worldY - it.centerY) }
     if (zone != null && hypot(worldX - zone.centerX, worldY - zone.centerY) <= zone.interactRadius * 1.15f) {
       selectedFacility = zone.facility
@@ -613,6 +632,9 @@ class SanctuaryLobbyEngine {
 
   fun enterFacilityInterior(facility: FacilityType) {
     if (facility !in ENTERABLE_FACILITIES) return
+    val now = System.currentTimeMillis()
+    if (now - lastTransitionMs < TRANSITION_DEBOUNCE_MS) return
+    lastTransitionMs = now
     if (!isInsideInterior) {
       savedExteriorX = camX
       savedExteriorY = camY
@@ -631,11 +653,25 @@ class SanctuaryLobbyEngine {
 
   fun exitFacilityInterior() {
     if (!isInsideInterior) return
+    val now = System.currentTimeMillis()
+    if (now - lastTransitionMs < TRANSITION_DEBOUNCE_MS) return
+    lastTransitionMs = now
     val exitedFrom = activeInterior
     activeInterior = null
-    camX = savedExteriorX
-    camY = savedExteriorY
-    zoom = savedExteriorZoom
+    // Restore saved exterior; fallback to doorway outsideSpawn if saved pos is blocked or too far.
+    val exteriorObstacles = TowerFloorCatalog.buildSanctuaryMap().obstacles
+    val wouldCollideSaved = CollisionPhysics.wouldCollide(savedExteriorX, savedExteriorY, 16f, exteriorObstacles)
+    val doorway = exitedFrom?.let { SanctuaryHouseEntrances.forFacility(it) }
+    if (wouldCollideSaved && doorway != null) {
+      camX = doorway.outsideSpawnX
+      camY = doorway.outsideSpawnY
+      zoom = savedExteriorZoom.coerceIn(0.52f, 0.92f)
+    } else {
+      camX = savedExteriorX
+      camY = savedExteriorY
+      zoom = savedExteriorZoom
+    }
+    // Guarantee outsideSpawn validity even if saved pos was okay but far from door — keep saved for spatial continuity.
     selectedHeroId = savedSelectedHeroId
     selectedFacility = savedSelectedFacility ?: exitedFrom
     isNearRestaurantExit = false
@@ -966,8 +1002,9 @@ class SanctuaryLobbyEngine {
     isNearRestaurantExit = false
     isNearChefCounter = false
 
-    // Detect nearby Sanctuary Exterior Facility centered around Camera
-    val primaryNearby = TowerFloorCatalog.SANCTUARY_ZONES
+    // Detect nearby — doorway trigger has priority over zone-center
+    val doorwayNearby = SanctuaryHouseEntrances.facilityAtDoorway(camX, camY, zoom)
+    val primaryNearby = if (doorwayNearby != null) doorwayNearby else TowerFloorCatalog.SANCTUARY_ZONES
       .minByOrNull { hypot(camX - it.centerX, camY - it.centerY) }
       ?.takeIf { hypot(camX - it.centerX, camY - it.centerY) <= it.interactRadius * 1.45f }
       ?.facility
