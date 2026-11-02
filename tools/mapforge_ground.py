@@ -335,8 +335,8 @@ def pebble_cluster(t: Torus, x, y, count, pal, r, spread=6):
 
 def soil(v: int) -> Image.Image:
     """Packed training earth: three value scales (masses / compaction / clusters)."""
-    darker = v % 3 == 2
-    t = Torus(SOIL["damp"] if darker else SOIL["body"])
+    darker = v % 3 == 2          # pattern difference only: the tone is equalised below
+    t = Torus(SOIL["body"])
     r = rng(5500 + v * 61)
 
     # scale 1 - broad earth masses, one value step apart, never harsh
@@ -505,6 +505,39 @@ def oak() -> Image.Image:
     return im
 
 
+# ---------------------------------------------------------------- tone equalisation
+def mean_luma(image: Image.Image) -> float:
+    px = image.load()
+    total, n = 0.0, 0
+    for y in range(64):
+        for x in range(64):
+            r, g, b, a = px[x, y]
+            if a:
+                total += 0.2126 * r + 0.7152 * g + 0.0722 * b
+                n += 1
+    return total / max(1, n)
+
+
+def equalize_tone(image: Image.Image, target: float, max_shift: int = 12) -> Image.Image:
+    """Shift a tile's value so every variant of an organic family has the same average.
+
+    Without this the renderer's hash-picked variants form a visible checkerboard of
+    per-tile brightness on wide ground (soil/gravel are low-frequency, so it shows).
+    Hue is untouched: every channel moves by the same offset.
+    """
+    delta = max(-max_shift, min(max_shift, round(target - mean_luma(image))))
+    if delta == 0:
+        return image
+    px = image.load()
+    for y in range(64):
+        for x in range(64):
+            r, g, b, a = px[x, y]
+            if a:
+                px[x, y] = (max(0, min(255, r + delta)), max(0, min(255, g + delta)),
+                            max(0, min(255, b + delta)), a)
+    return image
+
+
 # ---------------------------------------------------------------- export
 def main():
     manifest_path = OUT / "manifest.json"
@@ -521,8 +554,11 @@ def main():
     ]
     for name, count, fn, shared in families:
         reference = fn(0)
+        target_luma = mean_luma(reference)
         for v in range(count):
             image = fn(v)
+            if name in ("soil", "gravel"):
+                equalize_tone(image, target_luma)
             if shared:
                 for box in [(0, 0, 64, 2), (0, 62, 64, 64), (0, 0, 2, 64), (62, 0, 64, 64)]:
                     image.paste(reference.crop(box), box)
