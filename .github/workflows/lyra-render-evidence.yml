@@ -19,6 +19,8 @@ on:
       - 'app/src/test/java/com/example/MapForgeArchitectureContractTest.kt'
       - 'app/src/test/java/com/example/MapForgeP21RenderTest.kt'
       - 'app/src/test/java/com/example/MapForgeP21ContractTest.kt'
+      - 'app/src/test/java/com/example/MapForgeP22RenderTest.kt'
+      - 'app/src/test/java/com/example/MapForgeP22ContractTest.kt'
       - '.github/workflows/lyra-render-evidence.yml'
 
 permissions:
@@ -91,6 +93,23 @@ jobs:
       - name: Verify P21 asset and geometry contract
         run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeP21ContractTest" --stacktrace
 
+      # P22: Sanctuary + Tower vegetation render matrix + contract verification.
+      - name: Render P22 vegetation matrix (real draw code, Robolectric native graphics)
+        run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeP22RenderTest" --stacktrace
+
+      - name: Verify P22 vegetation asset and geometry contract
+        run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeP22ContractTest" --stacktrace
+
+      - name: Verify Sanctuary environment art, manifest, layout, and performance regressions
+        run: >-
+          gradle :app:testDebugUnitTest
+          --tests "com.example.SanctuaryMaterialTest.manifestAssetsDecodeAndMatchRuntimeAtlas"
+          --tests "com.example.SanctuaryEnvironmentArtTest"
+          --tests "com.example.ui.LayoutResponsivenessRobolectricTest"
+          --tests "com.example.performance.ScenePerformanceTest"
+          --tests "com.example.LivingWorldTest"
+          --stacktrace
+
       # P19: training field / gravel band / cobble joints, fixed cameras for before/after.
       - name: Render terrain slice (real draw code, Robolectric native graphics)
         run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeTerrainRenderTest" --stacktrace
@@ -110,9 +129,12 @@ jobs:
           cp -f app/build/visual_screenshots/p20/*.png docs/visual-evidence/p20/engine-render/ || true
           mkdir -p docs/visual-evidence/p21/engine-render
           cp -f app/build/visual_screenshots/p21/*.png docs/visual-evidence/p21/engine-render/ || true
+          mkdir -p docs/visual-evidence/p22/engine-render
+          cp -f app/build/visual_screenshots/p22/*.png docs/visual-evidence/p22/engine-render/ || true
+          cp -f app/build/visual_screenshots/p22/camera_props.json docs/visual-evidence/p22/ || true
           git config user.name "eternal-render-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add docs/visual-evidence/p17c/engine-render docs/visual-evidence/p18/engine-render docs/visual-evidence/p19/engine-render docs/visual-evidence/p20/engine-render docs/visual-evidence/p21/engine-render
+          git add docs/visual-evidence/p17c/engine-render docs/visual-evidence/p18/engine-render docs/visual-evidence/p19/engine-render docs/visual-evidence/p20/engine-render docs/visual-evidence/p21/engine-render docs/visual-evidence/p22/engine-render docs/visual-evidence/p22/camera_props.json
           if git diff --cached --quiet; then echo "no render changes"; exit 0; fi
           git commit -m "P17-C: engine render evidence (automated, Robolectric native graphics)"
           git push origin HEAD:${{ github.head_ref || github.ref_name }}
@@ -164,6 +186,8 @@ jobs:
             app/build/visual_screenshots/p19/*.png
             app/build/visual_screenshots/p20/*.png
             app/build/visual_screenshots/p21/*.png
+            app/build/visual_screenshots/p22/*.png
+            app/build/visual_screenshots/p22/camera_props.json
             app/build/reports/tests/testDebugUnitTest/**
           if-no-files-found: warn
           retention-days: 30

@@ -576,7 +576,7 @@
         124
       ],
       "runtime_usage": "PixelStructureAtlas; existing tree position/scale; silhouette shadows",
-      "sha256": "c7f35ea681eff667da52af939b5e48d24cfa3c7937159fd122b9fb0cd16e51c0"
+      "sha256": "422d5811ee81e809046885c10fc6e6c449204c5fb5614e0a55903106282e2cee"
     },
     {
       "id": "canopy_b",
@@ -590,7 +590,7 @@
         107
       ],
       "runtime_usage": "PixelStructureAtlas; existing tree position/scale; silhouette shadows",
-      "sha256": "ae452536bc8c4b6c580290d9454b3bd4bc787666cfc4f30e5823eb9c9bf73b1b"
+      "sha256": "6157716c6e15eeec00cbe639f613552bb642e7b53bbacb25b291e5af41fbe8a3"
     },
     {
       "id": "oak",
@@ -618,7 +618,7 @@
         124
       ],
       "runtime_usage": "PixelStructureAtlas; existing tree position/scale; silhouette shadows",
-      "sha256": "c739f681811a0ad765fb4645f32e3260b5622f5af7c1f49a65d965d0c3c7204b"
+      "sha256": "647c7fea5fd15a44bd2d87cb5e9eb15d707c6c60d7f18ff809916d368a440a4c"
     },
     {
       "id": "pine",
@@ -632,7 +632,7 @@
         120
       ],
       "runtime_usage": "PixelStructureAtlas; existing tree position/scale; silhouette shadows",
-      "sha256": "d421e5b36eb1fdb5a73c7028f5a3904536d15d8a432b1c005310c755af847b7a"
+      "sha256": "34f749cbf703625fee8cd534a7b0f56b7e6b687b5700b408ea1b193180d75a1b"
     },
     {
       "id": "cypress",
@@ -675,6 +675,34 @@
       ],
       "runtime_usage": "PixelStructureAtlas.barrelClusterSprite; existing props and shadow silhouette",
       "sha256": "320fb2a5f02a5b917cc564bb8fa5efcb29c48c48d78b072d7112fe4caa904412"
+    },
+    {
+      "id": "hedge_bush",
+      "path": "hedge_bush.png",
+      "size": [
+        64,
+        40
+      ],
+      "ground_anchor": [
+        32,
+        36
+      ],
+      "runtime_usage": "PropKind.GARDEN_HEDGE_BUSH",
+      "sha256": "5bbc70adbbfae819c0d0c00081adebb2e3d641ecb245147f902e75e7a1cfc9f8"
+    },
+    {
+      "id": "forest_bush",
+      "path": "forest_bush.png",
+      "size": [
+        64,
+        40
+      ],
+      "ground_anchor": [
+        32,
+        36
+      ],
+      "runtime_usage": "PropKind.FOREST_CANOPY_BUSH",
+      "sha256": "11e573a5f85ac1fae58a20a15f799013211bdf3c733fdbcd536edeab365e6fb5"
     }
   ]
 }
