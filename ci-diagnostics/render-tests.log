@@ -1,17 +1,17 @@
 ### test results
 total 8
--rw-r--r-- 1 runner runner 3199 Nov  2 11:57 TEST-com.example.MapForgeP21ContractTest.xml
-drwxr-xr-x 2 runner runner 4096 Nov  2 11:57 binary
+-rw-r--r-- 1 runner runner 3239 Nov  2 12:03 TEST-com.example.MapForgeP21ContractTest.xml
+drwxr-xr-x 2 runner runner 4096 Nov  2 12:03 binary
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.example.MapForgeP21ContractTest" tests="4" skipped="1" failures="1" errors="0" timestamp="2026-11-02T11:57:28.119Z" hostname="runnervmnwato" time="6.527">
+<testsuite name="com.example.MapForgeP21ContractTest" tests="4" skipped="1" failures="1" errors="0" timestamp="2026-11-02T12:03:52.922Z" hostname="runnervmnwato" time="6.667">
   <properties/>
-  <testcase name="worldGeometryIsUnchanged" classname="com.example.MapForgeP21ContractTest" time="5.563"/>
-  <testcase name="towerGatePortalMatchesAnimatedRiftBox" classname="com.example.MapForgeP21ContractTest" time="0.092"/>
-  <testcase name="enterableDoorsLandOnTheirWorldTriggers" classname="com.example.MapForgeP21ContractTest" time="0.097">
-    <failure message="java.lang.AssertionError: hero_quarters: door must map to world y 790.0, got 776.6667" type="java.lang.AssertionError">java.lang.AssertionError: hero_quarters: door must map to world y 790.0, got 776.6667
+  <testcase name="worldGeometryIsUnchanged" classname="com.example.MapForgeP21ContractTest" time="5.785"/>
+  <testcase name="towerGatePortalMatchesAnimatedRiftBox" classname="com.example.MapForgeP21ContractTest" time="0.093"/>
+  <testcase name="enterableDoorsLandOnTheirWorldTriggers" classname="com.example.MapForgeP21ContractTest" time="0.072">
+    <failure message="java.lang.AssertionError: hero_quarters: door probe must map 13.333333 u from the trigger, got -13.333313" type="java.lang.AssertionError">java.lang.AssertionError: hero_quarters: door probe must map 13.333333 u from the trigger, got -13.333313
 	at org.junit.Assert.fail(Assert.java:89)
 	at org.junit.Assert.assertTrue(Assert.java:42)
-	at com.example.MapForgeP21ContractTest.enterableDoorsLandOnTheirWorldTriggers(MapForgeP21ContractTest.kt:170)
+	at com.example.MapForgeP21ContractTest.enterableDoorsLandOnTheirWorldTriggers(MapForgeP21ContractTest.kt:174)
 	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
 	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
@@ -37,7 +37,7 @@ drwxr-xr-x 2 runner runner 4096 Nov  2 11:57 binary
 	at java.base/java.lang.Thread.run(Thread.java:1583)
 </failure>
   </testcase>
-  <testcase name="p20SliceIsIntact" classname="com.example.MapForgeP21ContractTest" time="0.307">
+  <testcase name="p20SliceIsIntact" classname="com.example.MapForgeP21ContractTest" time="0.272">
     <skipped/>
   </testcase>
   <system-out><![CDATA[]]></system-out>
