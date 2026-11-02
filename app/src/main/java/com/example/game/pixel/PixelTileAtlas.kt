@@ -2,7 +2,9 @@ package com.example.game.pixel
 
 import android.graphics.Bitmap
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import com.example.game.map.ObliqueCamera
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
@@ -239,6 +241,11 @@ object PixelTileAtlas {
 
   const val TILE_PX = 64
 
+  /** 4 x 4 grass tiles per pre-composed overview block, with 8 authored block variants. */
+  const val GRASS_BLOCK_TILES = 4
+  const val GRASS_BLOCK_COUNT = 8
+  const val GRASS_BLOCK_WORLD_SIZE = TILE_PX * GRASS_BLOCK_TILES
+
   // Reference-Accurate Sunlit Anime Sanctuary Lawn, Sand, Alabaster Stone & Grey Cobble Tiles (64x64)
   val sanctuaryGrassTiles: List<ImageBitmap> get() = SanctuaryArtAssets.tiles("grass", 8) ?: sanctuaryGrassTilesFallback
   private val sanctuaryGrassTilesFallback: List<ImageBitmap> by lazy {
@@ -262,6 +269,61 @@ object PixelTileAtlas {
 
   val sanctuaryRoadCurbTiles: List<ImageBitmap> by lazy {
     (0 until 4).map { variant -> createSanctuaryCurbTile(variant) }
+  }
+
+  /**
+   * Pre-composed 4 x 4 grass blocks, 256 x 184 px: sixteen authored 64 x 64 tiles already
+   * placed on the same 0.72 foreshortened ground plane the renderer uses. The overview
+   * camera draws one block instead of sixteen tiles, which removes ~90% of the terrain
+   * draw commands. Gameplay and inspection zoom keep the per-tile path, so the sharp
+   * nearest-neighbour art seen up close is completely unaffected.
+   */
+  val sanctuaryGrassBlocks: List<ImageBitmap> by lazy { buildSanctuaryGrassBlocks() }
+
+  private fun buildSanctuaryGrassBlocks(): List<ImageBitmap> {
+    val tiles = sanctuaryGrassTiles
+    if (tiles.isEmpty()) return emptyList()
+    val sources = ArrayList<IntArray>(tiles.size)
+    var srcW = 0
+    var srcH = 0
+    for (tile in tiles) {
+      val bitmap = tile.asAndroidBitmap()
+      if (bitmap.width <= 0 || bitmap.height <= 0) return emptyList()
+      srcW = bitmap.width
+      srcH = bitmap.height
+      val pixels = IntArray(srcW * srcH)
+      bitmap.getPixels(pixels, 0, srcW, 0, 0, srcW, srcH)
+      sources.add(pixels)
+    }
+    if (sources.isEmpty() || srcW <= 0 || srcH <= 0) return emptyList()
+
+    val cellW = TILE_PX
+    val cellH = (TILE_PX * ObliqueCamera.OBLIQUE_Y_SCALE).toInt().coerceAtLeast(1)
+    val blockW = cellW * GRASS_BLOCK_TILES
+    val blockH = cellH * GRASS_BLOCK_TILES
+    val blocks = ArrayList<ImageBitmap>(GRASS_BLOCK_COUNT)
+    for (block in 0 until GRASS_BLOCK_COUNT) {
+      val pixels = IntArray(blockW * blockH)
+      for (cellY in 0 until GRASS_BLOCK_TILES) {
+        for (cellX in 0 until GRASS_BLOCK_TILES) {
+          // Same deterministic variant rule the per-tile renderer uses, applied to a
+          // representative tile coordinate for this block variant.
+          val tx = (block and 3) * GRASS_BLOCK_TILES + cellX
+          val ty = (block shr 2) * GRASS_BLOCK_TILES + cellY
+          val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
+          val src = sources[hash % sources.size]
+          for (y in 0 until cellH) {
+            val srcRow = ((y * srcH) / cellH) * srcW
+            val dstRow = (cellY * cellH + y) * blockW + cellX * cellW
+            for (x in 0 until cellW) {
+              pixels[dstRow + x] = src[srcRow + (x * srcW) / cellW]
+            }
+          }
+        }
+      }
+      blocks.add(Bitmap.createBitmap(pixels, blockW, blockH, Bitmap.Config.ARGB_8888).asImageBitmap())
+    }
+    return blocks
   }
 
   val sanctuaryWaterTiles: List<ImageBitmap> by lazy {

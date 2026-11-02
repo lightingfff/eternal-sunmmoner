@@ -21,3 +21,4 @@ debug.keystore
 .aistudio/artifacts/
 .aistudio/.tempmediaStorage/
 
+__pycache__/
