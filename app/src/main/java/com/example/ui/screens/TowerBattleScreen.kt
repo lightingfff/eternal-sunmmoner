@@ -191,6 +191,7 @@ fun TowerBattleScreen(
   state: SummonerUiState,
   onFinishExpedition: (Boolean, Set<String>) -> Unit,
   onReturnToSanctuary: () -> Unit,
+  onPrepareRetry: (() -> Unit)? = null,
   settings: GameSettings = GameSettings(),
   sceneActive: Boolean = true,
   onFinishExpeditionDetailed: ((Boolean, Set<String>, Boolean, Long, Long, Set<String>, com.example.data.model.CourierOutcome?, String?) -> Unit)? = null,
@@ -266,7 +267,7 @@ fun TowerBattleScreen(
 
   BackHandler {
     if (combatEngine.stage == MissionStage.VICTORY || combatEngine.stage == MissionStage.DEFEAT) {
-      onReturnToSanctuary()
+      if (!state.isBusyAction && state.lastSettlement != null) onReturnToSanctuary()
     } else {
       showRetreatConfirm = !showRetreatConfirm
     }
@@ -687,6 +688,29 @@ fun TowerBattleScreen(
         }
       }
 
+      // Mission waypoint uses the existing ground projection; it never changes world geometry.
+      combatEngine.lostCourier?.let { mission ->
+        if ((mission.choiceAvailable || mission.choice == com.example.game.combat.CourierChoice.RECOVER_SUPPLIES) &&
+          !mission.suppliesRecovered) {
+          val sx = ObliqueCamera.worldToScreenX(mission.supplyX, camX, zoom, halfW)
+          val sy = ObliqueCamera.worldToScreenY(mission.supplyY, camY, zoom, halfH)
+          val rx = 26f * zoom
+          val ry = rx * ObliqueCamera.OBLIQUE_Y_SCALE
+          drawOval(SummonerGold.copy(alpha = .9f), Offset(sx-rx,sy-ry), Size(rx*2,ry*2),
+            style = Stroke(2f*zoom))
+          drawLine(SummonerGold,Offset(sx-8f*zoom,sy),Offset(sx+8f*zoom,sy),2f*zoom)
+          drawLine(SummonerGold,Offset(sx,sy-6f*zoom),Offset(sx,sy+6f*zoom),2f*zoom)
+          val label = textMeasurer.measure("Tiếp vận • đứng cạnh 3s",
+            style = TextStyle(color=SummonerGold,fontSize=9.5.sp,fontWeight=FontWeight.Bold))
+          val ly = sy - 42f*zoom
+          if (sx in 18f..(size.width-18f) && ly in (topHudSafePx+8f)..(size.height-96f)) {
+            drawRoundRect(Color(0xDD0D1322),Offset(sx-label.size.width/2f-6f,ly-2f),
+              Size(label.size.width+12f,label.size.height+4f),CornerRadius(6f,6f))
+            drawText(label,topLeft=Offset(sx-label.size.width/2f,ly))
+          }
+        }
+      }
+
       // Unclaimed Exploration Discovery Callouts
       combatEngine.discoveryNodes.filter { !it.discovered }.forEach { node ->
         val nx = ObliqueCamera.worldToScreenX(node.x, camX, zoom, halfW)
@@ -901,7 +925,16 @@ fun TowerBattleScreen(
             interceptAvailable=combatEngine.enemies.any { !it.dead && it.id==mission.scoutEnemyId },
             compact=isWideScreen,
             intercepting=combatEngine.activeOrder==TacticalOrder.ATTACK_TARGET &&
-              combatEngine.designatedTargetId==mission.scoutEnemyId)
+              combatEngine.designatedTargetId==mission.scoutEnemyId,
+            choiceAvailable=mission.choiceAvailable,
+            onSupport={mission.chooseChoice(com.example.game.combat.CourierChoice.SUPPORT_COURIER);hudRevision++},
+            onRecoverSupplies={mission.chooseChoice(com.example.game.combat.CourierChoice.RECOVER_SUPPLIES);hudRevision++},
+            suppliesPending=mission.choice==com.example.game.combat.CourierChoice.RECOVER_SUPPLIES && !mission.suppliesRecovered,
+            onGoToSupplies={
+              combatEngine.issueTacticalOrder(TacticalOrder.MOVE_TO)
+              combatEngine.onBattlefieldTapped(mission.supplyX,mission.supplyY)
+              hudRevision++
+            })
         }
 
         // Narrow Portrait: Place Squad Skill Strip cleanly on a slim horizontal row!
@@ -1367,9 +1400,7 @@ fun TowerBattleScreen(
                     )
                   }
                   if(settlement.courierOutcome!=null) {
-                    Text(if(settlement.courierOutcome==com.example.data.model.CourierOutcome.RESCUED)
-                      "Đã cứu người đưa tin. Dịch vụ lò rèn: phí chế tạo còn 90 vàng. Ký ức đồng đội đã lưu."
-                      else "Người đưa tin chưa tới cổng. Có thể trở lại Tầng 1 để thử hộ tống lần nữa.",
+                    Text(com.example.data.LostCourierProgression.outcomeDescription(settlement.courierOutcome),
                       color=PortalCyan,style=MaterialTheme.typography.bodySmall)
                   }
                   if (settlement.leveledUpHeroNames.isNotEmpty()) {
@@ -1394,6 +1425,14 @@ fun TowerBattleScreen(
                   }
                 }
               }
+            }
+
+            if (!isWin && onPrepareRetry != null) {
+              OutlinedButton(
+                onClick = onPrepareRetry,
+                enabled = !state.isBusyAction && settlement != null,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("prepare_rescue_retry_button"),
+              ) { Text("Chuẩn bị thử lại • Giữ tiến trình và thương tích") }
             }
 
             Button(

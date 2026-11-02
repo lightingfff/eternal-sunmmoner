@@ -1101,8 +1101,8 @@ class LocalGuestDataSource(
       retreatUsed -> 18L + floorNumber * 5L
       else -> 10L
     }
-    val goldEarned = ((baseGold + bonusGold) * dockMult).toLong()
-    val manaEarned = ((baseMana + bonusMana) * dockMult).toLong()
+    var goldEarned = ((baseGold + bonusGold) * dockMult).toLong()
+    var manaEarned = ((baseMana + bonusMana) * dockMult).toLong()
     val shardsEarned = when {
       victory -> 15L + floorNumber * 8L
       retreatUsed -> 5L + floorNumber * 2L
@@ -1122,7 +1122,7 @@ class LocalGuestDataSource(
     val leveledNames = mutableListOf<String>()
     var lootedName: String? = null
     val escortOutcome = courierOutcome?.let {
-      if (floorNumber == 1 && victory && it == CourierOutcome.RESCUED) CourierOutcome.RESCUED else CourierOutcome.FAILED
+      if (floorNumber == 1 && victory && LostCourierProgression.isRescue(it)) it else CourierOutcome.FAILED
     }
     var courierForgeUnlocked = false
     var courierMemoryHeroName: String? = null
@@ -1135,6 +1135,8 @@ class LocalGuestDataSource(
 
     saveManager.mutateSnapshot { snap ->
       val cur = snap.profile
+      goldEarned = ((baseGold + bonusGold + LostCourierProgression.bonusGold(cur.storyFlags, escortOutcome)) * dockMult).toLong()
+      manaEarned = ((baseMana + bonusMana + LostCourierProgression.bonusMana(cur.storyFlags, escortOutcome)) * dockMult).toLong()
       val totalMasterExp = cur.masterExp + masterExpGain
       val newMasterLevel = (1L + totalMasterExp / 250L).coerceAtMost(100L)
       val newHighestFloor = if (victory) maxOf(cur.highestClearedFloor, floorNumber.toLong()) else cur.highestClearedFloor

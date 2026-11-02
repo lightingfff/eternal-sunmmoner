@@ -316,7 +316,8 @@ class TowerCombatEngine(
 
       TacticalOrder.REGROUP -> {
         awaitingMoveToTap = false
-        postFeedback("Lệnh Chỉ Huy: Tập hợp đội hình quanh Ấn Lệnh Master!")
+        postFeedback(if (lostCourier != null) "Lệnh Chỉ Huy: Tập hợp đội hình quanh người đưa thư!"
+          else "Lệnh Chỉ Huy: Tập hợp đội hình quanh Ấn Lệnh Master!")
         floatingTexts += FloatingCombatText(masterX, masterY - 58f, "LỆNH: TẬP HỢP ĐỘI HÌNH!", Color(0xFFA855F7), true)
       }
 
@@ -544,6 +545,18 @@ class TowerCombatEngine(
       eventBannerTimer = 3.8f
     }
 
+    // Retreat always uses the extraction point, even when the command sigil moved.
+    // During an escort, regroup around the actual protected party rather than a sigil left behind.
+    val commandX = when (activeOrder) {
+      TacticalOrder.RETREAT -> floorSpec.spawnX
+      TacticalOrder.REGROUP -> lostCourier?.courier?.x ?: masterX
+      else -> masterX
+    }
+    val commandY = when (activeOrder) {
+      TacticalOrder.RETREAT -> floorSpec.spawnY
+      TacticalOrder.REGROUP -> lostCourier?.courier?.y ?: masterY
+      else -> masterY
+    }
     // 3. Step Autonomous Squad Heroes
     heroes.forEach { hero ->
       AutonomousHeroAi.updateHeroUnit(
@@ -551,8 +564,8 @@ class TowerCombatEngine(
         dt = dt,
         allHeroes = heroes,
         enemies = enemies,
-        masterX = masterX,
-        masterY = masterY,
+        masterX = commandX,
+        masterY = commandY,
         order = activeOrder,
         designatedTargetId = designatedTargetId,
         moveBeacon = moveBeacon,

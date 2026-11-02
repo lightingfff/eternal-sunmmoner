@@ -14,8 +14,11 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun CourierMissionHud(objective:String,status:String,hp:Int,maxHp:Int,progress:Float,
   protecting:Boolean,onProtect:()->Unit,onIntercept:()->Unit,modifier:Modifier=Modifier,
-  interceptAvailable:Boolean=true,compact:Boolean=false,intercepting:Boolean = !protecting) {
+  interceptAvailable:Boolean=true,compact:Boolean=false,intercepting:Boolean = !protecting,
+  choiceAvailable:Boolean=false,onSupport:()->Unit={},onRecoverSupplies:()->Unit={},
+  suppliesPending:Boolean=false,onGoToSupplies:()->Unit={}) {
   Surface(modifier.testTag("courier_mission_hud"),color=Color(0xEB14212A),shape=RoundedCornerShape(10.dp)) {
+    Column {
     if(compact) {
       Row(Modifier.padding(horizontal=6.dp),horizontalArrangement=Arrangement.spacedBy(6.dp),
         verticalAlignment=androidx.compose.ui.Alignment.CenterVertically) {
@@ -46,6 +49,26 @@ fun CourierMissionHud(objective:String,status:String,hp:Int,maxHp:Int,progress:F
     }
     LinearProgressIndicator(progress={ (hp.toFloat()/maxHp.coerceAtLeast(1)).coerceIn(0f,1f) },
       modifier=Modifier.align(androidx.compose.ui.Alignment.BottomCenter).fillMaxWidth().height(2.dp),color=Color(0xFF8AB99D))
+    }
+    }
+    if (choiceAvailable) {
+      Text("Chọn ưu tiên • Lựa chọn giữ nguyên đến hết nhiệm vụ",
+        modifier=Modifier.padding(horizontal=9.dp), style=MaterialTheme.typography.labelSmall,
+        color=Color(0xFFE4CE9B))
+      Row(Modifier.padding(horizontal=6.dp),horizontalArrangement=Arrangement.spacedBy(6.dp)) {
+        OutlinedButton(onClick=onSupport,modifier=Modifier.weight(1f).testTag("courier_support_choice")) {
+          Text("Hỗ trợ • +60 HP\n+20 Mana khi cứu (lần đầu)",style=MaterialTheme.typography.labelSmall)
+        }
+        OutlinedButton(onClick=onRecoverSupplies,modifier=Modifier.weight(1f).testTag("courier_supplies_choice")) {
+          Text("Lấy tiếp vận • Cần đứng cạnh 3s\n+60 Vàng khi cứu (lần đầu)",style=MaterialTheme.typography.labelSmall)
+        }
+      }
+    }
+    if (suppliesPending) {
+      OutlinedButton(onClick=onGoToSupplies,
+        modifier=Modifier.padding(horizontal=6.dp).fillMaxWidth().testTag("courier_supply_target")) {
+        Text("Tới kiện tiếp vận • Giữ Anh hùng cạnh kiện 3 giây",style=MaterialTheme.typography.labelSmall)
+      }
     }
     }
   }

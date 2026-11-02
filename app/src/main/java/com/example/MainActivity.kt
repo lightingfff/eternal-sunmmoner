@@ -357,6 +357,7 @@ fun EternalSummonerRootApp() {
           settings = gameSettings,
           onFinishExpedition = { victory, fallen -> vm.finishTowerExpedition(victory, fallen) },
           onReturnToSanctuary = vm::returnToSanctuaryLobby,
+          onPrepareRetry = vm::retryTowerExpedition,
           onFinishExpeditionDetailed = vm::finishTowerExpedition,
         )
       }

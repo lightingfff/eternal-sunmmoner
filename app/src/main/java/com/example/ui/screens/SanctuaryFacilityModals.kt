@@ -903,6 +903,12 @@ private fun SynthesisLabContent(
         if (LostCourierProgression.FLAG_RESCUED in profile.storyFlags) {
           Text("Ân tình người đưa thư: giảm vĩnh viễn 25% phí Vàng chế tác.", style = MaterialTheme.typography.labelSmall, color = EmeraldVitality)
         }
+        if (LostCourierProgression.FLAG_SUPPORTED in profile.storyFlags) {
+          Text("Ký ức đồng đội: Master đã ưu tiên băng bó người đưa thư trên đường về.", style = MaterialTheme.typography.labelSmall, color = RuneSilver)
+        }
+        if (LostCourierProgression.FLAG_SUPPLIES_RECOVERED in profile.storyFlags) {
+          Text("Tiếp vận đã về: người đưa thư ghi công đội đã mang túi hàng qua vòng vây.", style = MaterialTheme.typography.labelSmall, color = RuneSilver)
+        }
         if (!canSynthesize) {
           Spacer(modifier = Modifier.height(4.dp))
           Text(
