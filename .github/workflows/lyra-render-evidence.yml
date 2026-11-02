@@ -100,8 +100,15 @@ jobs:
       - name: Verify P22 vegetation asset and geometry contract
         run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeP22ContractTest" --stacktrace
 
-      - name: Run full unit test suite (:app:testDebugUnitTest)
-        run: gradle :app:testDebugUnitTest --stacktrace
+      - name: Verify Sanctuary environment art, materials, layout, and performance regressions
+        run: >-
+          gradle :app:testDebugUnitTest
+          --tests "com.example.SanctuaryMaterialTest"
+          --tests "com.example.SanctuaryEnvironmentArtTest"
+          --tests "com.example.ui.LayoutResponsivenessRobolectricTest"
+          --tests "com.example.performance.ScenePerformanceTest"
+          --tests "com.example.LivingWorldTest"
+          --stacktrace
 
       # P19: training field / gravel band / cobble joints, fixed cameras for before/after.
       - name: Render terrain slice (real draw code, Robolectric native graphics)
