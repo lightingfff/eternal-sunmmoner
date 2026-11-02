@@ -70,6 +70,10 @@ GATE = dict(mortar="#1b2129", dk="#28303a", base="#333c47", lt="#414c59", hi="#5
             rim="#6f7f8e", foot="#232a32")
 PLAS = dict(mortar="#2c3339", dk="#343c43", base="#3d454c", lt="#4a535b", hi="#5b646c",
             rim="#6d767e", foot="#2f363c")
+# perimeter masonry: darker and bluer than the buildings, so the fortress wall reads as the
+# boundary of the world rather than another house
+WALLSTONE = dict(mortar="#1a222a", dk="#28323b", base="#333f49", lt="#404d58", hi="#4e5d69",
+                 rim="#66757f", foot="#232c34")
 SLATE = dict(dk="#28313a", base="#333f49", lt="#3f4c57", hi="#4c5a66", ridge="#5f6d79")
 SHING = dict(dk="#241811", base="#33241a", lt="#402e21", hi="#513a28", ridge="#66482f")
 THATCH = dict(dk="#2a2418", base="#3a3222", lt="#4a402c", hi="#5b4f36", ridge="#6d603f")
@@ -1190,13 +1194,13 @@ def build_synthesis_lab() -> Canvas:
         c_.hline(xa + 1, xb - 1, sill_ - 10, "#b98a54")
         c_.rect(xa + 3, sill_ - 9, xa + 5, sill_ - 1, OAK["dk"])
         c_.rect(xb - 6, sill_ - 9, xb - 4, sill_ - 1, OAK["dk"])
-        c_.rect(cx_ - 4, sill_ - 18, cx_ + 4, sill_ - 13, "#3d5b63")
-        c_.ellipse(cx_, sill_ - 18, 4, 3, TEAL["base"])
-        c_.px(cx_ - 1, sill_ - 19, TEAL["core"])
+        c_.rect(cx_ - 4, sill_ - 18, cx_ + 4, sill_ - 13, "#2b4148")
+        c_.ellipse(cx_, sill_ - 18, 4, 3, TEAL["dim"])
+        c_.px(cx_ - 1, sill_ - 19, TEAL["base"])
 
     niche(c, cx=62, sill=sill, w=42, h=30, mat=STONE, counter=True, contents=bench)
     # plastered teal glow behind the bay
-    c.blend_rect(45, sill - 24, 79, sill - 6, TEAL["deep"], 0.30)
+    c.blend_rect(45, sill - 24, 79, sill - 6, TEAL["deep"], 0.16)
     window(c, 24, 122, 12, 14, glow=TEAL, lit=1.2, pad=2)
     window(c, 96, 124, 11, 13, glow=TEAL, lit=0.0, pad=2)
     window(c, 140, 126, 11, 13, glow=TEAL, lit=1.1, pad=2)
@@ -1870,11 +1874,15 @@ BUILDERS = {
     "townhouse_b": (lambda: build_townhouse(1), 144, 160, SANCT),
     "cottage_brown": (lambda: build_cottage(False), 132, 144, SANCT),
     "cottage_slate": (lambda: build_cottage(True), 132, 144, SANCT),
+    # Perimeter towers belong to the WALL family (dark slate-blue), not the temple family: the
+    # first engine pass painted them in pale LIME and they read as bleached white towers standing
+    # in front of the dark curtain wall. This is the same stone as `tower_gate`, one step up.
     "fortress_tower": (lambda: cylindrical_tower(80, 118, shaft_top=24, shaft_bot=118, half_w=30,
-                                                 seed=3400, mat=LIME, merlon_h=9),
+                                                 seed=3400, mat=WALLSTONE, merlon_h=9),
                        80, 118, SANCT),
     "gate_tower": (lambda: cylindrical_tower(96, 136, shaft_top=26, shaft_bot=136, half_w=38,
-                                             seed=3500, mat=LIME, merlon_h=11, gatehouse=True),
+                                             seed=3500, mat=WALLSTONE, merlon_h=11,
+                                             gatehouse=True),
                    96, 136, SANCT),
 }
 

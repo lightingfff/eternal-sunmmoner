@@ -547,12 +547,12 @@ def build_training_dummy() -> Canvas:
     c.rect(cx - 4, 20, cx + 4, base - 6, OAK["base"])
     c.vline(cx - 4, 20, base - 6, OAK["lt"])
     c.vline(cx + 4, 20, base - 6, OAK["dk"])
-    c.rect(cx - 8, 14, cx + 8, 36, "#8a7440")            # straw body
-    c.rect(cx - 7, 15, cx + 7, 35, "#a08a4c")
-    c.rect(cx - 7, 15, cx + 2, 35, "#bda659")            # lit left third
+    c.rect(cx - 8, 14, cx + 8, 36, "#5f5230")            # straw body (P19 sand value range)
+    c.rect(cx - 7, 15, cx + 7, 35, "#726237")
+    c.rect(cx - 7, 15, cx + 2, 35, "#877445")            # lit left third
     for ry in (17, 23, 29, 34):
-        c.hline(cx - 8, cx + 8, ry, "#5c4b22")           # rope bindings
-        c.hline(cx - 8, cx + 8, ry + 1, "#c9b068")
+        c.hline(cx - 8, cx + 8, ry, "#41361b")           # rope bindings
+        c.hline(cx - 8, cx + 8, ry + 1, "#8e7c4b")
     c.rect(cx - 8, 22, cx + 8, 23, "#3d3016")            # iron bands
     c.rect(cx - 8, 31, cx + 8, 32, "#3d3016")
     c.hline(cx - 8, cx + 8, 22, "#6b5a2c")
@@ -564,9 +564,9 @@ def build_training_dummy() -> Canvas:
         c.rect(ex, 18, ex + 3, 26, OAK["dk"])
         c.hline(ex, ex + 3, 18, OAK["base"])
     # ---- head knob + painted target ring ------------------------------------------------
-    c.rect(cx - 5, 6, cx + 5, 14, "#8a7440")
-    c.rect(cx - 4, 7, cx + 4, 13, "#bda659")
-    c.hline(cx - 5, cx + 5, 6, "#cbb673")
+    c.rect(cx - 5, 6, cx + 5, 14, "#5f5230")
+    c.rect(cx - 4, 7, cx + 4, 13, "#877445")
+    c.hline(cx - 5, cx + 5, 6, "#9c8a55")
     c.ellipse(cx, 25, 3, 2, "#8f2f2f")
     c.ellipse(cx, 25, 1, 1, "#d9b0b0")
     for x in range(cx - 17, cx + 18):

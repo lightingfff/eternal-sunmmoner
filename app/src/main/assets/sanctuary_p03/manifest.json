@@ -772,7 +772,7 @@
         117
       ],
       "runtime_usage": "P23 Sanctuary background building; bottom-centred drawCrispSprite at 2x scale",
-      "sha256": "33dc2bdd878b5437450033a25ffc90bcba15325e13dcde7c99066eab524a4a8b"
+      "sha256": "a089f113d589579c24371bdadbd022def9df0ef74aa30e3ea954fbc8663968d6"
     },
     {
       "id": "gate_tower",
@@ -786,7 +786,7 @@
         135
       ],
       "runtime_usage": "P23 Sanctuary background building; bottom-centred drawCrispSprite at 2x scale",
-      "sha256": "fccc1a9f106c8a84945a14342491b47c8edc0a18e93bdcf50fbb380ee55b3136"
+      "sha256": "ac723448d8816d6ce01faa49ec63e0b627d048a7074a9255bcd2443e9747a570"
     },
     {
       "id": "flower_planter",
@@ -912,7 +912,7 @@
         57
       ],
       "runtime_usage": "P23 environmental prop; PNG-first via SanctuaryArtAssets.assetSafe",
-      "sha256": "44a0c54163faa3cfe55fce2774dc8e6637fdaa0a365651c5fbfa09ea7811973d"
+      "sha256": "07e8bd06a24a42b11f8cab991cce875830090f2e8add78470114702942b3eeac"
     },
     {
       "id": "weapon_rack",
