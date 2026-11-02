@@ -72,6 +72,7 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -140,8 +141,48 @@ private sealed interface BattleDrawable {
     override val sortY: Float get() = unit.y
   }
 
+  data class Courier(val mission: com.example.game.combat.LostCourierEncounter) : BattleDrawable {
+    override val sortY: Float get() = mission.courier.y
+  }
+
   data class Enemy(val unit: EnemyCombatUnit) : BattleDrawable {
     override val sortY: Float get() = unit.y
+  }
+}
+
+/** Cache wrappers/static ordering; merge a small in-place sorted moving set without per-frame list copies. */
+private class BattleDrawQueue {
+  private var sourceProps: List<WorldObstacle>? = null
+  private var chestOpened = false
+  private var props: List<BattleDrawable.Prop> = emptyList()
+  private val heroWrappers = HashMap<String,BattleDrawable.Hero>()
+  private val enemyWrappers = HashMap<String,BattleDrawable.Enemy>()
+  private val moving = ArrayList<BattleDrawable>()
+  private val result = ArrayList<BattleDrawable>()
+  fun ordered(engine:TowerCombatEngine, extra:BattleDrawable? = null):List<BattleDrawable> {
+    val obstacles=engine.mapLayout.obstacles
+    val opened=engine.isDiscoveryClaimed("f1_discovery_chest_north")
+    if(sourceProps!==obstacles || opened!=chestOpened) {
+      sourceProps=obstacles;chestOpened=opened
+      props=obstacles.map { obs -> BattleDrawable.Prop(
+        if(opened && obs.id=="f1_discovery_chest_north") obs.copy(propKind=PropKind.TREASURE_CHEST_OPEN) else obs)
+      }.sortedBy { it.sortY }
+    }
+    moving.clear()
+    engine.heroes.forEach { if(!it.knockedOut) moving.add(heroWrappers.getOrPut(it.id){ BattleDrawable.Hero(it) }) }
+    engine.enemies.forEach { if(!it.dead || it.deathAnimProgress<1f) moving.add(enemyWrappers.getOrPut(it.id){ BattleDrawable.Enemy(it) }) }
+    if(extra!=null) moving.add(extra)
+    for(i in 1 until moving.size) {
+      val item=moving[i];var j=i-1
+      while(j>=0 && moving[j].sortY>item.sortY) { moving[j+1]=moving[j];j-- }
+      moving[j+1]=item
+    }
+    result.clear();var p=0;var a=0
+    while(p<props.size || a<moving.size) {
+      if(a==moving.size || (p<props.size && props[p].sortY<=moving[a].sortY)) result.add(props[p++])
+      else result.add(moving[a++])
+    }
+    return result
   }
 }
 
@@ -151,7 +192,8 @@ fun TowerBattleScreen(
   onFinishExpedition: (Boolean, Set<String>) -> Unit,
   onReturnToSanctuary: () -> Unit,
   settings: GameSettings = GameSettings(),
-  onFinishExpeditionDetailed: ((Boolean, Set<String>, Boolean, Long, Long, Set<String>) -> Unit)? = null,
+  sceneActive: Boolean = true,
+  onFinishExpeditionDetailed: ((Boolean, Set<String>, Boolean, Long, Long, Set<String>, com.example.data.model.CourierOutcome?, String?) -> Unit)? = null,
 ) {
   val nowSec = remember { System.currentTimeMillis() / 1000L }
   val feastBuffActive = remember(state.profile?.storyFlags) {
@@ -172,15 +214,25 @@ fun TowerBattleScreen(
       equipment = state.equipment,
       feastBuffActive = feastBuffActive,
       activeMealRecipe = activeMealRecipe,
+      enableLostCourier = state.selectedFloor.floorNumber == 1,
     )
   }
 
+  val courierDrawable = remember(combatEngine) { combatEngine.lostCourier?.let { BattleDrawable.Courier(it) } }
+  val depthQueue = remember(combatEngine) { BattleDrawQueue() }
+
   val introBeats = remember(state.selectedFloor.floorNumber) {
-    ManhwaStoryData.floorIntroBeats(state.selectedFloor.floorNumber)
+    if(state.selectedFloor.floorNumber==1) listOf(
+      com.example.game.story.DialogueBeat("Người đưa tin", "Người đưa tin thất lạc", "Bị thương", com.example.data.model.HeroClassType.PRIEST,
+        "Tôi phải đưa thư về cổng an toàn… Xin Master cho tôi đi cùng!"),
+      com.example.game.story.DialogueBeat("Kaelen", "Khiên thép tiền phong", "Cảnh giác", com.example.data.model.HeroClassType.KNIGHT,
+        "Đưa đội tới gần người đưa tin để bắt đầu hộ tống. Bảo vệ giúp anh ấy sống sót; chặn trinh sát trước khi nó gọi viện binh!")
+    ) else ManhwaStoryData.floorIntroBeats(state.selectedFloor.floorNumber)
   }
   var introIndex by remember { mutableIntStateOf(0) }
   var showRetreatConfirm by remember { mutableStateOf(false) }
   var settlementDispatched by remember { mutableStateOf(false) }
+  var introDismissed by remember(combatEngine) { mutableStateOf(false) }
 
   val textMeasurer = rememberTextMeasurer()
   val focusRequester = remember { FocusRequester() }
@@ -196,6 +248,17 @@ fun TowerBattleScreen(
   var camOffsetY by remember { mutableFloatStateOf(0f) }
   var frameTick by remember { mutableIntStateOf(0) }
   var animTimeSec by remember { mutableFloatStateOf(0f) }
+  var hudRevision by remember { mutableIntStateOf(0) }
+  var topHudHeightPx by remember { mutableIntStateOf(0) }
+  val hudElapsed = remember { floatArrayOf(0f) }
+  val visibleDrawables = remember { intArrayOf(0) }
+  val lastProbeSample = remember { longArrayOf(0L) }
+  val fixedSimulation = remember(combatEngine) { com.example.performance.FixedSceneSimulation() }
+  val performanceProbe = remember(settings.performanceOverlay,settings.performanceMode) {
+    com.example.performance.ScenePerformanceProbe(settings.performanceOverlay,settings.performanceMode.targetFps)
+  }
+  var performanceSnapshot by remember { mutableStateOf<com.example.performance.ScenePerformanceSnapshot?>(null) }
+
 
   LaunchedEffect(settings.defaultZoom) {
     zoom = settings.defaultZoom
@@ -209,48 +272,55 @@ fun TowerBattleScreen(
     }
   }
 
-  LaunchedEffect(combatEngine) {
-    focusRequester.requestFocus()
-    var lastNanos = 0L
-    while (true) {
-      withFrameNanos { nanos ->
-        val dt = if (lastNanos == 0L) 0.016f else ((nanos - lastNanos) / 1_000_000_000f).coerceIn(0.001f, 0.05f)
-        lastNanos = nanos
-        animTimeSec += dt
-
-        if (!showRetreatConfirm) {
-          val kDx = (if (keyRight) 1f else 0f) - (if (keyLeft) 1f else 0f)
-          val kDy = (if (keyDown) 1f else 0f) - (if (keyUp) 1f else 0f)
-          val dx = if (abs(joyDx) > 0.05f) joyDx else kDx
-          val dy = if (abs(joyDy) > 0.05f) joyDy else kDy
-          if (abs(dx) > 0.05f || abs(dy) > 0.05f) {
-            camOffsetX *= 0.88f
-            camOffsetY *= 0.88f
-          }
-          combatEngine.step(dt, dx, dy)
-        }
-        frameTick++
-
-        if (!settlementDispatched &&
-          (combatEngine.stage == MissionStage.VICTORY || combatEngine.stage == MissionStage.DEFEAT)
-        ) {
-          settlementDispatched = true
-          if (onFinishExpeditionDetailed != null) {
-            onFinishExpeditionDetailed(
-              combatEngine.stage == MissionStage.VICTORY,
-              combatEngine.fallenHeroIds(),
-              combatEngine.retreatCompleted,
-              combatEngine.bonusDiscoveryGold,
-              combatEngine.bonusDiscoveryMana,
-              combatEngine.discoveredNodeIds(),
-            )
-          } else {
-            onFinishExpedition(
-              combatEngine.stage == MissionStage.VICTORY,
-              combatEngine.fallenHeroIds(),
-            )
-          }
-        }
+  // Terminal states reached from UI commands must settle even though their frame loop is paused.
+  LaunchedEffect(combatEngine.stage) {
+    if(!settlementDispatched && (combatEngine.stage==MissionStage.VICTORY || combatEngine.stage==MissionStage.DEFEAT)) {
+      settlementDispatched=true
+      if(onFinishExpeditionDetailed!=null) onFinishExpeditionDetailed(
+        combatEngine.stage==MissionStage.VICTORY,combatEngine.fallenHeroIds(),combatEngine.retreatCompleted,
+        combatEngine.bonusDiscoveryGold,combatEngine.bonusDiscoveryMana,combatEngine.discoveredNodeIds(),
+        combatEngine.lostCourier?.outcome,combatEngine.lostCourier?.frightenedHeroId)
+      else onFinishExpedition(combatEngine.stage==MissionStage.VICTORY,combatEngine.fallenHeroIds())
+    }
+  }
+  LaunchedEffect(combatEngine) { focusRequester.requestFocus() }
+  com.example.performance.SceneFrameLoop(
+    // Engine stage is plain simulation state. Explicit Compose state must restart/cancel
+    // this effect outside the independently recomposing HUD subcomposition.
+    active = sceneActive && !showRetreatConfirm && introDismissed && !settlementDispatched,
+    targetFps = settings.performanceMode.targetFps,
+  ) { elapsed, nanos ->
+    if (elapsed == 0f) { performanceProbe.reset(); fixedSimulation.reset(); lastProbeSample[0] = nanos }
+    val dt = elapsed.coerceIn(0f,.10f) // Bound catch-up after a foreground stall; background time is excluded.
+    val started = if(settings.performanceOverlay) System.nanoTime() else 0L
+    animTimeSec += dt
+    val kDx = (if(keyRight) 1f else 0f) - (if(keyLeft) 1f else 0f)
+    val kDy = (if(keyDown) 1f else 0f) - (if(keyUp) 1f else 0f)
+    val dx = if(abs(joyDx)>.05f) joyDx else kDx
+    val dy = if(abs(joyDy)>.05f) joyDy else kDy
+    if(abs(dx)>.05f || abs(dy)>.05f) {
+      val decay = Math.pow(.88, (dt*60f).toDouble()).toFloat()
+      camOffsetX *= decay;camOffsetY *= decay
+    }
+    fixedSimulation.advance(dt) { step -> combatEngine.step(step,dx,dy) }
+    frameTick++
+    hudElapsed[0] += dt
+    val finished = combatEngine.stage == MissionStage.VICTORY || combatEngine.stage == MissionStage.DEFEAT
+    if (hudElapsed[0]>=.25f || finished) { hudElapsed[0]=0f;hudRevision++ }
+    if(!settlementDispatched && finished) {
+      settlementDispatched = true
+      if(onFinishExpeditionDetailed!=null) onFinishExpeditionDetailed(
+        combatEngine.stage==MissionStage.VICTORY,combatEngine.fallenHeroIds(),combatEngine.retreatCompleted,
+        combatEngine.bonusDiscoveryGold,combatEngine.bonusDiscoveryMana,combatEngine.discoveredNodeIds(),
+        combatEngine.lostCourier?.outcome,combatEngine.lostCourier?.frightenedHeroId)
+      else onFinishExpedition(combatEngine.stage==MissionStage.VICTORY,combatEngine.fallenHeroIds())
+    }
+    if(settings.performanceOverlay) {
+      performanceProbe.recordFrame(nanos,System.nanoTime()-started)
+      if(nanos-lastProbeSample[0]>=1_000_000_000L) {
+        performanceProbe.poll(nanos,combatEngine.heroes.count{!it.knockedOut},combatEngine.enemies.count{!it.dead},
+          visibleDrawables[0],com.example.game.pixel.SanctuaryArtAssets.cachedBitmapBytes)?.let { performanceSnapshot=it }
+        lastProbeSample[0]=nanos
       }
     }
   }
@@ -285,15 +355,29 @@ fun TowerBattleScreen(
 
     fun computeBattleCam(viewportHalfW: Float, viewportHalfH: Float): Pair<Float, Float> {
       val layout = combatEngine.mapLayout
+      var focusX = combatEngine.masterX
+      var focusY = combatEngine.masterY
+      combatEngine.lostCourier?.let { mission ->
+        // The external command sigil can remain behind while Protect escorts the NPC.
+        // Keep that actual moving party visible, retaining the same projection/pan/zoom.
+        var squadX = 0f
+        var squadY = 0f
+        var living = 0
+        for (hero in combatEngine.heroes) if (!hero.knockedOut) {
+          squadX += hero.x; squadY += hero.y; living++
+        }
+        focusX = if (living > 0) mission.courier.x * .4f + squadX / living * .6f else mission.courier.x
+        focusY = if (living > 0) mission.courier.y * .4f + squadY / living * .6f else mission.courier.y
+      }
       val cx = ObliqueCamera.clampCamX(
-        desiredCamX = combatEngine.masterX + camOffsetX,
+        desiredCamX = focusX + camOffsetX,
         worldWidth = layout.width,
         wallMargin = layout.wallMargin,
         zoom = zoom,
         viewportHalfW = viewportHalfW,
       )
       val cy = ObliqueCamera.clampCamY(
-        desiredCamY = combatEngine.masterY - 45f + camOffsetY,
+        desiredCamY = focusY - 45f + camOffsetY,
         worldHeight = layout.height,
         wallMargin = layout.wallMargin,
         zoom = zoom,
@@ -331,6 +415,8 @@ fun TowerBattleScreen(
         },
     ) {
       val tickRead = frameTick
+      val drawStarted = if(settings.performanceOverlay) System.nanoTime() else 0L
+      visibleDrawables[0] = 0
       if (tickRead < 0) return@Canvas
 
       val halfW = size.width / 2f
@@ -438,27 +524,47 @@ fun TowerBattleScreen(
       }
 
       // Y-Sorted 3/4 Props + Autonomous Heroes + Living Monsters
-      val drawables = buildList {
-        layout.obstacles.forEach { obs ->
-          val resolvedObs = if (obs.id == "f1_discovery_chest_north" && combatEngine.isDiscoveryClaimed(obs.id)) {
-            obs.copy(propKind = PropKind.TREASURE_CHEST_OPEN)
-          } else {
-            obs
-          }
-          add(BattleDrawable.Prop(resolvedObs))
-        }
-        combatEngine.heroes.filter { !it.knockedOut }.forEach { add(BattleDrawable.Hero(it)) }
-        combatEngine.enemies.filter { !it.dead || it.deathAnimProgress < 1f }.forEach { add(BattleDrawable.Enemy(it)) }
-      }.sortedBy { it.sortY }
+      val drawables = depthQueue.ordered(combatEngine,courierDrawable)
 
       with(com.example.game.pixel.SanctuaryEnvironmentShadows) {
         drawGroundShadows(layout.obstacles,camX,camY,zoom,clipToIsland=false,
           groundWidth=layout.width,groundHeight=layout.height)
       }
+      combatEngine.lostCourier?.let { mission ->
+        with(com.example.game.pixel.CourierPresentation) {
+          mission.eliteTelegraph?.let { cue ->
+            drawEliteTelegraph(cue.x,cue.y,cue.radius,cue.remainingSec/cue.durationSec,camX,camY,zoom)
+          }
+          if(mission.scoutWarningRemaining>0f && !mission.scoutCalledReinforcements) {
+            combatEngine.enemies.firstOrNull { !it.dead && it.id==mission.scoutEnemyId }?.let { scout ->
+              drawScoutAlert(scout.x,scout.y,camX,camY,zoom)
+            }
+          }
+        }
+      }
+      if(settings.performanceOverlay) visibleDrawables[0] = drawables.count { item ->
+        val (x,y) = when(item) {
+          is BattleDrawable.Prop -> item.obs.x to item.obs.y
+          is BattleDrawable.Hero -> item.unit.x to item.unit.y
+          is BattleDrawable.Enemy -> item.unit.x to item.unit.y
+          is BattleDrawable.Master -> item.x to item.y
+          is BattleDrawable.Courier -> item.mission.courier.x to item.mission.courier.y
+        }
+        val sx=ObliqueCamera.worldToScreenX(x,camX,zoom,halfW)
+        val sy=ObliqueCamera.worldToScreenY(y,camY,zoom,halfH)
+        sx>=-380f && sx<=size.width+380f && sy>=-400f && sy<=size.height+380f
+      }
       drawables.forEach { item ->
         when (item) {
           is BattleDrawable.Prop -> drawProp(item.obs, camX, camY, zoom, animTimeSec,renderShadow=null)
-          is BattleDrawable.Master -> Unit // Rendered above as Ground Tactical Command Sigil
+          is BattleDrawable.Master -> Unit // External commander, no controllable avatar.
+          is BattleDrawable.Courier -> {
+            val npc=item.mission.courier
+            with(com.example.game.pixel.CourierPresentation) {
+              drawCourier(npc.x,npc.y,camX,camY,zoom,npc.isMoving,npc.facingRight,npc.hurtFlash,npc.hp,npc.maxHp,animTimeSec)
+            }
+            drawActorCanopyOcclusion(layout.obstacles,npc.x,npc.y,camX,camY,zoom,animTimeSec)
+          }
           is BattleDrawable.Hero -> {
             val h = item.unit
             val aura = when {
@@ -486,7 +592,7 @@ fun TowerBattleScreen(
               skillAnimation = h.premiumSample && h.contactAttack.skill,
               emotion = when {
                 combatEngine.stage == MissionStage.VICTORY -> "victory"
-                combatEngine.activeOrder == TacticalOrder.RETREAT || h.hp < h.maxHp*.25f -> "fear"
+                h.fearSecondsRemaining > 0f || combatEngine.activeOrder == TacticalOrder.RETREAT || h.hp < h.maxHp*.25f -> "fear"
                 h.currentTargetId != null -> "alert"
                 else -> "calm"
               },
@@ -537,7 +643,8 @@ fun TowerBattleScreen(
       }
 
       // Overhead 3/4 Hero Labels + Live Observable AI Intent Tag & Boss Nameplate (Exact Rect non-overlap!)
-      val topHudSafePx = (if (isWideScreen) 64.dp else 112.dp).toPx()
+      val topHudSafePx = if (topHudHeightPx > 0) topHudHeightPx.toFloat()
+        else (if (isWideScreen) 64.dp else 112.dp).toPx()
       val placedHeroPillRects = mutableListOf<androidx.compose.ui.geometry.Rect>()
       combatEngine.heroes.filter { !it.knockedOut }.forEach { h ->
         val hx = ObliqueCamera.worldToScreenX(h.x, camX, zoom, halfW)
@@ -637,10 +744,13 @@ fun TowerBattleScreen(
       }
 
       drawForegroundAtmosphere(layout.biome, animTimeSec, settings.particlesEnabled)
+      if(settings.performanceOverlay) performanceProbe.recordDraw(System.nanoTime()-drawStarted)
     }
 
+    if(settings.performanceOverlay) com.example.performance.ScenePerformanceOverlay(performanceSnapshot,
+      Modifier.align(Alignment.CenterEnd).padding(8.dp))
     // 2. Slim, Responsive Top Tactical HUD (Never covers the battlefield or collides with Joystick!)
-    val hudTick = frameTick
+    val hudTick = hudRevision
     if (hudTick >= 0) {
       val remainingEnemies = combatEngine.enemies.count { !it.dead }
       val focusedEnemy = combatEngine.enemies.firstOrNull { !it.dead && it.id == combatEngine.designatedTargetId }
@@ -651,6 +761,7 @@ fun TowerBattleScreen(
           .fillMaxWidth()
           .statusBarsPadding()
           .padding(horizontal = 10.dp, vertical = 6.dp)
+          .onSizeChanged { topHudHeightPx = it.height }
           .testTag("tower_battle_top_hud"),
         verticalArrangement = Arrangement.spacedBy(5.dp),
       ) {
@@ -769,6 +880,28 @@ fun TowerBattleScreen(
               tint = WarningAmber,
             )
           }
+        }
+
+        combatEngine.lostCourier?.let { mission ->
+          val missionHint=buildString {
+            if(mission.scoutWarningRemaining>0f && !mission.scoutCalledReinforcements)
+              append("Trinh sát gọi viện sau ${kotlin.math.ceil(mission.scoutWarningRemaining).toInt()}s. ")
+            mission.eliteTelegraph?.let { append("Né vòng đỏ! ${String.format(java.util.Locale.US,"%.1f",it.remainingSec)}s. ") }
+            combatEngine.heroes.firstOrNull { it.fearSecondsRemaining>0f }?.let {
+              append("${it.name}: Sợ ${kotlin.math.ceil(it.fearSecondsRemaining).toInt()}s (-20% lực đánh/-15% tốc độ). ")
+            }
+            append(mission.statusVi)
+          }
+          com.example.ui.components.CourierMissionHud(mission.objectiveVi,missionHint,
+            mission.courier.hp,mission.courier.maxHp,mission.progress,
+            combatEngine.activeOrder == TacticalOrder.PROTECT_ALLY,
+            onProtect={combatEngine.chooseCourierOrder(com.example.game.combat.CourierOrder.PROTECT);hudRevision++},
+            onIntercept={combatEngine.chooseCourierOrder(com.example.game.combat.CourierOrder.INTERCEPT);hudRevision++},
+            modifier=Modifier.fillMaxWidth(),
+            interceptAvailable=combatEngine.enemies.any { !it.dead && it.id==mission.scoutEnemyId },
+            compact=isWideScreen,
+            intercepting=combatEngine.activeOrder==TacticalOrder.ATTACK_TARGET &&
+              combatEngine.designatedTargetId==mission.scoutEnemyId)
         }
 
         // Narrow Portrait: Place Squad Skill Strip cleanly on a slim horizontal row!
@@ -1043,6 +1176,8 @@ fun TowerBattleScreen(
                     introIndex++
                   } else {
                     combatEngine.stage = MissionStage.IN_PROGRESS
+                    introDismissed = true
+                    hudRevision++
                   }
                 },
                 modifier = Modifier.heightIn(min = 48.dp).testTag("start_combat_button"),
@@ -1195,7 +1330,7 @@ fun TowerBattleScreen(
                 CircularProgressIndicator(color = SummonerGold, modifier = Modifier.size(22.dp))
                 if(!state.isBusyAction && state.bannerFeedback != null) {
                   Button(onClick={
-                    if(onFinishExpeditionDetailed!=null) onFinishExpeditionDetailed(isWin,combatEngine.fallenHeroIds(),combatEngine.retreatCompleted,combatEngine.bonusDiscoveryGold,combatEngine.bonusDiscoveryMana,combatEngine.discoveredNodeIds())
+                    if(onFinishExpeditionDetailed!=null) onFinishExpeditionDetailed(isWin,combatEngine.fallenHeroIds(),combatEngine.retreatCompleted,combatEngine.bonusDiscoveryGold,combatEngine.bonusDiscoveryMana,combatEngine.discoveredNodeIds(),combatEngine.lostCourier?.outcome,combatEngine.lostCourier?.frightenedHeroId)
                     else onFinishExpedition(isWin,combatEngine.fallenHeroIds())
                   },modifier=Modifier.testTag("retry_settlement_button")) { Text("Thử lưu lại") }
                 }
@@ -1230,6 +1365,12 @@ fun TowerBattleScreen(
                       style = MaterialTheme.typography.labelLarge,
                       color = ArcaneViolet,
                     )
+                  }
+                  if(settlement.courierOutcome!=null) {
+                    Text(if(settlement.courierOutcome==com.example.data.model.CourierOutcome.RESCUED)
+                      "Đã cứu người đưa tin. Dịch vụ lò rèn: phí chế tạo còn 90 vàng. Ký ức đồng đội đã lưu."
+                      else "Người đưa tin chưa tới cổng. Có thể trở lại Tầng 1 để thử hộ tống lần nữa.",
+                      color=PortalCyan,style=MaterialTheme.typography.bodySmall)
                   }
                   if (settlement.leveledUpHeroNames.isNotEmpty()) {
                     Text(

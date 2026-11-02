@@ -1,6 +1,8 @@
 package com.example.data.firebase
 
 import com.example.base.FirestoreEmulatorTestBase
+import com.example.data.LostCourierProgression
+import com.example.data.model.CourierOutcome
 import com.google.firebase.firestore.FirebaseFirestoreException
 import java.util.UUID
 import kotlinx.coroutines.flow.first
@@ -13,6 +15,33 @@ import org.junit.Assert.fail
 import org.junit.Test
 
 class SummonerRepositoryRuleTest : FirestoreEmulatorTestBase() {
+
+  @Test
+  fun courierRescue_staleProfileReplay_grantsOneMemoryAndPermanentService() = runBlocking {
+    val uid = signInTestUser("courier_${UUID.randomUUID().toString().take(8)}@test.com")
+    val repo = SummonerRepository(firestore, auth)
+    withTimeout(DEFAULT_TIMEOUT_MS) { repo.bootstrapMasterIfNeeded("Courier Master") }
+    val profile = checkNotNull(withTimeout(FLOW_TIMEOUT_MS) { repo.observeMasterProfile(uid).first { it != null } })
+    val heroes = withTimeout(FLOW_TIMEOUT_MS) { repo.observeHeroes(uid).first { it.size == 3 } }
+    val first = withTimeout(DEFAULT_TIMEOUT_MS) {
+      repo.settleExpedition(profile, heroes, emptySet(), 1, true,
+        courierOutcome = CourierOutcome.RESCUED, courierMemoryHeroId = heroes.first().id)
+    }
+    assertTrue(first.courierForgeUnlocked)
+    val replay = withTimeout(DEFAULT_TIMEOUT_MS) {
+      repo.settleExpedition(profile, heroes, emptySet(), 1, true,
+        courierOutcome = CourierOutcome.RESCUED, courierMemoryHeroId = heroes.last().id)
+    }
+    assertEquals(false, replay.courierForgeUnlocked)
+    val saved = checkNotNull(withTimeout(FLOW_TIMEOUT_MS) {
+      repo.observeMasterProfile(uid).first { it != null && LostCourierProgression.FLAG_RESCUED in it.storyFlags }
+    })
+    assertEquals(90L, LostCourierProgression.synthesisGoldCost(saved.storyFlags))
+    val savedHeroes = withTimeout(FLOW_TIMEOUT_MS) {
+      repo.observeHeroes(uid).first { roster -> roster.any { LostCourierProgression.hasRescueMemory(it.bondSummary) } }
+    }
+    assertEquals(1, savedHeroes.count { LostCourierProgression.hasRescueMemory(it.bondSummary) })
+  }
 
   @Test
   fun bootstrapAndObserve_authenticatedOwner_createsStarterSanctuaryAndHeroes() = runBlocking {

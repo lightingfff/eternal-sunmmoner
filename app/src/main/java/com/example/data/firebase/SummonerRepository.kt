@@ -4,9 +4,11 @@ import android.content.Context
 import com.example.R
 import com.example.data.FeastBuffHelper
 import com.example.data.GuestSaveSnapshot
+import com.example.data.LostCourierProgression
 import com.example.data.SanctuaryProgressionHelper
 import com.example.data.SummonerDataSource
 import com.example.data.model.EquipmentRecord
+import com.example.data.model.CourierOutcome
 import com.example.data.model.FacilityType
 import com.example.data.model.HeroClassType
 import com.example.data.model.HeroRecord
@@ -65,6 +67,9 @@ data class ExpeditionSettlementResult(
   val bonusDiscoveryGold: Long = 0L,
   val bonusDiscoveryMana: Long = 0L,
   val discoveredNodesCount: Int = 0,
+  val courierOutcome: CourierOutcome? = null,
+  val courierForgeUnlocked: Boolean = false,
+  val courierMemoryHeroName: String? = null,
 )
 
 class SummonerRepository(
@@ -630,13 +635,13 @@ class SummonerRepository(
     val uid = requireUserId()
     val oreCost = 3L
     val essenceCost = 2L
-    val goldCost = 120L
+    val goldCost = LostCourierProgression.synthesisGoldCost(profile.storyFlags)
     require(
       profile.ironOre >= oreCost &&
         profile.arcaneEssence >= essenceCost &&
         profile.gold >= goldCost
     ) {
-      "Cần 3 Quặng Sắt, 2 Tinh Hoa Cổ Ngữ và 120 Vàng để chế tác."
+      "Cần 3 Quặng Sắt, 2 Tinh Hoa Cổ Ngữ và $goldCost Vàng để chế tác."
     }
 
     val roll = Random.nextInt(100)
@@ -943,8 +948,64 @@ class SummonerRepository(
     bonusGold: Long,
     bonusMana: Long,
     discoveredNodeIds: Set<String>,
+    courierOutcome: CourierOutcome?,
+    courierMemoryHeroId: String?,
   ): ExpeditionSettlementResult {
     val uid = requireUserId()
+    val userRef = db.collection("users").document(uid)
+    val escortOutcome = courierOutcome?.let {
+      if (floorNumber == 1 && victory && it == CourierOutcome.RESCUED) CourierOutcome.RESCUED else CourierOutcome.FAILED
+    }
+    try {
+      // Read before writing: a retry or a stale UI profile cannot grant the service/memory twice.
+      if (escortOutcome != null) {
+        return db.runTransaction { transaction ->
+          val currentProfile = transaction.get(userRef).toObject(MasterProfile::class.java)
+            ?: error("Không tìm thấy tiến trình Master để lưu nhiệm vụ.")
+          val currentHeroes = squadHeroes.mapNotNull { hero ->
+            transaction.get(userRef.collection("heroes").document(hero.id)).toObject(HeroRecord::class.java)
+          }
+          buildExpeditionSettlement(
+            uid, currentProfile, currentHeroes, fallenHeroIds, floorNumber, victory, retreatUsed,
+            bonusGold, bonusMana, discoveredNodeIds, escortOutcome, courierMemoryHeroId,
+            updateDocument = { ref, fields -> transaction.update(ref, fields); Unit },
+            setDocument = { ref, fields -> transaction.set(ref, fields); Unit },
+          )
+        }.await()
+      }
+      val batch = db.batch()
+      val result = buildExpeditionSettlement(
+        uid, profile, squadHeroes, fallenHeroIds, floorNumber, victory, retreatUsed,
+        bonusGold, bonusMana, discoveredNodeIds, null, null,
+        updateDocument = { ref, fields -> batch.update(ref, fields); Unit },
+        setDocument = { ref, fields -> batch.set(ref, fields); Unit },
+      )
+      batch.commit().await()
+      return result
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Exception) {
+      handleFirestoreError(e, OperationType.WRITE, userRef.path)
+      throw e
+    }
+  }
+
+  private fun buildExpeditionSettlement(
+    uid: String,
+    profile: MasterProfile,
+    squadHeroes: List<HeroRecord>,
+    fallenHeroIds: Set<String>,
+    floorNumber: Int,
+    victory: Boolean,
+    retreatUsed: Boolean,
+    bonusGold: Long,
+    bonusMana: Long,
+    discoveredNodeIds: Set<String>,
+    courierOutcome: CourierOutcome?,
+    courierMemoryHeroId: String?,
+    updateDocument: (com.google.firebase.firestore.DocumentReference, Map<String, Any>) -> Unit,
+    setDocument: (com.google.firebase.firestore.DocumentReference, Map<String, Any>) -> Unit,
+  ): ExpeditionSettlementResult {
     val userRef = db.collection("users").document(uid)
     val nowSec = System.currentTimeMillis() / 1000L
 
@@ -1004,116 +1065,121 @@ class SummonerRepository(
     var lootedName: String? = null
 
     val nodeFlags = discoveredNodeIds.map { "DISC_${it.take(36)}" }
-    val nextFlags = SanctuaryProgressionHelper.compactStoryFlags(profile.storyFlags + nodeFlags)
+    val courierForgeUnlocked = LostCourierProgression.isFirstRescue(profile.storyFlags, courierOutcome)
+    val squadIds = squadHeroes.map { it.id }.toSet()
+    val memoryHeroId = courierMemoryHeroId?.takeIf { it in squadIds } ?: squadHeroes.firstOrNull()?.id
+    var courierMemoryHeroName: String? = null
+    val nextFlags = SanctuaryProgressionHelper.compactStoryFlags(
+      LostCourierProgression.outcomeFlags(profile.storyFlags, courierOutcome) + nodeFlags,
+    )
 
-    try {
-      val batch = db.batch()
-      batch.update(
-        userRef,
+    updateDocument(
+      userRef,
+      mapOf(
+        "masterLevel" to newMasterLevel,
+        "masterExp" to totalMasterExp.coerceAtMost(10000000L),
+        "gold" to (profile.gold + goldEarned).coerceAtMost(99999999L),
+        "manaCrystals" to (profile.manaCrystals + manaEarned).coerceAtMost(9999999L),
+        "soulShards" to (profile.soulShards + shardsEarned).coerceAtMost(9999999L),
+        "rations" to (profile.rations + if (victory) 2L else 0L).coerceAtMost(99999L),
+        "ironOre" to (profile.ironOre + oreEarned).coerceAtMost(99999L),
+        "arcaneEssence" to (profile.arcaneEssence + essenceEarned).coerceAtMost(99999L),
+        "highestClearedFloor" to newHighestFloor,
+        "totalExpeditions" to (profile.totalExpeditions + 1L),
+        "storyFlags" to nextFlags,
+        "updatedAt" to FieldValue.serverTimestamp(),
+      ),
+    )
+
+    val heroExpGain = when {
+      victory -> 90L + floorNumber * 40L
+      retreatUsed -> 40L
+      else -> 25L
+    }
+    for (hero in squadHeroes) {
+      val heroRef = userRef.collection("heroes").document(hero.id)
+      val totalHeroExp = hero.exp + heroExpGain
+      val expNeeded = hero.level * 100L
+      val didLevelUp = victory && totalHeroExp >= expNeeded && hero.level < 100L
+      val nextLevel = if (didLevelUp) hero.level + 1L else hero.level
+      val remExp = if (didLevelUp) (totalHeroExp - expNeeded).coerceAtLeast(0L) else totalHeroExp
+      if (didLevelUp) leveledNames += hero.name
+
+      val wasKnockedOut = hero.id in fallenHeroIds || (!victory && !retreatUsed)
+      val nextStatus = if (wasKnockedOut) HeroStatusType.INJURED.name else HeroStatusType.READY.name
+      val recoveryUntil = if (wasKnockedOut) (nowSec + recoveryDurationSec) else 0L
+      if (wasKnockedOut) injuredNames += hero.name
+
+      val nextMorale = when {
+        victory -> (hero.morale - 6L).coerceIn(maxOf(20L, moraleFloor), 100L)
+        retreatUsed -> (hero.morale - 10L).coerceIn(maxOf(25L, moraleFloor), 100L)
+        else -> (hero.morale - 22L).coerceIn(moraleFloor, 100L)
+      }
+
+      updateDocument(
+        heroRef,
         mapOf(
-          "masterLevel" to newMasterLevel,
-          "masterExp" to totalMasterExp.coerceAtMost(10000000L),
-          "gold" to (profile.gold + goldEarned).coerceAtMost(99999999L),
-          "manaCrystals" to (profile.manaCrystals + manaEarned).coerceAtMost(9999999L),
-          "soulShards" to (profile.soulShards + shardsEarned).coerceAtMost(9999999L),
-          "rations" to (profile.rations + if (victory) 2L else 0L).coerceAtMost(99999L),
-          "ironOre" to (profile.ironOre + oreEarned).coerceAtMost(99999L),
-          "arcaneEssence" to (profile.arcaneEssence + essenceEarned).coerceAtMost(99999L),
-          "highestClearedFloor" to newHighestFloor,
-          "totalExpeditions" to (profile.totalExpeditions + 1L),
-          "storyFlags" to nextFlags,
+          "level" to nextLevel,
+          "exp" to remExp.coerceAtMost(10000000L),
+          "maxHp" to (hero.maxHp + if (didLevelUp) 32L else 0L).coerceAtMost(100000L),
+          "attack" to (hero.attack + if (didLevelUp) 7L else 0L).coerceAtMost(50000L),
+          "defense" to (hero.defense + if (didLevelUp) 4L else 0L).coerceAtMost(50000L),
+          "speed" to (hero.speed + if (didLevelUp) 2L else 0L).coerceAtMost(500L),
+          "status" to nextStatus,
+          "injuryRecoveryUntilEpochSec" to recoveryUntil,
+          "morale" to nextMorale,
+          "inActiveSquad" to if (wasKnockedOut) false else hero.inActiveSquad,
           "updatedAt" to FieldValue.serverTimestamp(),
+        ).let { fields ->
+          if (courierForgeUnlocked && hero.id == memoryHeroId) {
+            courierMemoryHeroName = hero.name
+            fields + ("bondSummary" to LostCourierProgression.rememberRescue(hero.bondSummary))
+          } else fields
+        },
+      )
+    }
+
+    if (victory) {
+      val dropBlueprint = SYNTHESIS_POOL[(floorNumber - 1) % SYNTHESIS_POOL.size]
+      val dropRarity = (2L + floorNumber / 2L).coerceIn(2L, 5L)
+      val dropId = "eq_drop_${UUID.randomUUID().toString().replace("-", "").take(14)}"
+      lootedName = "${dropBlueprint.nameVi} Tầng $floorNumber"
+      setDocument(
+        userRef.collection("equipment").document(dropId),
+        equipmentMap(
+          uid = uid,
+          name = lootedName,
+          slot = dropBlueprint.slot,
+          rarity = dropRarity,
+          bonusHp = dropBlueprint.baseHp * dropRarity,
+          bonusAtk = dropBlueprint.baseAtk * dropRarity,
+          bonusDef = dropBlueprint.baseDef * dropRarity,
+          bonusSpd = dropBlueprint.baseSpd * dropRarity,
+          iconType = dropBlueprint.iconType,
+          equippedByHeroId = "",
         ),
       )
-
-      val heroExpGain = when {
-        victory -> 90L + floorNumber * 40L
-        retreatUsed -> 40L
-        else -> 25L
-      }
-      for (hero in squadHeroes) {
-        val heroRef = userRef.collection("heroes").document(hero.id)
-        val totalHeroExp = hero.exp + heroExpGain
-        val expNeeded = hero.level * 100L
-        val didLevelUp = victory && totalHeroExp >= expNeeded && hero.level < 100L
-        val nextLevel = if (didLevelUp) hero.level + 1L else hero.level
-        val remExp = if (didLevelUp) (totalHeroExp - expNeeded).coerceAtLeast(0L) else totalHeroExp
-        if (didLevelUp) leveledNames += hero.name
-
-        val wasKnockedOut = hero.id in fallenHeroIds || (!victory && !retreatUsed)
-        val nextStatus = if (wasKnockedOut) HeroStatusType.INJURED.name else HeroStatusType.READY.name
-        val recoveryUntil = if (wasKnockedOut) (nowSec + recoveryDurationSec) else 0L
-        if (wasKnockedOut) injuredNames += hero.name
-
-        val nextMorale = when {
-          victory -> (hero.morale - 6L).coerceIn(maxOf(20L, moraleFloor), 100L)
-          retreatUsed -> (hero.morale - 10L).coerceIn(maxOf(25L, moraleFloor), 100L)
-          else -> (hero.morale - 22L).coerceIn(moraleFloor, 100L)
-        }
-
-        batch.update(
-          heroRef,
-          mapOf(
-            "level" to nextLevel,
-            "exp" to remExp.coerceAtMost(10000000L),
-            "maxHp" to (hero.maxHp + if (didLevelUp) 32L else 0L).coerceAtMost(100000L),
-            "attack" to (hero.attack + if (didLevelUp) 7L else 0L).coerceAtMost(50000L),
-            "defense" to (hero.defense + if (didLevelUp) 4L else 0L).coerceAtMost(50000L),
-            "speed" to (hero.speed + if (didLevelUp) 2L else 0L).coerceAtMost(500L),
-            "status" to nextStatus,
-            "injuryRecoveryUntilEpochSec" to recoveryUntil,
-            "morale" to nextMorale,
-            "inActiveSquad" to if (wasKnockedOut) false else hero.inActiveSquad,
-            "updatedAt" to FieldValue.serverTimestamp(),
-          ),
-        )
-      }
-
-      if (victory) {
-        val dropBlueprint = SYNTHESIS_POOL[(floorNumber - 1) % SYNTHESIS_POOL.size]
-        val dropRarity = (2L + floorNumber / 2L).coerceIn(2L, 5L)
-        val dropId = "eq_drop_${UUID.randomUUID().toString().replace("-", "").take(14)}"
-        lootedName = "${dropBlueprint.nameVi} Tầng $floorNumber"
-        batch.set(
-          userRef.collection("equipment").document(dropId),
-          equipmentMap(
-            uid = uid,
-            name = lootedName,
-            slot = dropBlueprint.slot,
-            rarity = dropRarity,
-            bonusHp = dropBlueprint.baseHp * dropRarity,
-            bonusAtk = dropBlueprint.baseAtk * dropRarity,
-            bonusDef = dropBlueprint.baseDef * dropRarity,
-            bonusSpd = dropBlueprint.baseSpd * dropRarity,
-            iconType = dropBlueprint.iconType,
-            equippedByHeroId = "",
-          ),
-        )
-      }
-
-      batch.commit().await()
-      return ExpeditionSettlementResult(
-        victory = victory,
-        floorNumber = floorNumber,
-        goldEarned = goldEarned,
-        manaEarned = manaEarned,
-        shardsEarned = shardsEarned,
-        oreEarned = oreEarned,
-        essenceEarned = essenceEarned,
-        injuredHeroNames = injuredNames,
-        leveledUpHeroNames = leveledNames,
-        lootedItemName = lootedName,
-        outcomeType = outcomeType,
-        bonusDiscoveryGold = bonusGold,
-        bonusDiscoveryMana = bonusMana,
-        discoveredNodesCount = discoveredNodeIds.size,
-      )
-    } catch (e: CancellationException) {
-      throw e
-    } catch (e: Exception) {
-      handleFirestoreError(e, OperationType.WRITE, userRef.path)
-      throw e
     }
+
+    return ExpeditionSettlementResult(
+      victory = victory,
+      floorNumber = floorNumber,
+      goldEarned = goldEarned,
+      manaEarned = manaEarned,
+      shardsEarned = shardsEarned,
+      oreEarned = oreEarned,
+      essenceEarned = essenceEarned,
+      injuredHeroNames = injuredNames,
+      leveledUpHeroNames = leveledNames,
+      lootedItemName = lootedName,
+      outcomeType = outcomeType,
+      bonusDiscoveryGold = bonusGold,
+      bonusDiscoveryMana = bonusMana,
+      discoveredNodesCount = discoveredNodeIds.size,
+      courierOutcome = courierOutcome,
+      courierForgeUnlocked = courierForgeUnlocked,
+      courierMemoryHeroName = courierMemoryHeroName,
+    )
   }
 
   private fun heroMap(
@@ -1221,7 +1287,7 @@ class SummonerRepository(
             "highestClearedFloor" to gp.highestClearedFloor.coerceIn(0L, 100L),
             "totalExpeditions" to gp.totalExpeditions.coerceIn(0L, 999999L),
             "unlockedFacilities" to gp.unlockedFacilities.ifEmpty { FacilityType.entries.map { it.name } }.take(10),
-            "storyFlags" to gp.storyFlags.distinct().takeLast(20),
+            "storyFlags" to SanctuaryProgressionHelper.compactStoryFlags(gp.storyFlags),
             "createdAt" to FieldValue.serverTimestamp(),
             "updatedAt" to FieldValue.serverTimestamp(),
           ),
@@ -1302,7 +1368,7 @@ class SummonerRepository(
             "arcaneEssence" to maxOf(cloudProfile.arcaneEssence, gp.arcaneEssence).coerceIn(0L, 99999L),
             "highestClearedFloor" to maxOf(cloudProfile.highestClearedFloor, gp.highestClearedFloor).coerceIn(0L, 100L),
             "totalExpeditions" to maxOf(cloudProfile.totalExpeditions, gp.totalExpeditions).coerceIn(0L, 999999L),
-            "storyFlags" to (cloudProfile.storyFlags + gp.storyFlags).distinct().takeLast(20),
+            "storyFlags" to SanctuaryProgressionHelper.compactStoryFlags(cloudProfile.storyFlags + gp.storyFlags),
             "updatedAt" to FieldValue.serverTimestamp(),
           ),
         )
@@ -1336,6 +1402,18 @@ class SummonerRepository(
                 "updatedAt" to FieldValue.serverTimestamp(),
               ),
             )
+          } else if (LostCourierProgression.hasRescueMemory(h.bondSummary)) {
+            val cloudHero = existingHeroesSnap.documents.firstOrNull { it.id == h.id }
+              ?: existingHeroesSnap.documents.firstOrNull { it.getString("name") == h.name }
+            if (cloudHero != null) {
+              batch.update(
+                cloudHero.reference,
+                mapOf(
+                  "bondSummary" to LostCourierProgression.rememberRescue(cloudHero.getString("bondSummary").orEmpty()),
+                  "updatedAt" to FieldValue.serverTimestamp(),
+                ),
+              )
+            }
           }
         }
 

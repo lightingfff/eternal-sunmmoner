@@ -37,6 +37,9 @@ class HeroCombatUnit(
   var currentTargetId: String? = null
   var aiIntentLabelVi: String = "Theo đội hình"
   var manualCommandCooldown: Float = 0f
+  var fearSecondsRemaining: Float = 0f
+  val effectiveAttack: Int get() = if (fearSecondsRemaining > 0f) (attack * 0.8f).toInt().coerceAtLeast(1) else attack
+  val effectiveSpeed: Float get() = if (fearSecondsRemaining > 0f) speed * 0.85f else speed
 }
 
 class EnemyCombatUnit(
