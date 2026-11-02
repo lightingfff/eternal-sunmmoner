@@ -126,7 +126,19 @@ that is the same arithmetic the game already accepted for Kaelen + goblin.
 4. No save, gameplay, balance, Gradle, package-ID or renderer-optimisation changes. P16
    batching is untouched.
 
-## 8. Known gaps
+## 8. Verification actually run
+
+| Check | Command / run | Result |
+| --- | --- | --- |
+| Generator determinism | run twice, compare SHA-256 of `lyra.png` | identical — `dd072ffd…48d04d2d` (updated value recorded in the manifest) |
+| Pack QA | `python3 tools/validate_lyra_pack.py` | **PASS** — 256 frames, ≤38 colours/frame, no edge bleed, baseline row 90, no duplicates, no pure-translation frames, engine contract match, asset SHA match |
+| Asset gate (CI step) | `python3 tools/validate_assets.py` | PASS |
+| Android build | GitHub Actions run [41413474427](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41413474427) on `4fc1612` | **Build Android APK: pass (2m13s)**; "Publish direct APK to Release": skipped (PR event) |
+
+Not run: unit tests (the workflow has no test step), any device/emulator render, FPS,
+thermal or memory measurement.
+
+## 9. Known gaps
 
 - `VirtualJoystickAndControls` still crops Kaelen's portrait (`srcOffset 19,4 / 26×26`) for
   every premium hero; Lyra's portrait crop is not authored yet, so her HUD portrait falls
