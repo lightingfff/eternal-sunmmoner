@@ -1,0 +1,65 @@
+{
+  "atlas": {
+    "file": "lyra.png",
+    "size": [
+      4096,
+      384
+    ],
+    "mode": "RGBA"
+  },
+  "grid": {
+    "columns": 64,
+    "rows": 4,
+    "frame": [
+      64,
+      96
+    ],
+    "pivot": [
+      32,
+      90
+    ]
+  },
+  "frames_checked": 256,
+  "engine_contract": {
+    "clip_order": [
+      "idle",
+      "walk",
+      "attack",
+      "skill",
+      "hit",
+      "rest",
+      "defeat",
+      "calm",
+      "alert",
+      "fear",
+      "victory"
+    ],
+    "frames_per_clip": {
+      "idle": 6,
+      "walk": 8,
+      "attack": 8,
+      "skill": 9,
+      "hit": 4,
+      "rest": 1,
+      "defeat": 6,
+      "calm": 6,
+      "alert": 4,
+      "fear": 6,
+      "victory": 6
+    }
+  },
+  "shipped_asset": {
+    "file": "lyra.png",
+    "sha256_matches_pack": true
+  },
+  "palette_colors_used": 40,
+  "max_colors_per_frame": 38,
+  "memory": {
+    "atlas_rgba_mb": 6.0,
+    "split_actors_rgba_mb": 6.0,
+    "kaelen_atlas_rgba_mb": 6.0,
+    "per_frame_kb": 24.0
+  },
+  "failures": [],
+  "status": "PASS"
+}

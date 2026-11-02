@@ -33,6 +33,13 @@ import kotlin.math.sin
  */
 object SanctuaryWorldRenderer {
 
+  /**
+   * Screen height of one 64 x 64 world tile, in px, below which the grass base switches to
+   * pre-composed 4 x 4 blocks. 25 px keeps the change well below gameplay zoom (a tile is
+   * 40 px tall at the 0.88 default camera), so the sharp art seen up close is untouched.
+   */
+  private const val GRASS_BLOCK_MIN_TILE_SCREEN_PX = 25
+
   fun DrawScope.drawSanctuaryFloatingWorld(
     camX: Float,
     camY: Float,
@@ -100,22 +107,52 @@ object SanctuaryWorldRenderer {
       val startTy = ((minWy / worldTileSize).toInt() - 1).coerceAtLeast(4)
       val endTy = ((maxWy / worldTileSize).toInt() + 1).coerceAtMost(38)
 
-      val grassTiles = PixelTileAtlas.sanctuaryGrassTiles
-
-      // 3A. Seamless Sunlit Anime Grass Lawn Base Across Entire Island
-      for (ty in startTy..endTy) {
-        val wy = ty * worldTileSize
-        val dstY = sy(wy).roundToInt()
-        for (tx in startTx..endTx) {
-          val wx = tx * worldTileSize
-          val dstX = sx(wx).roundToInt()
-          val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
-          drawImage(
-            image = grassTiles[hash % grassTiles.size],
-            dstOffset = IntOffset(dstX, dstY),
-            dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
-            filterQuality = FilterQuality.None,
-          )
+      // 3A. Seamless Sunlit Anime Grass Lawn Base Across Entire Island.
+      // At overview zoom a grass tile is only ~12-24 px tall, so sixteen tiles are replaced
+      // by one pre-composed 4x4 block with the same authored art. That drops the terrain
+      // draw-command count by ~85% exactly where the island-wide camera used to stall.
+      // From gameplay zoom up the per-tile path stays in charge and the art is untouched.
+      val grassBlocks = if (tileScreenH < GRASS_BLOCK_MIN_TILE_SCREEN_PX) {
+        PixelTileAtlas.sanctuaryGrassBlocks
+      } else {
+        emptyList()
+      }
+      if (grassBlocks.isNotEmpty()) {
+        val blockWorldSize = PixelTileAtlas.GRASS_BLOCK_WORLD_SIZE.toFloat()
+        val blockScreenW = (blockWorldSize * zoom).roundToInt().coerceAtLeast(2)
+        val blockScreenH = (blockWorldSize * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt().coerceAtLeast(2)
+        val startBx = startTx / PixelTileAtlas.GRASS_BLOCK_TILES
+        val endBx = endTx / PixelTileAtlas.GRASS_BLOCK_TILES
+        val startBy = startTy / PixelTileAtlas.GRASS_BLOCK_TILES
+        val endBy = endTy / PixelTileAtlas.GRASS_BLOCK_TILES
+        for (by in startBy..endBy) {
+          val dstY = sy(by * blockWorldSize).roundToInt()
+          for (bx in startBx..endBx) {
+            val hash = ((bx * 73856093) xor (by * 19349663)) and 0x7FFFFFFF
+            drawImage(
+              image = grassBlocks[hash % grassBlocks.size],
+              dstOffset = IntOffset(sx(bx * blockWorldSize).roundToInt(), dstY),
+              dstSize = IntSize(blockScreenW + 1, blockScreenH + 1),
+              filterQuality = FilterQuality.None,
+            )
+          }
+        }
+      } else {
+        val grassTiles = PixelTileAtlas.sanctuaryGrassTiles
+        for (ty in startTy..endTy) {
+          val wy = ty * worldTileSize
+          val dstY = sy(wy).roundToInt()
+          for (tx in startTx..endTx) {
+            val wx = tx * worldTileSize
+            val dstX = sx(wx).roundToInt()
+            val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
+            drawImage(
+              image = grassTiles[hash % grassTiles.size],
+              dstOffset = IntOffset(dstX, dstY),
+              dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
+              filterQuality = FilterQuality.None,
+            )
+          }
         }
       }
 
@@ -280,8 +317,12 @@ object SanctuaryWorldRenderer {
     tiles: List<androidx.compose.ui.graphics.ImageBitmap>,
     sx: (Float) -> Float, sy: (Float, Float) -> Float, zoom: Float,
     columns: IntRange, rows: IntRange,
+    roadPaths: List<PathSegment>? = null,
+    roadExtraWorld: Float = 0f,
   ) {
     for (ty in rows) for (tx in columns) {
+      // The road verge ring is a clip ring: tiles fully outside the road cannot contribute.
+      if (roadPaths != null && !SanctuaryRoadCoverage.mayContainRoad(roadPaths, tx, ty, roadExtraWorld)) continue
       val index = ((tx * 73856093 xor ty * 19349663) and 0x7fffffff) % tiles.size
       drawImage(tiles[index], dstOffset=IntOffset(sx(tx*64f).roundToInt(),sy(ty*64f,0f).roundToInt()),
         dstSize=IntSize((64*zoom).roundToInt().coerceAtLeast(1)+1,(64*zoom*ObliqueCamera.OBLIQUE_Y_SCALE).roundToInt().coerceAtLeast(1)+1),filterQuality=FilterQuality.None)
@@ -355,6 +396,9 @@ object SanctuaryWorldRenderer {
         for (tx in rStartTx..rEndTx) {
           val wx = tx * worldTileSize
           if (wx > 2460f) continue
+          // Skip tiles whose whole square is outside the road instead of submitting a
+          // drawImage that the clip path discards. Same pixels, far fewer commands.
+          if (!SanctuaryRoadCoverage.mayContainRoad(paths, tx, ty)) continue
           val dstX = sx(wx).roundToInt()
           val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
           drawImage(
@@ -369,7 +413,11 @@ object SanctuaryWorldRenderer {
     SanctuaryArtAssets.image("verge")?.let { fringe ->
       clipPath(cobbleInterior) {
         clipPath(buildRoadUnionPath(-12f), androidx.compose.ui.graphics.ClipOp.Difference) {
-          drawMaterialBand(listOf(fringe), sx, sy, zoom, startTx..endTx, startTy..endTy)
+          drawMaterialBand(
+            listOf(fringe), sx, sy, zoom, startTx..endTx, startTy..endTy,
+            // Outer curb union is the widest ring this band can reach.
+            roadPaths = paths, roadExtraWorld = 7.5f,
+          )
         }
       }
     }

@@ -1,0 +1,132 @@
+{
+  "asset_id": "hero_lyra_idle_front_right",
+  "hero": "Lyra (hero_starter_lyra) \u2014 Archer, 'M\u1eaft \u01afng Gi\u00f3 \u0110\u00eam'",
+  "status": "derived sample for review \u2014 not integrated, not a production animation sheet",
+  "frame": [
+    64,
+    96
+  ],
+  "pivot": [
+    32,
+    90
+  ],
+  "pivot_matches_engine": true,
+  "alpha_mode": "straight RGBA, 1-bit alpha (0 or 255)",
+  "opaque_pixels": 2184,
+  "coverage": 0.3555,
+  "visible_bbox": [
+    4,
+    1,
+    61,
+    91
+  ],
+  "lowest_opaque_row": 90,
+  "feet_on_pivot": true,
+  "corners_transparent": true,
+  "palette_colors": 25,
+  "palette": [
+    {
+      "hex": "#100E16",
+      "pixels": 454
+    },
+    {
+      "hex": "#635D37",
+      "pixels": 176
+    },
+    {
+      "hex": "#56492C",
+      "pixels": 163
+    },
+    {
+      "hex": "#1A1A0E",
+      "pixels": 129
+    },
+    {
+      "hex": "#967646",
+      "pixels": 124
+    },
+    {
+      "hex": "#2E2C1A",
+      "pixels": 112
+    },
+    {
+      "hex": "#3E3C23",
+      "pixels": 107
+    },
+    {
+      "hex": "#8C6237",
+      "pixels": 106
+    },
+    {
+      "hex": "#BD9251",
+      "pixels": 105
+    },
+    {
+      "hex": "#212617",
+      "pixels": 103
+    },
+    {
+      "hex": "#4B482A",
+      "pixels": 101
+    },
+    {
+      "hex": "#000000",
+      "pixels": 96
+    },
+    {
+      "hex": "#301F0F",
+      "pixels": 92
+    },
+    {
+      "hex": "#050804",
+      "pixels": 86
+    },
+    {
+      "hex": "#34341E",
+      "pixels": 83
+    },
+    {
+      "hex": "#89230F",
+      "pixels": 82
+    },
+    {
+      "hex": "#44321B",
+      "pixels": 81
+    },
+    {
+      "hex": "#794723",
+      "pixels": 77
+    },
+    {
+      "hex": "#150F06",
+      "pixels": 73
+    },
+    {
+      "hex": "#5A2611",
+      "pixels": 68
+    },
+    {
+      "hex": "#421C0C",
+      "pixels": 68
+    },
+    {
+      "hex": "#404427",
+      "pixels": 67
+    },
+    {
+      "hex": "#F1D28B",
+      "pixels": 57
+    },
+    {
+      "hex": "#150000",
+      "pixels": 24
+    },
+    {
+      "hex": "#000004",
+      "pixels": 4
+    }
+  ],
+  "source": "art/p16_lyra/lyra_concept_fullbody.png (generated in this session, original)",
+  "generated_by": "Arena built-in image generation + tools/generate_hero_sample.py",
+  "memory_kb_rgba": 24.0
+}
