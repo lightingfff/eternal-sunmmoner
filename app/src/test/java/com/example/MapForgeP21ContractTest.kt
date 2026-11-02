@@ -244,7 +244,14 @@ class MapForgeP21ContractTest {
     ).forEach { assertNotNull("atlas property must resolve", it.get()) }
   }
 
-  /** The tower gate's painted portal must occupy the box the renderer animates the rift into. */
+  /**
+   * The tower gate's aperture must be the box the renderer animates the rift into.
+   *
+   * The renderer draws a bright, moving rift oval at sprite (W/2, 120) +/- (16, 27). The art must
+   * therefore paint a DARK recess in exactly that box -- if it painted its own bright orb, the
+   * animated ring would sit on a static light and read as a sticker. The painted light belongs
+   * below the ring, on the threshold, where it can look like the source of the spill.
+   */
   @Test
   fun towerGatePortalMatchesAnimatedRiftBox() {
     prepare()
@@ -253,21 +260,27 @@ class MapForgeP21ContractTest {
     // => sprite centre (W/2, 120) with a 16 x 27 px half-size.
     val cx = bmp.width / 2
     val cy = 120
-    // The painted void must be dark at the rift centre's flanks and glowing at its core.
     var dark = 0
-    var glow = 0
+    var bright = 0
     for (y in (cy - 20)..(cy + 20)) for (x in (cx - 14)..(cx + 14)) {
       val p = bmp.getPixel(x, y)
       val r = (p shr 16) and 0xFF; val g = (p shr 8) and 0xFF; val b = p and 0xFF
       if ((p ushr 24) == 0) continue
       if (r < 40 && g < 40 && b < 46) dark++
-      if (g > 90 && b > 110) glow++
+      if (g > 140 && b > 160) bright++
     }
-    assertTrue("portal must contain a dark recess ($dark px)", dark > 200)
-    assertTrue("portal must contain the rift light ($glow px)", glow > 120)
+    assertTrue("the rift box must be a dark recess, not sky ($dark px)", dark > 600)
+    assertTrue("the rift box must not paint its own light ($bright px)", bright < 60)
     // The animated ring's outer edge must stay inside opaque stone, not float in the sky.
     for (x in (cx - 16)..(cx + 16)) {
       assertTrue("rift top edge must sit on stone at x=$x", (bmp.getPixel(x, cy - 27) ushr 24) != 0)
     }
+    // And the painted light lives on the threshold, below the rift box (rows H-38..H-24).
+    var spill = 0
+    for (y in (bmp.height - 38)..(bmp.height - 24)) for (x in (cx - 8)..(cx + 8)) {
+      val p = bmp.getPixel(x, y)
+      if ((p ushr 24) != 0 && ((p shr 8) and 0xFF) > 40) spill++
+    }
+    assertTrue("threshold must carry the cold spill ($spill px)", spill > 40)
   }
 }

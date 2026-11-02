@@ -1425,6 +1425,24 @@ def build_tower_gate() -> Image.Image:
     c.vline(cx - prx + 1, top + 11, bot - 1, BASA["lt"])
     c.vline(cx - prx + 2, top + 14, bot - 2, mix_hex(BASA["base"], CYAN["deep"], 0.55))
     c.vline(cx + prx - 1, top + 11, bot - 2, "#03060a")
+    # The renderer animates a bright rift oval inside sprite (130,120) +/- (16,27). If the art
+    # also paints a glowing orb there, the moving ring reads as a sticker on a static light and
+    # the two fight. So the aperture is painted DARK -- a real recess with depth bands -- and the
+    # only painted light is a cold spill on the threshold below the ring, which the animation
+    # then appears to come from. The stone rim stays opaque so the ring lands on masonry.
+    for i, (half, col) in enumerate(((13, "#0b1a22"), (10, "#0a151c"), (6, "#081016"))):
+        c.rect(cx - half, top + 16, cx + half, bot - 2, col)
+    c.ellipse(cx, top + 18, 12, 8, "#0b1a22")
+    c.ellipse(cx, top + 18, 6, 5, "#081016")
+    # side reveal: one value step up on the lit (left) side, near-black on the right
+    c.vline(cx - 13, top + 20, bot - 2, "#12303c")
+    c.vline(cx - 12, top + 22, bot - 3, "#0d222b")
+    # threshold spill: below the ring's bottom edge, brightest at the sill
+    for y in range(bot - 13, bot + 1):
+        t = 1.0 - (bot - y) / 13.0
+        half = int(3 + 8 * t)
+        c.rect(cx - half, y, cx + half, y, mix_hex("#0a1a22", CYAN["deep"], 0.55 + 0.45 * t))
+    c.rect(cx - 4, bot - 2, cx + 4, bot, CYAN["dim"])
     # voussoirs around the arch, one block per 15 degrees
     for a in range(13):
         ang = math.pi + a * math.pi / 12
