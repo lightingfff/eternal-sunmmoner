@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import org.json.JSONObject
 
 /**
- * Authored HUD busts for premium heroes (`premium_slice/portraits/*`), keyed by hero name.
+ * Authored HUD busts for premium heroes (premium_slice/portraits/), keyed by hero name.
  *
  * Before this existed the HUD avatar cropped a 26x26 patch out of the *Kaelen* world atlas
  * and stretched it for every hero, so Lyra showed Kaelen's face. A hero without an authored
