@@ -71,8 +71,12 @@ class MapForgeP23RenderTest {
     outDir.mkdirs()
     val sanctuary = SanctuaryLobbyEngine().mapLayout
     val floor1 = TowerFloorCatalog.buildTowerFloorMap(TowerFloorCatalog.FLOORS[0])
-    val floor3 = TowerFloorCatalog.buildTowerFloorMap(TowerFloorCatalog.FLOORS[2])
-    val f3Column = floor3.obstacles
+    val floor2 = TowerFloorCatalog.buildTowerFloorMap(TowerFloorCatalog.FLOORS[1])
+    val floor4 = TowerFloorCatalog.buildTowerFloorMap(TowerFloorCatalog.FLOORS[3])
+    val f2Ruin = floor2.obstacles
+      .filter { it.propKind == PropKind.ANCIENT_RUIN_ARCH }
+      .minBy { abs(it.y - 680f) + abs(it.x - 1400f) * 0.25f }
+    val f4Column = floor4.obstacles
       .filter { it.propKind == PropKind.OBSIDIAN_COLUMN }
       .minBy { abs(it.y - 680f) + abs(it.x - 1400f) * 0.25f }
 
@@ -388,13 +392,22 @@ class MapForgeP23RenderTest {
         focusIds = listOf("f1_ruin_arch_1", "f1_lantern_w"),
       )
       renderScene(
-        name = "tower_f3_obsidian_column_z148",
-        layout = floor3,
+        name = "tower_f2_ruin_arch_plum_z088",
+        layout = floor2,
         isSanctuary = false,
-        camX = f3Column.x,
-        camY = f3Column.y - 35f,
+        camX = f2Ruin.x,
+        camY = f2Ruin.y - 30f,
+        zoom = 0.88f,
+        focusIds = listOf(f2Ruin.id),
+      )
+      renderScene(
+        name = "tower_f4_obsidian_column_z148",
+        layout = floor4,
+        isSanctuary = false,
+        camX = f4Column.x,
+        camY = f4Column.y - 35f,
         zoom = 1.48f,
-        focusIds = listOf(f3Column.id),
+        focusIds = listOf(f4Column.id),
       )
 
       File(outDir, "camera_props.json").writeText(records.toString(2) + "\n")
