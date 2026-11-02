@@ -53,6 +53,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.data.GameSettings
+import com.example.data.PerformanceMode
 import com.example.data.SessionAccountMode
 import com.example.ui.theme.AmberWarning
 import com.example.ui.theme.ArcaneViolet
@@ -283,6 +284,58 @@ fun SettingsAndAccountModal(
                 )
               }
             }
+          }
+
+          Text(
+            text = "Nhịp Khung Hình",
+            style = MaterialTheme.typography.titleSmall,
+            color = SummonerGold,
+          )
+          FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+          ) {
+            PerformanceMode.entries.forEach { mode ->
+              val selected = settings.performanceMode == mode
+              Box(
+                modifier = Modifier
+                  .heightIn(min = 48.dp)
+                  .clip(RoundedCornerShape(10.dp))
+                  .background(if (selected) ArcaneViolet.copy(alpha = 0.45f) else SanctuaryStone)
+                  .border(1.dp, if (selected) SummonerGold else BorderRune, RoundedCornerShape(10.dp))
+                  .testTag("settings_performance_${mode.name.lowercase()}")
+                  .clickable { onUpdateSettings(settings.copy(performanceMode = mode)) }
+                  .padding(horizontal = 12.dp),
+                contentAlignment = Alignment.Center,
+              ) {
+                Text(
+                  text = if (mode == PerformanceMode.BALANCED) "Cân bằng • 30 FPS" else "Cao • 60 FPS",
+                  style = MaterialTheme.typography.labelMedium,
+                  color = if (selected) SummonerGold else ParchmentLight,
+                )
+              }
+            }
+          }
+          Text(
+            text = "Cân bằng tiết kiệm pin, giữ nguyên hình ảnh và tốc độ mô phỏng. Chế độ Cao dành cho máy chạy ổn định.",
+            style = MaterialTheme.typography.bodySmall,
+            color = RuneSilver,
+          )
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+          ) {
+            Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+              Text("Đo hiệu năng (nhà phát triển)", style = MaterialTheme.typography.labelLarge, color = ParchmentLight)
+              Text("Cập nhật số liệu mỗi giây; mặc định tắt", style = MaterialTheme.typography.bodySmall, color = RuneSilver)
+            }
+            Switch(
+              checked = settings.performanceOverlay,
+              onCheckedChange = { onUpdateSettings(settings.copy(performanceOverlay = it)) },
+              modifier = Modifier.testTag("settings_performance_overlay_toggle"),
+              colors = SwitchDefaults.colors(checkedThumbColor = ObsidianVoid, checkedTrackColor = PortalCyan),
+            )
           }
 
           // Toggle 1: Atmospheric Particles

@@ -1,5 +1,7 @@
 package com.example.ui.screens
 
+import com.example.data.LostCourierProgression
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
@@ -876,7 +878,8 @@ private fun SynthesisLabContent(
   onSynthesizeGear: () -> Unit,
   onEnhanceGear: (EquipmentRecord) -> Unit,
 ) {
-  val canSynthesize = profile.ironOre >= 3L && profile.arcaneEssence >= 2L && profile.gold >= 120L
+  val goldCost = LostCourierProgression.synthesisGoldCost(profile.storyFlags)
+  val canSynthesize = profile.ironOre >= 3L && profile.arcaneEssence >= 2L && profile.gold >= goldCost
 
   LazyColumn(
     modifier = Modifier.fillMaxSize(),
@@ -893,14 +896,17 @@ private fun SynthesisLabContent(
       ) {
         Text("Lò Dung Hợp Cổ Ngữ", style = MaterialTheme.typography.titleSmall, color = EmeraldVitality)
         Text(
-          text = "Kết hợp 3 Quặng Sắt + 2 Tinh Hoa Cổ Ngữ + 120 Vàng để rèn Vũ Khí hoặc Giáp Trụ 2★–4★.",
+          text = "Kết hợp 3 Quặng Sắt + 2 Tinh Hoa Cổ Ngữ + $goldCost Vàng để rèn Vũ Khí hoặc Giáp Trụ 2★–4★.",
           style = MaterialTheme.typography.bodySmall,
           color = RuneSilver,
         )
+        if (LostCourierProgression.FLAG_RESCUED in profile.storyFlags) {
+          Text("Ân tình người đưa thư: giảm vĩnh viễn 25% phí Vàng chế tác.", style = MaterialTheme.typography.labelSmall, color = EmeraldVitality)
+        }
         if (!canSynthesize) {
           Spacer(modifier = Modifier.height(4.dp))
           Text(
-            text = "Thiếu nguyên liệu rèn (Hiện có: ${profile.ironOre}/3 Quặng • ${profile.arcaneEssence}/2 Tinh Hoa • ${profile.gold}/120 Vàng).",
+            text = "Thiếu nguyên liệu rèn (Hiện có: ${profile.ironOre}/3 Quặng • ${profile.arcaneEssence}/2 Tinh Hoa • ${profile.gold}/$goldCost Vàng).",
             style = MaterialTheme.typography.labelSmall,
             color = AmberWarning,
           )
@@ -912,7 +918,7 @@ private fun SynthesisLabContent(
           modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("synthesize_gear_button"),
           colors = FantasySkin.buttonColors(containerColor = EmeraldVitality, contentColor = ObsidianVoid),
         ) {
-          Text("Dung Hợp Chế Tác (3 Quặng • 2 Tinh Hoa • 120 Vàng)", maxLines = 1, overflow = TextOverflow.Ellipsis)
+          Text("Dung Hợp Chế Tác (3 Quặng • 2 Tinh Hoa • $goldCost Vàng)", maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
       }
     }

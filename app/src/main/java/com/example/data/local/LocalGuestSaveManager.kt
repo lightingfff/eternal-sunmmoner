@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.data.FeastBuffHelper
 import com.example.data.GameSettings
 import com.example.data.GuestSaveSnapshot
+import com.example.data.LostCourierProgression
 import com.example.data.SanctuaryProgressionHelper
 import com.example.data.SessionAccountMode
 import com.example.data.SummonerDataSource
@@ -12,6 +13,7 @@ import com.example.data.firebase.ExpeditionOutcomeType
 import com.example.data.firebase.ExpeditionSettlementResult
 import com.example.data.firebase.SummonerRepository
 import com.example.data.model.EquipmentRecord
+import com.example.data.model.CourierOutcome
 import com.example.data.model.FacilityType
 import com.example.data.model.HeroClassType
 import com.example.data.model.HeroRecord
@@ -96,7 +98,6 @@ class LocalGuestSaveManager(context: Context) {
   }
 
   fun updateSettings(newSettings: GameSettings) {
-    _settings.value = newSettings
     val snap = _guestSnapshot.value
     if (snap != null) {
       val updated = snap.copy(
@@ -106,6 +107,7 @@ class LocalGuestSaveManager(context: Context) {
       writeSnapshotAtomically(updated)
       _guestSnapshot.value = updated
     }
+    _settings.value = newSettings
     persistSessionState(_sessionMode.value, newSettings)
   }
 
@@ -181,7 +183,8 @@ class LocalGuestSaveManager(context: Context) {
     val recovered = parseFileSafely(backupSaveFile)
     if (recovered != null) {
       Log.w(TAG, "Primary save corrupted/missing — restored intact Guest Save from .bak backup!")
-      writeSnapshotAtomically(recovered)
+      // A valid backup remains usable even when repairing the primary file is impossible.
+      runCatching { writeSnapshotAtomically(recovered) }
       return recovered
     }
     return null
@@ -218,6 +221,7 @@ class LocalGuestSaveManager(context: Context) {
       }
     } catch (e: Exception) {
       Log.e(TAG, "Atomic guest save failed", e)
+      throw e
     }
   }
 
@@ -396,6 +400,8 @@ class LocalGuestSaveManager(context: Context) {
     put("particlesEnabled", s.particlesEnabled)
     put("showHeroAiIntent", s.showHeroAiIntent)
     put("compactHud", s.compactHud)
+    put("performanceMode", s.performanceMode.name)
+    put("performanceOverlay", s.performanceOverlay)
   }
 
   private fun parseSettings(obj: JSONObject): GameSettings = GameSettings(
@@ -403,6 +409,10 @@ class LocalGuestSaveManager(context: Context) {
     particlesEnabled = obj.optBoolean("particlesEnabled", true),
     showHeroAiIntent = obj.optBoolean("showHeroAiIntent", true),
     compactHud = obj.optBoolean("compactHud", false),
+    performanceMode = com.example.data.PerformanceMode.entries.firstOrNull {
+      it.name == obj.optString("performanceMode")
+    } ?: com.example.data.PerformanceMode.BALANCED,
+    performanceOverlay = obj.optBoolean("performanceOverlay", false),
   )
 
   private fun serializeSnapshot(s: GuestSaveSnapshot): JSONObject = JSONObject().apply {
@@ -846,13 +856,13 @@ class LocalGuestDataSource(
   override suspend fun synthesizeEquipment(profile: MasterProfile): EquipmentRecord {
     val oreCost = 3L
     val essenceCost = 2L
-    val goldCost = 120L
+    val goldCost = LostCourierProgression.synthesisGoldCost(profile.storyFlags)
     require(
       profile.ironOre >= oreCost &&
         profile.arcaneEssence >= essenceCost &&
         profile.gold >= goldCost
     ) {
-      "Cần 3 Quặng Sắt, 2 Tinh Hoa Cổ Ngữ và 120 Vàng để chế tác."
+      "Cần 3 Quặng Sắt, 2 Tinh Hoa Cổ Ngữ và $goldCost Vàng để chế tác."
     }
 
     val roll = Random.nextInt(100)
@@ -866,6 +876,10 @@ class LocalGuestDataSource(
 
     lateinit var crafted: EquipmentRecord
     saveManager.mutateSnapshot { snap ->
+      val currentGoldCost = LostCourierProgression.synthesisGoldCost(snap.profile.storyFlags)
+      require(snap.profile.ironOre >= oreCost && snap.profile.arcaneEssence >= essenceCost && snap.profile.gold >= currentGoldCost) {
+        "Không đủ nguyên liệu chế tác."
+      }
       crafted = EquipmentRecord(
         id = itemId,
         userId = snap.guestPlayerId,
@@ -884,7 +898,7 @@ class LocalGuestDataSource(
         profile = snap.profile.copy(
           ironOre = snap.profile.ironOre - oreCost,
           arcaneEssence = snap.profile.arcaneEssence - essenceCost,
-          gold = snap.profile.gold - goldCost,
+          gold = snap.profile.gold - currentGoldCost,
         ),
         equipment = snap.equipment + crafted,
       )
@@ -1063,6 +1077,8 @@ class LocalGuestDataSource(
     bonusGold: Long,
     bonusMana: Long,
     discoveredNodeIds: Set<String>,
+    courierOutcome: CourierOutcome?,
+    courierMemoryHeroId: String?,
   ): ExpeditionSettlementResult {
     val nowSec = System.currentTimeMillis() / 1000L
     val hasAstralDock = SanctuaryProgressionHelper.isExpansionUnlocked(
@@ -1105,6 +1121,11 @@ class LocalGuestDataSource(
     val injuredNames = mutableListOf<String>()
     val leveledNames = mutableListOf<String>()
     var lootedName: String? = null
+    val escortOutcome = courierOutcome?.let {
+      if (floorNumber == 1 && victory && it == CourierOutcome.RESCUED) CourierOutcome.RESCUED else CourierOutcome.FAILED
+    }
+    var courierForgeUnlocked = false
+    var courierMemoryHeroName: String? = null
 
     val outcomeType = when {
       victory -> ExpeditionOutcomeType.VICTORY
@@ -1119,6 +1140,9 @@ class LocalGuestDataSource(
       val newHighestFloor = if (victory) maxOf(cur.highestClearedFloor, floorNumber.toLong()) else cur.highestClearedFloor
 
       val squadIds = squadHeroes.map { it.id }.toSet()
+      courierForgeUnlocked = LostCourierProgression.isFirstRescue(cur.storyFlags, escortOutcome)
+      val memoryHeroId = courierMemoryHeroId?.takeIf { it in squadIds }
+        ?: snap.heroes.firstOrNull { it.id in squadIds }?.id
       val heroExpGain = when {
         victory -> 90L + floorNumber * 40L
         retreatUsed -> 40L
@@ -1159,6 +1183,10 @@ class LocalGuestDataSource(
             injuryRecoveryUntilEpochSec = recoveryUntil,
             morale = nextMorale,
             inActiveSquad = if (wasKnockedOut) false else hero.inActiveSquad,
+            bondSummary = if (courierForgeUnlocked && hero.id == memoryHeroId) {
+              courierMemoryHeroName = hero.name
+              LostCourierProgression.rememberRescue(hero.bondSummary)
+            } else hero.bondSummary,
           )
         }
       }
@@ -1186,7 +1214,9 @@ class LocalGuestDataSource(
       }
 
       val nodeFlags = discoveredNodeIds.map { "DISC_${it.take(36)}" }
-      val nextFlags = SanctuaryProgressionHelper.compactStoryFlags(cur.storyFlags + nodeFlags)
+      val nextFlags = SanctuaryProgressionHelper.compactStoryFlags(
+        LostCourierProgression.outcomeFlags(cur.storyFlags, escortOutcome) + nodeFlags,
+      )
 
       snap.copy(
         profile = cur.copy(
@@ -1222,6 +1252,9 @@ class LocalGuestDataSource(
       bonusDiscoveryGold = bonusGold,
       bonusDiscoveryMana = bonusMana,
       discoveredNodesCount = discoveredNodeIds.size,
+      courierOutcome = escortOutcome,
+      courierForgeUnlocked = courierForgeUnlocked,
+      courierMemoryHeroName = courierMemoryHeroName,
     )
   }
 }

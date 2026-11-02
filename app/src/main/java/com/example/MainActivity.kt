@@ -123,6 +123,12 @@ fun EternalSummonerRootApp() {
   val gameSettings by saveManager.settings.collectAsStateWithLifecycle()
   val guestSnapshot by saveManager.guestSnapshot.collectAsStateWithLifecycle()
 
+  LaunchedEffect(gameSettings.performanceMode) {
+    com.example.game.pixel.DepthPresentation.quality =
+      if(gameSettings.performanceMode == com.example.data.PerformanceMode.HIGH)
+        com.example.game.pixel.DepthPresentation.Quality.BALANCED
+      else com.example.game.pixel.DepthPresentation.Quality.REDUCED
+  }
   var showSettingsModal by remember { mutableStateOf(false) }
   var isLinkingAccount by remember { mutableStateOf(false) }
   var linkStatusMessage by remember { mutableStateOf<String?>(null) }
@@ -166,7 +172,10 @@ fun EternalSummonerRootApp() {
           accountMode = SessionAccountMode.NONE,
           accountSummary = savedSummary ?: "Chưa có hồ sơ đang mở trên thiết bị",
           settings = gameSettings,
-          onUpdateSettings = saveManager::updateSettings,
+          onUpdateSettings = { next ->
+            try { saveManager.updateSettings(next) }
+            catch (error: Exception) { linkStatusMessage = "Không lưu được cài đặt; dữ liệu cũ được giữ lại. ${error.localizedMessage.orEmpty()}" }
+          },
           onClose = { showSettingsModal = false },
         )
       }
@@ -285,6 +294,7 @@ fun EternalSummonerRootApp() {
       GameScreenMode.SANCTUARY_LOBBY -> {
         SanctuaryLobbyScreen(
           state = uiState,
+          sceneActive = !showSettingsModal,
           settings = gameSettings,
           onOpenFacility = vm::openFacility,
           onCloseFacility = vm::closeFacilityModal,
@@ -343,6 +353,7 @@ fun EternalSummonerRootApp() {
       GameScreenMode.TOWER_COMBAT -> {
         TowerBattleScreen(
           state = uiState,
+          sceneActive = !showSettingsModal,
           settings = gameSettings,
           onFinishExpedition = { victory, fallen -> vm.finishTowerExpedition(victory, fallen) },
           onReturnToSanctuary = vm::returnToSanctuaryLobby,
@@ -364,7 +375,10 @@ fun EternalSummonerRootApp() {
         accountMode = activeMode,
         accountSummary = summaryText,
         settings = gameSettings,
-        onUpdateSettings = saveManager::updateSettings,
+        onUpdateSettings = { next ->
+            try { saveManager.updateSettings(next) }
+            catch (error: Exception) { linkStatusMessage = "Không lưu được cài đặt; dữ liệu cũ được giữ lại. ${error.localizedMessage.orEmpty()}" }
+          },
         onClose = { showSettingsModal = false },
         isLinkingAccount = isLinkingAccount,
         linkStatusMessage = linkStatusMessage,

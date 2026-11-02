@@ -2,6 +2,7 @@ package com.example.data
 
 import com.example.data.firebase.ExpeditionSettlementResult
 import com.example.data.model.EquipmentRecord
+import com.example.data.model.CourierOutcome
 import com.example.data.model.HeroRecord
 import com.example.data.model.HeroStatusType
 import com.example.data.model.IslandExpansionMilestone
@@ -16,11 +17,18 @@ enum class SessionAccountMode {
   GOOGLE_CLOUD,
 }
 
+enum class PerformanceMode(val targetFps: Int) {
+  BALANCED(30),
+  HIGH(60),
+}
+
 data class GameSettings(
   val defaultZoom: Float = 0.88f,
   val particlesEnabled: Boolean = true,
   val showHeroAiIntent: Boolean = true,
   val compactHud: Boolean = false,
+  val performanceMode: PerformanceMode = PerformanceMode.BALANCED,
+  val performanceOverlay: Boolean = false,
 )
 
 data class GuestSaveSnapshot(
@@ -130,6 +138,8 @@ interface SummonerDataSource {
     bonusGold: Long = 0L,
     bonusMana: Long = 0L,
     discoveredNodeIds: Set<String> = emptySet(),
+    courierOutcome: CourierOutcome? = null,
+    courierMemoryHeroId: String? = null,
   ): ExpeditionSettlementResult
 }
 
@@ -213,16 +223,16 @@ object SanctuaryProgressionHelper {
 
   /**
    * Compacts storyFlags to <= 20 entries (matching Firestore security rule limit) while NEVER
-   * evicting permanent flags (`PROLOGUE_SEEN`, `EXP_*`) when transient flags accumulate.
+   * evicting permanent progression and courier flags when transient flags accumulate.
    */
   fun compactStoryFlags(rawFlags: List<String>): List<String> {
     val distinct = rawFlags.map { it.take(50) }.filter { it.isNotBlank() }.distinct()
     if (distinct.size <= 20) return distinct
     val permanent = distinct.filter {
-      it == "PROLOGUE_SEEN" || it.startsWith("EXP_")
+      it == "PROLOGUE_SEEN" || it.startsWith("EXP_") || LostCourierProgression.isPermanentFlag(it)
     }
     val transient = distinct.filterNot {
-      it == "PROLOGUE_SEEN" || it.startsWith("EXP_")
+      it == "PROLOGUE_SEEN" || it.startsWith("EXP_") || LostCourierProgression.isPermanentFlag(it)
     }
     val remainingSlots = (20 - permanent.size).coerceAtLeast(0)
     return (permanent.take(20) + transient.takeLast(remainingSlots))

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.data.SummonerDataSource
 import com.example.data.firebase.ExpeditionSettlementResult
 import com.example.data.model.EquipmentRecord
+import com.example.data.model.CourierOutcome
 import com.example.data.model.FacilityType
 import com.example.data.model.HeroRecord
 import com.example.data.model.HeroStatusType
@@ -389,6 +390,8 @@ class SummonerViewModel(
     bonusGold: Long = 0L,
     bonusMana: Long = 0L,
     discoveredNodeIds: Set<String> = emptySet(),
+    courierOutcome: CourierOutcome? = null,
+    courierMemoryHeroId: String? = null,
   ) {
     val state = uiState.value
     val profile = state.profile ?: return
@@ -408,6 +411,8 @@ class SummonerViewModel(
           bonusGold = bonusGold,
           bonusMana = bonusMana,
           discoveredNodeIds = discoveredNodeIds,
+          courierOutcome = courierOutcome,
+          courierMemoryHeroId = courierMemoryHeroId,
         )
         _lastSettlement.value = result
       } catch (e: Exception) {

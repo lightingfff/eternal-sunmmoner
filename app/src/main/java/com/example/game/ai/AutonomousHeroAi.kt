@@ -37,6 +37,7 @@ object AutonomousHeroAi {
     spawnAoE: (CombatAoEEffect) -> Unit,
     spawnText: (FloatingCombatText) -> Unit,
     dealDamageToEnemy: (EnemyCombatUnit, Int, Boolean) -> Unit,
+    protectedAllyPosition: Pair<Float, Float>? = null,
   ) {
     if (hero.knockedOut) return
 
@@ -63,12 +64,12 @@ object AutonomousHeroAi {
             val mult = 1.65f + hero.skillLevel * .14f
             livingEnemies.forEach { enemy ->
               if (hypot(enemy.x-hero.x,enemy.y-hero.y) <= 120f)
-                dealDamageToEnemy(enemy,(hero.attack*mult).toInt(),true)
+                dealDamageToEnemy(enemy,(hero.effectiveAttack*mult).toInt(),true)
             }
           } else {
             val enemy = livingEnemies.firstOrNull { it.id == hero.contactAttack.targetId }
             if (enemy != null && hypot(enemy.x-hero.x,enemy.y-hero.y) <= hero.heroClass.preferredRange+35f)
-              dealDamageToEnemy(enemy,hero.attack,false)
+              dealDamageToEnemy(enemy,hero.effectiveAttack,false)
           }
         }
         hero.attackAnim = hero.contactAttack.progress
@@ -102,7 +103,7 @@ object AutonomousHeroAi {
       hero.aiIntentLabelVi = "Rút lui chiến thuật"
       val safeX = (masterX - 110f).coerceAtLeast(mapLayout.wallMargin + 40f)
       val safeY = masterY + formationOffsetY(hero.formationIndex)
-      moveTowards(hero, safeX, safeY, hero.speed * 1.24f, dt, mapLayout)
+      moveTowards(hero, safeX, safeY, hero.effectiveSpeed * 1.24f, dt, mapLayout)
       return
     }
 
@@ -111,7 +112,7 @@ object AutonomousHeroAi {
       val distToSlot = hypot(formPos.first - hero.x, formPos.second - hero.y)
       if (distToSlot > 52f) {
         hero.aiIntentLabelVi = "Tập hợp quanh Master"
-        moveTowards(hero, formPos.first, formPos.second, hero.speed * 1.18f, dt, mapLayout)
+        moveTowards(hero, formPos.first, formPos.second, hero.effectiveSpeed * 1.18f, dt, mapLayout)
         return
       }
     }
@@ -120,9 +121,12 @@ object AutonomousHeroAi {
     if (order == TacticalOrder.MOVE_TO && moveBeacon != null) {
       val slot = formationSlotAround(moveBeacon.first, moveBeacon.second, hero)
       val distBeacon = hypot(slot.first - hero.x, slot.second - hero.y)
-      if (distBeacon > 95f) {
+      // Escort telegraphs need a precise dodge; the normal loose formation stop
+      // radius can leave the frontline inside a clearly avoided danger circle.
+      val arrivalRadius = if (protectedAllyPosition != null) 24f else 95f
+      if (distBeacon > arrivalRadius) {
         hero.aiIntentLabelVi = "Tiến tới điểm chỉ định"
-        moveTowards(hero, slot.first, slot.second, hero.speed * 1.12f, dt, mapLayout)
+        moveTowards(hero, slot.first, slot.second, hero.effectiveSpeed * 1.12f, dt, mapLayout)
         return
       }
     }
@@ -136,6 +140,7 @@ object AutonomousHeroAi {
       masterY = masterY,
       order = order,
       designatedTargetId = designatedTargetId,
+      protectedAllyPosition = protectedAllyPosition,
     )
     hero.currentTargetId = target?.id
 
@@ -156,13 +161,14 @@ object AutonomousHeroAi {
         }
         TacticalOrder.PROTECT_ALLY -> {
           val vip = livingAllies.minByOrNull { it.hp.toFloat() / it.maxHp } ?: hero
-          if (vip.id == hero.id) formationSlotAround(masterX, masterY, hero)
+          if (protectedAllyPosition != null) formationSlotAround(protectedAllyPosition.first, protectedAllyPosition.second, hero)
+          else if (vip.id == hero.id) formationSlotAround(masterX, masterY, hero)
           else formationSlotAround(vip.x, vip.y, hero)
         }
         else -> formationSlotAround(masterX, masterY, hero)
       }
       if (hypot(anchor.first - hero.x, anchor.second - hero.y) > 22f) {
-        moveTowards(hero, anchor.first, anchor.second, hero.speed, dt, mapLayout)
+        moveTowards(hero, anchor.first, anchor.second, hero.effectiveSpeed, dt, mapLayout)
       } else {
         hero.isMoving = false
       }
@@ -185,7 +191,7 @@ object AutonomousHeroAi {
       hero.aiIntentLabelVi = "Giữ chốt phản kích"
       val distFromAnchor = hypot(hero.x - hero.anchorX, hero.y - hero.anchorY)
       if (distFromAnchor > 48f) {
-        moveTowards(hero, hero.anchorX, hero.anchorY, hero.speed, dt, mapLayout)
+        moveTowards(hero, hero.anchorX, hero.anchorY, hero.effectiveSpeed, dt, mapLayout)
       } else {
         hero.isMoving = false
       }
@@ -201,7 +207,7 @@ object AutonomousHeroAi {
       hero.aiIntentLabelVi = "Thả diều tầm xa"
       val retreatX = hero.x - (dx / dist) * 120f
       val retreatY = hero.y - (dy / dist) * 120f
-      moveTowards(hero, retreatX, retreatY, hero.speed * 0.95f, dt, mapLayout)
+      moveTowards(hero, retreatX, retreatY, hero.effectiveSpeed * 0.95f, dt, mapLayout)
       if (hero.attackCooldown <= 0f || hero.skillCooldown <= 0f) {
         executeCombatActions(hero, target, livingEnemies, spawnProjectile, spawnAoE, spawnText, dealDamageToEnemy)
       }
@@ -215,7 +221,7 @@ object AutonomousHeroAi {
       val safeRefY = knightAlly?.y ?: masterY
       if (hypot(safeRefX - hero.x, safeRefY - hero.y) > 45f && dist < 170f) {
         hero.aiIntentLabelVi = "Lùi về sau Khiên"
-        moveTowards(hero, safeRefX, safeRefY, hero.speed * 1.05f, dt, mapLayout)
+        moveTowards(hero, safeRefX, safeRefY, hero.effectiveSpeed * 1.05f, dt, mapLayout)
         return
       }
     }
@@ -228,7 +234,7 @@ object AutonomousHeroAi {
         hero.heroClass == HeroClassType.KNIGHT && hypot(target.x - masterX, target.y - masterY) < 190f -> "Đánh chặn hộ giá"
         else -> "Áp sát mục tiêu"
       }
-      moveTowards(hero, target.x, target.y, hero.speed, dt, mapLayout)
+      moveTowards(hero, target.x, target.y, hero.effectiveSpeed, dt, mapLayout)
     } else {
       hero.isMoving = false
       hero.aiIntentLabelVi = when {
@@ -249,6 +255,7 @@ object AutonomousHeroAi {
     masterY: Float,
     order: TacticalOrder,
     designatedTargetId: String?,
+    protectedAllyPosition: Pair<Float, Float>?,
   ): EnemyCombatUnit? {
     if (livingEnemies.isEmpty()) return null
 
@@ -261,8 +268,8 @@ object AutonomousHeroAi {
     // Protect Ally prioritizes enemy closest to the most vulnerable ally / Master
     if (order == TacticalOrder.PROTECT_ALLY) {
       val vulnerable = livingAllies.minByOrNull { it.hp.toFloat() / it.maxHp }
-      val refX = vulnerable?.x ?: masterX
-      val refY = vulnerable?.y ?: masterY
+      val refX = protectedAllyPosition?.first ?: vulnerable?.x ?: masterX
+      val refY = protectedAllyPosition?.second ?: vulnerable?.y ?: masterY
       return livingEnemies
         .filter { hypot(it.x - refX, it.y - refY) <= 420f }
         .minByOrNull { hypot(it.x - refX, it.y - refY) }
@@ -341,7 +348,7 @@ object AutonomousHeroAi {
           hero.shieldHp = (hero.shieldHp + 65 + hero.skillLevel * 12).coerceAtMost(220)
           spawnAoE(CombatAoEEffect(hero.x, hero.y, 115f, Color(0xFF38BDF8)))
           livingEnemies.filter { hypot(it.x - hero.x, it.y - hero.y) <= 120f }.forEach { e ->
-            dealDamageToEnemy(e, (hero.attack * skillMult).toInt(), true)
+            dealDamageToEnemy(e, (hero.effectiveAttack * skillMult).toInt(), true)
           }
         }
 
@@ -358,7 +365,7 @@ object AutonomousHeroAi {
                 y = hero.y - 16f,
                 vx = cos(rad) * 440f,
                 vy = sin(rad) * 440f,
-                damage = (hero.attack * (0.95f + hero.skillLevel * 0.08f)).toInt(),
+                damage = (hero.effectiveAttack * (0.95f + hero.skillLevel * 0.08f)).toInt(),
                 color = Color(0xFFFBBF24),
                 radius = 6.5f,
               )
@@ -370,7 +377,7 @@ object AutonomousHeroAi {
           // Astral Meteor AoE Blast at target cluster
           spawnAoE(CombatAoEEffect(target.x, target.y, 130f, Color(0xFFC084FC), duration = 0.68f))
           livingEnemies.filter { hypot(it.x - target.x, it.y - target.y) <= 135f }.forEach { e ->
-            dealDamageToEnemy(e, (hero.attack * (skillMult + 0.25f)).toInt(), true)
+            dealDamageToEnemy(e, (hero.effectiveAttack * (skillMult + 0.25f)).toInt(), true)
           }
         }
 
@@ -380,7 +387,7 @@ object AutonomousHeroAi {
           hero.x = target.x + behindDir * 30f
           hero.y = target.y
           spawnAoE(CombatAoEEffect(target.x, target.y, 65f, Color(0xFFF43F5E)))
-          dealDamageToEnemy(target, (hero.attack * (skillMult + 0.55f)).toInt(), true)
+          dealDamageToEnemy(target, (hero.effectiveAttack * (skillMult + 0.55f)).toInt(), true)
         }
 
         HeroClassType.BERSERKER -> {
@@ -388,14 +395,14 @@ object AutonomousHeroAi {
           val missingHpBonus = 1f + (1f - hero.hp.toFloat() / hero.maxHp.toFloat()) * 0.65f
           spawnAoE(CombatAoEEffect(hero.x, hero.y, 110f, Color(0xFFEF4444)))
           livingEnemies.filter { hypot(it.x - hero.x, it.y - hero.y) <= 115f }.forEach { e ->
-            dealDamageToEnemy(e, (hero.attack * skillMult * missingHpBonus).toInt(), true)
+            dealDamageToEnemy(e, (hero.effectiveAttack * skillMult * missingHpBonus).toInt(), true)
           }
         }
 
         HeroClassType.PRIEST -> {
           // Offensive Holy Smite if everyone is healthy
           spawnAoE(CombatAoEEffect(target.x, target.y, 85f, Color(0xFFFef08A)))
-          dealDamageToEnemy(target, (hero.attack * skillMult).toInt(), true)
+          dealDamageToEnemy(target, (hero.effectiveAttack * skillMult).toInt(), true)
         }
       }
       return
@@ -432,7 +439,7 @@ object AutonomousHeroAi {
               y = hero.y - 16f,
               vx = (dx / d) * projSpeed,
               vy = (dy / d) * projSpeed,
-              damage = hero.attack,
+              damage = hero.effectiveAttack,
               color = projColor,
               isAoEOnHit = hero.heroClass == HeroClassType.MAGE,
             )
@@ -440,7 +447,7 @@ object AutonomousHeroAi {
         }
 
         else -> {
-          dealDamageToEnemy(target, hero.attack, false)
+          dealDamageToEnemy(target, hero.effectiveAttack, false)
         }
       }
     }

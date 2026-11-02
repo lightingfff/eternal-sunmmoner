@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 
 /** Offline-authored PNGs. Cache lists as well as images; no decoding in warmed-up draw passes. */
 object SanctuaryArtAssets {
@@ -11,6 +12,8 @@ object SanctuaryArtAssets {
   private val images = mutableMapOf<String, ImageBitmap>()
   private val families = mutableMapOf<String, List<ImageBitmap>>()
   internal val cachedImageCount get() = images.size
+  /** Decoded PNG cache only; generated actor atlases and GPU copies are not included. Sample at 1 Hz. */
+  internal val cachedBitmapBytes: Long get() = images.values.sumOf { it.asAndroidBitmap().allocationByteCount.toLong() }
   fun init(context: Context) { this.context = context.applicationContext }
   fun image(id: String): ImageBitmap? = asset("sanctuary_p03/$id.png")
   internal fun textAsset(path: String): String? = context?.assets?.open(path)?.bufferedReader()?.use { it.readText() }

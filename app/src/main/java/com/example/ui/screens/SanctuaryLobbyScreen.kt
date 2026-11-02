@@ -69,10 +69,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -101,6 +101,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.FeastBuffHelper
 import com.example.data.GameSettings
+import com.example.performance.FixedSceneSimulation
+import com.example.performance.SceneFrameLoop
+import com.example.performance.ScenePerformanceOverlay
+import com.example.performance.ScenePerformanceProbe
+import com.example.performance.ScenePerformanceSnapshot
 import com.example.data.SanctuaryProgressionHelper
 import com.example.data.model.EquipmentRecord
 import com.example.data.model.FacilityType
@@ -221,6 +226,7 @@ fun SanctuaryLobbyScreen(
   onAssignHeroActivity: (HeroRecord, HeroStatusType) -> Unit = { _, _ -> },
   onHostMealWithRecipe: (SanctuaryMealRecipe) -> Unit = { _ -> onHostMeal() },
   onUnlockExpansion: (IslandExpansionMilestone) -> Unit = {},
+  sceneActive: Boolean = true,
 ) {
   val artContext = androidx.compose.ui.platform.LocalContext.current
   remember(artContext) { com.example.game.pixel.SanctuaryArtAssets.init(artContext) }
@@ -237,8 +243,16 @@ fun SanctuaryLobbyScreen(
   var keyLeft by remember { mutableStateOf(false) }
   var keyRight by remember { mutableStateOf(false) }
   var zoom by remember { mutableFloatStateOf(settings.defaultZoom) }
-  var frameTick by remember { mutableIntStateOf(0) }
   var animTimeSec by remember { mutableFloatStateOf(0f) }
+  val fixedSimulation = remember { FixedSceneSimulation() }
+  val performanceProbe = remember(settings.performanceOverlay, settings.performanceMode) {
+    ScenePerformanceProbe(settings.performanceOverlay, settings.performanceMode.targetFps)
+  }
+  var performanceSnapshot by remember { mutableStateOf<ScenePerformanceSnapshot?>(null) }
+  val drawStats = remember { intArrayOf(-1) }
+  val hudClock = remember { floatArrayOf(0f) }
+  var hudSelectedHeroId by remember { mutableStateOf<String?>(null) }
+  var hudNowEpochSec by remember { mutableLongStateOf(System.currentTimeMillis() / 1000L) }
   var activeInteriorState by remember { mutableStateOf<FacilityType?>(null) }
   val insideInterior = activeInteriorState != null
   val insideRestaurantState = activeInteriorState == FacilityType.RESTAURANT
@@ -286,30 +300,50 @@ fun SanctuaryLobbyScreen(
     }
   }
 
-  LaunchedEffect(Unit) {
-    focusRequester.requestFocus()
-    var lastNanos = 0L
-    while (true) {
-      withFrameNanos { nanos ->
-        val dt = if (lastNanos == 0L) 0.016f else ((nanos - lastNanos) / 1_000_000_000f).coerceIn(0.001f, 0.05f)
-        lastNanos = nanos
-        animTimeSec += dt
-
-        val kDx = (if (keyRight) 1f else 0f) - (if (keyLeft) 1f else 0f)
-        val kDy = (if (keyDown) 1f else 0f) - (if (keyUp) 1f else 0f)
-        val dx = if (kotlin.math.abs(joyDx) > 0.05f) joyDx else kDx
-        val dy = if (kotlin.math.abs(joyDy) > 0.05f) joyDy else kDy
-
-        lobbyEngine.step(dt, dx, dy)
-        activeInteriorState = lobbyEngine.activeInterior
-        frameTick++
-      }
-    }
-  }
-
   val showPrologue = profile != null && !profile.storyFlags.contains(ManhwaStoryData.FLAG_PROLOGUE_SEEN)
   var prologueIndex by remember { mutableIntStateOf(0) }
   val feastActive = FeastBuffHelper.isFeastBuffActive(profile?.storyFlags.orEmpty())
+
+  LaunchedEffect(Unit) { focusRequester.requestFocus() }
+  SceneFrameLoop(
+    active = sceneActive && state.activeFacilityModal == null && managementMode == null &&
+      !showPauseMapModal && !showChronicleModal && !showExpansionModal && inspectingHeroId == null && !showPrologue,
+    targetFps = settings.performanceMode.targetFps,
+  ) { elapsed, nanos ->
+    if (elapsed == 0f) {
+      fixedSimulation.reset()
+      performanceProbe.reset()
+    }
+    val started = if (settings.performanceOverlay) System.nanoTime() else 0L
+    // A debugger/foreground stall never causes an unbounded catch-up burst. Normal 30/60 Hz
+    // frames retain the same fixed 60 Hz simulation; background time is excluded by SceneFrameLoop.
+    val dt = elapsed.coerceAtMost(0.25f)
+    animTimeSec += dt
+    val kDx = (if (keyRight) 1f else 0f) - (if (keyLeft) 1f else 0f)
+    val kDy = (if (keyDown) 1f else 0f) - (if (keyUp) 1f else 0f)
+    val dx = if (kotlin.math.abs(joyDx) > 0.05f) joyDx else kDx
+    val dy = if (kotlin.math.abs(joyDy) > 0.05f) joyDy else kDy
+    fixedSimulation.advance(dt) { step -> lobbyEngine.step(step, dx, dy) }
+    activeInteriorState = lobbyEngine.activeInterior
+    hudClock[0] += dt
+    if (hudClock[0] >= 0.25f) {
+      hudClock[0] %= 0.25f
+      hudSelectedHeroId = lobbyEngine.selectedHeroId
+      hudNowEpochSec = System.currentTimeMillis() / 1000L
+    }
+    if (settings.performanceOverlay) {
+      performanceProbe.recordFrame(nanos, System.nanoTime() - started)
+      // Cache traversal and immutable UI snapshots happen at most once per second.
+      performanceProbe.poll(nanos)?.let { sample ->
+        performanceSnapshot = sample.copy(
+          activeHeroes = lobbyEngine.heroActors.size,
+          activeMonsters = 0,
+          visibleDrawables = drawStats[0],
+          bitmapCacheBytes = com.example.game.pixel.SanctuaryArtAssets.cachedBitmapBytes,
+        )
+      }
+    }
+  }
 
   BoxWithConstraints(
     modifier = Modifier
@@ -427,6 +461,7 @@ fun SanctuaryLobbyScreen(
               if (tappedHero != null) {
                 if (!tappedHero.isSanctuaryKeeperNpc) {
                   lobbyEngine.selectedHeroId = tappedHero.heroId
+                  hudSelectedHeroId = tappedHero.heroId
                 } else {
                   onOpenFacility(activeInt)
                 }
@@ -458,6 +493,7 @@ fun SanctuaryLobbyScreen(
               if (tappedHero != null) {
                 if (!tappedHero.isSanctuaryKeeperNpc) {
                   lobbyEngine.selectedHeroId = tappedHero.heroId
+                  hudSelectedHeroId = tappedHero.heroId
                   promptedFacility = null
                 } else {
                   promptedFacility = when (tappedHero.heroId) {
@@ -480,8 +516,8 @@ fun SanctuaryLobbyScreen(
           }
         },
     ) {
-      val tickRead = frameTick
-      if (tickRead < 0) return@Canvas
+      // Animation state is read in draw only, so a world tick does not recompose the HUD.
+      val drawStarted = if (settings.performanceOverlay) System.nanoTime() else 0L
 
       val halfW = size.width / 2f
       val halfH = size.height / 2f
@@ -531,6 +567,7 @@ fun SanctuaryLobbyScreen(
       if (!lobbyEngine.isInsideInterior) with(com.example.game.pixel.LivingWorldRenderer) { drawWeather(camX,camY,zoom,false) }
       // Y-Sorted 2.5D Architecture, Trees, Furnishings, and Autonomous 3/4 Anime Heroes
       val drawables = depthQueue.ordered(layout.obstacles,lobbyEngine.heroActors)
+      var visibleDrawables = 0
 
       if (!lobbyEngine.isInsideInterior) {
         with(com.example.game.pixel.SanctuaryEnvironmentShadows) {
@@ -538,6 +575,22 @@ fun SanctuaryLobbyScreen(
         }
       }
       drawables.forEach { item ->
+        // Share the existing renderer's generous margins; also skip offscreen canopy work.
+        val visible = when (item) {
+          is LobbyDrawableItem.Prop -> {
+            val sx = ObliqueCamera.worldToScreenX(item.obs.x, camX, zoom, halfW)
+            val sy = ObliqueCamera.worldToScreenY(item.obs.y, camY, zoom, halfH, item.obs.elevationZ)
+            sx >= -380f && sx <= size.width + 380f && sy >= -400f && sy <= size.height + 380f
+          }
+          is LobbyDrawableItem.HeroNpc -> {
+            val sx = ObliqueCamera.worldToScreenX(item.actor.x, camX, zoom, halfW)
+            val sy = ObliqueCamera.worldToScreenY(item.actor.y, camY, zoom, halfH)
+            sx >= -120f && sx <= size.width + 120f && sy >= -150f && sy <= size.height + 120f
+          }
+          is LobbyDrawableItem.Master -> false
+        }
+        if (!visible) return@forEach
+        visibleDrawables++
         when (item) {
           is LobbyDrawableItem.Prop -> drawProp(
             obs = item.obs,
@@ -791,6 +844,15 @@ fun SanctuaryLobbyScreen(
       }
 
       drawForegroundAtmosphere(layout.biome, animTimeSec, settings.particlesEnabled)
+      drawStats[0] = visibleDrawables
+      if (settings.performanceOverlay) performanceProbe.recordDraw(System.nanoTime() - drawStarted)
+    }
+
+    if (settings.performanceOverlay) {
+      ScenePerformanceOverlay(
+        performanceSnapshot,
+        Modifier.align(Alignment.CenterStart).padding(8.dp).testTag("sanctuary_performance_overlay"),
+      )
     }
 
     // 2. Slim, Non-Intrusive Fantasy RPG Top HUD (7-9% height)
@@ -972,7 +1034,7 @@ fun SanctuaryLobbyScreen(
         horizontalAlignment = Alignment.End,
         verticalArrangement = Arrangement.spacedBy(6.dp),
       ) {
-        val selectedHeroRecord = state.heroes.find { it.id == lobbyEngine.selectedHeroId }
+        val selectedHeroRecord = state.heroes.find { it.id == hudSelectedHeroId }
         val activePrompt = promptedFacility
 
         if (activePrompt != null && !insideInterior) {
@@ -998,12 +1060,12 @@ fun SanctuaryLobbyScreen(
           SelectedHeroCompactCard(
             hero = selectedHeroRecord,
             equipment = state.equipment,
-            nowEpochSec = System.currentTimeMillis() / 1000L,
+            nowEpochSec = hudNowEpochSec,
             isInsideInterior = insideInterior,
             onOpenFullProfile = { inspectingHeroId = selectedHeroRecord.id },
             onCommandHold = { lobbyEngine.commandHeroHold(selectedHeroRecord.id) },
             onCommandTask = { task -> lobbyEngine.commandHeroTask(selectedHeroRecord.id, task) },
-            onDismiss = { lobbyEngine.selectedHeroId = null },
+            onDismiss = { lobbyEngine.selectedHeroId = null; hudSelectedHeroId = null },
           )
         }
 
@@ -1102,6 +1164,7 @@ fun SanctuaryLobbyScreen(
                 .clickable {
                   promptedFacility = null
                   lobbyEngine.selectedHeroId = hero.id
+                  hudSelectedHeroId = hero.id
                   lobbyEngine.focusCameraOnHero(hero.id)
                 }
                 .padding(2.dp),

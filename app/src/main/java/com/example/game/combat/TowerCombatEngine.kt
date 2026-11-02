@@ -30,6 +30,7 @@ class TowerCombatEngine(
   equipment: List<EquipmentRecord>,
   val feastBuffActive: Boolean = false,
   val activeMealRecipe: SanctuaryMealRecipe? = null,
+  enableLostCourier: Boolean = false,
 ) {
   val mapLayout: GeneratedMapLayout = TowerFloorCatalog.buildTowerFloorMap(floorSpec)
 
@@ -117,11 +118,19 @@ class TowerCombatEngine(
   val projectiles: MutableList<CombatProjectile> = mutableListOf()
   val aoeEffects: MutableList<CombatAoEEffect> = mutableListOf()
   val floatingTexts: MutableList<FloatingCombatText> = mutableListOf()
+  val lostCourier: LostCourierEncounter? = if (enableLostCourier && floorSpec.floorNumber == 1) {
+    LostCourierEncounter(this, squadRecords)
+  } else null
 
   init {
     selectedHeroId = heroes.firstOrNull()?.id
-    floorSpec.enemies.filter { !it.spawnOnEventWave }.forEachIndexed { idx, spawn ->
-      enemies += createEnemyUnit("enemy_init_$idx", spawn.archetype, spawn.x, spawn.y, floorSpec.floorNumber)
+    if (lostCourier != null) {
+      lostCourier.initialize()
+      activeOrder = TacticalOrder.PROTECT_ALLY
+    } else {
+      floorSpec.enemies.filter { !it.spawnOnEventWave }.forEachIndexed { idx, spawn ->
+        enemies += createEnemyUnit("enemy_init_$idx", spawn.archetype, spawn.x, spawn.y, floorSpec.floorNumber)
+      }
     }
 
     mapLayout.obstacles.forEach { obs ->
@@ -164,7 +173,7 @@ class TowerCombatEngine(
     }
   }
 
-  private fun postFeedback(message: String) {
+  internal fun postFeedback(message: String) {
     commandFeedback = message
     commandFeedbackTimer = 3.2f
   }
@@ -236,9 +245,32 @@ class TowerCombatEngine(
   fun confirmTacticalRetreat() {
     if (stage == MissionStage.VICTORY || stage == MissionStage.DEFEAT) return
     retreatCompleted = true
+    lostCourier?.fail("Đã rút lui an toàn. Nhiệm vụ người đưa thư có thể thử lại.")
     activeOrder = TacticalOrder.RETREAT
     stage = MissionStage.DEFEAT
     postFeedback("Đã rút lui chiến thuật an toàn về Thánh Địa!")
+  }
+
+  internal fun eventWaveTriggeredForCourier() { eventWaveTriggered = true }
+
+  fun chooseCourierOrder(order: CourierOrder) {
+    val mission = lostCourier ?: return
+    if (mission.outcome != null) return
+    if (order == CourierOrder.PROTECT) {
+      mission.order = order
+      issueTacticalOrder(TacticalOrder.PROTECT_ALLY)
+      postFeedback("BẢO VỆ: bọc lót người đưa thư, chặn lính gác; giảm 40% sát thương khi đứng gần. Trinh sát có thể gọi viện!")
+    } else {
+      val scout = enemies.firstOrNull { it.id == mission.scoutEnemyId && !it.dead }
+      if (scout == null) {
+        postFeedback("Chưa có trinh sát đang gọi viện. Bảo vệ người đưa thư trước!")
+        return
+      }
+      mission.order = order
+      designatedTargetId = scout.id
+      issueTacticalOrder(TacticalOrder.ATTACK_TARGET)
+      postFeedback("CHẶN TRINH SÁT: toàn đội truy đuổi; người đưa thư mất đội hình che chắn!")
+    }
   }
 
   fun issueTacticalOrder(order: TacticalOrder) {
@@ -416,6 +448,7 @@ class TowerCombatEngine(
     if (stage == MissionStage.INTRO_DIALOGUE || stage == MissionStage.VICTORY || stage == MissionStage.DEFEAT) {
       return
     }
+    lostCourier?.beforeStep(dt)
 
     if (commandFeedbackTimer > 0f) {
       commandFeedbackTimer = (commandFeedbackTimer - dt).coerceAtLeast(0f)
@@ -471,7 +504,7 @@ class TowerCombatEngine(
 
     // Master tactical guiding arcane bolt support from command sigil
     masterBoltCooldown = (masterBoltCooldown - dt).coerceAtLeast(0f)
-    if (masterBoltCooldown <= 0f) {
+    if (masterBoltCooldown <= 0f && lostCourier == null) {
       val nearThreat = enemies.filter { !it.dead && hypot(it.x - masterX, it.y - masterY) <= 270f }
         .minByOrNull { hypot(it.x - masterX, it.y - masterY) }
       if (nearThreat != null) {
@@ -496,7 +529,7 @@ class TowerCombatEngine(
     // 2. Check Mid-Mission Manhwa Event Trigger (Boss & Ambush Wave!)
     val leadX = maxOf(masterX, heroes.filter { !it.knockedOut }.maxOfOrNull { it.x } ?: masterX)
     val initialCleared = enemies.all { it.dead }
-    if (!eventWaveTriggered && (leadX >= floorSpec.eventTriggerX || initialCleared)) {
+    if (lostCourier == null && !eventWaveTriggered && (leadX >= floorSpec.eventTriggerX || initialCleared)) {
       eventWaveTriggered = true
       floorSpec.enemies.filter { it.spawnOnEventWave }.forEachIndexed { idx, sp ->
         val bossUnit = createEnemyUnit("enemy_event_$idx", sp.archetype, sp.x, sp.y, floorSpec.floorNumber)
@@ -530,13 +563,18 @@ class TowerCombatEngine(
         dealDamageToEnemy = { enemy, rawDmg, isSkill ->
           applyDamageToEnemy(enemy, rawDmg, isSkill)
         },
+        protectedAllyPosition = lostCourier?.courier?.let { it.x to it.y },
       )
+      if (hero.fearSecondsRemaining > 0f) hero.aiIntentLabelVi = "Lo sợ • -20% sát thương / -15% tốc độ"
     }
 
     // 4. Step Differentiated Enemy AI & Defeat Collapse Animation
-    enemies.forEach { enemy ->
+    // A scout call can append reinforcements. Visit only the roster present at tick start.
+    val enemyCountAtTickStart = enemies.size
+    for (enemyIndex in 0 until enemyCountAtTickStart) {
+      val enemy = enemies[enemyIndex]
       if (!enemy.dead) {
-        updateEnemyAi(enemy, dt)
+        if (lostCourier?.handles(enemy) == true) lostCourier.updateEnemy(enemy, dt) else updateEnemyAi(enemy, dt)
       } else if (enemy.deathAnimProgress < 1f) {
         enemy.deathAnimProgress = (enemy.deathAnimProgress + dt * 2.2f).coerceAtMost(1f)
       }
@@ -598,6 +636,12 @@ class TowerCombatEngine(
 
     // 7. Check Mission Victory / Tactical Retreat / Defeat Conditions
     val livingHeroes = heroes.filter { !it.knockedOut }
+    lostCourier?.afterStep()
+    if (lostCourier != null) {
+      if (activeOrder == TacticalOrder.RETREAT && livingHeroes.isNotEmpty() &&
+        livingHeroes.all { hypot(it.x - floorSpec.spawnX, it.y - floorSpec.spawnY) <= 185f }) confirmTacticalRetreat()
+      return
+    }
     if (eventWaveTriggered && enemies.all { it.dead }) {
       stage = MissionStage.VICTORY
     } else if (masterHp <= 0 || livingHeroes.isEmpty()) {
@@ -781,7 +825,10 @@ class TowerCombatEngine(
     if (enemy.dead) return
     enemy.aggroed = true
     val variance = 0.92f + Random.nextFloat() * 0.16f
-    val mitigated = ((rawDmg * variance).toInt() - enemy.defense / 2).coerceAtLeast(6)
+    val courierMission = lostCourier
+    val counterMult = if (courierMission != null && enemy.id == courierMission.eliteEnemyId &&
+      courierMission.eliteRecoveryRemaining > 0f && activeOrder == TacticalOrder.FOCUS_FIRE) 1.35f else 1f
+    val mitigated = ((rawDmg * variance * counterMult).toInt() - enemy.defense / 2).coerceAtLeast(6)
     enemy.hp = (enemy.hp - mitigated).coerceAtLeast(0)
     enemy.hurtFlash = 1f
     aoeEffects += CombatAoEEffect(enemy.x, enemy.y - 12f, if (isSkill) 36f else 22f, Color(0xFFFEF08A), duration = 0.25f)
@@ -801,7 +848,7 @@ class TowerCombatEngine(
     }
   }
 
-  private fun applyDamageToHero(hero: HeroCombatUnit, rawDmg: Int) {
+  internal fun applyDamageToHero(hero: HeroCombatUnit, rawDmg: Int) {
     if (hero.knockedOut) return
     var mitigated = (rawDmg - hero.defense / 2).coerceAtLeast(4)
     if (hero.shieldHp > 0) {
