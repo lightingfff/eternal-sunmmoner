@@ -156,19 +156,25 @@ class MapForgeP21ContractTest {
       // painted door must therefore be centred within 1.5 px of the canvas centre.
       assertEquals("${case.key}: trigger must invert onto canvas centre X", case.w / 2f, px, 1.5f)
       assertEquals("${case.key}: trigger must invert onto the H-3 base row", case.h - 3f, py, 1.5f)
-      // That pixel must be inside a real dark opening, i.e. inside the door leaf.
+      // Probe the leaf a few pixels above the sill: the sill row itself is the contact rim.
+      val liftPx = 6
       val cx = px.toInt()
-      val cy = py.toInt() - 6
+      val cy = py.toInt() - liftPx
       val p = bmp.getPixel(cx, cy)
       val luminance = (((p shr 16) and 0xFF) * 299 + ((p shr 8) and 0xFF) * 587 + (p and 0xFF) * 114) / 1000
       assertTrue("${case.key}: door pixel must be a dark opaque leaf (0x${Integer.toHexString(p)}, luma $luminance)",
         (p ushr 24) == 255 && luminance < 96)
-      // Forward mapping: the same pixel maps back to the trigger, not somewhere else.
+      // Forward mapping: the probe must land on the trigger's column, and exactly `liftPx` sprite
+      // rows of world space along +Y from the trigger (6 px * 1.6 / 0.72 = 13.33 world units at
+      // scale 0.80). Tolerances absorb the 1 px truncation of the probe coordinate.
+      val liftWorld = liftPx * (2f * obs.scale) / 0.72f
       val (wx, wy) = worldOf(obs.x, obs.y, case.w, case.h, obs.scale, cx.toFloat(), cy.toFloat())
       assertTrue("${case.key}: door must map to world x ${entrance.doorWorldX}, got $wx",
         kotlin.math.abs(wx - entrance.doorWorldX) <= 4f)
-      assertTrue("${case.key}: door must map to world y ${entrance.doorWorldY}, got $wy",
-        kotlin.math.abs(wy - entrance.doorWorldY) <= 6f)
+      assertTrue(
+        "${case.key}: door probe must map $liftWorld u from the trigger, got ${wy - entrance.doorWorldY}",
+        kotlin.math.abs((wy - entrance.doorWorldY) - liftWorld) <= 2f,
+      )
       // Ancillary contract: the entrance and the obstacle were not edited to fit the art.
       assertEquals("${case.key}: entrance row stays on the obstacle anchor", obs.y, entrance.doorWorldY, 0.01f)
     }
