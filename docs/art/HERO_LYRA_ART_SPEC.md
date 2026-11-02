@@ -100,26 +100,26 @@ does not glow against the dark ground.
 6. Verify against a real renderer capture (Robolectric evidence harness) before claiming
    integration.
 
-## 8. What this cycle produced, honestly
+## 8. Status
 
-Produced:
-- `art/p16_lyra/lyra_concept_fullbody.png` — original full-body concept, generated in this
-  session, flat studio backdrop (**this is the strongest asset of the batch**).
-- `art/p16_lyra/lyra_portrait_bust.png` — original bust portrait for a hero panel / card.
-- `art/p16_lyra/lyra_idle_sprite_64x96.png` — 64 × 96 idle sample **derived automatically**
-  from the concept by `tools/generate_hero_sample.py`.
-- `art/p16_lyra/lyra_sample_report.json` — pivot/alpha/palette validation (feet on pivot
-  row 90, corners transparent, 25 colours, 24 KB RGBA).
-- `art/p16_lyra/lyra_idle_sprite_4x_preview.png`, `lyra_palette.png`,
-  `docs/visual-evidence/p16/hero_sample_vs_existing.png`.
+### P17 milestone (this cycle) — 4-direction idle + walk
+`art/p16_lyra/pack/` now holds hand-authored (procedural, cluster-by-cluster) sprites:
+56 frames, 4 directions × (idle 6 + walk 8), 64 × 96, pivot (32, 90), atlas 896 × 384,
+1.31 MB, 35 colours, validation PASS. See `docs/art/LYRA_SPRITE_PACK.md` for the direction
+mapping, animation table, QA gates and the exact integration diff.
 
-Not produced, and not claimed:
-- A production animation sheet. The derived frame proves the palette, silhouette and export
-  contract, but an automatic reduction of a painterly 1024 px concept cannot invent clean
-  1-px cluster control, a readable 3-px face, or consistent frame-to-frame identity. A
-  hand-authoring pass (or a pixel-art-specialised generator) over this concept is required
-  before anything is wired into `PremiumActorAtlas`.
-- Any in-game integration, any device screenshot, any performance measurement.
+### Superseded
+The earlier `art/p16_lyra/lyra_idle_sprite_64x96.png` (auto-derived from the concept) is
+kept only as a record of that experiment; it is **not** part of the pack and should not be
+integrated. The pack above replaces it.
 
-Recommended next micro-batch: hand-author (or regenerate at 4× and clean up) the 4-direction
-idle sheet for Lyra from this concept, then the walk cycle, and only then integration.
+### Still original concept work, not sprites
+- `art/p16_lyra/lyra_concept_fullbody.png` — concept / art direction.
+- `art/p16_lyra/lyra_portrait_bust.png` — portrait for a hero panel (not wired).
+
+### Not done, not claimed
+- attack / skill / hit / fear / defeat / rest and the emotion clips in any direction.
+- In-game integration (`PremiumActorAtlas`), device screenshots, device performance.
+- The sprite pack is authored art, but it has **not** been reviewed by a human artist or
+  seen inside the engine yet; treat `docs/visual-evidence/p17/lyra_ingame_scale_mockup.png`
+  as a composite mockup, not an engine render.

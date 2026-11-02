@@ -1,0 +1,140 @@
+{
+  "version": 1,
+  "asset_id": "lyra_4dir_idle_walk",
+  "category": "hero_world_sprite",
+  "file_path": "art/p16_lyra/pack/lyra_4dir_idle_walk.png",
+  "character": "Lyra (hero_starter_lyra) — Archer, 'Mắt Ưng Gió Đêm'",
+  "origin": "Original ETERNAL SUMMONER art; authored cluster recipes in tools/generate_lyra_sprites.py",
+  "source_or_license": "Original in-repo artwork, authored procedurally from pixel recipes; no external, copied, traced or generated bitmap assets are used",
+  "frame": [
+    64,
+    96
+  ],
+  "frame_count": 14,
+  "pivot": [
+    32,
+    90
+  ],
+  "foot_anchor": [
+    32,
+    90
+  ],
+  "world_pixel_scale": 1.08,
+  "intended_world_scale": 1.08,
+  "palette_tag": "dark_fantasy_moss_oxblood",
+  "palette_colors": 35,
+  "approximate_mb": 1.31,
+  "status": "idle + walk complete for all four rows; attack/hurt/fear/skill/defeat pending",
+  "directions": [
+    "front_right",
+    "front_left",
+    "back_right",
+    "back_left"
+  ],
+  "direction_mapping": {
+    "row 0 front_right": "moving toward screen-right, camera-side 3/4 (EAST-facing in the oblique view)",
+    "row 1 front_left": "moving toward screen-left, camera-side 3/4 (WEST-facing)",
+    "row 2 back_right": "moving away, right — back view (NORTH, right lane)",
+    "row 3 back_left": "moving away, left — back view (NORTH, left lane)"
+  },
+  "row_rule": "row = (north ? 2 : 0) + (right ? 0 : 1)  — PremiumActorAtlas.frame()",
+  "clip_order": [
+    "idle",
+    "walk"
+  ],
+  "clips": {
+    "idle": [
+      0.24,
+      0.16,
+      0.2,
+      0.24,
+      0.16,
+      0.2
+    ],
+    "walk": [
+      0.08,
+      0.07,
+      0.07,
+      0.08,
+      0.08,
+      0.07,
+      0.07,
+      0.08
+    ]
+  },
+  "loop_clips": [
+    "idle",
+    "walk"
+  ],
+  "atlas": {
+    "file": "lyra_4dir_idle_walk.png",
+    "size": [
+      896,
+      384
+    ],
+    "pitch": [
+      64,
+      96
+    ]
+  },
+  "clip_columns": {
+    "idle": {
+      "start_column": 0,
+      "frames": 6
+    },
+    "walk": {
+      "start_column": 6,
+      "frames": 8
+    }
+  },
+  "quality": {
+    "front_right": {
+      "bbox": [
+        14,
+        6,
+        49,
+        91
+      ],
+      "colors": 35
+    },
+    "front_left": {
+      "bbox": [
+        15,
+        6,
+        50,
+        91
+      ],
+      "colors": 33
+    },
+    "back_right": {
+      "bbox": [
+        14,
+        9,
+        49,
+        91
+      ],
+      "colors": 32
+    },
+    "back_left": {
+      "bbox": [
+        15,
+        9,
+        50,
+        91
+      ],
+      "colors": 30
+    }
+  },
+  "implementation_notes": "Rows follow the engine's existing 4-direction rule, so the sheet can drop into PremiumActorAtlas once the remaining clips exist. Every frame is a separate authored pose: no mirrored-frame reuse inside a clip, no translation-only fake frames. 1 px transparent margin on all sides keeps nearest-neighbour atlas sampling free of bleeding.",
+  "pending_clips": [
+    "attack",
+    "skill",
+    "hit",
+    "rest",
+    "defeat",
+    "calm",
+    "alert",
+    "fear",
+    "victory"
+  ]
+}

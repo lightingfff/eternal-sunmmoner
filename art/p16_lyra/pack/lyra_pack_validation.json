@@ -1,0 +1,33 @@
+{
+  "atlas": {
+    "file": "lyra_4dir_idle_walk.png",
+    "size": [
+      896,
+      384
+    ],
+    "mode": "RGBA"
+  },
+  "grid": {
+    "columns": 14,
+    "rows": 4,
+    "frame": [
+      64,
+      96
+    ],
+    "pivot": [
+      32,
+      90
+    ]
+  },
+  "frames_checked": 56,
+  "palette_colors_used": 35,
+  "max_colors_per_frame": 35,
+  "memory": {
+    "atlas_rgba_mb": 1.31,
+    "split_actors_rgba_mb": 1.31,
+    "kaelen_atlas_rgba_mb": 6.0,
+    "per_frame_kb": 24.0
+  },
+  "failures": [],
+  "status": "PASS"
+}
