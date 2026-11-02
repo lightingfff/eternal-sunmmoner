@@ -131,10 +131,16 @@ next candidates (unchanged from P16) are the name-pill `TextLayoutResult` cache,
 
 ## 6. CI
 
-| Workflow | Run | Result |
-| --- | --- | --- |
-| Build Eternal Summoner APK | `41417844891` | **pass** |
-| Lyra engine render evidence (new, additive) | `41417844912` | **pass** — rendered and committed the PNGs |
+| Workflow | Run | Commit | Result |
+| --- | --- | --- | --- |
+| Build Eternal Summoner APK | [41418541023](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41418541023) | `d40362a` | **pass** |
+| Lyra engine render evidence (new, additive) | [41418540989](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41418540989) | `d40362a` | **pass** — rendered and committed the PNGs (`fe3d18f`) |
+| (earlier, pre-polish) | [41417844912](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41417844912) | `2e5f2a9` | pass |
+
+The runs triggered by the automated evidence commit itself (`fe3d18f`) are parked in
+`action_required` — GitHub does not auto-run workflows for a bot push to a PR branch; a
+maintainer can approve them from the Actions tab. They only re-check the PNG commit, and the
+same PNGs were already produced and passed on `d40362a`.
 
 The render workflow is additive: `.github/workflows/lyra-render-evidence.yml` does not modify
 `main.yml`. It exists because the existing pipeline only ran `assembleDebug`, so no test and
