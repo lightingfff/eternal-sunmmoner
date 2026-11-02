@@ -17,6 +17,8 @@ on:
       - 'app/src/test/java/com/example/MapForgeTerrainRenderTest.kt'
       - 'app/src/test/java/com/example/MapForgeArchitectureRenderTest.kt'
       - 'app/src/test/java/com/example/MapForgeArchitectureContractTest.kt'
+      - 'app/src/test/java/com/example/MapForgeP21RenderTest.kt'
+      - 'app/src/test/java/com/example/MapForgeP21ContractTest.kt'
       - '.github/workflows/lyra-render-evidence.yml'
 
 permissions:
@@ -81,6 +83,14 @@ jobs:
       - name: Verify P20 asset contract
         run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeArchitectureContractTest" --stacktrace
 
+      # P21: six authored facilities through the same real draw path, fixed cameras.
+      - name: Render P21 premium facilities (real draw code, Robolectric native graphics)
+        run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeP21RenderTest" --stacktrace
+
+      # P21 asset + geometry contract: canvas, door-to-trigger mapping, world anchors, fallback.
+      - name: Verify P21 asset and geometry contract
+        run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeP21ContractTest" --stacktrace
+
       # P19: training field / gravel band / cobble joints, fixed cameras for before/after.
       - name: Render terrain slice (real draw code, Robolectric native graphics)
         run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeTerrainRenderTest" --stacktrace
@@ -98,9 +108,11 @@ jobs:
           cp -f app/build/visual_screenshots/p19/*.png docs/visual-evidence/p19/engine-render/ || true
           mkdir -p docs/visual-evidence/p20/engine-render
           cp -f app/build/visual_screenshots/p20/*.png docs/visual-evidence/p20/engine-render/ || true
+          mkdir -p docs/visual-evidence/p21/engine-render
+          cp -f app/build/visual_screenshots/p21/*.png docs/visual-evidence/p21/engine-render/ || true
           git config user.name "eternal-render-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add docs/visual-evidence/p17c/engine-render docs/visual-evidence/p18/engine-render docs/visual-evidence/p19/engine-render docs/visual-evidence/p20/engine-render
+          git add docs/visual-evidence/p17c/engine-render docs/visual-evidence/p18/engine-render docs/visual-evidence/p19/engine-render docs/visual-evidence/p20/engine-render docs/visual-evidence/p21/engine-render
           if git diff --cached --quiet; then echo "no render changes"; exit 0; fi
           git commit -m "P17-C: engine render evidence (automated, Robolectric native graphics)"
           git push origin HEAD:${{ github.head_ref || github.ref_name }}
@@ -151,6 +163,7 @@ jobs:
             app/build/visual_screenshots/p18/*.png
             app/build/visual_screenshots/p19/*.png
             app/build/visual_screenshots/p20/*.png
+            app/build/visual_screenshots/p21/*.png
             app/build/reports/tests/testDebugUnitTest/**
           if-no-files-found: warn
           retention-days: 30

@@ -180,6 +180,54 @@
         384
       ],
       "sha256": "bee9d4ff9da69af81c2d76749d519f857885a9039f9945b18c74a00f206fe5af"
+    },
+    "summoning_hall": {
+      "file": "summoning_hall.png",
+      "size": [
+        268,
+        206
+      ],
+      "sha256": "ae277ce0df7fe1e25c1fe6f7910277f1ea2b25a0960f7fff531dfb9cbe4708ce"
+    },
+    "tower_gate": {
+      "file": "tower_gate.png",
+      "size": [
+        260,
+        224
+      ],
+      "sha256": "974ba943bbd1fbd3048272b4a5e3df88d2cdddcf3a770d127e2b0694a324f60a"
+    },
+    "hero_registry": {
+      "file": "hero_registry.png",
+      "size": [
+        188,
+        166
+      ],
+      "sha256": "0b313db2c4e51dc2583514549cd71ec22419e83cf30ce2b14be238238f619432"
+    },
+    "hero_quarters": {
+      "file": "hero_quarters.png",
+      "size": [
+        200,
+        168
+      ],
+      "sha256": "215411ccb35969825a11cac9da33882b9f6975ed9f5647a7ff081d63d79c6000"
+    },
+    "restaurant": {
+      "file": "restaurant.png",
+      "size": [
+        206,
+        172
+      ],
+      "sha256": "39918fabb4da5f82c2a75c6cee1fa0eb3c0bd6936bc85a7f7d0135178bc606fa"
+    },
+    "synthesis_lab": {
+      "file": "synthesis_lab.png",
+      "size": [
+        188,
+        168
+      ],
+      "sha256": "389cadb5250d6601a083f3f222c78de80de8ef2fd8bbc38a6c3b5f8958686983"
     }
   },
   "sample": {

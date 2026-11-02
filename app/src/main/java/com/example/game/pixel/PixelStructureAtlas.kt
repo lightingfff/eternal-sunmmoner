@@ -10,16 +10,35 @@ import kotlin.random.Random
  */
 object PixelStructureAtlas {
 
-  // Sanctuary 3/4 Landmark Facilities
-  val towerGateMonument: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildTowerGateMonument() }
-  val summoningHallStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildSummoningHall() }
-  val heroRegistryStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildHeroRegistryHall() }
+  // Sanctuary 3/4 Landmark Facilities.
+  //
+  // P20 introduced the authored-PNG-first pattern for the Armory; P21 extends it to the six other
+  // facilities and makes the fallback real: `assetSafe` returns null for a missing/corrupt PNG
+  // instead of throwing, so the Elvis branch can actually reach the procedural builder. Canvases
+  // are identical between PNG and fallback, so the renderer's bottom-centred blit, the door
+  // triggers and the depth sort anchors are unchanged either way. Nothing is generated at draw
+  // time: one cached decode, then one blit per facility per frame.
+  val towerGateMonument: ImageBitmap get() =
+    SanctuaryArtAssets.assetSafe("premium_slice/tower_gate.png") ?: towerGateMonumentFallback
+  private val towerGateMonumentFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildTowerGateMonument() }
+  val summoningHallStructure: ImageBitmap get() =
+    SanctuaryArtAssets.assetSafe("premium_slice/summoning_hall.png") ?: summoningHallFallback
+  private val summoningHallFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildSummoningHall() }
+  val heroRegistryStructure: ImageBitmap get() =
+    SanctuaryArtAssets.assetSafe("premium_slice/hero_registry.png") ?: heroRegistryFallback
+  private val heroRegistryFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildHeroRegistryHall() }
   val trainingGroundStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildTrainingGround() }
-  val armoryStructure: ImageBitmap get() = SanctuaryArtAssets.asset("premium_slice/armory.png") ?: armoryFallback
+  val armoryStructure: ImageBitmap get() = SanctuaryArtAssets.assetSafe("premium_slice/armory.png") ?: armoryFallback
   private val armoryFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildArmory() }
-  val synthesisLabStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildSynthesisLab() }
-  val heroQuartersStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildHeroQuarters() }
-  val restaurantStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildRestaurantExterior() }
+  val synthesisLabStructure: ImageBitmap get() =
+    SanctuaryArtAssets.assetSafe("premium_slice/synthesis_lab.png") ?: synthesisLabFallback
+  private val synthesisLabFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildSynthesisLab() }
+  val heroQuartersStructure: ImageBitmap get() =
+    SanctuaryArtAssets.assetSafe("premium_slice/hero_quarters.png") ?: heroQuartersFallback
+  private val heroQuartersFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildHeroQuarters() }
+  val restaurantStructure: ImageBitmap get() =
+    SanctuaryArtAssets.assetSafe("premium_slice/restaurant.png") ?: restaurantFallback
+  private val restaurantFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildRestaurantExterior() }
   val floorVistaArchStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildFloorVistaArch() }
 
   // 2.5D Oblique 3/4 Medieval Townhouses, Cottages, Terraces, Stairs, Balustrades & Street Props
