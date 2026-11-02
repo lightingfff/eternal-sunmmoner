@@ -25,7 +25,7 @@ PALETTE_HEX = {
     "#171420",                                    # ink
     "#262b1a", "#383620", "#4a4e2d", "#66683a",   # cloak
     "#332a1e", "#584428", "#7a6039",              # leather
-    "#2d2f22", "#464632", "#5e5e42",              # jerkin
+    "#303224", "#52523a", "#6a6a4c",              # jerkin (P17-C value lift)
     "#421c0c", "#89230f", "#a8402a",              # sash
     "#3c1c0c", "#6d2a12", "#a84a22", "#d08a4a",   # hair
     "#a0714f", "#c69a7d", "#e6be98",              # skin

@@ -58,8 +58,8 @@ PAL = {
     "cloak_lt": (74, 78, 45, 255), "cloak_hi": (102, 104, 58, 255),
     "leather_dk": (51, 42, 30, 255), "leather": (88, 68, 40, 255),
     "leather_lt": (122, 96, 57, 255),
-    "jerkin_sh": (45, 47, 34, 255), "jerkin": (70, 70, 50, 255),
-    "jerkin_lt": (94, 94, 66, 255),
+    "jerkin_sh": (48, 50, 36, 255), "jerkin": (82, 82, 58, 255),
+    "jerkin_lt": (106, 106, 76, 255),
     "sash_sh": (66, 28, 12, 255), "sash": (137, 35, 15, 255), "sash_lt": (168, 64, 42, 255),
     "hair_sh": (60, 28, 12, 255), "hair": (109, 42, 18, 255),
     "hair_lt": (168, 74, 34, 255), "hair_hi": (208, 138, 74, 255),
@@ -215,7 +215,7 @@ def draw_bow(poly, line, px, bx, by, tilt, draw_hand=None, arrow=0, tips=None, f
         qbez((bx, by + 1), (bx - flare, by + 12), lower, 14)[1:]
     line(limb, "INK", 3)
     line(limb, "bow", 1)
-    line([(x - 1, y - 1) for x, y in limb[4:-4]], "bow_lt", 1)
+    line([(x - 1, y - 1) for x, y in limb[2:-2]], "bow_lt", 1)
     # riser
     poly([(bx - 1, by - 3), (bx + 1, by - 3), (bx + 1, by + 3), (bx - 1, by + 3)], "brass", INK)
     px(bx - 1, by - 2, "brass_hi")
@@ -275,6 +275,8 @@ def draw_lyra(clip: str, frame: int, back: bool, left: bool) -> Image.Image:
           (cx - 5 + sway, hem_y - 6), (cx - 12 + sway, hem_y - 1), (cx - 14 + sway, 46 + crouch)],
          "cloak", INK)
     line([(cx - 9, 34 + b + crouch), (cx - 11 + sway, 56), (cx - 12 + sway, hem_y - 3)],
+         "cloak_hi", 1)
+    line([(cx - 11, 29 + b + crouch), (cx - 14 + sway, 47 + crouch), (cx - 15 + sway, hem_y - 2)],
          "cloak_hi", 1)
     line([(cx + 9, 36 + b + crouch), (cx + 12 + sway, 58), (cx + 13 + sway, hem_y - 6)],
          "cloak_hi", 1)
