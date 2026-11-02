@@ -77,15 +77,24 @@ class MapForgeArchitectureContractTest {
 
     // Canopy occlusion splits the sprite at topFraction 0.54: the canopy above that line must
     // be dense foliage and the trunk band below it must exist but be much thinner.
-    var upper = 0
-    var lowerOpaque = 0
+    var canopyBand = 0
+    var trunkBand = 0
     val split = (bmp.height * 0.54f).toInt()
     for (y in 0 until bmp.height) for (x in 0 until bmp.width) {
       if ((bmp.getPixel(x, y) ushr 24) == 0) continue
-      if (y < split) upper++ else lowerOpaque++
+      if (y < split) canopyBand++ else trunkBand++
     }
-    assertTrue("canopy band must be dense ($upper px)", upper > 900)
-    assertTrue("trunk band must be present but sparse ($lowerOpaque px)", lowerOpaque in 60..900)
+    // The occlusion split must land inside foliage, and the very bottom must be trunk/roots,
+    // not a solid block: that is what keeps a hero crossing behind the tree readable.
+    var foot = 0
+    for (y in 78 until bmp.height) for (x in 0 until bmp.width) {
+      if ((bmp.getPixel(x, y) ushr 24) != 0) foot++
+    }
+    assertTrue("canopy band above the occlusion split must be dense ($canopyBand px)",
+      canopyBand > 700)
+    assertTrue("foot band must be trunk/roots, not a wall of pixels ($foot px)", foot in 40..200)
+    assertTrue("canopy + trunk both present ($canopyBand / $trunkBand)",
+      trunkBand > 200 && canopyBand > 700)
 
     val manifest = JSONObject(SanctuaryArtAssets.textAsset("sanctuary_p03/manifest.json")!!)
     val entries = manifest.getJSONArray("assets")
