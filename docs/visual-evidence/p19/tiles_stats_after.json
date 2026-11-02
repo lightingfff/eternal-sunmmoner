@@ -1,0 +1,27 @@
+{
+  "grass": {
+    "variants": 8,
+    "colors_min": 8,
+    "colors_max": 10
+  },
+  "soil": {
+    "variants": 6,
+    "colors_min": 11,
+    "colors_max": 12
+  },
+  "cobble": {
+    "variants": 6,
+    "colors_min": 9,
+    "colors_max": 10
+  },
+  "flagstone": {
+    "variants": 8,
+    "colors_min": 9,
+    "colors_max": 9
+  },
+  "gravel": {
+    "variants": 4,
+    "colors_min": 9,
+    "colors_max": 11
+  }
+}

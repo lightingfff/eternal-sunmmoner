@@ -30,7 +30,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "0c2d8329d3b254725acf5302c8d31e8700646301a7b170ea49b7cdef9018e899"
+      "sha256": "274d99188f446e6a45e11719292833afcce6892c5a54759c80f9a0f771daf67a"
     },
     {
       "id": "grass_1",
@@ -44,7 +44,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "c3fd37f0b77299093730cefa2e16d1d6e5e5e8db36bc304ea360faf355c242aa"
+      "sha256": "3d86842c05bbd49a3c03b4f55f6c48d5ac8b873f73665bc2d66baf4b356d2d39"
     },
     {
       "id": "grass_2",
@@ -58,7 +58,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "96479b07dfb515f2c95b6691a18ca69285a12fff60b31d3c38e2b74b7c8dca2c"
+      "sha256": "2b1271d5b5bfc130295d5e33b86d1d3500d6dab330ce438ae4b8ff7db397acfb"
     },
     {
       "id": "grass_3",
@@ -72,7 +72,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "9e6a0a15116baba306f4f2f907bceac15a08a5fc233b5745749ca1737c3dbccb"
+      "sha256": "e72434c07e6829b55dc6f479561ebdc0070d61ba4372d7b024fb992d328aeb43"
     },
     {
       "id": "grass_4",
@@ -86,7 +86,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "cd6119987516e3dfd2a14b598236232f1c205c2068beb3a86070e21255bc9466"
+      "sha256": "286fe1456dfc67148abe426dc7366bcca59a9c07b0fc33fa24028544b50a4c56"
     },
     {
       "id": "grass_5",
@@ -100,7 +100,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "68211086266e3f2e199f28e4f0ecbfe9fbb918dbe39cd68343c1809c4c185d7a"
+      "sha256": "5fffb8821778f216c85b3651871fecab002620e1117424f8eb87090c779c4cd4"
     },
     {
       "id": "grass_6",
@@ -114,7 +114,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "a52b79e0b389bf7bfcc829559bf2a70c83ff9b36c89487a79dafde3785b4239c"
+      "sha256": "118328cfdcd03168f4187d0c5e25ca52fa1a69171bb499e2f5bf8458fa749097"
     },
     {
       "id": "grass_7",
@@ -128,7 +128,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "2b6c6c986ef63c4030251b6bb515a0aedef90d6a964551aff672c2891b44bc65"
+      "sha256": "b118cdbc08a9369e65f81dd969e0f8606c96fa9e1af6bbf6ce614b63758595f1"
     },
     {
       "id": "flagstone_0",
@@ -254,7 +254,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.cobble; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "295c01f3f36f9d740a146995dd31fbda734ff591b9bb9f937c62832d31b43eb4"
+      "sha256": "60bf56fd6b8d9898d102952314bd0baa7dbc4392eb208cadcfceca336751de0f"
     },
     {
       "id": "cobble_1",
@@ -268,7 +268,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.cobble; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "b276ba8fb1602db9c9ce1ea244dffcce6db4c6f752b1780df4481ae17b25ed4d"
+      "sha256": "4f2546ee88b6ba671ca7f47c9caf74b0383f598bc999e35550275f315574003c"
     },
     {
       "id": "cobble_2",
@@ -282,7 +282,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.cobble; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "4b1579ab16c7fbbebf592d18e6c4291381097af4de1fc29dc1fdb544c0b2477f"
+      "sha256": "dfafe8865e6a7d994e141b010e708aea76ec09d1365b55748bddf3f4e69e2903"
     },
     {
       "id": "cobble_3",
@@ -296,7 +296,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.cobble; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "8a6319bf397631aac34152eea8ac618af8bc0530fce3040700721a2a481eb9c0"
+      "sha256": "13975030489b0a3339a9a0f34af0fad2fa51ab4787ce6cb5b63e147e72d78214"
     },
     {
       "id": "cobble_4",
@@ -310,7 +310,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.cobble; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "fcec399af3949b27745f75bb6587ba2aed16d8905d9f096e7ded533e9b61820f"
+      "sha256": "1cef8a6c37c265afe6134cd90ac7904f921e31bfec6221a6a6616cfe849ef39e"
     },
     {
       "id": "cobble_5",
@@ -324,7 +324,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.cobble; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "d486f048712f7063c20034d752545c60d95a860bb6c2a13050adb48b8b26edbc"
+      "sha256": "b5403d04c16b5335d881fc13ee463f8f73dbc3965c88836ec0167c43606d7572"
     },
     {
       "id": "soil_0",
@@ -338,7 +338,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.soil; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "37a0b6251c522d115b802d65df73044160218bc80d2cda92ff87fcd395fccc74"
+      "sha256": "e39c5fa20cb929bb8681c24ca2119907b890295a8f37a4699cf434576ca0ed1d"
     },
     {
       "id": "soil_1",
@@ -352,7 +352,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.soil; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "bb191d8220aa4871a128612a4ec04724768881ec4592e665d5ab022b6614ec4a"
+      "sha256": "398092ba0fffaaf91c3ad93257ad566016cc927100705f50d2f449b004f00535"
     },
     {
       "id": "soil_2",
@@ -366,7 +366,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.soil; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "05b73f20a0d40d26499524efb0ed6b339e064c02efe24f47e5b4b059b815506c"
+      "sha256": "827f9cdf3357c7742529c0e1a329cfb2820981cedb5b85ae31be4375d818b8fa"
     },
     {
       "id": "soil_3",
@@ -380,7 +380,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.soil; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "8eb88e6390f720e07112859441b597edc53f2a891b3bcb2c3f889298289ffea4"
+      "sha256": "a0496d1e03b4eeafe8091922230e6f7039bf35f157f3727eb63f9caca8efa9fa"
     },
     {
       "id": "soil_4",
@@ -394,7 +394,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.soil; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "f7feaedad646f04935c189f1939261db5e6e31c4628a016818e9e56e1ea3fa89"
+      "sha256": "bb372f2ad5259a8fca6973e6cd315bde1a07b20b986a710cc3c46bac380e64f9"
     },
     {
       "id": "soil_5",
@@ -408,7 +408,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.soil; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "a39343eec1650c6be8c5d2098d0288d7f76ad4a7bb6303f4444eda37995cc985"
+      "sha256": "0bc72c8d86a01142492a3aedcb44853be4ea2a4123b75af66c8e56d305e6d956"
     },
     {
       "id": "gravel_0",
@@ -422,7 +422,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.gravel; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "1ca532f8091eb699436591efc24dd97f93fe1f1d132bc9acd06cbd76944d1e80"
+      "sha256": "219d56614871d20047f59329011406d5c49370b065b36be1907a38f3f7cda7e2"
     },
     {
       "id": "gravel_1",
@@ -436,7 +436,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.gravel; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "6c5e81b08be9cd87883c818cc1ffcaf7a5997e5da822c6281e932eba3bce3928"
+      "sha256": "643f0a18afbcf768ee519b4fdd1862c6c692c1ba86c86c2fec4e9b74f15738a1"
     },
     {
       "id": "gravel_2",
@@ -450,7 +450,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.gravel; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "1791dc46299cc4aa3922820b80cd6c680c0ede4069963ffbd545ef6ff4fec6b1"
+      "sha256": "8c2a1ede1660a71cf3c8aeab0faeaeea9efa02a04538099dec8abfeb810b7547"
     },
     {
       "id": "gravel_3",
@@ -464,7 +464,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.gravel; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "c404335c181f0e78627b4ae9a2ca2d29af13c13b7b996cfba4d5dccd4c16aa69"
+      "sha256": "8eff9d53a989dd64df5ec2801a55714c85e3ec5eeb05d00bd2eade54714033ea"
     },
     {
       "id": "wood_0",
