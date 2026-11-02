@@ -67,3 +67,39 @@ CSV traces and inspected screenshots: [visual-evidence/mission01](visual-evidenc
 - Device/emulator input playthrough, physical-device FPS, GPU time, memory/thermal profiling and real Firebase integration are untested. Local CPU/lifecycle/cache checks cannot substitute for those.
 - `.github/workflows/mission01-rescue.yml` adds PR acceptance checks. Cloud-worker passing checks are not a remote CI result.
 - Draft PR publication depends on repository/API access. See the final chat report for the actual push/PR result; no merge is authorized or performed.
+
+## Remote publication result
+
+Implementation commit: `84295cd46b77aa371ec6022895eb2fb19d36af96`. Branch push to origin succeeded. `gh pr create --draft` returned `Post https://api.github.com/graphql: Forbidden`; no PR was created and remote CI is not established. Open https://github.com/lightingfff/eternal-sunmmoner/pull/new/mission01/floor1-rescue to create a draft for review. No merge performed.
+
+## Exact changed files
+
+- `.github/workflows/mission01-rescue.yml`
+- `app/src/main/java/com/example/MainActivity.kt`
+- `app/src/main/java/com/example/data/LostCourierProgression.kt`
+- `app/src/main/java/com/example/data/firebase/SummonerRepository.kt`
+- `app/src/main/java/com/example/data/local/LocalGuestSaveManager.kt`
+- `app/src/main/java/com/example/data/model/CourierOutcome.kt`
+- `app/src/main/java/com/example/game/ai/AutonomousHeroAi.kt`
+- `app/src/main/java/com/example/game/combat/CourierChoice.kt`
+- `app/src/main/java/com/example/game/combat/LostCourierEncounter.kt`
+- `app/src/main/java/com/example/game/combat/TowerCombatEngine.kt`
+- `app/src/main/java/com/example/ui/SummonerViewModel.kt`
+- `app/src/main/java/com/example/ui/components/CourierMissionHud.kt`
+- `app/src/main/java/com/example/ui/screens/SanctuaryFacilityModals.kt`
+- `app/src/main/java/com/example/ui/screens/TowerBattleScreen.kt`
+- `app/src/test/java/com/example/CourierChoiceInteractionTest.kt`
+- `app/src/test/java/com/example/LostCourierStarterPartyTest.kt`
+- `app/src/test/java/com/example/RescueTacticalCommandsTest.kt`
+- `app/src/test/java/com/example/data/LostCourierBranchPolicyTest.kt`
+- `app/src/test/java/com/example/data/LostCourierPersistenceRobolectricTest.kt`
+- `app/src/test/java/com/example/ui/RescueChoiceHudTest.kt`
+- `app/src/test/java/com/example/ui/RescueRetryFlowTest.kt`
+- `docs/MISSION01_RESCUE.md`
+- `docs/visual-evidence/mission01/choice_landscape.png`
+- `docs/visual-evidence/mission01/choice_portrait.png`
+- `docs/visual-evidence/mission01/starter_party_RECOVER_SUPPLIES_false_playthrough.csv`
+- `docs/visual-evidence/mission01/starter_party_RECOVER_SUPPLIES_true_playthrough.csv`
+- `docs/visual-evidence/mission01/starter_party_SUPPORT_COURIER_false_playthrough.csv`
+- `docs/visual-evidence/mission01/tower_landscape_720dp.png`
+- `docs/visual-evidence/mission01/tower_scout_gameplay_400dp.png`
