@@ -502,11 +502,14 @@ def build_monolith() -> Canvas:
     for xx in range(cx - 10, cx + 11, 7):
         c.vline(xx, base - 5, base - 1, STONE["mortar"])
     # ---- shaft: leaning, lit left face, shaded right, chipped crown --------------------
-    c.poly([(cx - 8, 6), (cx + 3, 3), (cx + 8, 66), (cx - 6, 66)], "#343b52")
-    c.poly([(cx - 8, 6), (cx - 2, 4), (cx + 1, 66), (cx - 6, 66)], "#465071")
-    c.poly([(cx + 3, 3), (cx + 8, 66), (cx + 1, 66), (cx - 2, 4)], "#232840")
-    c.line([(cx - 8, 6), (cx - 2, 4)], "#5f6b8e")
-    c.line([(cx - 2, 4), (cx + 3, 3)], "#6f7d9e")
+    c.poly([(cx - 8, 6), (cx + 3, 3), (cx + 8, 66), (cx - 6, 66)], STONE["dk"])
+    c.poly([(cx - 8, 6), (cx - 2, 4), (cx + 1, 66), (cx - 6, 66)], STONE["base"])
+    c.poly([(cx + 3, 3), (cx + 8, 66), (cx + 1, 66), (cx - 2, 4)], STONE["foot"])
+    c.line([(cx - 8, 6), (cx - 2, 4)], STONE["lt"])
+    c.line([(cx - 2, 4), (cx + 3, 3)], STONE["hi"])
+    # a few carved courses so it reads as stone, not a smooth bar
+    for cy_ in range(12, 62, 9):
+        c.hline(cx - 7, cx + 6, cy_, STONE["mortar"])
     # carved rune channel + glyph ticks (cold cyan, restrained)
     c.rect(cx - 2, 16, cx, 54, "#1b2030")
     c.vline(cx - 1, 18, 52, mix("#1b2030", "#3f8fa8", 0.55))
@@ -514,7 +517,7 @@ def build_monolith() -> Canvas:
         c.px(cx - 2, yy, "#3f8fa8")
         c.px(cx, yy + 2, "#244a5c")
     # weathering: hairline cracks + moss at the foot
-    c.line([(cx + 4, 20), (cx + 5, 30), (cx + 3, 38)], "#1a1e2c", 1)
+    c.line([(cx + 4, 20), (cx + 5, 30), (cx + 3, 38)], STONE["mortar"], 1)
     for mx in (cx - 6, cx - 3, cx + 4):
         if c.opaque(mx, base - 8):
             c.px(mx, base - 8, MOSS["base"])
