@@ -74,7 +74,12 @@ Not touched: soil, gravel, wood, all other props, `SanctuaryMaterials` procedura
 | `engine-render/ground_lawn_close.png` | **REAL ENGINE RENDER** — 1.48, lawn only |
 | `engine-render/ground_oak_verge.png` | **REAL ENGINE RENDER** — 1.00, oak against the verge |
 
-Real renders come from `MapForgeGroundRenderTest` (`@GraphicsMode(NATIVE)`, Robolectric),
+Engine renders were produced by render run
+[41424137414](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41424137414)
+(APK build [41424137317](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41424137317)),
+both green on commit `5701574`.
+
+They come from `MapForgeGroundRenderTest` (`@GraphicsMode(NATIVE)`, Robolectric),
 which calls `drawSanctuaryFloatingWorld`, `drawGroundShadows` and the depth-sorted `drawProp`
 path — the same functions the game draws with. Software rasterised at 1× density.
 
