@@ -30,11 +30,10 @@ import org.robolectric.annotation.GraphicsMode
  *
  * The defects P20/P21 shipped were structural, so the assertions here are structural too:
  *
- *  1. NO INTERIOR ALPHA HOLE. For each building canvas, every column of pixels inside the
- *     silhouette must be a single opaque run (no transparent band above a lower mass). That is
- *     the "grass shows through the roof" failure measured instead of eyeballed. The Tower Gate
- *     is the one documented exception: its twin proud towers leave a sky cleft, and the exact
- *     x range of that cleft is pinned so the exemption cannot quietly grow.
+ *  1. NO INTERIOR ALPHA HOLE. For each of the 13 building canvases (including Tower Gate),
+ *     every column of pixels inside the silhouette must be a single opaque run (zero transparent
+ *     bands above a lower mass). Tower Gate preserves its twin-tower sky cleft via a stepped-down
+ *     central curtain wall silhouette (`topOpaqueRow >= 34` across `x = 105..155`).
  *  2. DOORS LAND ON THEIR TRIGGERS. Each enterable facility's painted doorway inverts back onto
  *     its `SanctuaryHouseEntrances` row, and the Armory's door is on the trigger it was
  *     previously 76 world units away from.

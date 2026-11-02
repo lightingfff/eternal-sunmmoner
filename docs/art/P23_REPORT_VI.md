@@ -121,13 +121,13 @@ tại `cy + 8s` của `InteriorWorldRenderer`, triệt tiêu lỗi bóng đổ r
 
 | mục | giá trị |
 |---|---|
-| HEAD cuối | `b1c92084` (branch `arena/c67c3cc2-eternal-sunmmoner`) |
-| Baseline before | `b0dca99` → `docs/visual-evidence/p23/engine-render-before/` (24 ảnh, chụp trên art P22) |
-| After | `docs/visual-evidence/p23/engine-render/` (24 ảnh, cùng camera/zoom/actor/timeSec) |
+| HEAD art + code + render | `aaeb752` → render `db0710b` (branch `arena/c67c3cc2-eternal-sunmmoner`) |
+| Baseline before | `b0dca99` / `ee84631` → `docs/visual-evidence/p23/engine-render-before/` (24 ảnh, chụp trên art P22 `b40563e`) |
+| After | `docs/visual-evidence/p23/engine-render/` (24 ảnh `REAL ENGINE RENDER (Robolectric)`, cùng camera/zoom/actor/timeSec) |
 | Contact sheets | `docs/visual-evidence/p23/contact-sheets/` — nhãn **ART CONTACT SHEET** |
 | Camera config | `docs/visual-evidence/p23/camera_props.json` |
-| CI `Build Eternal Summoner APK` | run `41486894628` — **pass** (trên `4143a8aa`); run `41488123618` chạy lại trên HEAD cuối |
-| CI `Lyra engine render evidence` | run `41486894782` — **pass** (trên `4143a8aa`); run `41488123522` chạy lại trên HEAD cuối |
+| CI `Build Eternal Summoner APK` | run `41497619921` — **pass** (`:app:assembleDebug` + `validate_assets.py`) |
+| CI `Lyra engine render evidence` | run `41497619876` — **pass** (24 frame P23 + toàn bộ contract/render P17-C..P23) |
 | Trong đó | P23 render 24 frame + P23 contract 7 test + P20/P21/P22 contract & render + `SanctuaryMaterialTest` + `SanctuaryEnvironmentArtTest` + `LayoutResponsiveness` + `ScenePerformanceTest` + `LivingWorldTest` |
 | Ghi chú diff | `docs/visual-evidence/p17c…p22/` **đổi byte** một cách hợp lệ: workflow render lại toàn bộ ma trận trên art mới, và các frame P20/P21/P22 có chứa đúng những toà nhà vừa sửa. `ci-diagnostics/` (log lỗi tạm) đã được xoá khỏi nhánh. |
 
