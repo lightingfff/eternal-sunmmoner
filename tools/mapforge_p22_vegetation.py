@@ -363,12 +363,13 @@ class PixelCanvas:
                 self.faceted_spray(px_c - 0.8, py_c - 0.8, prx * 0.74, pry * 0.72, pal["shd_dk"], psd + 3, vertices=10, jag=0.20)
                 self.faceted_spray(px_c - 1.5, py_c - 1.2, prx * 0.38, pry * 0.36, pal["shd"], psd + 4, vertices=8, jag=0.18)
 
-        # Crisp diagonal sub-crown shadow shelves separating foreground upper dome from lower boughs!
+        # Staggered scalloped sub-crown shadow pockets (broken pixel clusters, NEVER a continuous drawn line!)
         if internal_creases:
-            for crease in internal_creases:
-                self.line(crease, pal["shd_dk"], 2)
-                self.line([(x, y + 1) for x, y in crease], pal["occ"], 1)
-                self.line([(x - 1, y - 1) for x, y in crease[:-1]], pal["mid"], 1)
+            for idx_c, crease in enumerate(internal_creases):
+                for pt_i, (cx_p, cy_p) in enumerate(crease):
+                    self.faceted_spray(cx_p + 0.8, cy_p + 1.4, 5.2, 3.2, pal["shd_dk"], 900 + idx_c * 17 + pt_i, vertices=8, jag=0.26)
+                    self.faceted_spray(cx_p, cy_p - 0.8, 5.6, 3.6, pal["mid"], 950 + idx_c * 17 + pt_i, vertices=8, jag=0.24)
+                    self.faceted_spray(cx_p - 1.2, cy_p - 1.8, 3.8, 2.5, pal["lit"], 980 + idx_c * 17 + pt_i, vertices=8, jag=0.20)
 
         # Carve genuine negative-space sky apertures around major branch forks
         for gx_c, gy_c, grx, gry in sky_gaps:
@@ -632,12 +633,15 @@ def generate_hedge_bush() -> Image.Image:
             if c.get(tx, ty)[3] == 255:
                 c.px(tx, ty, p["rim"])
 
-    # Delicate fallen Sanctuary dusk-rose sakura petals resting on upper hedge table
-    for bx, by in [(19, 14), (33, 12), (44, 16)]:
-        c.px(bx, by, p["petal_mid"])
-        c.px(bx - 1, by, p["petal_hi"])
-
     c.deorphan_clusters(passes=1)
+
+    # Crisp 2px fallen Sanctuary dusk-rose sakura petal clusters on upper hedge table (placed after deorphan!)
+    for bx, by in [(18, 14), (32, 12), (43, 16)]:
+        c.px(bx, by, p["petal_hi"])
+        c.px(bx + 1, by, p["petal_hi"])
+        c.px(bx + 1, by + 1, p["petal_mid"])
+        c.px(bx + 2, by + 1, p["petal_mid"])
+
     c.enforce_margins_and_bottom(36, (8, 55), p["occ"], side_margin=4)
     return c.im
 
@@ -882,14 +886,17 @@ def generate_forest_bush() -> Image.Image:
         internal_creases=[[(21, 23), (30, 25), (39, 22)]],
     )
 
+    c.deorphan_clusters(passes=1)
+
     for sx, sy in [(20, 33), (41, 33)]:
         c.px(sx, sy, p["stem_lt"])
+        c.px(sx + 1, sy, p["stem_lt"])
         c.px(sx + 1, sy + 1, p["stem_dk"])
-    for bx, by in [(18, 25), (44, 24)]:
+        c.px(sx + 2, sy + 1, p["stem_dk"])
+    for bx, by in [(18, 25), (43, 24)]:
         c.px(bx, by, p["berry"])
-        c.px(bx + 1, by, p["shd_dk"])
+        c.px(bx + 1, by, p["berry"])
 
-    c.deorphan_clusters(passes=1)
     c.enforce_margins_and_bottom(36, (8, 55), p["occ"], side_margin=4)
     return c.im
 

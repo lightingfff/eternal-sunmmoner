@@ -93,9 +93,15 @@ jobs:
       - name: Verify P21 asset and geometry contract
         run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeP21ContractTest" --stacktrace
 
-      # P22: Sanctuary + Tower vegetation render matrix (real draw code + canopy occlusion).
+      # P22: Sanctuary + Tower vegetation render matrix + contract verification.
       - name: Render P22 vegetation matrix (real draw code, Robolectric native graphics)
         run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeP22RenderTest" --stacktrace
+
+      - name: Verify P22 vegetation asset and geometry contract
+        run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeP22ContractTest" --stacktrace
+
+      - name: Run full unit test suite (:app:testDebugUnitTest)
+        run: gradle :app:testDebugUnitTest --stacktrace
 
       # P19: training field / gravel band / cobble joints, fixed cameras for before/after.
       - name: Render terrain slice (real draw code, Robolectric native graphics)
