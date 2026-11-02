@@ -87,7 +87,8 @@ door egress with an actor, actor in front / behind).
 - `MapForgeArchitectureContractTest` (Robolectric): armory 190×166 + door box still a dark
   opaque opening + manifest SHA; cypress 48×88 + anchor `[24,83]` + canopy/trunk density split;
   P19 families (8 grass / 6 soil / 4 gravel) and the Lyra atlas still resolve.
-- CI `assembleDebug` + render job: run IDs in the PR description.
+- CI `assembleDebug` [41432905414](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41432905414) success ·
+  render job [41432905556](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41432905556) success (commit `327453c`).
 - Device FPS / jank / thermal: **NOT TESTED** — no device in this environment.
 
 ## 6. Performance
