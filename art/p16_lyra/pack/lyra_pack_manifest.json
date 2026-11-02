@@ -1,16 +1,16 @@
 {
-  "version": 1,
-  "asset_id": "lyra_4dir_idle_walk",
+  "asset_id": "lyra_4dir_all_clips",
   "category": "hero_world_sprite",
-  "file_path": "art/p16_lyra/pack/lyra_4dir_idle_walk.png",
+  "file_path": "app/src/main/assets/premium_slice/lyra.png",
   "character": "Lyra (hero_starter_lyra) — Archer, 'Mắt Ưng Gió Đêm'",
   "origin": "Original ETERNAL SUMMONER art; authored cluster recipes in tools/generate_lyra_sprites.py",
-  "source_or_license": "Original in-repo artwork, authored procedurally from pixel recipes; no external, copied, traced or generated bitmap assets are used",
+  "source_or_license": "Original in-repo artwork authored from pixel recipes; no external or copied art",
   "frame": [
     64,
     96
   ],
-  "frame_count": 14,
+  "frame_count_per_row": 64,
+  "total_frames": 256,
   "pivot": [
     32,
     90
@@ -20,27 +20,31 @@
     90
   ],
   "world_pixel_scale": 1.08,
-  "intended_world_scale": 1.08,
   "palette_tag": "dark_fantasy_moss_oxblood",
-  "palette_colors": 35,
-  "approximate_mb": 1.31,
-  "status": "idle + walk complete for all four rows; attack/hurt/fear/skill/defeat pending",
-  "directions": [
-    "front_right",
-    "front_left",
-    "back_right",
-    "back_left"
-  ],
-  "direction_mapping": {
-    "row 0 front_right": "moving toward screen-right, camera-side 3/4 (EAST-facing in the oblique view)",
-    "row 1 front_left": "moving toward screen-left, camera-side 3/4 (WEST-facing)",
-    "row 2 back_right": "moving away, right — back view (NORTH, right lane)",
-    "row 3 back_left": "moving away, left — back view (NORTH, left lane)"
+  "atlas": {
+    "file": "lyra.png",
+    "size": [
+      4096,
+      384
+    ],
+    "pitch": [
+      64,
+      96
+    ],
+    "sha256": "dd072ffda6d223a8587a79dc6011d38d9c008a30da0fd4c54445f6a948d04d2d"
   },
-  "row_rule": "row = (north ? 2 : 0) + (right ? 0 : 1)  — PremiumActorAtlas.frame()",
   "clip_order": [
     "idle",
-    "walk"
+    "walk",
+    "attack",
+    "skill",
+    "hit",
+    "rest",
+    "defeat",
+    "calm",
+    "alert",
+    "fear",
+    "victory"
   ],
   "clips": {
     "idle": [
@@ -60,21 +64,74 @@
       0.07,
       0.07,
       0.08
-    ]
-  },
-  "loop_clips": [
-    "idle",
-    "walk"
-  ],
-  "atlas": {
-    "file": "lyra_4dir_idle_walk.png",
-    "size": [
-      896,
-      384
     ],
-    "pitch": [
-      64,
-      96
+    "attack": [
+      0.06,
+      0.06,
+      0.06,
+      0.04,
+      0.045,
+      0.055,
+      0.07,
+      0.09
+    ],
+    "skill": [
+      0.08,
+      0.08,
+      0.07,
+      0.07,
+      0.06,
+      0.07,
+      0.08,
+      0.09,
+      0.12
+    ],
+    "hit": [
+      0.045,
+      0.065,
+      0.085,
+      0.105
+    ],
+    "rest": [
+      1.0
+    ],
+    "defeat": [
+      0.09,
+      0.11,
+      0.13,
+      0.15,
+      0.2,
+      0.32
+    ],
+    "calm": [
+      0.24,
+      0.18,
+      0.2,
+      0.24,
+      0.16,
+      0.18
+    ],
+    "alert": [
+      0.16,
+      0.2,
+      0.18,
+      0.26
+    ],
+    "fear": [
+      0.12,
+      0.08,
+      0.16,
+      0.09,
+      0.18,
+      0.17
+    ],
+    "victory": [
+      0.14,
+      0.16,
+      0.22,
+      0.24,
+      0.2,
+      0.24
     ]
   },
   "clip_columns": {
@@ -85,56 +142,477 @@
     "walk": {
       "start_column": 6,
       "frames": 8
+    },
+    "attack": {
+      "start_column": 14,
+      "frames": 8
+    },
+    "skill": {
+      "start_column": 22,
+      "frames": 9
+    },
+    "hit": {
+      "start_column": 31,
+      "frames": 4
+    },
+    "rest": {
+      "start_column": 35,
+      "frames": 1
+    },
+    "defeat": {
+      "start_column": 36,
+      "frames": 6
+    },
+    "calm": {
+      "start_column": 42,
+      "frames": 6
+    },
+    "alert": {
+      "start_column": 48,
+      "frames": 4
+    },
+    "fear": {
+      "start_column": 52,
+      "frames": 6
+    },
+    "victory": {
+      "start_column": 58,
+      "frames": 6
     }
+  },
+  "direction_rows": {
+    "front_right": 0,
+    "front_left": 1,
+    "back_right": 2,
+    "back_left": 3
+  },
+  "direction_mapping": {
+    "row 0 front_right": "camera-side 3/4 facing screen-right",
+    "row 1 front_left": "camera-side 3/4 facing screen-left",
+    "row 2 back_right": "back view moving away, right",
+    "row 3 back_left": "back view moving away, left"
+  },
+  "row_rule": "row = (north ? 2 : 0) + (right ? 0 : 1) — PremiumActorAtlas.frame()",
+  "vfx_markers": {
+    "attack_release_column": 19,
+    "skill_release_column": 26,
+    "skill_charge_columns": [
+      23,
+      24,
+      25
+    ],
+    "hit_reaction_column": 32,
+    "walk_contact_columns": [
+      8,
+      12
+    ],
+    "defeat_start_column": 36,
+    "notes": "Column = atlas column index. Attack contact is the frame after the string clears (arrow spawn); skill release is the magic projectile spawn; hit reaction is the deepest impact frame; walk contacts are the zero-stride frames. Data only — the runtime does not consume these yet."
   },
   "quality": {
     "front_right": {
-      "bbox": [
-        14,
-        6,
-        49,
-        91
-      ],
-      "colors": 35
+      "idle": {
+        "bbox": [
+          16,
+          6,
+          49,
+          91
+        ],
+        "colors": 36
+      },
+      "walk": {
+        "bbox": [
+          15,
+          5,
+          51,
+          91
+        ],
+        "colors": 36
+      },
+      "attack": {
+        "bbox": [
+          17,
+          6,
+          51,
+          91
+        ],
+        "colors": 36
+      },
+      "skill": {
+        "bbox": [
+          20,
+          6,
+          57,
+          91
+        ],
+        "colors": 38
+      },
+      "hit": {
+        "bbox": [
+          14,
+          5,
+          49,
+          91
+        ],
+        "colors": 36
+      },
+      "rest": {
+        "bbox": [
+          17,
+          12,
+          52,
+          91
+        ],
+        "colors": 21
+      },
+      "defeat": {
+        "bbox": [
+          13,
+          6,
+          48,
+          91
+        ],
+        "colors": 36
+      },
+      "calm": {
+        "bbox": [
+          16,
+          7,
+          49,
+          91
+        ],
+        "colors": 36
+      },
+      "alert": {
+        "bbox": [
+          21,
+          4,
+          51,
+          91
+        ],
+        "colors": 36
+      },
+      "fear": {
+        "bbox": [
+          14,
+          9,
+          46,
+          91
+        ],
+        "colors": 35
+      },
+      "victory": {
+        "bbox": [
+          20,
+          6,
+          53,
+          91
+        ],
+        "colors": 36
+      }
     },
     "front_left": {
-      "bbox": [
-        15,
-        6,
-        50,
-        91
-      ],
-      "colors": 33
+      "idle": {
+        "bbox": [
+          15,
+          6,
+          48,
+          91
+        ],
+        "colors": 35
+      },
+      "walk": {
+        "bbox": [
+          13,
+          5,
+          49,
+          91
+        ],
+        "colors": 35
+      },
+      "attack": {
+        "bbox": [
+          13,
+          6,
+          47,
+          91
+        ],
+        "colors": 35
+      },
+      "skill": {
+        "bbox": [
+          7,
+          6,
+          44,
+          91
+        ],
+        "colors": 37
+      },
+      "hit": {
+        "bbox": [
+          15,
+          5,
+          50,
+          91
+        ],
+        "colors": 35
+      },
+      "rest": {
+        "bbox": [
+          12,
+          12,
+          47,
+          91
+        ],
+        "colors": 20
+      },
+      "defeat": {
+        "bbox": [
+          16,
+          6,
+          51,
+          91
+        ],
+        "colors": 35
+      },
+      "calm": {
+        "bbox": [
+          15,
+          7,
+          48,
+          91
+        ],
+        "colors": 35
+      },
+      "alert": {
+        "bbox": [
+          13,
+          4,
+          43,
+          91
+        ],
+        "colors": 35
+      },
+      "fear": {
+        "bbox": [
+          18,
+          9,
+          50,
+          91
+        ],
+        "colors": 34
+      },
+      "victory": {
+        "bbox": [
+          11,
+          6,
+          44,
+          91
+        ],
+        "colors": 35
+      }
     },
     "back_right": {
-      "bbox": [
-        14,
-        9,
-        49,
-        91
-      ],
-      "colors": 32
+      "idle": {
+        "bbox": [
+          16,
+          9,
+          49,
+          91
+        ],
+        "colors": 33
+      },
+      "walk": {
+        "bbox": [
+          15,
+          8,
+          51,
+          91
+        ],
+        "colors": 33
+      },
+      "attack": {
+        "bbox": [
+          17,
+          9,
+          51,
+          91
+        ],
+        "colors": 33
+      },
+      "skill": {
+        "bbox": [
+          20,
+          9,
+          57,
+          91
+        ],
+        "colors": 35
+      },
+      "hit": {
+        "bbox": [
+          14,
+          8,
+          49,
+          91
+        ],
+        "colors": 33
+      },
+      "rest": {
+        "bbox": [
+          17,
+          15,
+          52,
+          91
+        ],
+        "colors": 19
+      },
+      "defeat": {
+        "bbox": [
+          13,
+          9,
+          48,
+          91
+        ],
+        "colors": 33
+      },
+      "calm": {
+        "bbox": [
+          16,
+          10,
+          49,
+          91
+        ],
+        "colors": 33
+      },
+      "alert": {
+        "bbox": [
+          21,
+          7,
+          51,
+          91
+        ],
+        "colors": 33
+      },
+      "fear": {
+        "bbox": [
+          14,
+          12,
+          46,
+          91
+        ],
+        "colors": 32
+      },
+      "victory": {
+        "bbox": [
+          20,
+          8,
+          53,
+          91
+        ],
+        "colors": 33
+      }
     },
     "back_left": {
-      "bbox": [
-        15,
-        9,
-        50,
-        91
-      ],
-      "colors": 30
+      "idle": {
+        "bbox": [
+          15,
+          9,
+          48,
+          91
+        ],
+        "colors": 32
+      },
+      "walk": {
+        "bbox": [
+          13,
+          8,
+          49,
+          91
+        ],
+        "colors": 32
+      },
+      "attack": {
+        "bbox": [
+          13,
+          9,
+          47,
+          91
+        ],
+        "colors": 32
+      },
+      "skill": {
+        "bbox": [
+          7,
+          9,
+          44,
+          91
+        ],
+        "colors": 34
+      },
+      "hit": {
+        "bbox": [
+          15,
+          8,
+          50,
+          91
+        ],
+        "colors": 32
+      },
+      "rest": {
+        "bbox": [
+          12,
+          15,
+          47,
+          91
+        ],
+        "colors": 18
+      },
+      "defeat": {
+        "bbox": [
+          16,
+          9,
+          51,
+          91
+        ],
+        "colors": 32
+      },
+      "calm": {
+        "bbox": [
+          15,
+          10,
+          48,
+          91
+        ],
+        "colors": 32
+      },
+      "alert": {
+        "bbox": [
+          13,
+          7,
+          43,
+          91
+        ],
+        "colors": 32
+      },
+      "fear": {
+        "bbox": [
+          18,
+          12,
+          50,
+          91
+        ],
+        "colors": 31
+      },
+      "victory": {
+        "bbox": [
+          11,
+          8,
+          44,
+          91
+        ],
+        "colors": 32
+      }
     }
-  },
-  "implementation_notes": "Rows follow the engine's existing 4-direction rule, so the sheet can drop into PremiumActorAtlas once the remaining clips exist. Every frame is a separate authored pose: no mirrored-frame reuse inside a clip, no translation-only fake frames. 1 px transparent margin on all sides keeps nearest-neighbour atlas sampling free of bleeding.",
-  "pending_clips": [
-    "attack",
-    "skill",
-    "hit",
-    "rest",
-    "defeat",
-    "calm",
-    "alert",
-    "fear",
-    "victory"
-  ]
+  }
 }

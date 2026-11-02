@@ -6,8 +6,11 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import org.json.JSONObject
 
-/** A bounded, offline atlas for exactly Kaelen and the existing field goblin raider.
- * Animation timing and feet are authored data. Selection allocates nothing after first load. */
+/** A bounded, offline atlas for the premium actors that actually ship an authored sheet
+ * (Kaelen, the field goblin raider, and Lyra). Animation timing and feet are authored data.
+ * Selection allocates nothing after first load. Unknown ids, missing assets or malformed
+ * sheets all return null so every call site keeps its procedural fallback instead of
+ * reaching a getValue() crash. */
 internal class PremiumActorAtlas private constructor(
   private val clips: Map<String, Clip>,
   private val emotions: Map<String, String>,
@@ -45,14 +48,20 @@ internal class PremiumActorAtlas private constructor(
     return clip.frame(row,time,clip.loop)
   }
   companion object {
+    /** Only ids with a complete clip_order sheet may be built. */
+    private val authoredIds = setOf("kaelen","goblin_raider","lyra")
     private val cache = mutableMapOf<String,PremiumActorAtlas>()
     internal val loadedCount get() = cache.size
     fun get(id: String): PremiumActorAtlas? {
+      if (id !in authoredIds) return null
       cache[id]?.let { return it }
+      return try { build(id) } catch (e: Exception) { null } catch (e: OutOfMemoryError) { null }
+    }
+    private fun build(id: String): PremiumActorAtlas? {
       val text = SanctuaryArtAssets.textAsset("premium_slice/manifest.json") ?: return null
       val meta = JSONObject(text)
       val assets = meta.getJSONObject("assets")
-      if (!assets.has(id) || id != "kaelen" && id != "goblin_raider") return null
+      if (!assets.has(id)) return null
       val source = SanctuaryArtAssets.decodeAsset("premium_slice/${assets.getJSONObject(id).getString("file")}")
         ?.asAndroidBitmap() ?: return null
       val width = meta.getJSONArray("frame").getInt(0)
@@ -80,7 +89,7 @@ internal class PremiumActorAtlas private constructor(
         require(source.width == column * width && source.height == 4 * height)
       } finally {
         // decodeAsset is uncached. Retain only frame crops, never a second full sheet.
-        source.recycle()
+        if (!source.isRecycled) source.recycle()
       }
       val emotionDefinitions = meta.getJSONObject("emotion_clips")
       val emotions = HashMap<String,String>()

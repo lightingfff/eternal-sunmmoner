@@ -94,7 +94,8 @@ does not glow against the dark ground.
 2. Lowest opaque row = 90 for every grounded frame (idle, walk, attack, hit, victory);
    `defeat` is the only clip allowed to break it.
 3. Corners transparent; no semi-transparent halo pixels (1-bit alpha after quantise).
-4. ≤ 32 colours per frame, no anti-aliased edge pixels.
+4. ≤ 40 colours per frame (multi-material hero; the validator documents the gate),
+   no anti-aliased edge pixels.
 5. 3× repetition test: tile the sprite against itself at 1×, 1.5× and 2× zoom, confirm the
    outline does not double.
 6. Verify against a real renderer capture (Robolectric evidence harness) before claiming
@@ -102,24 +103,34 @@ does not glow against the dark ground.
 
 ## 8. Status
 
-### P17 milestone (this cycle) — 4-direction idle + walk
-`art/p16_lyra/pack/` now holds hand-authored (procedural, cluster-by-cluster) sprites:
-56 frames, 4 directions × (idle 6 + walk 8), 64 × 96, pivot (32, 90), atlas 896 × 384,
-1.31 MB, 35 colours, validation PASS. See `docs/art/LYRA_SPRITE_PACK.md` for the direction
-mapping, animation table, QA gates and the exact integration diff.
+### P17-B milestone (this cycle) — full 11-clip production pack, integrated
+`app/src/main/assets/premium_slice/lyra.png` now holds hand-authored (procedural,
+cluster-by-cluster) sprites: **256 frames = 4 directions × 11 clips** (idle 6, walk 8,
+attack 8, skill 9, hit 4, rest 1, defeat 6, calm 6, alert 4, fear 6, victory 6),
+64 × 96, pivot (32, 90), atlas 4096 × 384 = 6.00 MB decoded / 144 KB PNG, 40 authored
+tones (≤38 per frame), validation **PASS**.
+
+Integration is real, not a description: `PremiumActorAtlas` accepts the id `lyra`,
+`PixelSpriteRenderer` maps `heroName == "Lyra" && heroClass == ARCHER` to it, the asset
+SHA-256 is pinned in `premium_slice/manifest.json`, and a missing or malformed sheet falls
+back to the procedural sprite instead of throwing. See `docs/art/LYRA_SPRITE_PACK.md` for
+the direction mapping, clip table, VFX markers, memory and the exact diff.
 
 ### Superseded
 The earlier `art/p16_lyra/lyra_idle_sprite_64x96.png` (auto-derived from the concept) is
-kept only as a record of that experiment; it is **not** part of the pack and should not be
-integrated. The pack above replaces it.
+kept only as a record of that experiment; it is **not** part of the pack. The P17 2-clip
+sheet and its 56 per-frame PNGs were replaced by the full atlas in this cycle.
 
 ### Still original concept work, not sprites
 - `art/p16_lyra/lyra_concept_fullbody.png` — concept / art direction.
 - `art/p16_lyra/lyra_portrait_bust.png` — portrait for a hero panel (not wired).
 
 ### Not done, not claimed
-- attack / skill / hit / fear / defeat / rest and the emotion clips in any direction.
-- In-game integration (`PremiumActorAtlas`), device screenshots, device performance.
-- The sprite pack is authored art, but it has **not** been reviewed by a human artist or
-  seen inside the engine yet; treat `docs/visual-evidence/p17/lyra_ingame_scale_mockup.png`
-  as a composite mockup, not an engine render.
+- No engine render has been captured with Lyra on screen: `docs/visual-evidence/p17/`
+  contains 3× sheets, 1× actual-size frames, a Lyra-vs-Kaelen scene-scale comparison and
+  `lyra_ingame_mockup.png`, which is explicitly labelled **MOCKUP — NOT ENGINE RENDER**.
+- No device FPS, thermal or memory measurement was performed.
+- `VirtualJoystickAndControls` still crops Kaelen's portrait for every premium hero; Lyra's
+  portrait crop is not authored yet.
+- VFX markers (release/contact/impact columns) are authored data; the runtime does not
+  consume them yet.

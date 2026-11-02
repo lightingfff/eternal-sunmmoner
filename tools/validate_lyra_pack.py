@@ -31,10 +31,11 @@ PALETTE_HEX = {
     "#a0714f", "#c69a7d", "#e6be98",              # skin
     "#44321b", "#8c6237", "#bd9251", "#f1d28b",   # brass
     "#6e7c86", "#a8b4bc",                         # steel
-    "#2a1a10", "#7a5a34", "#cfc9b0",              # bow / string
+    "#26221e", "#685c46", "#cfc9b0", "#6c6856",   # bow / string / drawn string
     "#e8dfc8",                                    # ivory
     "#35291d", "#58432a", "#785e3a",              # boot
     "#3a362a", "#4c4636", "#5d5640",              # trousers
+    "#6cced6", "#c4f6f6",                         # skill magic arrow
 }
 # The spec's 32-colour guideline is for a one-material character; Lyra carries cloak,
 # jerkin, leather, sash, hair, skin, brass, steel, bow and boot ramps, so 40 is the gate.
@@ -57,7 +58,7 @@ def main() -> int:
     fw, fh = manifest["frame"]
     pivot_x, pivot_y = manifest["pivot"]
     columns = sum(c["frames"] for c in manifest["clip_columns"].values())
-    rows = len(manifest["directions"])
+    rows = len(manifest["direction_rows"])
 
     if atlas.size != (fw * columns, fh * rows):
         failures.append(f"atlas size {atlas.size} != grid {(fw*columns, fh*rows)}")
@@ -67,7 +68,8 @@ def main() -> int:
     per_clip_hashes = {}
     frame_reports = []
     global_colors = set()
-    for row, name in enumerate(manifest["directions"]):
+    directions = [n for n, _ in sorted(manifest["direction_rows"].items(), key=lambda kv: kv[1])]
+    for row, name in enumerate(directions):
         for clip, info in manifest["clip_columns"].items():
             start = info["start_column"]
             seen = {}
@@ -108,6 +110,53 @@ def main() -> int:
         if len(set(digests)) != len(digests):
             failures.append(f"{key}: repeated frame inside the clip")
 
+    # 1) The pack must match what PremiumActorAtlas reads, or getValue("attack") crashes.
+    engine_path = ROOT / "app/src/main/assets/premium_slice/manifest.json"
+    engine = json.loads(engine_path.read_text())
+    engine_clips = engine["clips"]
+    engine_order = engine["clip_order"]
+    if list(manifest["clip_order"]) != list(engine_order):
+        failures.append(f"clip_order {manifest['clip_order']} != engine {engine_order}")
+    for clip in engine_order:
+        if clip not in manifest["clips"]:
+            failures.append(f"engine clip '{clip}' missing from the pack")
+            continue
+        if len(manifest["clips"][clip]) != len(engine_clips[clip]):
+            failures.append(f"clip '{clip}' has {len(manifest['clips'][clip])} durations, "
+                            f"engine expects {len(engine_clips[clip])}")
+        if any(abs(a - b) > 1e-6 for a, b in zip(manifest["clips"][clip], engine_clips[clip])):
+            failures.append(f"clip '{clip}' durations differ from the engine contract")
+
+    # 2) The shipped asset must be the reviewed pack, byte for byte.
+    asset = ROOT / "app/src/main/assets/premium_slice" / manifest["atlas"]["file"]
+    if not asset.exists():
+        failures.append(f"runtime asset missing: {asset.relative_to(ROOT)}")
+    else:
+        if hashlib.sha256(asset.read_bytes()).hexdigest() != manifest["atlas"]["sha256"]:
+            failures.append("reviewed pack atlas and shipped asset differ (regenerate both)")
+        entry = engine.get("assets", {}).get("lyra", {})
+        if entry.get("sha256") != manifest["atlas"]["sha256"]:
+            failures.append("premium_slice/manifest.json lyra sha256 is stale")
+        if entry.get("size") != [atlas.width, atlas.height]:
+            failures.append("premium_slice/manifest.json lyra size is stale")
+
+    # 3) No frame may be another frame translated: that is the "same still shifted" defect.
+    def mask(frame):
+        bbox = frame.getchannel("A").getbbox()
+        return frame.crop(bbox) if bbox else None
+
+    for clip, info in manifest["clip_columns"].items():
+        start, count = info["start_column"], info["frames"]
+        for row, name in enumerate(directions):
+            for i in range(count - 1):
+                a = mask(atlas.crop(((start + i) * fw, row * fh, (start + i + 1) * fw, (row + 1) * fh)))
+                b = mask(atlas.crop(((start + i + 1) * fw, row * fh, (start + i + 2) * fw, (row + 1) * fh)))
+                if a is None or b is None or a.size != b.size:
+                    continue
+                if a.tobytes() == b.tobytes():
+                    failures.append(f"{name}/{clip}[{i}]->[{i+1}] is a pure translation "
+                                    f"(identical silhouette shifted, not animated)")
+
     atlas_bytes = atlas.width * atlas.height * 4
     split_bytes = columns * rows * fw * fh * 4
     kaelen = ROOT / "app/src/main/assets/premium_slice/kaelen.png"
@@ -120,6 +169,10 @@ def main() -> int:
         "atlas": {"file": atlas_path.name, "size": list(atlas.size), "mode": atlas.mode},
         "grid": {"columns": columns, "rows": rows, "frame": [fw, fh], "pivot": [pivot_x, pivot_y]},
         "frames_checked": len(frame_reports),
+        "engine_contract": {"clip_order": list(engine_order),
+                            "frames_per_clip": {c: len(engine_clips[c]) for c in engine_order}},
+        "shipped_asset": {"file": manifest["atlas"]["file"],
+                          "sha256_matches_pack": not any("sha256" in f for f in failures)},
         "palette_colors_used": len(global_colors),
         "max_colors_per_frame": max(r["colors"] for r in frame_reports),
         "memory": {

@@ -1140,6 +1140,13 @@ object PixelSpriteRenderer {
     }
   }
 
+  /** Authored premium sheet id for a hero, or null when the procedural sheet still applies. */
+  private fun premiumActorId(heroName: String?, heroClass: HeroClassType): String? = when {
+    heroName == "Kaelen" && heroClass == HeroClassType.KNIGHT -> "kaelen"
+    heroName == "Lyra" && heroClass == HeroClassType.ARCHER -> "lyra"
+    else -> null
+  }
+
   /**
    * Renders Master Summoner, Autonomous Heroes, or Sanctuary Keepers in True 3/4 Perspective
    * (38x50 native pixel art at crisp nearest-neighbor scale + foreshortened elliptical ground shadow).
@@ -1169,8 +1176,10 @@ object PixelSpriteRenderer {
     val cy = ObliqueCamera.worldToScreenY(worldY, camY, zoom, size.height / 2f)
     if (cx < -120f || cx > size.width + 120f || cy < -150f || cy > size.height + 120f) return
 
-    val premium = if (!isMaster && heroName == "Kaelen" && heroClass == HeroClassType.KNIGHT)
-      PremiumActorAtlas.get("kaelen") else null
+    // Authored premium sheets win when they exist; every path below still works when the
+    // sheet is absent or invalid, so a missing asset can never strand a hero without art.
+    val premiumId = if (isMaster) null else premiumActorId(heroName, heroClass)
+    val premium = premiumId?.let { PremiumActorAtlas.get(it) }
     val pixelScale = (premium?.worldPixelScale ?: 1.85f) * zoom
 
     // Foreshortened 3/4 Sovereign Sigil / Shield Barrier Ellipse on Ground
@@ -1183,7 +1192,8 @@ object PixelSpriteRenderer {
       )
     }
 
-    if (premium != null) with(PremiumSliceRenderer) {
+    // The shield-shockwave ground ring belongs to Kaelen's knight skill, not to an archer.
+    if (premium != null && premiumId == "kaelen") with(PremiumSliceRenderer) {
       drawSkillGround(cx,cy,zoom,attackAnimProgress,skillAnimation)
     }
     val frameBmp = premium?.frame(facingRight,facingNorth,isMoving,attackAnimProgress,

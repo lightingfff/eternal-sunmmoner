@@ -172,6 +172,14 @@
         96
       ],
       "sha256": "dc5d920a5ee7fc73e128b15b5a95ebb327a6bdfce109c255d190c89d70fa9ac2"
+    },
+    "lyra": {
+      "file": "lyra.png",
+      "size": [
+        4096,
+        384
+      ],
+      "sha256": "dd072ffda6d223a8587a79dc6011d38d9c008a30da0fd4c54445f6a948d04d2d"
     }
   },
   "sample": {
