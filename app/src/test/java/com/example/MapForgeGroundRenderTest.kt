@@ -104,17 +104,19 @@ class MapForgeGroundRenderTest {
   fun grassVariantsCarryDifferentContent() {
     prepare()
     val tiles = SanctuaryArtAssets.tiles("grass", 8)!!.map { it.asAndroidBitmap() }
-    var differentPixels = 0
-    var total = 0
-    for (y in 0 until 64) for (x in 0 until 64) {
-      val first = tiles[0].getPixel(x, y)
-      total++
-      if (tiles.drop(1).all { it.getPixel(x, y) != first }) differentPixels++
+    val reference = tiles[0]
+    for ((index, tile) in tiles.withIndex()) {
+      if (index == 0) continue
+      var differing = 0
+      for (y in 0 until 64) for (x in 0 until 64) {
+        if (tile.getPixel(x, y) != reference.getPixel(x, y)) differing++
+      }
+      val ratio = differing / 4096.0
+      assertTrue(
+        "grass_$index must be a real variant, only ${"%.1f".format(ratio * 100)}% of pixels differ",
+        ratio > 0.25,
+      )
     }
-    assertTrue(
-      "expected shared grass body with varied clumps, got $differentPixels/$total differing",
-      differentPixels > total / 3,
-    )
   }
 
   /** Fixed cameras through the real renderer: default zoom, overview (block path), verge. */

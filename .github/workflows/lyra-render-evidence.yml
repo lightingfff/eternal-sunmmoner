@@ -100,6 +100,15 @@ jobs:
           } > /tmp/diag.txt 2>&1
           mkdir -p ci-diagnostics
           tail -c 60000 /tmp/diag.txt > ci-diagnostics/gradle-error.log
+          # Unit-test failures never reach the compiler log, so capture the JUnit XML too.
+          {
+            echo "### test results"
+            ls -l app/build/test-results/testDebugUnitTest 2>/dev/null || true
+            for f in app/build/test-results/testDebugUnitTest/*.xml; do
+              [ -e "$f" ] || continue
+              head -c 40000 "$f"
+            done
+          } > ci-diagnostics/render-tests.log 2>&1
           git config user.name "eternal-render-bot"
           git config user.email "actions@users.noreply.github.com"
           git add ci-diagnostics
