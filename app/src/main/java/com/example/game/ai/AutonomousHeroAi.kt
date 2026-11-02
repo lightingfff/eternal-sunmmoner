@@ -357,12 +357,13 @@ object AutonomousHeroAi {
           val baseAngle = kotlin.math.atan2(target.y - hero.y, target.x - hero.x)
           for (offsetDeg in listOf(-12f, 0f, 12f)) {
             val rad = baseAngle + Math.toRadians(offsetDeg.toDouble()).toFloat()
+            val release = bowReleasePoint(hero, target)
             spawnProjectile(
               CombatProjectile(
                 id = UUID.randomUUID().toString(),
                 fromHero = true,
-                x = hero.x,
-                y = hero.y - 16f,
+                x = release.first,
+                y = release.second,
                 vx = cos(rad) * 440f,
                 vy = sin(rad) * 440f,
                 damage = (hero.effectiveAttack * (0.95f + hero.skillLevel * 0.08f)).toInt(),
@@ -431,12 +432,14 @@ object AutonomousHeroAi {
             HeroClassType.MAGE -> Color(0xFFA855F7)
             else -> Color(0xFF6EE7B7)
           }
+          val release = if (hero.heroClass == HeroClassType.ARCHER)
+            bowReleasePoint(hero, target) else hero.x to hero.y - 16f
           spawnProjectile(
             CombatProjectile(
               id = UUID.randomUUID().toString(),
               fromHero = true,
-              x = hero.x,
-              y = hero.y - 16f,
+              x = release.first,
+              y = release.second,
               vx = (dx / d) * projSpeed,
               vy = (dy / d) * projSpeed,
               damage = hero.effectiveAttack,
@@ -505,4 +508,29 @@ object AutonomousHeroAi {
     2 -> -92f
     else -> 92f
   }
+
+  /**
+   * World-space point where an archer's arrow leaves the bow.
+   *
+   * The old spawn was the hero's own centre (`x`, `y - 16`), so arrows visibly left her torso
+   * at knee height. The authored aim frame puts the bow hand ~57 frame px above the ground
+   * row (1 frame px = 1 / 1.08 world px), and the battle renderer already lifts projectiles
+   * by 28 world px, so a 12 px step forward along the aim line at this height lands the
+   * arrow on the bow itself.
+   *
+   * This moves the visual origin only: damage, cadence and hit resolution are untouched
+   * (the projectile still resolves on the same proximity check).
+   */
+  private fun bowReleasePoint(
+    hero: HeroCombatUnit,
+    target: EnemyCombatUnit,
+  ): Pair<Float, Float> {
+    val dx = target.x - hero.x
+    val dy = target.y - hero.y
+    val d = hypot(dx, dy).coerceAtLeast(1f)
+    val step = 12f / d
+    return (hero.x + dx * step) to (hero.y - 24f + dy * step * OBLIQUE_STEP_VERTICAL)
+  }
+
+  private const val OBLIQUE_STEP_VERTICAL = 0.36f
 }

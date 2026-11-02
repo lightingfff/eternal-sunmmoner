@@ -195,5 +195,17 @@
       256,
       192
     ]
+  },
+  "portraits": {
+    "lyra": {
+      "file": "portraits/lyra_portrait.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "f004c558571b0808010455e7c637468e050e43ef64223a5e0d896709cd21d6b4",
+      "native_px": 64,
+      "usage": "HUD hero avatar; drawn at 1:1 up to 64 dp, nearest filter, alpha over the UI gradient"
+    }
   }
 }

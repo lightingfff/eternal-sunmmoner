@@ -227,6 +227,17 @@ fun PixelHeroPortraitAvatar(
     contentAlignment = Alignment.Center,
   ) {
     Canvas(modifier = Modifier.size(sizeDp * 0.90f)) {
+      // Authored bust first (Lyra ships one), otherwise the legacy world-atlas crop.
+      val bust = com.example.game.pixel.PremiumPortraits.get(heroName)
+      if (bust != null) {
+        drawImage(
+          image = bust,
+          dstOffset = IntOffset(0, 0),
+          dstSize = IntSize(size.width.toInt().coerceAtLeast(2), size.height.toInt().coerceAtLeast(2)),
+          filterQuality = FilterQuality.None,
+        )
+        return@Canvas
+      }
       val premium = if (heroName == "Kaelen" && heroClass == HeroClassType.KNIGHT)
         com.example.game.pixel.PremiumActorAtlas.get("kaelen") else null
       val sprite = premium?.frame(true,false,false,0f,false,0f,false,0f) ?: if (heroClass == null) {

@@ -16,7 +16,7 @@ on:
       - '.github/workflows/lyra-render-evidence.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   render:
@@ -26,6 +26,8 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Set up Java 21
         uses: actions/setup-java@v5
@@ -62,6 +64,20 @@ jobs:
 
       - name: Render Lyra (real draw code, Robolectric native graphics)
         run: gradle :app:testDebugUnitTest --tests "com.example.LyraEngineRenderTest" --stacktrace
+
+      # The PNGs are also committed so reviewers (and the agent) can open them straight from
+      # the branch; the artifact below is the same bytes for offline download.
+      - name: Publish render PNGs into the branch
+        run: |
+          set -euo pipefail
+          mkdir -p docs/visual-evidence/p17c/engine-render
+          cp -f app/build/visual_screenshots/p17c/*.png docs/visual-evidence/p17c/engine-render/ || true
+          git config user.name "eternal-render-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/visual-evidence/p17c/engine-render
+          if git diff --cached --quiet; then echo "no render changes"; exit 0; fi
+          git commit -m "P17-C: engine render evidence (automated, Robolectric native graphics)"
+          git push origin HEAD:${{ github.head_ref || github.ref_name }}
 
       - name: Show render outputs
         if: always()
