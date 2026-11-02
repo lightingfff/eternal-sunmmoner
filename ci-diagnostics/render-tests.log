@@ -1,16 +1,16 @@
 ### test results
 total 8
--rw-r--r-- 1 runner runner 3067 Nov  2 16:35 TEST-com.example.MapForgeP21ContractTest.xml
-drwxr-xr-x 2 runner runner 4096 Nov  2 16:35 binary
+-rw-r--r-- 1 runner runner 3100 Nov  2 16:40 TEST-com.example.MapForgeP23ContractTest.xml
+drwxr-xr-x 2 runner runner 4096 Nov  2 16:40 binary
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.example.MapForgeP21ContractTest" tests="3" skipped="1" failures="1" errors="0" timestamp="2026-11-02T16:35:00.331Z" hostname="runnervmnwato" time="6.595">
+<testsuite name="com.example.MapForgeP23ContractTest" tests="3" skipped="1" failures="1" errors="0" timestamp="2026-11-02T16:40:20.956Z" hostname="runnervmnwato" time="4.487">
   <properties/>
-  <testcase name="worldGeometryIsUnchanged" classname="com.example.MapForgeP21ContractTest" time="5.732"/>
-  <testcase name="towerGatePortalMatchesAnimatedRiftBox" classname="com.example.MapForgeP21ContractTest" time="0.118">
-    <failure message="java.lang.AssertionError: threshold must carry the cold spill (17 px)" type="java.lang.AssertionError">java.lang.AssertionError: threshold must carry the cold spill (17 px)
+  <testcase name="propsReachTheGroundRowAndLanternFramesAreLocked" classname="com.example.MapForgeP23ContractTest" time="3.853"/>
+  <testcase name="enterableDoorsSitOnTheirWorldTriggers" classname="com.example.MapForgeP23ContractTest" time="0.092">
+    <failure message="java.lang.AssertionError: armory door must be flanked by lit wall stone" type="java.lang.AssertionError">java.lang.AssertionError: armory door must be flanked by lit wall stone
 	at org.junit.Assert.fail(Assert.java:89)
 	at org.junit.Assert.assertTrue(Assert.java:42)
-	at com.example.MapForgeP21ContractTest.towerGatePortalMatchesAnimatedRiftBox(MapForgeP21ContractTest.kt:284)
+	at com.example.MapForgeP23ContractTest.enterableDoorsSitOnTheirWorldTriggers(MapForgeP23ContractTest.kt:184)
 	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
 	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
@@ -36,7 +36,7 @@ drwxr-xr-x 2 runner runner 4096 Nov  2 16:35 binary
 	at java.base/java.lang.Thread.run(Thread.java:1583)
 </failure>
   </testcase>
-  <testcase name="enterableDoorsLandOnTheirWorldTriggers" classname="com.example.MapForgeP21ContractTest" time="0.306">
+  <testcase name="reAuthoredPropsCastApprovedSilhouetteShadows" classname="com.example.MapForgeP23ContractTest" time="0.261">
     <skipped/>
   </testcase>
   <system-out><![CDATA[]]></system-out>
