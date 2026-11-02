@@ -1,15 +1,26 @@
 #!/usr/bin/env python3
-"""MAP FORGE — P18 vertical slice: the plaza / road / lawn ground family repaint.
+"""MAP FORGE — P18 vertical slice + P19 terrain cohesion.
 
 Scope (deliberately bounded):
   * grass_0..7      dusk lawn, 8 variants   (PixelTileAtlas.grass, drives the 4x4 blocks)
   * cobble_0..5     road stone, 6 variants  (PixelTileAtlas.cobble)
   * flagstone_0..7  plaza slab, 8 variants  (PixelTileAtlas.flagstone)
+  * soil_0..5       packed training earth, 6 variants  (P19; PixelTileAtlas.sandTiles)
+  * gravel_0..3     gravel-in-dirt band, 4 variants    (P19; the grass/sand transition band)
   * verge           lawn-to-path fringe, transparent clusters
   * oak             the plaza/verge tree prop, repainted in place
 
-Everything else in sanctuary_p03/ (soil, gravel, wood, pine, cypress, pillar, barrels,
-boulder, canopy) is untouched — same file names, same counts, same loader contract.
+Still untouched in sanctuary_p03/: wood_0..5, pine, cypress, twisted, canopy_a/b, boulder,
+pillar, barrels — same file names, same counts, same loader contract.
+
+P19 rules on top of the P18 ones:
+  * soil is built at three scales (broad earth masses / compacted patches / connected
+    pebble-and-grit clusters) and never by sprinkling independent pixels;
+  * gravel is authored as 2-5 pebble CLUSTERS with a contact shadow and an upper-left
+    highlight, so it reads as small stones bedded in dirt, not polka dots;
+  * cobble courses carry break stones that straddle the grout seam, which removes the
+    full-width "brick row" bands visible at 1x;
+  * every family is checked as a 5x5 tiled mosaic, not just as a centred preview.
 
 Authoring rules followed here:
   * painted on a torus (every motif is stamped at 9 offsets) so tiles join without seams;
@@ -43,10 +54,23 @@ GRASS = {
     "earth": "#3a3225", "earth_lt": "#4a4130", "moss": "#45603f", "moss_lt": "#5c7a4c",
 }
 COBBLE = {
-    "mortar": "#181f24", "mortar_lt": "#232c31",
+    "mortar": "#1e262b", "mortar_lt": "#283136",
     "shade": "#33404b", "body": "#42505d", "body_b": "#4b5a68",
     "light": "#5d6d7b", "rim": "#7c8b96", "glint": "#93a1a8",
     "moss": "#415a44", "moss_lt": "#587150", "wear": "#6b6a58",
+}
+SOIL = {
+    "deep": "#302a20", "shade": "#42382a", "body": "#51452f", "body_b": "#5a4d36",
+    "light": "#63553c", "dry": "#6d5f45", "damp": "#3a3226",
+    # embedded stone: cool grey so the arena rim shares the cobble vocabulary
+    "stone": "#565849", "stone_b": "#63655a", "stone_lt": "#767a68", "stone_sh": "#2a2820",
+    "grit": "#5a5140",
+}
+GRAVEL = {
+    "deep": "#2b2620", "shade": "#403930", "body": "#4c4439", "body_b": "#564d40",
+    "light": "#5a5346", "dry": "#655e4e", "damp": "#3c352c",
+    "stone": "#454d54", "stone_b": "#525a61", "stone_lt": "#69717a", "stone_sh": "#22262b",
+    "moss": "#3d5340", "moss_lt": "#4f6b4d",
 }
 FLAG = {
     "mortar": "#2a2f2c", "mortar_lt": "#3a3f38",
@@ -140,14 +164,14 @@ def grass(v: int) -> Image.Image:
                 (x + 2, y + 2), (x - 2, y + 2)], GRASS["moss"])
         t.line([(x - 3, y - 1), (x, y)], GRASS["moss_lt"], 1)
     # 5. clumps: 9-12 per tile, phyllotaxis-free placement, sizes vary
-    clumps = 12 + (v % 5)
+    clumps = 10 + (v % 4)
     for i in range(clumps):
         x, y = r(60) + 2, r(60) + 2
         roll = (i * 7 + v * 3) % 10
-        scale = 0 if roll < 4 else (1 if roll < 8 else 2)
-        blade_fan(t, x, y, scale, r, lit=(x + y) % 3 != 0)
-    # 6. a couple of slightly taller clumps give the tile a focal point without a light path
-    for _ in range(2):
+        scale = 0 if roll < 3 else (1 if roll < 7 else 2)
+        blade_fan(t, x, y, scale, r, lit=(x + y) % 3 != 0 and scale > 0)
+    # 6. a few taller clumps give the tile a focal point without a light path
+    for _ in range(3):
         blade_fan(t, r(56) + 4, r(56) + 4, 3, r, lit=True)
     return t.image()
 
@@ -190,6 +214,7 @@ def cobble(v: int) -> Image.Image:
                 (x + 1, y + 3), (x - 4, y + 2)], COBBLE["mortar_lt"])
     y = -3 - (v * 2) % 7          # per-variant course phase kills the repeated seam rows
     row = 0
+    bounds: list[int] = []
     while y < 64:
         row_h = 8 + r(5) + (1 if (row + v) % 4 == 0 else 0)
         x = -6 - r(10)
@@ -205,9 +230,30 @@ def cobble(v: int) -> Image.Image:
                 (x1 - 1, y1 - 1), (x1 - w // 3, y1), (x0 + 1, y1 - 1), (x0, y0 + h // 2),
             ]
             stone(t, pts, COBBLE, r, moss_chance=8, chip_chance=5)
-            x += w + 2 + r(1)
+            x += w + 1 + r(2)
+        bounds.append(y)
         y += row_h
         row += 1
+
+    # P19: break stones that straddle a grout seam. A course line that runs the full tile
+    # width is what made the P18 road read as brick; these taller stones cut the band into
+    # short, uneven runs without changing stone count or road width.
+    for _ in range(3 + (v % 2)):
+        by = bounds[1 + r(len(bounds) - 2)]
+        bw = 9 + r(8)
+        bh = 12 + r(5)
+        bx = r(64)
+        pts = [
+            (bx + 2, by - bh // 2), (bx + bw // 3, by - bh // 2 - 2),
+            (bx + bw - 3, by - bh // 2 + 1), (bx + bw, by),
+            (bx + bw - 2, by + bh // 2), (bx + bw // 2, by + bh // 2 + 2),
+            (bx + 2, by + bh // 2 - 1), (bx, by - 1),
+        ]
+        stone(t, pts, COBBLE, r, moss_chance=7, chip_chance=4)
+        # a single chipped notch at the seam keeps the join readable
+        if r(2):
+            t.px(bx + bw // 2, by + bh // 2, COBBLE["shade"])
+
     # worn polish where traffic runs: short broken segments, and only in some variants
     if v % 2 == 0:
         by = 10 + (v * 11) % 40
@@ -260,6 +306,122 @@ def flagstone(v: int) -> Image.Image:
                 t.line([(gx - 3, gy), (gx, gy - 3), (gx + 3, gy), (gx, gy + 3), (gx - 3, gy)],
                        FLAG["cool"], 1)
             x += w + 3 + r(1)
+    return t.image()
+
+
+# ---------------------------------------------------------------- earth materials (P19)
+def pebble(t: Torus, x, y, w, h, pal, r, lit=True):
+    """One small stone, 3-7 px wide: contact shadow below-right, body, upper-left rim."""
+    t.poly([(x - w + 1, y - h + 1), (x + w, y - h + 2), (x + w, y + h), (x - w + 1, y + h + 1)],
+           pal["stone_sh"])
+    t.poly([(x - w, y - h), (x + w - 1, y - h + 1), (x + w, y + h - 1), (x - w + 1, y + h)],
+           pal["stone"])
+    if lit:
+        t.line([(x - w + 1, y - h), (x + w - 2, y - h + 1)], pal["stone_lt"], 1)
+    if r(3) == 0:
+        t.px(x, y + h - 1, pal["stone_b"])
+
+
+def pebble_cluster(t: Torus, x, y, count, pal, r, spread=6):
+    """2-5 stones sharing one patch of disturbed ground: a cluster, not scattered dots."""
+    # disturbed earth ring under the cluster so the stones are bedded, not pasted
+    t.poly([(x - spread + 1, y + 2), (x - spread // 2, y - 2), (x + spread // 2, y - 1),
+            (x + spread - 1, y + 2), (x, y + 3)], pal["shade"])
+    for _ in range(count):
+        px_ = x + r(spread * 2) - spread
+        py = y + r(spread) - spread // 2
+        pebble(t, px_, py, 1 + r(3), 1 + r(2), pal, r, lit=(px_ + py) % 4 != 0)
+
+
+def soil(v: int) -> Image.Image:
+    """Packed training earth: three value scales (masses / compaction / clusters)."""
+    darker = v % 3 == 2          # pattern difference only: the tone is equalised below
+    t = Torus(SOIL["body"])
+    r = rng(5500 + v * 61)
+
+    # scale 1 - earth masses kept SMALLER than the tile and one value step deep.
+    # Large lobes tore visibly at every tile boundary once the renderer hash-picked
+    # variants (0.88 patchwork); the field must read as texture, not as patches.
+    for _ in range(9):
+        x, y = r(64), r(64)
+        w, h = 6 + r(8), 4 + r(5)
+        pts = []
+        for k in range(9):
+            ang = k * 6.28318 / 9
+            import math as _m
+            wob = 1.0 + ((k * 5 + v * 3) % 7 - 3) * 0.09
+            pts.append((x + w * wob * _m.cos(ang), y + h * 0.85 * wob * _m.sin(ang)))
+        t.poly([(round(a), round(b)) for a, b in pts],
+               SOIL["shade"] if (darker and r(3) == 0) else SOIL["body_b"])
+
+    # compaction smears: short, broken runs along the traffic direction (never a full band)
+    for _ in range(4 + (v % 3)):
+        sx, sy = r(56) + 4, r(56) + 4
+        t.poly([(sx - 7, sy), (sx - 2, sy - 3), (sx + 6, sy - 2), (sx + 8, sy + 1),
+                (sx + 1, sy + 3), (sx - 5, sy + 2)], SOIL["light"] if r(3) == 0 else SOIL["body_b"])
+        t.line([(sx - 4, sy - 1), (sx + 3, sy)], SOIL["dry"], 1)
+
+    # scale 2 - compacted patches: grit and tiny chips in one small area
+    for _ in range(3 + (v % 3)):
+        x, y = r(56) + 4, r(56) + 4
+        t.poly([(x - 6, y), (x - 2, y - 4), (x + 5, y - 2), (x + 7, y + 1),
+                (x + 1, y + 4), (x - 4, y + 3)], SOIL["body_b"] if not darker else SOIL["shade"])
+        for _ in range(2 + r(3)):
+            t.px(x - 4 + r(10), y - 2 + r(6), SOIL["stone_b"] if r(2) else SOIL["light"])
+
+    # shallow dry cracks: rare, 1 px, broken - the "used ground" read
+    for _ in range(1 + (v % 2)):
+        cx, cy = r(40) + 12, r(40) + 12
+        t.line([(cx, cy), (cx + 4, cy + 2), (cx + 7, cy + 1), (cx + 11, cy + 3)], SOIL["deep"], 1)
+        t.line([(cx + 7, cy + 1), (cx + 9, cy - 2)], SOIL["deep"], 1)
+        t.line([(cx + 1, cy + 3), (cx + 6, cy + 4), (cx + 10, cy + 4)], SOIL["shade"], 1)
+
+    # scale 3 - embedded stones as connected clusters with contact shadow and lit rim
+    for _ in range(4 + (v % 3)):
+        pebble_cluster(t, r(56) + 4, r(56) + 4, 2 + r(4), SOIL, r, spread=6)
+
+    # fine grain: short 2-3 px runs of one low-contrast value, never bright confetti
+    for _ in range(20):
+        x, y = r(63), r(63)
+        t.px(x, y, SOIL["grit"] if r(2) else SOIL["shade"])
+        if r(2):
+            t.px(x + 1, y + r(2), SOIL["shade"] if r(2) else SOIL["grit"])
+    return t.image()
+
+
+def gravel(v: int) -> Image.Image:
+    """Gravel bedded in dirt: cohesive 2-5 pebble clusters, shared cobble stone values."""
+    t = Torus(GRAVEL["body"])
+    r = rng(6600 + v * 47)
+
+    # dirt masses, small enough that a hash-picked neighbour blend stays seamless
+    for _ in range(8):
+        x, y = r(64), r(64)
+        w, h = 6 + r(7), 4 + r(5)
+        t.poly([(x - w, y + 1), (x - w // 3, y - h), (x + w // 3, y - h + 1), (x + w, y),
+                (x + w // 2, y + h), (x - w // 2, y + h - 1)],
+               GRAVEL["body_b"] if r(3) else GRAVEL["shade"])
+
+    # loose grit fields (scale 2), confined to small patches
+    for _ in range(3):
+        x, y = r(52) + 6, r(52) + 6
+        t.poly([(x - 8, y), (x - 3, y - 5), (x + 6, y - 3), (x + 9, y + 1),
+                (x + 2, y + 5), (x - 5, y + 4)], GRAVEL["damp"])
+        for _ in range(4 + r(4)):
+            t.px(x - 6 + r(14), y - 3 + r(8), GRAVEL["light"] if r(2) else GRAVEL["body_b"])
+
+    # scale 3 - the actual gravel: 6-8 clusters, density deliberately restrained so tiny
+    # hero feet are not swallowed at 0.88
+    for _ in range(6 + (v % 3)):
+        pebble_cluster(t, r(56) + 4, r(56) + 4, 2 + r(4), GRAVEL, r, spread=5)
+
+    # moss only in the two dampest variants, in the gaps
+    if v % 2:
+        for _ in range(2):
+            x, y = r(56) + 4, r(56) + 4
+            t.poly([(x - 3, y), (x - 1, y - 2), (x + 2, y - 1), (x + 3, y + 1),
+                    (x, y + 2), (x - 2, y + 1)], GRAVEL["moss"])
+            t.px(x, y - 1, GRAVEL["moss_lt"])
     return t.image()
 
 
@@ -342,6 +504,39 @@ def oak() -> Image.Image:
     return im
 
 
+# ---------------------------------------------------------------- tone equalisation
+def mean_luma(image: Image.Image) -> float:
+    px = image.load()
+    total, n = 0.0, 0
+    for y in range(64):
+        for x in range(64):
+            r, g, b, a = px[x, y]
+            if a:
+                total += 0.2126 * r + 0.7152 * g + 0.0722 * b
+                n += 1
+    return total / max(1, n)
+
+
+def equalize_tone(image: Image.Image, target: float, max_shift: int = 12) -> Image.Image:
+    """Shift a tile's value so every variant of an organic family has the same average.
+
+    Without this the renderer's hash-picked variants form a visible checkerboard of
+    per-tile brightness on wide ground (soil/gravel are low-frequency, so it shows).
+    Hue is untouched: every channel moves by the same offset.
+    """
+    delta = max(-max_shift, min(max_shift, round(target - mean_luma(image))))
+    if delta == 0:
+        return image
+    px = image.load()
+    for y in range(64):
+        for x in range(64):
+            r, g, b, a = px[x, y]
+            if a:
+                px[x, y] = (max(0, min(255, r + delta)), max(0, min(255, g + delta)),
+                            max(0, min(255, b + delta)), a)
+    return image
+
+
 # ---------------------------------------------------------------- export
 def main():
     manifest_path = OUT / "manifest.json"
@@ -349,14 +544,23 @@ def main():
     by_id = {entry["id"]: entry for entry in manifest["assets"]}
 
     written = []
-    families = [("grass", 8, grass), ("cobble", 6, cobble), ("flagstone", 8, flagstone)]
-    for name, count, fn in families:
+    # Shared 2 px perimeter keeps family adjacency stable for the structured materials.
+    # Earth materials deliberately opt out: their low-frequency masses do not match the
+    # reference border, and the copy paints a visible frame around every soil/gravel tile.
+    families = [
+        ("grass", 8, grass, True), ("cobble", 6, cobble, True), ("flagstone", 8, flagstone, True),
+        ("soil", 6, soil, False), ("gravel", 4, gravel, False),
+    ]
+    for name, count, fn, shared in families:
         reference = fn(0)
+        target_luma = mean_luma(reference)
         for v in range(count):
             image = fn(v)
-            # shared 2px perimeter: the family adjacency contract the old generator used
-            for box in [(0, 0, 64, 2), (0, 62, 64, 64), (0, 0, 2, 64), (62, 0, 64, 64)]:
-                image.paste(reference.crop(box), box)
+            if name in ("soil", "gravel"):
+                equalize_tone(image, target_luma)
+            if shared:
+                for box in [(0, 0, 64, 2), (0, 62, 64, 64), (0, 0, 2, 64), (62, 0, 64, 64)]:
+                    image.paste(reference.crop(box), box)
             path = OUT / f"{name}_{v}.png"
             image.save(path, optimize=True)
             written.append(path.name)
