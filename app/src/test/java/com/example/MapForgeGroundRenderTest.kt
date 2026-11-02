@@ -87,15 +87,31 @@ class MapForgeGroundRenderTest {
     assertEquals("verge overlay stays 64x64", 64, verge!!.width)
 
     // Packaged bytes must equal the manifest pins for the rewritten files.
+    // sanctuary_p03 keeps `assets` as an array of {id, path, size:[w,h], sha256, ...}.
     val context = RuntimeEnvironment.getApplication()
     val manifest = JSONObject(SanctuaryArtAssets.textAsset("sanctuary_p03/manifest.json")!!)
-    val assets = manifest.getJSONObject("assets")
-    for (name in listOf("grass_0", "grass_7", "cobble_0", "cobble_5", "flagstone_0", "flagstone_7", "verge", "oak")) {
-      val entry = assets.getJSONObject(name)
-      val bytes = context.assets.open("sanctuary_p03/${entry.getString("file")}").use { it.readBytes() }
+    val entries = manifest.getJSONArray("assets")
+    val byId = (0 until entries.length()).associate { i ->
+      val entry = entries.getJSONObject(i)
+      entry.getString("id") to entry
+    }
+    val expected = mapOf(
+      "grass_0" to (64 to 64), "grass_7" to (64 to 64),
+      "cobble_0" to (64 to 64), "cobble_5" to (64 to 64),
+      "flagstone_0" to (64 to 64), "flagstone_7" to (64 to 64),
+      "verge" to (64 to 64), "oak" to (112 to 136),
+    )
+    for ((name, wh) in expected) {
+      val entry = byId[name]
+      assertNotNull("manifest entry for $name", entry)
+      entry!!
+      val size = entry.getJSONArray("size")
+      assertEquals("$name declared width", wh.first, size.getInt(0))
+      assertEquals("$name declared height", wh.second, size.getInt(1))
+      val path = entry.getString("path")
+      val bytes = context.assets.open("sanctuary_p03/$path").use { it.readBytes() }
       val digest = MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
-      assertEquals("$name.png SHA-256 vs manifest", entry.getString("sha256"), digest)
-      assertEquals("$name.png size vs manifest", bytes.size, entry.getInt("size"))
+      assertEquals("$name SHA-256 vs manifest", entry.getString("sha256"), digest)
     }
   }
 
