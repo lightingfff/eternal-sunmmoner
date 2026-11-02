@@ -146,7 +146,7 @@ def main() -> int:
 
         # Determinism check against generator function
         regen = gen.ASSET_SPECS[aid]["fn"]()
-        if list(regen.getdata()) != list(im.getdata()):
+        if regen.tobytes() != im.tobytes():
             failures.append(f"{aid}: disk PNG pixels do not match deterministic generator output")
 
         report["p22_assets"][aid] = {
@@ -172,8 +172,8 @@ def main() -> int:
         if bush_iou > 0.88:
             failures.append(f"bush clone detected: hedge_bush vs forest_bush IoU={bush_iou:.3f}")
         # Also verify distinct color sets between courtyard hedge and woodland bush
-        c_hedge = set(loaded_imgs["hedge_bush"].getdata())
-        c_forest = set(loaded_imgs["forest_bush"].getdata())
+        c_hedge = {rgba for _, rgba in (loaded_imgs["hedge_bush"].getcolors(256) or [])}
+        c_forest = {rgba for _, rgba in (loaded_imgs["forest_bush"].getcolors(256) or [])}
         if c_hedge == c_forest:
             failures.append("hedge_bush and forest_bush have identical palettes")
 
