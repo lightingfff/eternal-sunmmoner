@@ -10,10 +10,14 @@ For graphics changes, build the APK and capture real runtime overview/gameplay, 
 
 ## User's game-development skill preference
 
-For future game implementation and art/animation tasks in this repository, read
-`.agents/skills/ai-game-spritesheets/SKILL.md` and use the relevant supplied templates.
-At the start of the task, explicitly mention in chat that you are using
-`ai-game-spritesheets` and adapting it to the existing camera and asset pipeline.
+For future game implementation tasks in this repository, read
+`.agents/skills/eternal-summoner-skill-router/SKILL.md` and select only relevant
+guidance from `docs/GAME_SKILL_SELECTION.md`. For sprite/art/animation tasks also
+read `.agents/skills/ai-game-spritesheets/SKILL.md` and use the supplied templates.
+At the start of the task, explicitly mention in chat the one to three relevant
+skills being used and how they fit the existing camera and asset pipeline.
+Scenario skill documents do not install Scenario MCP or paid model access. Engine-
+specific Unity/Godot/Unreal/Roblox instructions must not replace Kotlin/Compose.
 Preserve the 2.5D rules above; upstream top-down examples and suggested frame sizes
 do not override this game's projection, pivots, gameplay timing or existing systems.
 The local skill is saved project guidance, not a promise of memory in unrelated chats.
