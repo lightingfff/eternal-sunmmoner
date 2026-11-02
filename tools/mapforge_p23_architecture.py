@@ -1586,13 +1586,6 @@ def build_tower_gate() -> Canvas:
             continue
         c.rect(int(cx - half), y, int(cx + half), y,
                mix("#05080b", "#0d2230", min(1.0, t * 1.15)))
-    # painted light lives ONLY below the animated ring box (rows 174..186)
-    for y in range(bot - 13, bot + 1):
-        t = 1.0 - (bot - y) / 13.0
-        half = int(3 + 8 * t)
-        c.rect(cx - half, y, cx + half, y, mix("#0a1a22", CYAN["deep"], 0.55 + 0.45 * t))
-        c.rect(cx - half + 3, y, cx + half - 3, y, mix(CYAN["deep"], CYAN["base"], t ** 1.4))
-    c.rect(cx - 4, bot - 2, cx + 4, bot, CYAN["dim"])
     # reveal: lit left jamb, dark right jamb
     c.vline(cx - prx + 1, top + 11, bot - 1, BASA["lt"])
     c.vline(cx - prx + 2, top + 14, bot - 2, mix(BASA["base"], CYAN["deep"], 0.5))
@@ -1601,6 +1594,14 @@ def build_tower_gate() -> Canvas:
         c.rect(cx - half, top + 16, cx + half, bot - 2, col)
     c.ellipse(cx, top + 18, 12, 8, "#0b1a22")
     c.ellipse(cx, top + 18, 6, 5, "#081016")
+    # painted light lives ONLY below the animated ring box (rows 174..186)
+    for y in range(bot - 13, bot + 1):
+        t = 1.0 - (bot - y) / 13.0
+        half = int(3 + 8 * t)
+        c.rect(cx - half, y, cx + half, y, mix("#0a1a22", CYAN["deep"], 0.55 + 0.45 * t))
+        c.rect(cx - half + 3, y, cx + half - 3, y, mix(CYAN["deep"], CYAN["base"], t ** 1.4))
+    c.rect(cx - 4, bot - 2, cx + 4, bot, CYAN["dim"])
+
     # voussoirs around the arch
     for a in range(13):
         ang = math.pi + a * math.pi / 12

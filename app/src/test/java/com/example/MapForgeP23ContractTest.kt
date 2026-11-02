@@ -154,10 +154,14 @@ class MapForgeP23ContractTest {
       val luma = (((p shr 16) and 0xFF) * 299 + ((p shr 8) and 0xFF) * 587 + (p and 0xFF) * 114) / 1000
       assertTrue("$key: door probe must be a dark opaque leaf (0x${Integer.toHexString(p)})",
         (p ushr 24) == 255 && luma < 90)
-      // and the surround on both sides must be lit stone, i.e. this is a real opening
-      for (side in listOf(-14, 14)) {
+      // and the jamb stone on both sides must be opaque and lighter than the leaf: that pair of
+      // lit jambs is what makes this a recess cut into the wall instead of a rectangle on it
+      for (side in listOf(-16, 16)) {
         val q = bmp.getPixel(cx + side, cy)
-        assertTrue("$key: door surround at $side must be opaque", (q ushr 24) == 255)
+        assertTrue("$key: door jamb at $side must be opaque stone", (q ushr 24) == 255)
+        val jl = (((q shr 16) and 0xFF) * 299 + ((q shr 8) and 0xFF) * 587 + (q and 0xFF) * 114) / 1000
+        assertTrue("$key: jamb at $side (luma $jl) must be lighter than the leaf ($luma)",
+          jl > luma)
       }
     }
     // The Armory must hold the specific correction P21 documented: its P20 art advertised a
@@ -173,8 +177,8 @@ class MapForgeP23ContractTest {
       kotlin.math.abs(oldWorldX - armoryEntrance.doorWorldX) > 40f)
     // A doorway is a recess: dark leaf at the centre column, lit wall stone either side of it.
     val leaf = armory.getPixel(94, 150)
-    val leftWall = armory.getPixel(94 - 20, 150)
-    val rightWall = armory.getPixel(94 + 20, 150)
+    val leftWall = armory.getPixel(94 - 16, 150)
+    val rightWall = armory.getPixel(94 + 16, 150)
     fun luma(c: Int) = (((c shr 16) and 0xFF) * 299 + ((c shr 8) and 0xFF) * 587 + (c and 0xFF) * 114) / 1000
     assertTrue("armory door leaf must be dark at canvas centre (luma ${luma(leaf)})", luma(leaf) < 90)
     assertTrue("armory door must be flanked by lit wall stone",
