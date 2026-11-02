@@ -21,6 +21,8 @@ on:
       - 'app/src/test/java/com/example/MapForgeP21ContractTest.kt'
       - 'app/src/test/java/com/example/MapForgeP22RenderTest.kt'
       - 'app/src/test/java/com/example/MapForgeP22ContractTest.kt'
+      - 'app/src/test/java/com/example/MapForgeP23RenderTest.kt'
+      - 'app/src/test/java/com/example/MapForgeP23ContractTest.kt'
       - '.github/workflows/lyra-render-evidence.yml'
 
 permissions:
@@ -100,6 +102,10 @@ jobs:
       - name: Verify P22 vegetation asset and geometry contract
         run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeP22ContractTest" --stacktrace
 
+      # P23: Sanctuary architecture 2.5D repair + environmental props cohesion render matrix.
+      - name: Render P23 architecture and props matrix (real draw code, Robolectric native graphics)
+        run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeP23RenderTest" --stacktrace
+
       - name: Verify Sanctuary environment art, manifest, layout, and performance regressions
         run: >-
           gradle :app:testDebugUnitTest
@@ -132,9 +138,16 @@ jobs:
           mkdir -p docs/visual-evidence/p22/engine-render
           cp -f app/build/visual_screenshots/p22/*.png docs/visual-evidence/p22/engine-render/ || true
           cp -f app/build/visual_screenshots/p22/camera_props.json docs/visual-evidence/p22/ || true
+          if [ ! -d docs/visual-evidence/p23/engine-render-before ]; then
+            mkdir -p docs/visual-evidence/p23/engine-render-before
+            cp -f app/build/visual_screenshots/p23/*.png docs/visual-evidence/p23/engine-render-before/ || true
+          fi
+          mkdir -p docs/visual-evidence/p23/engine-render
+          cp -f app/build/visual_screenshots/p23/*.png docs/visual-evidence/p23/engine-render/ || true
+          cp -f app/build/visual_screenshots/p23/camera_props.json docs/visual-evidence/p23/ || true
           git config user.name "eternal-render-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add docs/visual-evidence/p17c/engine-render docs/visual-evidence/p18/engine-render docs/visual-evidence/p19/engine-render docs/visual-evidence/p20/engine-render docs/visual-evidence/p21/engine-render docs/visual-evidence/p22/engine-render docs/visual-evidence/p22/camera_props.json
+          git add docs/visual-evidence/p17c/engine-render docs/visual-evidence/p18/engine-render docs/visual-evidence/p19/engine-render docs/visual-evidence/p20/engine-render docs/visual-evidence/p21/engine-render docs/visual-evidence/p22/engine-render docs/visual-evidence/p22/camera_props.json docs/visual-evidence/p23/engine-render-before docs/visual-evidence/p23/engine-render docs/visual-evidence/p23/camera_props.json
           if git diff --cached --quiet; then echo "no render changes"; exit 0; fi
           git commit -m "P17-C: engine render evidence (automated, Robolectric native graphics)"
           git push origin HEAD:${{ github.head_ref || github.ref_name }}
@@ -188,6 +201,8 @@ jobs:
             app/build/visual_screenshots/p21/*.png
             app/build/visual_screenshots/p22/*.png
             app/build/visual_screenshots/p22/camera_props.json
+            app/build/visual_screenshots/p23/*.png
+            app/build/visual_screenshots/p23/camera_props.json
             app/build/reports/tests/testDebugUnitTest/**
           if-no-files-found: warn
           retention-days: 30
