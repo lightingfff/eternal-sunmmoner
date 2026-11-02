@@ -165,15 +165,16 @@ class MapForgeP21ContractTest {
       assertTrue("${case.key}: door pixel must be a dark opaque leaf (0x${Integer.toHexString(p)}, luma $luminance)",
         (p ushr 24) == 255 && luminance < 96)
       // Forward mapping: the probe must land on the trigger's column, and exactly `liftPx` sprite
-      // rows of world space along +Y from the trigger (6 px * 1.6 / 0.72 = 13.33 world units at
-      // scale 0.80). Tolerances absorb the 1 px truncation of the probe coordinate.
+      // rows of world space *north* of it (6 px * 1.6 / 0.72 = 13.33 world units at scale 0.80;
+      // sprite rows run down-canvas like world +Y, so a row above the sill is -Y). Tolerances
+      // absorb the 1 px truncation of the probe coordinate.
       val liftWorld = liftPx * (2f * obs.scale) / 0.72f
       val (wx, wy) = worldOf(obs.x, obs.y, case.w, case.h, obs.scale, cx.toFloat(), cy.toFloat())
       assertTrue("${case.key}: door must map to world x ${entrance.doorWorldX}, got $wx",
         kotlin.math.abs(wx - entrance.doorWorldX) <= 4f)
       assertTrue(
-        "${case.key}: door probe must map $liftWorld u from the trigger, got ${wy - entrance.doorWorldY}",
-        kotlin.math.abs((wy - entrance.doorWorldY) - liftWorld) <= 2f,
+        "${case.key}: door probe must map -$liftWorld u from the trigger, got ${wy - entrance.doorWorldY}",
+        kotlin.math.abs((wy - entrance.doorWorldY) + liftWorld) <= 2f,
       )
       // Ancillary contract: the entrance and the obstacle were not edited to fit the art.
       assertEquals("${case.key}: entrance row stays on the obstacle anchor", obs.y, entrance.doorWorldY, 0.01f)
