@@ -29,15 +29,17 @@ internal object ObliqueSpriteGeometry {
   fun pixelScale(kind: PropKind) = when(kind) {
     PropKind.OAK_TREE, PropKind.MYSTIC_PLUM_TREE -> 2.05f
     PropKind.GARDEN_HEDGE_BUSH -> 1.9f
+    PropKind.FLOWER_PLANTER_BED -> 1f
     else -> 2f
   }
   fun footOffset(kind: PropKind) = when(kind) {
-    PropKind.OAK_TREE, PropKind.MYSTIC_PLUM_TREE, PropKind.PINE_SPIRIT_TREE -> 8f
+    PropKind.OAK_TREE, PropKind.MYSTIC_PLUM_TREE, PropKind.PINE_SPIRIT_TREE,
+    PropKind.SOUTHERN_GATE_TOWER, PropKind.FLOWER_PLANTER_BED -> 8f
     PropKind.CYPRESS_CONIFER_TREE, PropKind.GARDEN_HEDGE_BUSH, PropKind.FOREST_CANOPY_BUSH,
     PropKind.OBSIDIAN_COLUMN, PropKind.RUINED_PILLAR, PropKind.MOSSY_BOULDER, PropKind.STREET_LANTERN,
     PropKind.BARREL_CLUSTER, PropKind.WOODEN_BENCH_34, PropKind.STONE_BALUSTRADE_RAIL,
-    PropKind.STONE_RETAINING_WALL, PropKind.TERRACE_CLIFF_WALL, PropKind.TRAINING_STRIKING_POST -> 4f
-    PropKind.SOUTHERN_GATE_TOWER -> 8f
+    PropKind.STONE_RETAINING_WALL, PropKind.TERRACE_CLIFF_WALL, PropKind.TRAINING_STRIKING_POST,
+    PropKind.TRAINING_DUMMY, PropKind.WEAPON_RACK, PropKind.ANCIENT_MONOLITH, PropKind.SUMMON_OBELISK -> 4f
     else -> 6f
   }
   // The existing building art/door locations are preserved. Trees are explicitly grounded at obs.y.

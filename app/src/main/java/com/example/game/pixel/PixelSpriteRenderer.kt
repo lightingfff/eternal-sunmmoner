@@ -974,6 +974,12 @@ object PixelSpriteRenderer {
 
       PropKind.TRAINING_DUMMY -> {
         val wobble = sin(timeSec * 5.5f + obs.y) * 1.4f * s
+        val dummySprite = PixelStructureAtlas.trainingDummySprite
+        if (dummySprite != null) {
+          // P23 authored sprite: same anchor and scale, so the obstacle row is untouched.
+          drawCrispSprite(dummySprite, cx, cy + 4f * s, 2.0f * s)
+          return@drawProp
+        }
         if (legacyShadow) drawDirectionalShadow34(cx + 6f * s, cy, 18f * s, 6f * s, alpha = 0.36f)
         // Base cross-stand on sand
         drawRect(Color(0xFF2B1B10), Offset(cx - 12f * s, cy - 4f * s), Size(24f * s, 6f * s))
@@ -992,6 +998,11 @@ object PixelSpriteRenderer {
       }
 
       PropKind.WEAPON_RACK -> {
+        val rackSprite = PixelStructureAtlas.weaponRackSprite
+        if (rackSprite != null) {
+          drawCrispSprite(rackSprite, cx, cy + 4f * s, 2.0f * s)
+          return@drawProp
+        }
         if (legacyShadow) drawDirectionalShadow34(cx + 6f * s, cy, 34f * s, 8f * s, alpha = 0.36f)
         // A-frame wooden side posts & horizontal crossbar
         drawRect(Color(0xFF2B1B10), Offset(cx - 32f * s, cy - 34f * s), Size(7f * s, 36f * s))

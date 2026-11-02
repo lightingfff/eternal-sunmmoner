@@ -40,14 +40,18 @@ class MapForgeArchitectureContractTest {
     assertEquals("armory width (drawCrispSprite anchors on this)", 190, bmp.width)
     assertEquals("armory height", 166, bmp.height)
 
-    // The doorway the world trigger (993, 673) lands on must stay a real opening: a dark,
-    // opaque, recessed box at x 133..150, y 109..139 with a lit threshold below it.
+    // P23 re-authored the doorway onto its real trigger. P20 painted it at x 133..150 /
+    // y 109..139, which inverts to world (1069.4, 601.7): 76 units east and 120 north of the
+    // playable trigger (993, 655), so a player walking to the painted door was aiming at
+    // nothing. The trigger did not move; the art did. At scale 0.80 the trigger inverts to
+    // canvas centre X (93.75) and row H-3 (163), and the leaf base sits two rows above that.
     var opaque = 0
     var darkDoorPixels = 0
+    val doorCx = 94
     for (y in 0 until bmp.height) for (x in 0 until bmp.width) {
       val p = bmp.getPixel(x, y)
       if ((p ushr 24) != 0) opaque++
-      if (x in 133..149 && y in 109..139) {
+      if (x in (doorCx - 9)..(doorCx + 9) && y in 130..162) {
         val r = (p shr 16) and 0xFF
         val g = (p shr 8) and 0xFF
         val b = p and 0xFF

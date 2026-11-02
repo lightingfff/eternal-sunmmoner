@@ -323,6 +323,13 @@ object SanctuaryShadowRegistry {
     PropKind.PINE_SPIRIT_TREE, PropKind.CYPRESS_CONIFER_TREE -> 62f
     PropKind.GARDEN_HEDGE_BUSH, PropKind.FOREST_CANOPY_BUSH -> 22f
     PropKind.MOSSY_BOULDER -> 18f
+    // P23 props: they now cast a projected silhouette instead of a painted blob, so the
+    // registry needs their real heights rather than the 24f default.
+    PropKind.ANCIENT_RUIN_ARCH -> 46f
+    PropKind.ANCIENT_MONOLITH, PropKind.SUMMON_OBELISK -> 50f
+    PropKind.FLOWER_PLANTER_BED -> 10f
+    PropKind.TRAINING_DUMMY -> 42f
+    PropKind.WEAPON_RACK -> 36f
     PropKind.OBSIDIAN_COLUMN, PropKind.RUINED_PILLAR -> 84f
     PropKind.STREET_LANTERN -> 38f
     PropKind.WOODEN_BENCH_34 -> 14f
@@ -331,8 +338,6 @@ object SanctuaryShadowRegistry {
     PropKind.STONE_RETAINING_WALL -> 18f
     PropKind.TAVERN_COUNTER_BAR -> 32f
     PropKind.ARCANE_BRAZIER -> 28f
-    PropKind.TRAINING_DUMMY -> 42f
-    PropKind.WEAPON_RACK -> 34f
     else -> 24f
   }
   fun silhouetteFor(kind: PropKind): ShadowSilhouette = when (kind) {

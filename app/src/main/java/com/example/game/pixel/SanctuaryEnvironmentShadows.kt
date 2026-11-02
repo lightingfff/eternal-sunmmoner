@@ -46,6 +46,12 @@ object SanctuaryEnvironmentShadows {
       PropKind.STONE_RETAINING_WALL -> stoneRetainingWallSprite
       PropKind.TERRACE_CLIFF_WALL -> terraceCliffWallSprite
       PropKind.TRAINING_STRIKING_POST -> trainingStrikingPostSprite
+      // P23 props: registered so each one gets the projected silhouette shadow + contact AO.
+      PropKind.FLOWER_PLANTER_BED -> flowerPlanterSprite
+      PropKind.TRAINING_DUMMY -> trainingDummySprite
+      PropKind.WEAPON_RACK -> weaponRackSprite
+      PropKind.ANCIENT_RUIN_ARCH -> ruinArchSprite
+      PropKind.ANCIENT_MONOLITH, PropKind.SUMMON_OBELISK -> monolithSprite
       else -> null
     }
   }
