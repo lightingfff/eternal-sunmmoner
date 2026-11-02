@@ -137,11 +137,11 @@ class MapForgeP22ContractTest {
 
     // No vegetation obstacle may overlap any SanctuaryHouseEntrances trigger radius.
     val veg = sakuras + hedges + cypresses
-    for (door in SanctuaryHouseEntrances.ALL) {
+    for (door in SanctuaryHouseEntrances.ENTRIES.values) {
       for (obs in veg) {
-        val dist = hypot(door.doorX - obs.x, door.doorY - obs.y)
+        val dist = hypot(door.doorWorldX - obs.x, door.doorWorldY - obs.y)
         assertTrue(
-          "Vegetation ${obs.id} too close to ${door.id} (${dist}px)",
+          "Vegetation ${obs.id} too close to ${door.obstacleId} (${dist}px)",
           dist > door.triggerRadius + obs.radius + 16f,
         )
       }
