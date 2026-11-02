@@ -15,6 +15,7 @@ on:
       - 'app/src/test/java/com/example/LyraEngineRenderTest.kt'
       - 'app/src/test/java/com/example/MapForgeGroundRenderTest.kt'
       - 'app/src/test/java/com/example/MapForgeTerrainRenderTest.kt'
+      - 'app/src/test/java/com/example/MapForgeArchitectureRenderTest.kt'
       - '.github/workflows/lyra-render-evidence.yml'
 
 permissions:
@@ -71,6 +72,10 @@ jobs:
       - name: Render ground slice (real draw code, Robolectric native graphics)
         run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeGroundRenderTest" --stacktrace
 
+      # P20: armory architecture + cypress vegetation slice, fixed cameras incl. actor.
+      - name: Render architecture slice (real draw code, Robolectric native graphics)
+        run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeArchitectureRenderTest" --stacktrace
+
       # P19: training field / gravel band / cobble joints, fixed cameras for before/after.
       - name: Render terrain slice (real draw code, Robolectric native graphics)
         run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeTerrainRenderTest" --stacktrace
@@ -86,9 +91,11 @@ jobs:
           cp -f app/build/visual_screenshots/p18/*.png docs/visual-evidence/p18/engine-render/ || true
           mkdir -p docs/visual-evidence/p19/engine-render
           cp -f app/build/visual_screenshots/p19/*.png docs/visual-evidence/p19/engine-render/ || true
+          mkdir -p docs/visual-evidence/p20/engine-render
+          cp -f app/build/visual_screenshots/p20/*.png docs/visual-evidence/p20/engine-render/ || true
           git config user.name "eternal-render-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add docs/visual-evidence/p17c/engine-render docs/visual-evidence/p18/engine-render docs/visual-evidence/p19/engine-render
+          git add docs/visual-evidence/p17c/engine-render docs/visual-evidence/p18/engine-render docs/visual-evidence/p19/engine-render docs/visual-evidence/p20/engine-render
           if git diff --cached --quiet; then echo "no render changes"; exit 0; fi
           git commit -m "P17-C: engine render evidence (automated, Robolectric native graphics)"
           git push origin HEAD:${{ github.head_ref || github.ref_name }}
@@ -138,6 +145,7 @@ jobs:
             app/build/visual_screenshots/p17c/*.png
             app/build/visual_screenshots/p18/*.png
             app/build/visual_screenshots/p19/*.png
+            app/build/visual_screenshots/p20/*.png
             app/build/reports/tests/testDebugUnitTest/**
           if-no-files-found: warn
           retention-days: 30
