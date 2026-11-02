@@ -79,6 +79,26 @@ jobs:
           git commit -m "P17-C: engine render evidence (automated, Robolectric native graphics)"
           git push origin HEAD:${{ github.head_ref || github.ref_name }}
 
+      # Gradle logs and artifacts live on hosts this repo's reviewers may not reach, so on
+      # failure the compiler output is committed back to the branch for triage.
+      - name: Capture compiler diagnostics on failure
+        if: failure()
+        run: |
+          set +e
+          {
+            echo "### :app:compileDebugKotlin"
+            gradle :app:compileDebugKotlin --console=plain
+            echo "### :app:compileDebugUnitTestKotlin"
+            gradle :app:compileDebugUnitTestKotlin --console=plain
+          } > /tmp/diag.txt 2>&1
+          mkdir -p ci-diagnostics
+          tail -c 60000 /tmp/diag.txt > ci-diagnostics/gradle-error.log
+          git config user.name "eternal-render-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add ci-diagnostics
+          git commit -m "ci: gradle diagnostics for the failed render run" || exit 0
+          git push origin HEAD:${{ github.head_ref || github.ref_name }} || true
+
       - name: Show render outputs
         if: always()
         run: |
