@@ -1,0 +1,469 @@
+{
+  "captures": [
+    {
+      "file": "sanctuary_overview_z036.png",
+      "scene": "SANCTUARY_ASTRAL",
+      "camX": 1600,
+      "camY": 1380,
+      "zoom": 0.36000001430511475,
+      "props": [
+        {
+          "id": "sanctuary_sakura_1",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1690,
+          "y": 495,
+          "scale": 0.9800000190734863
+        },
+        {
+          "id": "sanctuary_sakura_2",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 2245,
+          "y": 520,
+          "scale": 1.0399999618530273
+        },
+        {
+          "id": "sanctuary_sakura_14",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1715,
+          "y": 1845,
+          "scale": 1.0399999618530273
+        },
+        {
+          "id": "sanctuary_sakura_15",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1865,
+          "y": 2025,
+          "scale": 0.9200000166893005
+        },
+        {
+          "id": "sanctuary_hedge_bush_2",
+          "kind": "GARDEN_HEDGE_BUSH",
+          "x": 1065,
+          "y": 1095,
+          "scale": 0.8999999761581421
+        }
+      ]
+    },
+    {
+      "file": "sanctuary_ne_garden_z088.png",
+      "scene": "SANCTUARY_ASTRAL",
+      "camX": 2360,
+      "camY": 620,
+      "zoom": 0.8799999952316284,
+      "props": [
+        {
+          "id": "sanctuary_sakura_2",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 2245,
+          "y": 520,
+          "scale": 1.0399999618530273
+        },
+        {
+          "id": "sanctuary_sakura_3",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 2385,
+          "y": 605,
+          "scale": 0.9200000166893005
+        },
+        {
+          "id": "sanctuary_sakura_4",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 2520,
+          "y": 725,
+          "scale": 0.9800000190734863
+        },
+        {
+          "id": "sanctuary_hedge_bush_4",
+          "kind": "GARDEN_HEDGE_BUSH",
+          "x": 2355,
+          "y": 735,
+          "scale": 0.8999999761581421
+        }
+      ]
+    },
+    {
+      "file": "sanctuary_south_sakura_pair_z088.png",
+      "scene": "SANCTUARY_ASTRAL",
+      "camX": 1790,
+      "camY": 1890,
+      "zoom": 0.8799999952316284,
+      "props": [
+        {
+          "id": "sanctuary_sakura_14",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1715,
+          "y": 1845,
+          "scale": 1.0399999618530273
+        },
+        {
+          "id": "sanctuary_sakura_15",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1865,
+          "y": 2025,
+          "scale": 0.9200000166893005
+        }
+      ]
+    },
+    {
+      "file": "sanctuary_south_sakura_mid_z100.png",
+      "scene": "SANCTUARY_ASTRAL",
+      "camX": 1790,
+      "camY": 1880,
+      "zoom": 1,
+      "props": [
+        {
+          "id": "sanctuary_sakura_14",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1715,
+          "y": 1845,
+          "scale": 1.0399999618530273
+        },
+        {
+          "id": "sanctuary_sakura_15",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1865,
+          "y": 2025,
+          "scale": 0.9200000166893005
+        }
+      ]
+    },
+    {
+      "file": "sanctuary_courtyard_hedges_z088.png",
+      "scene": "SANCTUARY_ASTRAL",
+      "camX": 1060,
+      "camY": 960,
+      "zoom": 0.8799999952316284,
+      "props": [
+        {
+          "id": "sanctuary_hedge_bush_1",
+          "kind": "GARDEN_HEDGE_BUSH",
+          "x": 965,
+          "y": 1055,
+          "scale": 0.8999999761581421
+        },
+        {
+          "id": "sanctuary_hedge_bush_2",
+          "kind": "GARDEN_HEDGE_BUSH",
+          "x": 1065,
+          "y": 1095,
+          "scale": 0.8999999761581421
+        },
+        {
+          "id": "sanctuary_hedge_bush_3",
+          "kind": "GARDEN_HEDGE_BUSH",
+          "x": 1215,
+          "y": 1045,
+          "scale": 0.8999999761581421
+        }
+      ]
+    },
+    {
+      "file": "sanctuary_north_lawn_control_z100.png",
+      "scene": "SANCTUARY_ASTRAL",
+      "camX": 1350,
+      "camY": 560,
+      "zoom": 1,
+      "props": [
+        {
+          "id": "sanctuary_sakura_0",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1435,
+          "y": 490,
+          "scale": 0.9200000166893005
+        },
+        {
+          "id": "sanctuary_cypress_2",
+          "kind": "CYPRESS_CONIFER_TREE",
+          "x": 1485,
+          "y": 655,
+          "scale": 0.9399999976158142
+        },
+        {
+          "id": "sanctuary_hedge_bush_0",
+          "kind": "GARDEN_HEDGE_BUSH",
+          "x": 1100,
+          "y": 565,
+          "scale": 0.8999999761581421
+        }
+      ]
+    },
+    {
+      "file": "sakura_a_full_z148.png",
+      "scene": "SANCTUARY_ASTRAL",
+      "camX": 1715,
+      "camY": 1705,
+      "zoom": 1.4800000190734863,
+      "props": [
+        {
+          "id": "sanctuary_sakura_14",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1715,
+          "y": 1845,
+          "scale": 1.0399999618530273
+        }
+      ]
+    },
+    {
+      "file": "sakura_a_foliage_detail_z148.png",
+      "scene": "SANCTUARY_ASTRAL",
+      "camX": 1715,
+      "camY": 1765,
+      "zoom": 1.4800000190734863,
+      "props": [
+        {
+          "id": "sanctuary_sakura_14",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1715,
+          "y": 1845,
+          "scale": 1.0399999618530273
+        }
+      ]
+    },
+    {
+      "file": "sakura_b_full_z148.png",
+      "scene": "SANCTUARY_ASTRAL",
+      "camX": 1865,
+      "camY": 1915,
+      "zoom": 1.4800000190734863,
+      "props": [
+        {
+          "id": "sanctuary_sakura_15",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1865,
+          "y": 2025,
+          "scale": 0.9200000166893005
+        }
+      ]
+    },
+    {
+      "file": "sakura_occlusion_front_z088.png",
+      "scene": "SANCTUARY_ASTRAL",
+      "camX": 1715,
+      "camY": 1800,
+      "zoom": 0.8799999952316284,
+      "props": [
+        {
+          "id": "sanctuary_sakura_14",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1715,
+          "y": 1845,
+          "scale": 1.0399999618530273
+        },
+        {
+          "id": "sanctuary_sakura_15",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1865,
+          "y": 2025,
+          "scale": 0.9200000166893005
+        }
+      ]
+    },
+    {
+      "file": "sakura_occlusion_under_crown_z088.png",
+      "scene": "SANCTUARY_ASTRAL",
+      "camX": 1715,
+      "camY": 1800,
+      "zoom": 0.8799999952316284,
+      "props": [
+        {
+          "id": "sanctuary_sakura_14",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1715,
+          "y": 1845,
+          "scale": 1.0399999618530273
+        },
+        {
+          "id": "sanctuary_sakura_15",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1865,
+          "y": 2025,
+          "scale": 0.9200000166893005
+        }
+      ]
+    },
+    {
+      "file": "sakura_occlusion_behind_crown_z088.png",
+      "scene": "SANCTUARY_ASTRAL",
+      "camX": 1715,
+      "camY": 1800,
+      "zoom": 0.8799999952316284,
+      "props": [
+        {
+          "id": "sanctuary_sakura_14",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1715,
+          "y": 1845,
+          "scale": 1.0399999618530273
+        },
+        {
+          "id": "sanctuary_sakura_15",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1865,
+          "y": 2025,
+          "scale": 0.9200000166893005
+        }
+      ]
+    },
+    {
+      "file": "sakura_occlusion_canopy_edge_z088.png",
+      "scene": "SANCTUARY_ASTRAL",
+      "camX": 1715,
+      "camY": 1800,
+      "zoom": 0.8799999952316284,
+      "props": [
+        {
+          "id": "sanctuary_sakura_14",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1715,
+          "y": 1845,
+          "scale": 1.0399999618530273
+        },
+        {
+          "id": "sanctuary_sakura_15",
+          "kind": "SAKURA_BLOSSOM_TREE",
+          "x": 1865,
+          "y": 2025,
+          "scale": 0.9200000166893005
+        }
+      ]
+    },
+    {
+      "file": "courtyard_hedge_front_behind_z148.png",
+      "scene": "SANCTUARY_ASTRAL",
+      "camX": 1090,
+      "camY": 1005,
+      "zoom": 1.4800000190734863,
+      "props": [
+        {
+          "id": "sanctuary_hedge_bush_1",
+          "kind": "GARDEN_HEDGE_BUSH",
+          "x": 965,
+          "y": 1055,
+          "scale": 0.8999999761581421
+        },
+        {
+          "id": "sanctuary_hedge_bush_2",
+          "kind": "GARDEN_HEDGE_BUSH",
+          "x": 1065,
+          "y": 1095,
+          "scale": 0.8999999761581421
+        },
+        {
+          "id": "sanctuary_hedge_bush_3",
+          "kind": "GARDEN_HEDGE_BUSH",
+          "x": 1215,
+          "y": 1045,
+          "scale": 0.8999999761581421
+        }
+      ]
+    },
+    {
+      "file": "tower_f1_pine_oak_bush_z088.png",
+      "scene": "FIRST_FIELD_MEADOW",
+      "camX": 430,
+      "camY": 1060,
+      "zoom": 0.8799999952316284,
+      "props": [
+        {
+          "id": "f1_spawn_grove_0",
+          "kind": "OAK_TREE",
+          "x": 210,
+          "y": 945,
+          "scale": 1.0399999618530273
+        },
+        {
+          "id": "f1_spawn_grove_1",
+          "kind": "PINE_SPIRIT_TREE",
+          "x": 430,
+          "y": 920,
+          "scale": 1.0399999618530273
+        },
+        {
+          "id": "f1_spawn_grove_2",
+          "kind": "OAK_TREE",
+          "x": 255,
+          "y": 1275,
+          "scale": 1.0399999618530273
+        },
+        {
+          "id": "f1_spawn_grove_3",
+          "kind": "FOREST_CANOPY_BUSH",
+          "x": 460,
+          "y": 1255,
+          "scale": 1.0399999618530273
+        },
+        {
+          "id": "f1_spawn_grove_5",
+          "kind": "PINE_SPIRIT_TREE",
+          "x": 790,
+          "y": 1245,
+          "scale": 1.0399999618530273
+        }
+      ]
+    },
+    {
+      "file": "tower_f1_pine_full_z148.png",
+      "scene": "FIRST_FIELD_MEADOW",
+      "camX": 430,
+      "camY": 800,
+      "zoom": 1.4800000190734863,
+      "props": [
+        {
+          "id": "f1_spawn_grove_1",
+          "kind": "PINE_SPIRIT_TREE",
+          "x": 430,
+          "y": 920,
+          "scale": 1.0399999618530273
+        }
+      ]
+    },
+    {
+      "file": "tower_f1_forest_bush_close_z148.png",
+      "scene": "FIRST_FIELD_MEADOW",
+      "camX": 460,
+      "camY": 1235,
+      "zoom": 1.4800000190734863,
+      "props": [
+        {
+          "id": "f1_spawn_grove_3",
+          "kind": "FOREST_CANOPY_BUSH",
+          "x": 460,
+          "y": 1255,
+          "scale": 1.0399999618530273
+        }
+      ]
+    },
+    {
+      "file": "tower_f2_twisted_plum_z088.png",
+      "scene": "ELDERWOOD_FOREST",
+      "camX": 1383.6939697265625,
+      "camY": 447.6796569824219,
+      "zoom": 0.8799999952316284,
+      "props": [
+        {
+          "id": "f2_obs_19",
+          "kind": "MYSTIC_PLUM_TREE",
+          "x": 1383.6939697265625,
+          "y": 487.6796569824219,
+          "scale": 1.0399999618530273
+        }
+      ]
+    },
+    {
+      "file": "tower_f2_twisted_plum_full_z148.png",
+      "scene": "ELDERWOOD_FOREST",
+      "camX": 1383.6939697265625,
+      "camY": 362.6796569824219,
+      "zoom": 1.4800000190734863,
+      "props": [
+        {
+          "id": "f2_obs_19",
+          "kind": "MYSTIC_PLUM_TREE",
+          "x": 1383.6939697265625,
+          "y": 487.6796569824219,
+          "scale": 1.0399999618530273
+        }
+      ]
+    }
+  ]
+}
