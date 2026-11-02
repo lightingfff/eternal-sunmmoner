@@ -53,8 +53,10 @@ kèm ba cổng tự động **chặn build** (không phải chặn reviewer):
   diềm — nên lỗi làm tròn cũng đọc thành bóng dưới mái đua, không thành lỗ;
 - `prune_specks()` xoá đảo < 12 px — chính là lỗi tạo ra "dây sống mái lơ lửng".
 
-Ngoại lệ duy nhất được ghi rõ: khe trời giữa hai tháp Tower Gate là **silhouette thiết kế**, và
-cả generator (`GAP_ALLOW_X`) lẫn test Kotlin đều ghim đúng dải x 96..166 để nó không thể nới ra.
+Toàn bộ 13 công trình (kể cả `tower_gate.png`) nay đạt **0 cột thủng alpha** (`GAP_ALLOW_X = {}`):
+khe trời giữa hai tháp Tower Gate được giữ nguyên bằng **silhouette đỉnh tường hạ thấp**
+(`topOpaqueRow >= 34` trên `x = 105..155` so với hai tháp `<= 16`), còn phần gờ tháp đua ra được
+đỡ bằng hệ corbel đá bậc thang nên không còn mảng đen lơ lửng hay tai tường thừa ở mép ngoài.
 
 ### 1.3 Bảy công trình
 
@@ -64,9 +66,9 @@ cả generator (`GAP_ALLOW_X`) lẫn test Kotlin đều ghim đúng dải x 96..
 | **Hero Quarters** | 200×168 | vào được (823, 790) → x 99, sill 165 | cửa lõm 5 lớp (viền đá → jamb sáng → jamb tối → reveal đen → cánh thụt → 2 bậc); mái hiên có 2 cột chạm đất; dormer; nhà phụ lean-to |
 | **Restaurant** | 206×172 | vào được (1103, 925) → x 102, sill 169 | gable lối vào nhô ra ôm đúng cửa; awning sọc có diềm scallop; ống khói có bóng đổ trên mái |
 | **Hero Registry** | 188×166 | **zone-only → loggia 3 vòm có mặt bàn đá** | bỏ cửa giả; turret chuông + đồng hồ; bảng đồng, bục sổ, ghế đá |
-| **Synthesis Lab** | 188×168 | **zone-only → workshop bay mở** | bỏ cửa giả; ống ngưng đồng, retort thuỷ tinh, bench trong hốc |
-| **Summoning Hall** | 268×206 | zone-only, rune stage vẫn ở sprite (111, 176) | khép kín trọn khối: pediment → entablature → capital → cột → stylobate → sân đài **đục**; không còn 10 px trời giữa entablature và cột, không còn 33 px trời dưới podium |
-| **Tower Gate** | 260×224 | zone-only, hốc tối đúng box rift (130, 120) ± (16, 27) | **1127 px tối / 0 px sáng** trong box rift, đỉnh vòng rift nằm trên đá đục, 150 px spill ở ngưỡng; tường lùi tối hơn tháp 26 %; tháp có batter, quoin, plinth, lỗ châu mai |
+| **Synthesis Lab** | 188×168 | **zone-only → workshop bay mở** | bỏ cửa giả; ống ngưng đồng patina đặt trên bệ corbel đá + cổ chì chống thấm xuyên mái; retort thuỷ tinh, bench trong hốc |
+| **Summoning Hall** | 268×206 | zone-only, rune stage vẫn ở sprite (111, 176) | khép kín trọn khối (`0` lỗ alpha): pediment → entablature → capital → cột → **bậc stylobate ngang mặt tiền + gập chéo mặt hông phải** → sân đài đục |
+| **Tower Gate** | 260×224 | zone-only, hốc tối đúng box rift (130, 120) ± (16, 27) | **0 cột thủng alpha**, hốc tối đúng box rift + 150 px spill ở ngưỡng; tường lùi tối hơn tháp 26 %; tháp 3/4 có corbel đỡ parapet & lintel, xoá tai thừa hai bên và vạch kẻ dọc 1 px |
 
 ### 1.4 Sáu công trình nền Sanctuary (PNG mới, cùng hợp đồng blit)
 
@@ -82,11 +84,13 @@ tối hơn đá, parapet corbel, merlon, plinth.
 
 ### 1.5 Mười một prop
 
-Bồn hoa (7), đèn đường 3 frame (6), ghế gỗ (4), vòm phế tích (6 ở F1/F2), tường chắn, monolith,
-dummy tập luyện (10), giá vũ khí (4), cọc đấm. Tất cả là PNG pixel thật, cùng bảng màu và cùng
-nguồn trăng trên-trái với công trình.
+Bồn hoa (7), đèn đường 3 frame (6), ghế gỗ (4), vòm phế tích mở xuyên vòm + intrados đá 3/4 (6 ở F1/F2),
+tường chắn, monolith, dummy tập luyện chạm hàng đáy `57` (10), giá vũ khí (4), cọc đấm. Tất cả là
+PNG pixel thật, cùng bảng màu và cùng nguồn trăng trên-trái với công trình. Riêng bồn hoa được
+đồng bộ `ObliqueSpriteGeometry.pixelScale = 1f` và `footOffset = 8f` khớp đúng phép vẽ `64s × 36s`
+tại `cy + 8s` của `InteriorWorldRenderer`, triệt tiêu lỗi bóng đổ rộng gấp 2 lần thân bồn hoa.
 
-Đèn đường: **29/32 cột pixel giống tuyệt đối giữa 3 frame**, chỉ cột x 21–24 (lửa trong kính)
+Đèn đường: **29/32 cột pixel giống tuyệt đối giữa 3 frame**, chỉ cột x 21–23 (lửa trong kính)
 đổi — trước đây bán kính `fillCircle` đổi theo frame nên **silhouette rung**, một lỗi thật.
 
 ---
@@ -173,7 +177,8 @@ File **đã đụng**:
 - `app/src/main/java/.../pixel/SanctuaryEnvironmentShadows.kt` (đăng ký shadow cho prop)
 - `app/src/main/java/.../pixel/PixelSpriteRenderer.kt` (dummy/rack dùng sprite khi có)
 - `app/src/main/java/.../pixel/InteriorWorldRenderer.kt` (planter dùng sprite khi có)
-- `app/src/main/java/.../map/WorldMapModels.kt` (chiều cao shadow cho 5 kind)
+- `app/src/main/java/.../pixel/ObliqueSpriteGeometry.kt` (đồng bộ `pixelScale = 1f`, `footOffset = 8f` cho `FLOWER_PLANTER_BED` và `footOffset = 4f` cho `TRAINING_DUMMY`, `WEAPON_RACK`, `ANCIENT_MONOLITH`)
+- `app/src/main/java/.../map/WorldMapModels.kt` (chiều cao shadow cho 5 kind, xoá nhánh trùng)
 - `app/src/test/java/.../MapForgeP23ContractTest.kt` (mới), `MapForgeP23RenderTest.kt` (mới)
 - `app/src/test/java/.../MapForgeArchitectureContractTest.kt` (hộp cửa Armory P20 → vị trí đúng trigger)
 - `.github/workflows/lyra-render-evidence.yml` (thêm P23 render/contract + publish `p23/`, rebase trước khi push ảnh)
@@ -181,9 +186,9 @@ File **đã đụng**:
 - `docs/visual-evidence/p23/`
 
 File **KHÔNG đụng** (cố ý): `TowerFloorCatalog.kt`, `SanctuaryHouseEntrances`, `ObliqueCamera.kt`,
-`ObliqueSpriteGeometry.kt`, `SanctuaryWorldRenderer.kt`, `paintAnimeHalfTimberHouse` (giữ làm
-fallback), `PixelSanctuaryLandmarks.kt`, toàn bộ P18/P19 terrain, `oak.png`, `cypress.png`,
-`smithery_verge.png`, Lyra pack, save schema, collision/navmesh, camera.
+`SanctuaryWorldRenderer.kt`, `paintAnimeHalfTimberHouse` (giữ làm fallback), `PixelSanctuaryLandmarks.kt`,
+toàn bộ P18/P19 terrain, `oak.png`, `cypress.png`, `smithery_verge.png`, Lyra pack, save schema,
+collision/navmesh, camera.
 
 **Không tự merge.** PR để owner review.
 

@@ -1161,20 +1161,40 @@ def build_synthesis_lab() -> Canvas:
     m = house_mass(c, x0=x0, xm=xm, x1=x1, eave=96, ridge_y=28, rise_r=16, drop_r=19,
                    jetty=116, base=base, stone=STONE, upper=PLAS, roof_ramp=SLATE, seed=2700,
                    overhang=8, rows=8, tile=12)
-    # copper condenser stack: the workshop's silhouette marker
-    c.rect(120, 32, 140, 88, "#5a3a2a")
-    c.rect(121, 33, 139, 86, "#7a4f34")
-    c.vline(122, 34, 85, "#9a6644")
-    c.vline(138, 34, 85, "#4a2e22")
-    for yy in range(38, 84, 7):
-        c.hline(121, 139, yy, "#3d2519")
-        c.hline(121, 139, yy + 1, "#8f5f3e")
-    c.rect(120, 26, 140, 34, "#4a2e22")
-    c.hline(120, 140, 26, "#a06e4a")
-    c.rect(124, 28, 136, 31, "#1d2328")
-    c.px(128, 22, "#3fbfae")
-    c.px(132, 19, "#2f9d90")
-    c.px(135, 16, "#22645f")
+    # copper condenser stack: grounded on a stone wall corbel breast + lead roof flashing
+    # stone chimney breast + stepped corbel bracket on the right return wall (below the eave)
+    c.rect(121, 90, 139, 114, STONE["dk"])
+    c.rect(122, 91, 138, 112, STONE["base"])
+    for yy in range(95, 112, 6):
+        c.hline(122, 138, yy, STONE["mortar"])
+    for s_i, (cx0, cx1, cy0) in enumerate(((121, 139, 113), (123, 137, 116), (126, 134, 119))):
+        c.rect(cx0, cy0, cx1, cy0 + 2, STONE["dk"] if s_i % 2 else STONE["foot"])
+        c.hline(cx0, cx1, cy0, STONE["lt"])
+    # dark lead flashing collar where the condenser pierces the slate roof
+    c.poly([(118, 91), (121, 86), (139, 86), (142, 91)], SLATE["dk"])
+    c.hline(121, 139, 86, SLATE["lt"])
+    c.hline(118, 142, 91, "#12181e")
+    # weathered night-patina bronze/copper flue with subtle verdigris tarnish at the seams
+    c.rect(121, 32, 139, 86, "#463126")
+    c.rect(122, 33, 138, 85, "#634535")
+    c.rect(122, 33, 127, 85, "#7b5742")
+    c.vline(122, 34, 85, "#936b52")
+    c.vline(138, 34, 85, "#32221a")
+    for yy in range(39, 84, 8):
+        c.hline(121, 139, yy, "#2b1d16")
+        c.hline(122, 138, yy + 1, "#856049")
+        c.px(124, yy + 2, "#355a54")
+        c.px(135, yy + 2, "#2b4a45")
+    # hooded condenser cap + faint teal aether vapor (flush with flue width so 0 column gaps)
+    c.rect(121, 27, 139, 33, "#3c2920")
+    c.hline(121, 139, 27, "#8d664e")
+    c.hline(121, 139, 33, "#241812")
+    c.rect(124, 29, 136, 31, "#182026")
+    c.poly([(122, 27), (130, 21), (138, 27)], "#543b2d")
+    c.line([(122, 27), (130, 21)], "#8d664e", 1)
+    c.px(128, 18, "#3fbfae")
+    c.px(132, 15, "#2f9d90")
+    c.px(135, 13, "#22645f")
     # ridge vent cupola
     c.rect(58, 18, 76, 30, "#5a3a2a")
     c.rect(59, 19, 75, 29, "#7a4f34")
@@ -1301,14 +1321,28 @@ def build_summoning_hall() -> Canvas:
         c.rect(PR - 1, qy, PR + 3, min(qy + 6, pod_bot - 1), LIME_T["lt"])
         c.hline(PR - 1, PR + 3, min(qy + 6, pod_bot - 1), LIME_T["foot"])
 
-    # ---- 4. podium: three steps inside the porch span -----------------------------------
+    # ---- 4. podium stylobate: horizontal across the front colonnade + oblique right return --
+    # solid limestone retaining cheek under the receding right-side steps (replaces dark apron fill)
+    c.poly([(PR, pod_bot), (RR, pod_bot - RISE), (RR, pod_bot + 10), (PR, pod_bot + 12)],
+           LIME_T["dk"])
+    for cy_r in (pod_bot - 6, pod_bot - 1, pod_bot + 4):
+        c.line([(PR, cy_r + 6), (RR, cy_r + 6 - RISE // 2)], LIME_T["mortar"], 1)
     for i in range(3):
         yy = pod_bot - i * 5
-        c.poly([(PL + 4 + i * 2, yy), (RR - 4 - i * 2, yy - RISE * 0.75),
-                (RR - 4 - i * 2, yy - RISE * 0.75 + 3), (PL + 4 + i * 2, yy + 3)],
-               LIME_T["base"] if i % 2 else LIME_T["lt"])
-        c.line([(PL + 4 + i * 2, yy), (RR - 4 - i * 2, yy - RISE * 0.75)], LIME_T["hi"])
-        c.line([(PL + 4 + i * 2, yy + 3), (RR - 4 - i * 2, yy - RISE * 0.75 + 3)], LIME_T["foot"])
+        xl = PL + i * 2
+        xm_s = PR - i * 2
+        xr = RR - i * 2
+        front_col = LIME_T["base"] if i % 2 else LIME_T["lt"]
+        # frontal horizontal step course (parallel to column bases, entablature, and pediment)
+        c.rect(xl, yy, xm_s, yy + 4, front_col)
+        c.hline(xl, xm_s, yy, LIME_T["hi"])
+        c.hline(xl, xm_s, yy + 4, LIME_T["foot"])
+        for jx in range(xl + 12, xm_s - 6, 18):
+            c.vline(jx, yy + 1, yy + 3, LIME_T["mortar"])
+        # receding oblique right-side step return (parallel to the right cella & entablature)
+        c.poly([(xm_s, yy), (xr, yy - RISE), (xr, yy - RISE + 4), (xm_s, yy + 4)], LIME_T["dk"])
+        c.line([(xm_s, yy), (xr, yy - RISE)], LIME_T["lt"])
+        c.line([(xm_s, yy + 4), (xr, yy - RISE + 4)], "#0e1418")
 
     # ---- 5. central arched portal through the cella ------------------------------------
     pcx = 140
@@ -1497,79 +1531,93 @@ def build_tower_gate() -> Canvas:
         c.px(bx + 1, wall_top + 4, BASA["mortar"])
 
     # ---- twin battered towers, solid from the battlement cap to the dais --------------
-    for idx, (tx0, tx1) in enumerate(((26, 98), (162, 234))):
+    # Locked 3/4 oblique projection: each tower has a battered frontal face + a darker right
+    # receding return (+6 px), and its corbelled battlement cap overhangs cleanly on stepped
+    # machicolations so zero side-wall pixels poke out as rabbit-ears and zero column gaps form.
+    for idx, (tx0, tx1) in enumerate(((24, 94), (164, 232))):
         tow_top = 26
-        side_left = tx0 < cx
-        # front face with a batter (top narrower)
-        taper = 4
-        ax0 = tx0 + (taper if side_left else 0)
-        ax1 = tx1 - (taper if not side_left else 0)
+        ret_w = 6
+        ret_rise = 5
+        # front battered face
+        ax0, ax1 = tx0 + 2, tx1 - 1
         c.poly([(ax0, tow_top), (ax1, tow_top), (tx1, wall_bot), (tx0, wall_bot)], GATE["base"])
         ashlar(c, [(ax0, tow_top), (ax1, tow_top), (tx1, wall_bot), (tx0, wall_bot)], GATE,
                row_h=8, block_w=17, seed=2910 + idx)
-        # the outer side face recedes away from the key light
-        if side_left:
-            c.poly([(tx0 - 9, tow_top - 9), (ax0, tow_top), (tx0, wall_bot),
-                    (tx0 - 9, wall_bot)], GATE["dk"])
-            for i in range(1, 8):
-                t = i / 8
-                c.line([(tx0 - 9, tow_top - 9 + (wall_bot - tow_top + 9) * t),
-                        (tx0, wall_bot - (wall_bot - tow_top) * (1 - t))], GATE["mortar"], 1)
-            c.vline(tx0 - 9, tow_top - 9, wall_bot, GATE["lt"])
-            c.vline(tx0, tow_top, wall_bot, GATE["mortar"])
-        else:
-            c.poly([(ax1, tow_top), (tx1 + 9, tow_top - 9), (tx1 + 9, wall_bot),
-                    (tx1, wall_bot)], GATE["dk"])
-            for i in range(1, 8):
-                t = i / 8
-                c.line([(ax1, tow_top + (wall_bot - tow_top) * t),
-                        (tx1 + 9, tow_top - 9 + (wall_bot - tow_top + 9) * t)], GATE["mortar"], 1)
-            c.vline(tx1 + 9, tow_top - 9, wall_bot, "#0e1418")
-            c.vline(tx1, tow_top, wall_bot, GATE["mortar"])
-        # quoin strip on the inner corner ties the tower to the curtain wall
-        qx = tx1 - 5 if side_left else tx0
-        quoin_column(c, qx, tow_top + 10, wall_bot - 16, GATE, seed=2920 + idx, width=5,
-                     left=side_left)
-        # battered plinth so the tower meets the ground with weight
-        c.rect(tx0 - 3, wall_bot - 12, tx1 + 3, wall_bot, BASA["dk"])
-        c.hline(tx0 - 3, tx1 + 3, wall_bot - 12, GATE["lt"])
-        c.hline(tx0 - 3, tx1 + 3, wall_bot, BASA["mortar"])
-        for bx in range(tx0 + 3, tx1 - 4, 13):
+        # lit left chamfer (2 px bevel facing key light)
+        c.poly([(tx0, tow_top + 1), (ax0, tow_top), (tx0 + 2, wall_bot), (tx0, wall_bot)],
+               GATE["lt"])
+        c.vline(tx0, tow_top + 1, wall_bot, GATE["hi"])
+        # darker foreshortened right return face (staggered courses, beneath the parapet cap)
+        c.poly([(ax1, tow_top), (tx1 + ret_w, tow_top - ret_rise),
+                (tx1 + ret_w, wall_bot - ret_rise if idx == 1 else wall_bot),
+                (tx1, wall_bot)], GATE["dk"])
+        for y_c in range(tow_top + 6, wall_bot - 6, 8):
+            c.line([(tx1, y_c), (tx1 + ret_w, y_c - ret_rise)], GATE["mortar"], 1)
+        c.vline(tx1, tow_top, wall_bot, GATE["mortar"])
+        c.vline(tx1 + ret_w, tow_top - ret_rise,
+                wall_bot - ret_rise if idx == 1 else wall_bot, "#0e1418")
+        # quoin strip on both frontal corners
+        quoin_column(c, tx0 + 1, tow_top + 8, wall_bot - 14, GATE, seed=2920 + idx, width=5,
+                     left=False)
+        quoin_column(c, tx1 - 5, tow_top + 8, wall_bot - 14, GATE, seed=2930 + idx, width=5,
+                     left=True)
+        # battered plinth so the tower meets the dais with weight
+        px_l, px_r = tx0 - 2, tx1 + ret_w
+        c.rect(px_l, wall_bot - 12, px_r, wall_bot, BASA["dk"])
+        c.hline(px_l, px_r, wall_bot - 12, GATE["lt"])
+        c.hline(px_l, px_r, wall_bot, BASA["mortar"])
+        for bx in range(px_l + 5, px_r - 4, 13):
             c.vline(bx, wall_bot - 11, wall_bot - 1, BASA["mortar"])
-        # string course
-        c.hline(tx0 + 2, tx1 - 2, 96, GATE["lt"])
-        c.hline(tx0 + 2, tx1 - 2, 97, BASA["mortar"])
-        # rune-lit loophole
-        fx = cx - 86 if side_left else cx + 86
-        c.rect(fx - 3, 52, fx + 3, 90, BASA["dk"])
+        # horizontal string courses tying the shaft together (no vertical ruler lines!)
+        for sy_c in (96, 144):
+            c.hline(tx0 + 1, tx1, sy_c, GATE["lt"])
+            c.hline(tx0 + 1, tx1, sy_c + 1, BASA["mortar"])
+            c.line([(tx1, sy_c), (tx1 + ret_w, sy_c - ret_rise)], GATE["base"], 1)
+        # rune-lit loophole centered on the frontal tower face
+        fx = (tx0 + tx1) // 2
+        c.rect(fx - 4, 51, fx + 4, 91, GATE["dk"])
+        c.hline(fx - 4, fx + 4, 51, GATE["mortar"])
+        c.hline(fx - 4, fx + 4, 91, GATE["lt"])
         c.rect(fx - 2, 54, fx + 2, 88, "#090f14")
+        c.vline(fx - 3, 53, 89, GATE["lt"])
         c.px(fx, 84, CYAN["base"])
         c.px(fx, 86, CYAN["dim"])
         c.px(fx - 1, 85, CYAN["deep"])
-        # carved channel either side
-        c.vline(fx - 13, 40, wall_bot - 16, BASA["dk"])
-        c.vline(fx - 12, 40, wall_bot - 16, BASA["lt"])
-        c.vline(fx + 13, 40, wall_bot - 16, BASA["dk"])
-        # battlement cap: moulded course, then alternating merlons with lit top edges
-        cap_x0, cap_x1 = tx0 - 4, tx1 + 4
-        c.rect(cap_x0, 16, cap_x1, tow_top + 2, GATE["base"])
-        c.rect(cap_x0 + 1, 17, cap_x1 - 1, tow_top + 1, GATE["lt"])
-        c.hline(cap_x0, cap_x1, 16, GATE["rim"])
-        c.hline(cap_x0, cap_x1, tow_top + 2, "#0b0f14")
-        for i, bx in enumerate(range(cap_x0 + 2, cap_x1 - 7, 13)):
-            h = 10 if i % 2 == 0 else 6
-            c.rect(bx, 16 - h, bx + 8, 16, GATE["lt"] if i % 2 == 0 else GATE["base"])
-            c.hline(bx, bx + 8, 16 - h, GATE["rim"] if i % 2 == 0 else GATE["lt"])
-            c.vline(bx + 8, 16 - h, 15, GATE["dk"])
+        # stepped stone machicolation corbels supporting the parapet cap cleanly (zero gaps)
+        cap_x0, cap_x1 = tx0, tx1 + ret_w
+        c.poly([(cap_x0, tow_top - ret_rise), (cap_x1, tow_top - ret_rise),
+                (tx1 + ret_w, tow_top + 4), (tx0, tow_top + 4)], GATE["dk"])
+        for mbx in range(cap_x0 + 2, cap_x1 - 2, 7):
+            c.rect(mbx, tow_top - 1, mbx + 3, tow_top + 4, GATE["base"])
+            c.hline(mbx, mbx + 3, tow_top + 4, "#0b0f14")
+        # battlement cap: moulded frontal course + oblique right return cap + merlons
+        c.rect(cap_x0, 15, tx1 + 1, tow_top - 1, GATE["base"])
+        c.rect(cap_x0 + 1, 16, tx1, tow_top - 2, GATE["lt"])
+        c.poly([(tx1 + 1, 15), (cap_x1, 15 - 3), (cap_x1, tow_top - ret_rise),
+                (tx1 + 1, tow_top - 1)], GATE["dk"])
+        c.hline(cap_x0, tx1 + 1, 15, GATE["rim"])
+        c.line([(tx1 + 1, 15), (cap_x1, 15 - 3)], GATE["lt"], 1)
+        c.hline(cap_x0, tx1 + 1, tow_top - 1, "#0b0f14")
+        for i, bx in enumerate(range(cap_x0 + 2, tx1 - 6, 13)):
+            h = 9 if i % 2 == 0 else 6
+            c.rect(bx, 15 - h, bx + 8, 15, GATE["lt"] if i % 2 == 0 else GATE["base"])
+            c.hline(bx, bx + 8, 15 - h, GATE["rim"] if i % 2 == 0 else GATE["lt"])
+            c.vline(bx + 8, 15 - h, 14, GATE["dk"])
 
-    # ---- heavy lintel over the passage ------------------------------------------------
+    # ---- heavy lintel over the passage, carried on stepped stone corbels -------------
     ly0 = 76
-    c.rect(cx - 56, ly0 - 6, cx + 56, ly0, GATE["lt"])
-    c.hline(cx - 56, cx + 56, ly0 - 6, GATE["rim"])
-    c.rect(cx - 56, ly0 + 1, cx + 56, ly0 + 4, "#0a0e13")
-    for bx in range(cx - 52, cx + 52, 6):
+    c.rect(cx - 50, ly0 - 6, cx + 50, ly0, GATE["lt"])
+    c.hline(cx - 50, cx + 50, ly0 - 6, GATE["rim"])
+    c.rect(cx - 50, ly0 + 1, cx + 50, ly0 + 3, "#0a0e13")
+    # stepped corbel brackets tying the lintel ends into both inner tower piers
+    for sgn in (-1, 1):
+        lx_e = cx + sgn * 48
+        c.rect(min(lx_e, lx_e - sgn * 8), ly0 + 2, max(lx_e, lx_e - sgn * 8), ly0 + 6, GATE["dk"])
+        c.rect(min(lx_e - sgn * 2, lx_e - sgn * 8), ly0 + 6,
+               max(lx_e - sgn * 2, lx_e - sgn * 8), ly0 + 10, BASA["dk"])
+    for bx in range(cx - 46, cx + 46, 7):
         c.rect(bx, ly0, bx + 2, ly0 + 1, GATE["lt"])
-    for rx in (cx - 30, cx + 30):
+    for rx in (cx - 28, cx + 28):
         c.rect(rx - 5, ly0 + 7, rx + 5, ly0 + 14, BASA["dk"])
         c.hline(rx - 4, rx + 4, ly0 + 7, BASA["mortar"])
         c.px(rx, ly0 + 9, CYAN["dim"])
@@ -1900,12 +1948,9 @@ def expected_door(key):
     return W / 2 + (dx - ox) / (2 * sc), (H - 3) - (oy - dy) * 0.72 / (2 * sc)
 
 
-# Documented design gaps: columns where a transparent band ABOVE a lower mass is the intended
-# silhouette (the sky cleft between the Tower Gate's two proud towers). Everything else must be
-# hole-free. Keeping this explicit is what stops "the roof floats" from hiding in a tolerance.
-GAP_ALLOW_X = {
-    "tower_gate": (96, 166),
-}
+# Zero vertical column gaps across all 13 buildings; Tower Gate's sky cleft is a lower top
+# silhouette between x 101..161 (curtain wall top >= 35 vs twin towers <= 15), not a floating cap.
+GAP_ALLOW_X = {}
 
 
 def validate(key: str, c: Canvas) -> dict:

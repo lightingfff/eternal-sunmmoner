@@ -870,7 +870,7 @@
         85
       ],
       "runtime_usage": "P23 environmental prop; PNG-first via SanctuaryArtAssets.assetSafe",
-      "sha256": "290e544a39fe68256839482c84f75087bcf747a08b1d68b97ee5eda8b0acb8ec"
+      "sha256": "29980344ad3eaf90b573595ef3a71bdde8e84e874a318632dec87a6efd0b5b0e"
     },
     {
       "id": "retaining_wall",
@@ -912,7 +912,7 @@
         57
       ],
       "runtime_usage": "P23 environmental prop; PNG-first via SanctuaryArtAssets.assetSafe",
-      "sha256": "07e8bd06a24a42b11f8cab991cce875830090f2e8add78470114702942b3eeac"
+      "sha256": "54f7ee4b13c3c5c82e930735242e95b352a0a43c1ac537eebbf9fb0b38efc293"
     },
     {
       "id": "weapon_rack",

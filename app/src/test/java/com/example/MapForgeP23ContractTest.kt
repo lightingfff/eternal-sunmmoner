@@ -111,17 +111,19 @@ class MapForgeP23ContractTest {
       assertTrue("$name: ${holes.size} columns contain an interior alpha hole: " +
         "${holes.take(8)}", holes.isEmpty())
     }
-    // The Tower Gate's twin towers intentionally leave a sky cleft. Pin its exact span so the
-    // exemption stays a documented silhouette instead of a licence for floating roofs.
+    // Tower Gate ALSO has zero vertical column holes (no floating parapet overhangs or rabbit-ears),
+    // while preserving the twin-tower sky cleft silhouette (curtain wall top >= 34 vs towers <= 15).
     val gate = premium("tower_gate").asAndroidBitmap()
     val gateHoles = holeColumns(gate)
-    assertTrue("tower gate cleft must exist between the two towers (design): $gateHoles",
-      gateHoles.isNotEmpty())
-    for (x in gateHoles) {
-      assertTrue("tower gate sky cleft must stay inside x 96..166, got $x", x in 96..166)
+    assertTrue("tower_gate must have 0 vertical column holes, got $gateHoles", gateHoles.isEmpty())
+    fun topOpaqueRow(bmp: android.graphics.Bitmap, x: Int): Int =
+      (0 until bmp.height).firstOrNull { opaqueAt(bmp, x, it) } ?: bmp.height
+    assertTrue("tower_gate left tower must rise above y=16", topOpaqueRow(gate, 60) <= 16)
+    assertTrue("tower_gate right tower must rise above y=16", topOpaqueRow(gate, 198) <= 16)
+    for (x in 105..155) {
+      assertTrue("tower_gate central sky cleft at x=$x must step down >= 34",
+        topOpaqueRow(gate, x) >= 34)
     }
-    assertTrue("tower gate must stay hole-free outside the cleft",
-      holeColumns(gate, 0, 95).isEmpty() && holeColumns(gate, 167, gate.width - 1).isEmpty())
   }
 
   // ------------------------------------------------------------------ 2. doors on triggers
@@ -246,6 +248,17 @@ class MapForgeP23ContractTest {
       if (frames[0].getPixel(x, y) != frames[1].getPixel(x, y)) changed++
     }
     assertTrue("the flame must actually change between frames ($changed px)", changed > 0)
+    // Ruin arch must have a genuinely OPEN transparent archway (grass/forest shows through)
+    // framed by two solid grounded piers with zero accidental rectangular holes in the masonry.
+    val ruin = sanct("ruin_arch").asAndroidBitmap()
+    assertTrue("ruin_arch passage must be open (alpha == 0 at centre)", !opaqueAt(ruin, 46, 68))
+    assertTrue("ruin_arch left pier must be grounded and solid",
+      opaqueAt(ruin, 20, 85) && holeColumns(ruin, 8, 33).isEmpty())
+    assertTrue("ruin_arch right pier must be grounded and solid (no window hole)",
+      opaqueAt(ruin, 68, 85) && holeColumns(ruin, 55, 82).isEmpty())
+    // Planter shadow geometry must match InteriorWorldRenderer's 1x scale and +8s foot offset.
+    assertEquals(1f, ObliqueSpriteGeometry.pixelScale(PropKind.FLOWER_PLANTER_BED), 0.001f)
+    assertEquals(8f, ObliqueSpriteGeometry.footOffset(PropKind.FLOWER_PLANTER_BED), 0.001f)
   }
 
   // ------------------------------------------------------------------ 5. world contract intact

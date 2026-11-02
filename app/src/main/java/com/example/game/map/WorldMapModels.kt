@@ -338,8 +338,6 @@ object SanctuaryShadowRegistry {
     PropKind.STONE_RETAINING_WALL -> 18f
     PropKind.TAVERN_COUNTER_BAR -> 32f
     PropKind.ARCANE_BRAZIER -> 28f
-    PropKind.TRAINING_DUMMY -> 42f
-    PropKind.WEAPON_RACK -> 34f
     else -> 24f
   }
   fun silhouetteFor(kind: PropKind): ShadowSilhouette = when (kind) {

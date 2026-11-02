@@ -40,13 +40,13 @@ return face, and every base reaches the canvas ground row.
 
 | asset | canvas | colours | replaces | contract |
 |---|---|---|---|---|
-| `flower_planter.png` | 64×36 | 43 | Canvas curb + candy circles | same 60×13 curb footprint, drawn bottom-centre at `cy + 8s`, `2s` scale |
-| `street_lantern_0/1/2.png` | 32×66 ×3 | 15 | procedural 3-frame lantern | **29 of 32 columns byte-identical across all frames**; only x 21–24 (the glass flame) differ |
+| `flower_planter.png` | 64×36 | 43 | Canvas curb + candy circles | same 60×13 curb footprint, drawn bottom-centre at `cy + 8s`, `1s` scale (`ObliqueSpriteGeometry.pixelScale = 1f`, `footOffset = 8f`) |
+| `street_lantern_0/1/2.png` | 32×66 ×3 | 15 | procedural 3-frame lantern | **29 of 32 columns byte-identical across all frames**; only x 21–23 (the glass flame) differ |
 | `wooden_bench.png` | 58×36 | 11 | `buildWoodenBench34` | seat top face + apron + 4 legs on the ground row |
-| `ruin_arch.png` | 96×86 | 32 | `buildAncientRuinArch` | solid wall with the arch **cut into** it; both piers on the ground row |
+| `ruin_arch.png` | 96×86 | 18 | `buildAncientRuinArch` | genuinely **open** archway (`alpha = 0` passage) + 4 px 3/4 stone intrados + stepped tumbled crown; both piers on row 85 |
 | `retaining_wall.png` | 88×48 | 19 | `buildStoneRetainingWall` | coursed wall + lit coping + ivy clusters |
-| `monolith.png` | 44×74 | 16 | `buildAncientMonolith` | leaning shaft, carved rune channel, stone plinth |
-| `training_dummy.png` | 40×58 | 13 | `drawRect`/`drawCircle` dummy | cross-stand, straw torso in the P19 sand value range, iron bands, painted target |
+| `monolith.png` | 44×74 | 13 | `buildAncientMonolith` | leaning shaft, carved rune channel, stone plinth |
+| `training_dummy.png` | 40×58 | 13 | `drawRect`/`drawCircle` dummy | cross-stand grounded on row 57 (`H-1`), straw torso in the P19 sand value range, iron bands, painted target |
 | `weapon_rack.png` | 68×48 | 10 | `drawRect` rack | A-frame with two rails and five practice weapons |
 | `striking_post.png` | 36×86 | 14 | `buildTrainingStrikingPost` | stone collar, oak pillar, three rope zones, iron pegs |
 
@@ -56,9 +56,11 @@ Only new assets were created — **no existing PNG was overwritten**, so `oak.pn
 ### 2.1 Planter: keep the footprint, fix the material
 
 The Canvas version drew a 60 × 13 unit curb centred on the anchor. The PNG keeps that footprint
-exactly (64 × 36 canvas, 60 px of curb, blitted bottom-centre at `cy + 8s` with `2s` scale), so
+exactly (64 × 36 canvas, 57 px of curb, blitted bottom-centre at `cy + 8s` with `1s` scale in
+`InteriorWorldRenderer`, matched by `ObliqueSpriteGeometry.pixelScale = 1f` and `footOffset = 8f`
+so `SanctuaryEnvironmentShadows` casts a 1:1 shadow instead of a 2× wide shadow), so
 the seven `sanctuary_flower_planter_*` obstacles keep their radius, their collider and their
-planting positions. What changed is the material: a foreshortened lit top face (3 px of stone),
+planting positions. What changed is the material: a foreshortened lit top face (5 px of stone),
 a coursed front face, a shaded right return, a plinth on the ground row, and three bounded leaf
 clusters with twelve blooms instead of five smooth circles.
 

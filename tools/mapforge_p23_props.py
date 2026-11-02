@@ -337,108 +337,157 @@ def build_wooden_bench() -> Canvas:
 
 # --------------------------------------------------------------------------- ruin arch
 def build_ruin_arch() -> Canvas:
-    """96x86 — crumbling double-pier arch: coursed stone, real arched opening, moss, grounded.
+    """96x86 — weathered 2.5D double-pier stone arch with an OPEN passage and oblique intrados.
 
-    The Canvas version this replaces drew two flat purple brick rectangles floating 10 px above
-    their own shadow, with a neon-lime blob on top. This one is a solid wall with an arch cut
-    INTO it, so the opening is depth (dark intrados, lit left jamb, shaded right jamb) rather
-    than a hole in two separate blocks, and both piers reach the canvas ground row.
+    Replaces the procedural purple-brick cutout. Both coursed stone piers + their oblique right
+    returns sit firmly on the ground row (`base = 85`), the upper-right crown steps down cleanly
+    as tumbled masonry open to the sky from `y = 0` (no floating bridge over a square hole), and
+    the arched opening itself is genuinely transparent (`alpha = 0`) inside a 4 px 3/4 stone
+    intrados so grass, cobbles, and forest show through the arch in real gameplay.
     """
     W, H = 96, 86
     c = Canvas(W, H)
     base = H - 1
-    x0, x1 = 8, 82
-    open_l, open_r = 35, 55          # arch opening span
-    spring_y = 46                     # where the arch springs from the jambs
+    x0, x1 = 8, 78
+    ret_w, ret_rise = 5, 4            # 3/4 oblique right return on the outer pier
+    open_l, open_r = 34, 54           # frontal arch opening span
+    spring_y = 47                     # where the arch springs from the jambs
+    cxv = (open_l + open_r) // 2      # 44
+    arch_rx, arch_ry = (open_r - open_l) // 2, 13
 
-    # ---- solid wall body ---------------------------------------------------------------
-    c.rect(x0, 26, x1, base, STONE["base"])
-    # ---- ordered courses with staggered vertical joints --------------------------------
+    # ---- 1. solid frontal masonry + 3/4 right return -----------------------------------
+    c.rect(x0, 24, x1, base, STONE["base"])
+    c.poly([(x1, 24), (x1 + ret_w, 24 - ret_rise), (x1 + ret_w, base - ret_rise), (x1, base)],
+           STONE["dk"])
     yy = 28
     row = 0
     while yy < base:
         c.hline(x0, x1, yy, STONE["mortar"])
         c.hline(x0, x1, yy + 1, mix(STONE["base"], "#ffffff", 0.07))
+        c.line([(x1, yy), (x1 + ret_w, yy - ret_rise)], STONE["mortar"], 1)
         off = 0 if row % 2 == 0 else 5
         for xx in range(x0 + off, x1, 9):
             c.vline(xx, yy + 1, min(yy + 4, base), STONE["mortar"])
         yy += 5
         row += 1
-    # lit left edge, shaded right return
-    c.rect(x0, 26, x0 + 4, base, mix(STONE["lt"], "#ffffff", 0.05))
-    c.rect(x1 - 4, 26, x1, base, STONE["dk"])
-    c.vline(x0, 26, base, STONE["hi"])
-    c.vline(x1, 26, base, "#0f1519")
-    # ---- broken crown: staggered top edge, highest over the left pier ------------------
-    c.poly([(x0, 26), (x0 + 18, 26), (x0 + 20, 22), (x0 + 40, 22), (x0 + 42, 30),
-            (x1 - 14, 30), (x1 - 12, 26), (x1, 26), (x1, 34), (x0, 34)], STONE["dk"])
-    c.poly([(x0, 26), (x0 + 18, 26), (x0 + 20, 22), (x0 + 40, 22), (x0 + 41, 25),
-            (x0 + 24, 25), (x0 + 22, 29), (x0, 31)], STONE["base"])
-    c.hline(x0 + 20, x0 + 40, 22, STONE["rim"])
-    c.hline(x0 + 42, x1 - 12, 30, STONE["lt"])
-    for i in range(x0 + 4, x0 + 36, 5):       # chipped crown on the tall left block only
-        if (i // 5) % 2:
-            c.px(i, 21, STONE["lt"])
-            c.px(i + 1, 21, STONE["base"])
+    # lit left edge + corner quoins + dark outer return edge
+    c.rect(x0, 24, x0 + 4, base, mix(STONE["lt"], "#ffffff", 0.05))
+    c.vline(x0, 24, base, STONE["hi"])
+    c.vline(x1, 24, base, STONE["mortar"])
+    c.vline(x1 + ret_w, 24 - ret_rise, base - ret_rise, "#0f1519")
 
-    # ---- the arch opening: cut through the wall, then give it depth --------------------
-    c.rect(open_l, spring_y, open_r, base, "#070b0e")
-    c.ellipse((open_l + open_r) // 2, spring_y, (open_r - open_l) // 2, 14, "#070b0e")
-    # intrados bands, darkest at the crown
-    for i, inset in enumerate((2, 4, 6)):
-        col = ("#0b1216", "#0f181d", "#131e24")[i]
-        c.rect(open_l + inset, spring_y + 2, open_r - inset, base, col)
-        c.ellipse((open_l + open_r) // 2, spring_y, (open_r - open_l) // 2 - inset, 14 - inset,
-                  col)
-    # lit left jamb, shaded right jamb
-    c.vline(open_l, spring_y + 2, base, STONE["lt"])
-    c.vline(open_l + 1, spring_y + 4, base, mix("#0b1216", STONE["base"], 0.35))
-    c.vline(open_r, spring_y + 2, base, "#080c0f")
-    # voussoir ring around the head, one block per 12 degrees
-    cxv = (open_l + open_r) // 2
-    for a in range(13):
-        ang = math.pi + a * math.pi / 12
-        vx = cxv + math.cos(ang) * ((open_r - open_l) // 2 + 3)
-        vy = spring_y + math.sin(ang) * 17
-        c.rect(vx - 2, vy - 2, vx + 2, vy + 2, STONE["lt"])
-        c.hline(vx - 2, vx + 2, vy - 2, STONE["hi"])
-        c.hline(vx - 2, vx + 2, vy + 2, STONE["dk"])
-    # keystone
-    c.rect(cxv - 3, spring_y - 21, cxv + 3, spring_y - 14, STONE["lt"])
-    c.hline(cxv - 3, cxv + 3, spring_y - 21, STONE["rim"])
-    c.hline(cxv - 3, cxv + 3, spring_y - 14, STONE["foot"])
-    # the right shoulder of the ring is BROKEN: clear a clean wedge, then re-cap its stone
-    # edge so the break reads as missing masonry instead of a checkerboard
-    for dx in range(16, 27):
-        for dy in range(-19, -7):
-            c.im.putpixel((cxv + dx, spring_y + dy), (0, 0, 0, 0))
-    for dy in range(-19, -7):
-        xedge = cxv + 16 + (abs(dy + 13) // 3)
-        if c.opaque(xedge - 1, spring_y + dy):
-            c.px(xedge - 1, spring_y + dy, STONE["lt"])
-            c.px(xedge - 2, spring_y + dy, STONE["base"])
+    # ---- 2. weathered stepped crown (open to sky from y = 0; zero floating top bar!) ----
+    # Clear above a stepped ruin profile: tall over the left pier & keystone, tumbled on right
+    crown_profile = []
+    for x in range(W):
+        if x < x0 + 6:
+            top_y = 26
+        elif x < x0 + 18:
+            top_y = 23
+        elif x < cxv + 6:
+            top_y = 20
+        elif x < cxv + 15:
+            top_y = 24
+        elif x < x1 - 10:
+            top_y = 31
+        elif x <= x1:
+            top_y = 35
+        else:
+            top_y = 35 - ((x - x1) * ret_rise) // max(1, ret_w)
+        crown_profile.append(top_y)
+    px = c.im.load()
+    for x in range(W):
+        lim = crown_profile[x]
+        for y in range(0, min(H, lim)):
+            px[x, y] = (0, 0, 0, 0)
+        if x0 <= x <= x1 + ret_w and 0 <= lim < H and px[x, lim][3] > 0:
+            c.px(x, lim, STONE["rim"] if x <= x1 else STONE["lt"])
+            if lim + 1 < H and px[x, lim + 1][3] > 0:
+                c.px(x, lim + 1, STONE["lt"] if x <= x1 else STONE["base"])
 
-    # ---- rubble at the feet, both on the ground row ------------------------------------
-    c.poly([(26, base - 4), (33, base - 9), (41, base - 5), (37, base)], STONE["base"])
-    c.line([(26, base - 4), (33, base - 9)], STONE["lt"])
-    c.line([(33, base - 9), (41, base - 5)], STONE["hi"])
-    c.poly([(58, base - 3), (66, base - 7), (71, base - 2), (64, base)], STONE["dk"])
+    # ---- 3. voussoir arch ring & keystone BEFORE carving the open aperture --------------
+    for a in range(25):
+        ang = math.pi + a * math.pi / 24
+        vx = int(round(cxv + math.cos(ang) * (arch_rx + 3)))
+        vy = int(round(spring_y + math.sin(ang) * (arch_ry + 3)))
+        if vy >= crown_profile[max(0, min(W - 1, vx))]:
+            c.rect(vx - 2, vy - 2, vx + 2, vy + 2, STONE["lt"])
+            c.hline(vx - 2, vx + 2, vy - 2, STONE["hi"])
+            c.hline(vx - 2, vx + 2, vy + 2, STONE["dk"])
+    c.rect(cxv - 3, spring_y - arch_ry - 6, cxv + 3, spring_y - arch_ry + 1, STONE["lt"])
+    c.hline(cxv - 3, cxv + 3, spring_y - arch_ry - 6, STONE["rim"])
+    c.hline(cxv - 3, cxv + 3, spring_y - arch_ry + 1, STONE["foot"])
+
+    # ---- 4. carve the OPEN archway + paint 4 px 2.5D inner stone intrados ---------------
+    # First fill the entire frontal aperture with dark receding intrados stone, then clear the
+    # shifted oblique opening `(cxv + 4, spring_y - 2)` to `alpha = 0` so the left pier's inner
+    # depth face and upper-left soffit remain visible in true 3/4 perspective!
+    for y in range(spring_y - arch_ry, base + 1):
+        for x in range(open_l, open_r + 1):
+            in_front = (y >= spring_y) or (
+                ((x - cxv) / float(arch_rx)) ** 2 + ((y - spring_y) / float(arch_ry)) ** 2 <= 1.0
+            )
+            if not in_front:
+                continue
+            # Shifted back-plane opening (+4 px right, -2 px up for 3/4 oblique wall thickness)
+            bx_c = cxv + 4
+            by_s = spring_y - 2
+            in_back = (x <= open_r - 1) and (
+                (y >= by_s and x >= open_l + 4) or (
+                    x >= open_l + 4 and
+                    ((x - bx_c) / float(arch_rx)) ** 2 + ((y - by_s) / float(arch_ry)) ** 2 <= 1.0
+                )
+            )
+            if in_back:
+                px[x, y] = (0, 0, 0, 0)
+            else:
+                # Visible 3/4 inner intrados stone thickness + coursed mortar seams
+                shade = STONE["dk"] if y >= spring_y - 2 else STONE["foot"]
+                if (y - 28) % 5 == 0:
+                    shade = STONE["mortar"]
+                c.px(x, y, shade)
+    # Crisp bevels on the left/right jamb corners and pier plinths
+    c.vline(open_l - 1, spring_y, base, STONE["lt"])
+    c.vline(open_l + 3, spring_y, base, "#121a20")
+    c.vline(open_r, spring_y, base, "#10161b")
+    c.rect(x0 - 1, base - 4, open_l + 3, base, STONE["foot"])
+    c.hline(x0 - 1, open_l, base - 4, STONE["lt"])
+    c.rect(open_r, base - 4, x1 + 1, base, STONE["foot"])
+    c.hline(open_r, x1 + 1, base - 4, STONE["lt"])
+
+    # ---- 5. fallen rubble blocks at both pier bases (outside the open passage) ----------
+    c.poly([(22, base - 4), (29, base - 8), (35, base - 4), (33, base)], STONE["base"])
+    c.line([(22, base - 4), (29, base - 8)], STONE["lt"])
+    c.line([(29, base - 8), (35, base - 4)], STONE["hi"])
+    c.poly([(58, base - 3), (66, base - 7), (72, base - 2), (65, base)], STONE["dk"])
     c.line([(58, base - 3), (66, base - 7)], STONE["base"])
 
-    # ---- moss where the stone meets the ground, ivy on the left pier --------------------
+    # ---- 6. damp moss & creeping ivy on the piers and stepped crown ---------------------
     r = rr(7300)
     for _ in range(14):
-        mx = x0 + r(24)
+        mx = x0 + r(22)
         my = base - r(5)
         if c.opaque(mx, my):
             c.px(mx, my, MOSS["base"])
-            c.px(mx + 1, my, MOSS["dk"])
-            c.px(mx, my - 1, MOSS["lt"])
+            if c.opaque(mx + 1, my):
+                c.px(mx + 1, my, MOSS["dk"])
+            if c.opaque(mx, my - 1):
+                c.px(mx, my - 1, MOSS["lt"])
     for i in range(9):
-        c.px(x0 + 2 + (i % 3), 44 + i * 3, MOSS["dk"] if i % 2 else MOSS["base"])
-        c.px(x0 + 3 + (i % 2), 45 + i * 3, MOSS["lt"])
-    # ---- contact AO --------------------------------------------------------------------
-    for x in range(x0, x1 + 1):
+        iy = 42 + i * 3
+        ix = x0 + 2 + (i % 3)
+        if c.opaque(ix, iy):
+            c.px(ix, iy, MOSS["dk"] if i % 2 else MOSS["base"])
+        if c.opaque(ix + 1, iy + 1):
+            c.px(ix + 1, iy + 1, MOSS["lt"])
+    for mx in (cxv + 10, cxv + 11, x1 - 8, x1 - 7):
+        cy_m = crown_profile[mx]
+        if c.opaque(mx, cy_m):
+            c.px(mx, cy_m, MOSS["lt"])
+            if c.opaque(mx, cy_m + 1):
+                c.px(mx, cy_m + 1, MOSS["base"])
+    # ---- 7. contact AO on both grounded piers -------------------------------------------
+    for x in range(x0 - 1, x1 + ret_w + 1):
         if c.opaque(x, base):
             c.blend(x, base, "#111a1f", 0.40)
     return c
@@ -539,13 +588,16 @@ def build_training_dummy() -> Canvas:
     c = Canvas(W, H)
     base = H - 1
     cx = 20
-    # ---- cross-stand base --------------------------------------------------------------
+    # ---- cross-stand base (grounded cleanly on row H-1) --------------------------------
     for fx in (4, 28):
-        c.rect(fx, base - 6, fx + 8, base - 2, OAK["dk"])
-        c.hline(fx, fx + 8, base - 6, OAK["base"])
-        c.hline(fx, fx + 8, base - 2, "#10130f")
-    c.rect(cx - 5, base - 8, cx + 5, base - 2, OAK["base"])
-    c.hline(cx - 5, cx + 5, base - 8, OAK["lt"])
+        c.rect(fx, base - 4, fx + 8, base, OAK["dk"])
+        c.hline(fx, fx + 8, base - 4, OAK["base"])
+        c.hline(fx, fx + 8, base, "#10130f")
+    c.rect(cx - 12, base - 3, cx + 12, base - 1, OAK["dk"])
+    c.hline(cx - 12, cx + 12, base - 3, OAK["base"])
+    c.rect(cx - 5, base - 7, cx + 5, base, OAK["base"])
+    c.hline(cx - 5, cx + 5, base - 7, OAK["lt"])
+    c.hline(cx - 5, cx + 5, base, "#10130f")
     # ---- post + straw torso ------------------------------------------------------------
     c.rect(cx - 4, 20, cx + 4, base - 6, OAK["base"])
     c.vline(cx - 4, 20, base - 6, OAK["lt"])

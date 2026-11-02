@@ -69,9 +69,11 @@ plus three automated gates that fail the build (not the reviewer):
 * `prune_specks()` deletes sub-12-pixel islands (1 px line spill), which is exactly the bug
   that produced the "detached ridge wire".
 
-The one documented exemption is the Tower Gate's sky cleft between its two proud towers: it is
-the gate's silhouette, and both the generator (`GAP_ALLOW_X`) and the Kotlin contract test pin
-its exact x range (96..166) so it cannot silently grow.
+All 13 buildings (including `tower_gate.png`) pass with **zero vertical column holes**
+(`GAP_ALLOW_X = {}`): Tower Gate preserves its twin-tower sky cleft by stepping the central
+curtain wall's top row down (`y >= 34` across `x = 105..155` vs twin tower battlements `y <= 16`)
+while supporting its parapet caps on stepped stone machicolations so zero floating overhang pixels
+or vertical gaps occur.
 
 ---
 
@@ -130,7 +132,8 @@ an entrance that does not exist — the exact "looks like a door but you cannot 
 They now carry a **niche** instead: a recessed arcade opening with a stone counter lip across the
 bottom. The Registry reads as a civic loggia (three arches, bronze plaque row, ledger lectern on
 the counter, stone bench, bell turret with clock); the Lab reads as an open workshop bay with a
-bench, a retort and a copper condenser stack. Neither invites a walk-in, both still look like they
+bench, a retort and a weathered bronze/copper condenser stack grounded on a stepped stone wall
+corbel breast with lead roof flashing. Neither invites a walk-in, both still look like they
 belong to the building they are cut into.
 
 ### 3.4 Summoning Hall — one continuous structure
@@ -142,12 +145,15 @@ above the plaza. The rebuild fixes the vertical order and closes every joint:
 ```
 pediment (30..66) → entablature (66..83, cornice = its top 3 rows)
                   → capitals (84..89) → column shafts (90..145)
-                  → stylobate (146..161) → terrace apron (142..205, opaque bed)
+                  → horizontal frontal stylobate + oblique right return (146..161)
+                  → terrace apron (142..205, opaque bed)
 cella wall behind the colonnade (84..161); receding return's top edge = entablature underside
 ```
 
-Because the apron is now an opaque bed, the plaza tiers sit on stone instead of grass, and the
-podium's outer corners have something under them at every zoom. The rune ring is still authored
+Because the apron is now an opaque bed and the 3-tier stylobate runs horizontally across the
+frontal colonnade before turning along the oblique right return (with a coursed limestone cheek
+beneath), the plaza tiers sit on stone instead of grass and the podium's outer corners align
+cleanly with the locked 3/4 camera. The rune ring is still authored
 at sprite **(111, 176)** — the inverse of the zone centre (2380, 1930) — so the hero stands on
 the visual focus. `MapForgeP23ContractTest` re-derives that position and counts lit rune pixels.
 
@@ -159,8 +165,10 @@ the ring's top edge sits on opaque stone, and the only painted light is the cold
 threshold below it (150 px) — the animation then appears to come *from* the gate.
 
 Structurally the gate is now: basement dais (solid, 200 → 223) → battered curtain wall (62 → 200)
-with corbelled crenellated parapet → two proud battered towers with their own caps, quoins,
-plinth, loopholes and receding outer faces → heavy lintel with carved runes. The recessed wall is
+with corbelled crenellated parapet → two proud battered towers in locked 3/4 oblique projection
+(lit frontal face + darker 6 px right return, corbelled machicolations under the battlement caps,
+quoins, plinth, loopholes, zero outer rabbit-ears and zero vertical ruler lines) → heavy lintel
+carried on stepped stone corbels with carved runes. The recessed wall is
 blended **26 %** darker than the proud towers (was 12 %), which is what finally separates the
 three planes at gameplay zoom.
 
