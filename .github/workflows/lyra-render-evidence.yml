@@ -13,6 +13,7 @@ on:
     paths:
       - 'app/src/main/**'
       - 'app/src/test/java/com/example/LyraEngineRenderTest.kt'
+      - 'app/src/test/java/com/example/MapForgeGroundRenderTest.kt'
       - '.github/workflows/lyra-render-evidence.yml'
 
 permissions:
@@ -65,6 +66,10 @@ jobs:
       - name: Render Lyra (real draw code, Robolectric native graphics)
         run: gradle :app:testDebugUnitTest --tests "com.example.LyraEngineRenderTest" --stacktrace
 
+      # P18: the Map Forge ground slice, same harness, same real draw path.
+      - name: Render ground slice (real draw code, Robolectric native graphics)
+        run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeGroundRenderTest" --stacktrace
+
       # The PNGs are also committed so reviewers (and the agent) can open them straight from
       # the branch; the artifact below is the same bytes for offline download.
       - name: Publish render PNGs into the branch
@@ -72,9 +77,11 @@ jobs:
           set -euo pipefail
           mkdir -p docs/visual-evidence/p17c/engine-render
           cp -f app/build/visual_screenshots/p17c/*.png docs/visual-evidence/p17c/engine-render/ || true
+          mkdir -p docs/visual-evidence/p18/engine-render
+          cp -f app/build/visual_screenshots/p18/*.png docs/visual-evidence/p18/engine-render/ || true
           git config user.name "eternal-render-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add docs/visual-evidence/p17c/engine-render
+          git add docs/visual-evidence/p17c/engine-render docs/visual-evidence/p18/engine-render
           if git diff --cached --quiet; then echo "no render changes"; exit 0; fi
           git commit -m "P17-C: engine render evidence (automated, Robolectric native graphics)"
           git push origin HEAD:${{ github.head_ref || github.ref_name }}
@@ -93,6 +100,15 @@ jobs:
           } > /tmp/diag.txt 2>&1
           mkdir -p ci-diagnostics
           tail -c 60000 /tmp/diag.txt > ci-diagnostics/gradle-error.log
+          # Unit-test failures never reach the compiler log, so capture the JUnit XML too.
+          {
+            echo "### test results"
+            ls -l app/build/test-results/testDebugUnitTest 2>/dev/null || true
+            for f in app/build/test-results/testDebugUnitTest/*.xml; do
+              [ -e "$f" ] || continue
+              head -c 40000 "$f"
+            done
+          } > ci-diagnostics/render-tests.log 2>&1
           git config user.name "eternal-render-bot"
           git config user.email "actions@users.noreply.github.com"
           git add ci-diagnostics
@@ -113,6 +129,7 @@ jobs:
           name: lyra-engine-render
           path: |
             app/build/visual_screenshots/p17c/*.png
+            app/build/visual_screenshots/p18/*.png
             app/build/reports/tests/testDebugUnitTest/**
           if-no-files-found: warn
           retention-days: 30

@@ -16,7 +16,7 @@
         64
       ],
       "runtime_usage": "SanctuaryWorldRenderer; transparent terrain transition clusters",
-      "sha256": "bc49320184f26cfda314a6ae5c7b5a0fe601bdd3d9c13d4bf46df46f4fe26dec"
+      "sha256": "ea2919b9b8fe5ec7bd46fd2186f5762ce2ef5d4c324262779574c0767daa1307"
     },
     {
       "id": "grass_0",
@@ -30,7 +30,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "b0fe3e6cb6112bb51557797cbea2c211a71d8c81c71fa05972c7a430acf14924"
+      "sha256": "0c2d8329d3b254725acf5302c8d31e8700646301a7b170ea49b7cdef9018e899"
     },
     {
       "id": "grass_1",
@@ -44,7 +44,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "d9c1a0ec50f5da5b78f9615e7f82a35a224f720c6488ee04fc0ed49f3379732f"
+      "sha256": "c3fd37f0b77299093730cefa2e16d1d6e5e5e8db36bc304ea360faf355c242aa"
     },
     {
       "id": "grass_2",
@@ -58,7 +58,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "ad6ddc7f49f1919623045f2b135dd6cfb0a3a61e9827d38bd4ca4976b039a953"
+      "sha256": "96479b07dfb515f2c95b6691a18ca69285a12fff60b31d3c38e2b74b7c8dca2c"
     },
     {
       "id": "grass_3",
@@ -72,7 +72,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "5e4161157adaaecece2a9c4e490094fb9bd37e47f1b9f6833f16213a06377120"
+      "sha256": "9e6a0a15116baba306f4f2f907bceac15a08a5fc233b5745749ca1737c3dbccb"
     },
     {
       "id": "grass_4",
@@ -86,7 +86,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "2870f9db29671bcbf5ecede3dc091b346f723610270b92c889861f560a314f12"
+      "sha256": "cd6119987516e3dfd2a14b598236232f1c205c2068beb3a86070e21255bc9466"
     },
     {
       "id": "grass_5",
@@ -100,7 +100,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "c726b4a5d7d886f74f8392d20196aecbdd805f35d5534984861e53ca7e78fa90"
+      "sha256": "68211086266e3f2e199f28e4f0ecbfe9fbb918dbe39cd68343c1809c4c185d7a"
     },
     {
       "id": "grass_6",
@@ -114,7 +114,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "9a6fd1b2eade38e42b84762c400c2cabaef1a0189c9bc14c291914bff81f17e4"
+      "sha256": "a52b79e0b389bf7bfcc829559bf2a70c83ff9b36c89487a79dafde3785b4239c"
     },
     {
       "id": "grass_7",
@@ -128,7 +128,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.grass; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "df3e308689d54a3a8bfe5eff6d609471cf590a22bbc569f7e1aeb66735c98b13"
+      "sha256": "2b6c6c986ef63c4030251b6bb515a0aedef90d6a964551aff672c2891b44bc65"
     },
     {
       "id": "flagstone_0",
@@ -142,7 +142,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.flagstone; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "6a1cff9df5fa8794441987f83388987fbeacb71a5bbe65d3c34ccd46a4fd48e6"
+      "sha256": "e4a2d56ecf6fc09dd0b9d5ef8cc66973c0d33fdfd816252df4a91444073fe644"
     },
     {
       "id": "flagstone_1",
@@ -156,7 +156,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.flagstone; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "7d34ebf2ae17af33d6aa9526f89078d6580a42c8cf12467e6e7c3baab88b36c3"
+      "sha256": "0f6ff7a98ad423aba659d96107dfa886b7e1de2b655bdc22c4dd526e0c850839"
     },
     {
       "id": "flagstone_2",
@@ -170,7 +170,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.flagstone; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "996ad3568fc559a2e4af6b64467daf56d4dff2050410f0423e1d7ca86319b8b1"
+      "sha256": "8308dc017848dfa1b27eb2cea031593e4f3485c6b3a0f678074c6a8d3023ef81"
     },
     {
       "id": "flagstone_3",
@@ -184,7 +184,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.flagstone; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "2c95eec56cd01518c5cb289f6f5c02230ba2a97df07add82a59757a5e76fd1c7"
+      "sha256": "78cf8b4c14e53823066ebd52267d6a3b333599e1d96efd4f69748d69c91171d3"
     },
     {
       "id": "flagstone_4",
@@ -198,7 +198,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.flagstone; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "da543b3053032272d66de1988ea745c9be46f1fc1f5e72971877d6b9860fb190"
+      "sha256": "fd7809af6c13be9fea3071e507f3233541bb66f495bb24ea6c0d5d8941d22790"
     },
     {
       "id": "flagstone_5",
@@ -212,7 +212,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.flagstone; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "5b5cc2b6f89ca0c7aeeca3552b6213fc39581d0767d25d4e34be5781145255f2"
+      "sha256": "0158b059f45b87f1a227dd331ae1061289885269cc057820517faf2936b40a7d"
     },
     {
       "id": "flagstone_6",
@@ -226,7 +226,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.flagstone; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "48d31fa6d3c8c4d8d03a91b510695f8b425d97986108a8a6233b63835b368f82"
+      "sha256": "08e127b51749f29afc159f4fb881090bcfde45f56b41a18678be95ecccef946e"
     },
     {
       "id": "flagstone_7",
@@ -240,7 +240,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.flagstone; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "c8bb13a9bc7b7f3315ffcb0c9cbba0288b4f5af208cc66f09d712ca3353b1be8"
+      "sha256": "783854cef64ebdd2b30d16f57684bdc7e92a379c822af900aab82570e16fdd1d"
     },
     {
       "id": "cobble_0",
@@ -254,7 +254,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.cobble; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "987efebb89759cc02870673dac470a451177cf163815487f5f67a478efc71c5b"
+      "sha256": "295c01f3f36f9d740a146995dd31fbda734ff591b9bb9f937c62832d31b43eb4"
     },
     {
       "id": "cobble_1",
@@ -268,7 +268,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.cobble; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "48416abca0bf8ebf35aa3a649b99222e27ad29b90f1a9d5810269835b3f4b733"
+      "sha256": "b276ba8fb1602db9c9ce1ea244dffcce6db4c6f752b1780df4481ae17b25ed4d"
     },
     {
       "id": "cobble_2",
@@ -282,7 +282,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.cobble; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "b74a134d4b16a7e0ce717cfcc3940ee05a0dbe4d8ffe8be327ee59a114d4192d"
+      "sha256": "4b1579ab16c7fbbebf592d18e6c4291381097af4de1fc29dc1fdb544c0b2477f"
     },
     {
       "id": "cobble_3",
@@ -296,7 +296,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.cobble; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "2a68ab2789769f85aefd3f93575633c7164aaffca67bf31caa0d2b2a02003023"
+      "sha256": "8a6319bf397631aac34152eea8ac618af8bc0530fce3040700721a2a481eb9c0"
     },
     {
       "id": "cobble_4",
@@ -310,7 +310,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.cobble; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "5adcf4674bc5a4f63b47d3438d4baa9dcede466b2a7c1c199f2f7b6281f18425"
+      "sha256": "fcec399af3949b27745f75bb6587ba2aed16d8905d9f096e7ded533e9b61820f"
     },
     {
       "id": "cobble_5",
@@ -324,7 +324,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.cobble; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "2addd57f12804eea9e2027abcd113a3535f0ee3915034483097b59c73fe97363"
+      "sha256": "d486f048712f7063c20034d752545c60d95a860bb6c2a13050adb48b8b26edbc"
     },
     {
       "id": "soil_0",
@@ -604,7 +604,7 @@
         128
       ],
       "runtime_usage": "PixelStructureAtlas; existing tree position/scale; silhouette shadows",
-      "sha256": "0e0b90adcbd2bc8fb11957fc1fefde7ea9e816ebd9b6a010f1b149da35e871d6"
+      "sha256": "556eefd5c1b1f14872b67e6e651b8c7d6645e4632519d0719a6ce614b240a229"
     },
     {
       "id": "twisted",
