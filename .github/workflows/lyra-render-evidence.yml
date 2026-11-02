@@ -1,0 +1,118 @@
+name: Lyra engine render evidence
+
+# Additive workflow: it does not modify or replace "Build Eternal Summoner APK".
+# It runs the Robolectric native-graphics render test, which executes the real draw code
+# (Sanctuary world + depth sorting + canopy pass + drawCharacterSprite) and uploads the
+# resulting PNGs, so a reviewer can look at renderer output instead of a mockup.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'app/src/main/**'
+      - 'app/src/test/java/com/example/LyraEngineRenderTest.kt'
+      - '.github/workflows/lyra-render-evidence.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    name: Render Lyra with the game renderer
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install Android SDK packages
+        run: |
+          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager | head -n 1)
+          set +o pipefail
+          yes | "$SDKMANAGER" --licenses
+          license_status=${PIPESTATUS[1]}
+          set -o pipefail
+          test "$license_status" -eq 0
+          "$SDKMANAGER" --install \
+            "platform-tools" \
+            "platforms;android-36.1" \
+            "build-tools;36.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.3.1'
+
+      - name: Add temporary Google Sign-In resource
+        run: |
+          mkdir -p app/src/debug/res/values
+          cat > app/src/debug/res/values/google_services_placeholder.xml <<'EOF'
+          <resources>
+              <string name="default_web_client_id" translatable="false">debug-placeholder.apps.googleusercontent.com</string>
+          </resources>
+          EOF
+
+      - name: Render Lyra (real draw code, Robolectric native graphics)
+        run: gradle :app:testDebugUnitTest --tests "com.example.LyraEngineRenderTest" --stacktrace
+
+      # The PNGs are also committed so reviewers (and the agent) can open them straight from
+      # the branch; the artifact below is the same bytes for offline download.
+      - name: Publish render PNGs into the branch
+        run: |
+          set -euo pipefail
+          mkdir -p docs/visual-evidence/p17c/engine-render
+          cp -f app/build/visual_screenshots/p17c/*.png docs/visual-evidence/p17c/engine-render/ || true
+          git config user.name "eternal-render-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/visual-evidence/p17c/engine-render
+          if git diff --cached --quiet; then echo "no render changes"; exit 0; fi
+          git commit -m "P17-C: engine render evidence (automated, Robolectric native graphics)"
+          git push origin HEAD:${{ github.head_ref || github.ref_name }}
+
+      # Gradle logs and artifacts live on hosts this repo's reviewers may not reach, so on
+      # failure the compiler output is committed back to the branch for triage.
+      - name: Capture compiler diagnostics on failure
+        if: failure()
+        run: |
+          set +e
+          {
+            echo "### :app:compileDebugKotlin"
+            gradle :app:compileDebugKotlin --console=plain
+            echo "### :app:compileDebugUnitTestKotlin"
+            gradle :app:compileDebugUnitTestKotlin --console=plain
+          } > /tmp/diag.txt 2>&1
+          mkdir -p ci-diagnostics
+          tail -c 60000 /tmp/diag.txt > ci-diagnostics/gradle-error.log
+          git config user.name "eternal-render-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add ci-diagnostics
+          git commit -m "ci: gradle diagnostics for the failed render run" || exit 0
+          git push origin HEAD:${{ github.head_ref || github.ref_name }} || true
+
+      - name: Show render outputs
+        if: always()
+        run: |
+          ls -l app/build/visual_screenshots/p17c || true
+          echo "--- test report ---"
+          ls -l app/build/reports/tests/testDebugUnitTest 2>/dev/null || true
+
+      - name: Upload engine render PNGs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lyra-engine-render
+          path: |
+            app/build/visual_screenshots/p17c/*.png
+            app/build/reports/tests/testDebugUnitTest/**
+          if-no-files-found: warn
+          retention-days: 30

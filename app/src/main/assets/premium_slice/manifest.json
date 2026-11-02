@@ -179,7 +179,7 @@
         4096,
         384
       ],
-      "sha256": "dd072ffda6d223a8587a79dc6011d38d9c008a30da0fd4c54445f6a948d04d2d"
+      "sha256": "bee9d4ff9da69af81c2d76749d519f857885a9039f9945b18c74a00f206fe5af"
     }
   },
   "sample": {
@@ -195,5 +195,17 @@
       256,
       192
     ]
+  },
+  "portraits": {
+    "lyra": {
+      "file": "portraits/lyra_portrait.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "6e1e1596878d75584e3abc51429838ee56f03b254ead4ef6ae3ca969485d6a62",
+      "native_px": 64,
+      "usage": "HUD hero avatar; drawn at 1:1 up to 64 dp, nearest filter, alpha over the UI gradient"
+    }
   }
 }

@@ -34,7 +34,7 @@ python3 tools/validate_assets.py           # CI's own asset gate (PNG + manifest
 | Atlas | 4096 × 384 RGBA — 6.00 MB decoded, 144 KB PNG |
 | Sampling | `FilterQuality.None`, `worldPixelScale` 1.08 |
 | Aisle | ≥1 px transparent margin around every frame (validator gate) |
-| Palette | 40 authored tones, ≤38 per frame (multi-material hero, gate documented in the validator) |
+| Palette | 40 authored tones, ≤38 per frame (multi-material hero, gate documented in the validator); P17-C lifted the jerkin ramp one step so the chest separates from the cloak |
 
 Ground clipping is structural: `ground_clip()` clears every pixel below row 90 before the
 frame is written, so the pivot assertion cannot be broken by an outline or a collapsed pose.
@@ -125,6 +125,14 @@ that is the same arithmetic the game already accepted for Kaelen + goblin.
    `tools/validate_assets.py` (run in CI) verifies the shipped bytes.
 4. No save, gameplay, balance, Gradle, package-ID or renderer-optimisation changes. P16
    batching is untouched.
+
+## 7b. P17-C runtime follow-ups
+
+Engine-render evidence, the authored HUD portrait, the bow-release anchor and the Lobby
+allocation audit are documented in `docs/art/P17C_RUNTIME_QA.md`. The portrait lives at
+`premium_slice/portraits/lyra_portrait.png` (64×64, authored by
+`tools/generate_lyra_portrait.py`) and is resolved by `PremiumPortraits`, so the HUD no longer
+shows Kaelen's face for Lyra.
 
 ## 8. Verification actually run
 
