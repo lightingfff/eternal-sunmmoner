@@ -106,6 +106,9 @@ jobs:
       - name: Render P23 architecture and props matrix (real draw code, Robolectric native graphics)
         run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeP23RenderTest" --stacktrace
 
+      - name: Verify P23 architecture and props contract
+        run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeP23ContractTest" --stacktrace
+
       - name: Verify Sanctuary environment art, manifest, layout, and performance regressions
         run: >-
           gradle :app:testDebugUnitTest

@@ -590,6 +590,24 @@ object InteriorWorldRenderer {
       }
 
       PropKind.FLOWER_PLANTER_BED -> {
+        val planterSprite = PixelStructureAtlas.flowerPlanterSprite
+        if (planterSprite != null) {
+          // P23: authored stone-curb planter. The 64x36 canvas is blitted bottom-centred at
+          // 2s with a +8s foot offset, which is where the Canvas curb used to sit, so the prop
+          // keeps its anchor, its footprint and its collider.
+          val planterW = (64f * s).roundToInt().coerceAtLeast(2)
+          val planterH = (36f * s).roundToInt().coerceAtLeast(2)
+          drawImage(
+            image = planterSprite,
+            dstOffset = IntOffset(
+              (cx - planterW / 2f).roundToInt(),
+              (cy + 8f * s - planterH).roundToInt(),
+            ),
+            dstSize = IntSize(planterW, planterH),
+            filterQuality = FilterQuality.None,
+          )
+          return true
+        }
         drawOval(Color(0x38000000), Offset(cx - 34f * s, cy - 8f * s), Size(72f * s, 18f * s))
         // Low pale-stone curb planter box + rich soil + multi-colored blossoms
         drawRect(Color(0xFFD6CFC2), Offset(cx - 30f * s, cy - 13f * s), Size(60f * s, 13f * s))

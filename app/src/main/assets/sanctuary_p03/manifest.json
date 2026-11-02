@@ -703,6 +703,244 @@
       ],
       "runtime_usage": "PropKind.FOREST_CANOPY_BUSH",
       "sha256": "11e573a5f85ac1fae58a20a15f799013211bdf3c733fdbcd536edeab365e6fb5"
+    },
+    {
+      "id": "townhouse_a",
+      "path": "townhouse_a.png",
+      "size": [
+        152,
+        156
+      ],
+      "ground_anchor": [
+        76,
+        155
+      ],
+      "runtime_usage": "P23 Sanctuary background building; bottom-centred drawCrispSprite at 2x scale",
+      "sha256": "6bd41108e9df3cd807afd22770488bc496f8b8ac7659f3427f73e2ec379b59f5"
+    },
+    {
+      "id": "townhouse_b",
+      "path": "townhouse_b.png",
+      "size": [
+        144,
+        160
+      ],
+      "ground_anchor": [
+        72,
+        159
+      ],
+      "runtime_usage": "P23 Sanctuary background building; bottom-centred drawCrispSprite at 2x scale",
+      "sha256": "7ac49279c527af8298c67048bc0cd8c23b13d9c07523dbb36bf20bd435116fb2"
+    },
+    {
+      "id": "cottage_brown",
+      "path": "cottage_brown.png",
+      "size": [
+        132,
+        144
+      ],
+      "ground_anchor": [
+        66,
+        143
+      ],
+      "runtime_usage": "P23 Sanctuary background building; bottom-centred drawCrispSprite at 2x scale",
+      "sha256": "7f0e7c3745d39f0f2f657eaada6854cc71f58e573676f56e7b411421b2810874"
+    },
+    {
+      "id": "cottage_slate",
+      "path": "cottage_slate.png",
+      "size": [
+        132,
+        144
+      ],
+      "ground_anchor": [
+        66,
+        143
+      ],
+      "runtime_usage": "P23 Sanctuary background building; bottom-centred drawCrispSprite at 2x scale",
+      "sha256": "7e1566ebddf48494b53d5ff8350e9c27f540e5c8c4ec69287da0339c5c2b5c58"
+    },
+    {
+      "id": "fortress_tower",
+      "path": "fortress_tower.png",
+      "size": [
+        80,
+        118
+      ],
+      "ground_anchor": [
+        40,
+        117
+      ],
+      "runtime_usage": "P23 Sanctuary background building; bottom-centred drawCrispSprite at 2x scale",
+      "sha256": "33dc2bdd878b5437450033a25ffc90bcba15325e13dcde7c99066eab524a4a8b"
+    },
+    {
+      "id": "gate_tower",
+      "path": "gate_tower.png",
+      "size": [
+        96,
+        136
+      ],
+      "ground_anchor": [
+        48,
+        135
+      ],
+      "runtime_usage": "P23 Sanctuary background building; bottom-centred drawCrispSprite at 2x scale",
+      "sha256": "fccc1a9f106c8a84945a14342491b47c8edc0a18e93bdcf50fbb380ee55b3136"
+    },
+    {
+      "id": "flower_planter",
+      "path": "flower_planter.png",
+      "size": [
+        64,
+        36
+      ],
+      "ground_anchor": [
+        32,
+        35
+      ],
+      "runtime_usage": "P23 environmental prop; PNG-first via SanctuaryArtAssets.assetSafe",
+      "sha256": "0db9d12d75e952f5ff2b5c454d9aded7ae0f5a14bedacf521ce6ac0908af545f"
+    },
+    {
+      "id": "street_lantern_0",
+      "path": "street_lantern_0.png",
+      "size": [
+        32,
+        66
+      ],
+      "ground_anchor": [
+        16,
+        65
+      ],
+      "runtime_usage": "P23 environmental prop; PNG-first via SanctuaryArtAssets.assetSafe",
+      "sha256": "47e97de80019804374f9136c22b0205513069cccb06fa1e9ac2166d2264a183c"
+    },
+    {
+      "id": "street_lantern_1",
+      "path": "street_lantern_1.png",
+      "size": [
+        32,
+        66
+      ],
+      "ground_anchor": [
+        16,
+        65
+      ],
+      "runtime_usage": "P23 environmental prop; PNG-first via SanctuaryArtAssets.assetSafe",
+      "sha256": "16137b1aa9f1b8e564a420fc3724bf64122165cb0c9edbb5076d795da478cd24"
+    },
+    {
+      "id": "street_lantern_2",
+      "path": "street_lantern_2.png",
+      "size": [
+        32,
+        66
+      ],
+      "ground_anchor": [
+        16,
+        65
+      ],
+      "runtime_usage": "P23 environmental prop; PNG-first via SanctuaryArtAssets.assetSafe",
+      "sha256": "9778a71987b6b9667ed5f79a64a45f19db5179db8d17be97436dedce49002bbd"
+    },
+    {
+      "id": "wooden_bench",
+      "path": "wooden_bench.png",
+      "size": [
+        58,
+        36
+      ],
+      "ground_anchor": [
+        29,
+        35
+      ],
+      "runtime_usage": "P23 environmental prop; PNG-first via SanctuaryArtAssets.assetSafe",
+      "sha256": "7f1d62beb56f1460c7a08487cc99a131b8932175b2a5e82c65641a7be378e145"
+    },
+    {
+      "id": "ruin_arch",
+      "path": "ruin_arch.png",
+      "size": [
+        96,
+        86
+      ],
+      "ground_anchor": [
+        48,
+        85
+      ],
+      "runtime_usage": "P23 environmental prop; PNG-first via SanctuaryArtAssets.assetSafe",
+      "sha256": "290e544a39fe68256839482c84f75087bcf747a08b1d68b97ee5eda8b0acb8ec"
+    },
+    {
+      "id": "retaining_wall",
+      "path": "retaining_wall.png",
+      "size": [
+        88,
+        48
+      ],
+      "ground_anchor": [
+        44,
+        47
+      ],
+      "runtime_usage": "P23 environmental prop; PNG-first via SanctuaryArtAssets.assetSafe",
+      "sha256": "4a577d9e6132fa0d5e5bfefdc993cd9cfae813ed27a23bb5dc77fbf0b71170ae"
+    },
+    {
+      "id": "monolith",
+      "path": "monolith.png",
+      "size": [
+        44,
+        74
+      ],
+      "ground_anchor": [
+        22,
+        73
+      ],
+      "runtime_usage": "P23 environmental prop; PNG-first via SanctuaryArtAssets.assetSafe",
+      "sha256": "c68c5b64bc375aaedb09e55019da15d0e2ca2e99184f02915d6ec05f752a2847"
+    },
+    {
+      "id": "training_dummy",
+      "path": "training_dummy.png",
+      "size": [
+        40,
+        58
+      ],
+      "ground_anchor": [
+        20,
+        57
+      ],
+      "runtime_usage": "P23 environmental prop; PNG-first via SanctuaryArtAssets.assetSafe",
+      "sha256": "44a0c54163faa3cfe55fce2774dc8e6637fdaa0a365651c5fbfa09ea7811973d"
+    },
+    {
+      "id": "weapon_rack",
+      "path": "weapon_rack.png",
+      "size": [
+        68,
+        48
+      ],
+      "ground_anchor": [
+        34,
+        47
+      ],
+      "runtime_usage": "P23 environmental prop; PNG-first via SanctuaryArtAssets.assetSafe",
+      "sha256": "f4f55bf1fcaa326632daa9ca31669766f94d15189104d7b2f95254a33120b9b3"
+    },
+    {
+      "id": "striking_post",
+      "path": "striking_post.png",
+      "size": [
+        36,
+        86
+      ],
+      "ground_anchor": [
+        18,
+        85
+      ],
+      "runtime_usage": "P23 environmental prop; PNG-first via SanctuaryArtAssets.assetSafe",
+      "sha256": "77cd53554fb0940249c36d0ffe4b6d928f93224a133e67792b7d12fd13ff0b13"
     }
   ]
 }
