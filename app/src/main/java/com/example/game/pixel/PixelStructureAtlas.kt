@@ -54,7 +54,9 @@ object PixelStructureAtlas {
   private val sakuraTreeSpriteBFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(1, 96, 114) }
   val cypressConiferSprite: ImageBitmap get() = SanctuaryArtAssets.image("cypress") ?: cypressConiferSpriteFallback
   private val cypressConiferSpriteFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(2, 48, 88) }
-  val gardenHedgeBushSprite: ImageBitmap by lazy { SanctuaryVegetation.shrub() }
+  val gardenHedgeBushSprite: ImageBitmap get() =
+    SanctuaryArtAssets.assetSafe("sanctuary_p03/hedge_bush.png") ?: gardenHedgeBushFallback
+  private val gardenHedgeBushFallback: ImageBitmap by lazy { SanctuaryVegetation.shrub() }
   val trainingStrikingPostSprite: ImageBitmap by lazy { buildTrainingStrikingPost() }
   val terraceCliffWallSprite: ImageBitmap by lazy { buildTerraceCliffWall() }
   val terraceGrandStairsSprite: ImageBitmap by lazy { buildTerraceGrandStairs() }
@@ -82,7 +84,9 @@ object PixelStructureAtlas {
   private val spiritPineSpriteFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(2, 96, 128) }
   val mysticPlumTreeSprite: ImageBitmap get() = SanctuaryArtAssets.image("twisted") ?: mysticPlumTreeSpriteFallback
   private val mysticPlumTreeSpriteFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(3, 112, 132) }
-  val forestBushSprite: ImageBitmap by lazy { SanctuaryVegetation.shrub() }
+  val forestBushSprite: ImageBitmap get() =
+    SanctuaryArtAssets.assetSafe("sanctuary_p03/forest_bush.png") ?: forestBushFallback
+  private val forestBushFallback: ImageBitmap by lazy { SanctuaryVegetation.shrub() }
   val ruinArchSprite: ImageBitmap by lazy { buildAncientRuinArch() }
   val monolithSprite: ImageBitmap by lazy { buildAncientMonolith() }
   val mossyBoulderSprite: ImageBitmap get() = SanctuaryArtAssets.image("boulder") ?: boulderFallback

@@ -576,7 +576,7 @@
         124
       ],
       "runtime_usage": "PixelStructureAtlas; existing tree position/scale; silhouette shadows",
-      "sha256": "c7f35ea681eff667da52af939b5e48d24cfa3c7937159fd122b9fb0cd16e51c0"
+      "sha256": "baecc04838c1f127dcb11586f91709a06dd48ffc40fbeea58c0434a426ea8ce9"
     },
     {
       "id": "canopy_b",
@@ -590,7 +590,7 @@
         107
       ],
       "runtime_usage": "PixelStructureAtlas; existing tree position/scale; silhouette shadows",
-      "sha256": "ae452536bc8c4b6c580290d9454b3bd4bc787666cfc4f30e5823eb9c9bf73b1b"
+      "sha256": "bad1ae38022052c40adc7725376ae77fcc99fa9b4cbd7c458c8750b176ac8b06"
     },
     {
       "id": "oak",
@@ -675,6 +675,20 @@
       ],
       "runtime_usage": "PixelStructureAtlas.barrelClusterSprite; existing props and shadow silhouette",
       "sha256": "320fb2a5f02a5b917cc564bb8fa5efcb29c48c48d78b072d7112fe4caa904412"
+    },
+    {
+      "id": "hedge_bush",
+      "path": "hedge_bush.png",
+      "size": [
+        64,
+        40
+      ],
+      "ground_anchor": [
+        32,
+        36
+      ],
+      "runtime_usage": "PropKind.GARDEN_HEDGE_BUSH",
+      "sha256": "a2b92b4461e80c33f6a76735036512f1559501765e07594d753b006e91335b3f"
     }
   ]
 }
