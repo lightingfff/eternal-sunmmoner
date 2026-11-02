@@ -339,28 +339,27 @@ def soil(v: int) -> Image.Image:
     t = Torus(SOIL["body"])
     r = rng(5500 + v * 61)
 
-    # scale 1 - broad earth masses, one value step apart, never harsh
-    for _ in range(5):
+    # scale 1 - earth masses kept SMALLER than the tile and one value step deep.
+    # Large lobes tore visibly at every tile boundary once the renderer hash-picked
+    # variants (0.88 patchwork); the field must read as texture, not as patches.
+    for _ in range(9):
         x, y = r(64), r(64)
-        w, h = 13 + r(13), 7 + r(7)
-        # organic 10-gon: a hand-shaped earth lobe, not a stamped triangle
+        w, h = 6 + r(8), 4 + r(5)
         pts = []
-        for k in range(10):
-            ang = k * 6.28318 / 10
+        for k in range(9):
+            ang = k * 6.28318 / 9
             import math as _m
-            wob = 1.0 + ((k * 5 + v * 3) % 7 - 3) * 0.07
-            pts.append((x + w * wob * _m.cos(ang), y + h * 0.82 * wob * _m.sin(ang)))
+            wob = 1.0 + ((k * 5 + v * 3) % 7 - 3) * 0.09
+            pts.append((x + w * wob * _m.cos(ang), y + h * 0.85 * wob * _m.sin(ang)))
         t.poly([(round(a), round(b)) for a, b in pts],
                SOIL["shade"] if (darker and r(3) == 0) else SOIL["body_b"])
 
-    # a trodden route: wide, very low-contrast compaction band (traffic, not paint)
-    if v % 2 == 0:
-        by = 12 + r(38)
-        t.poly([(0, by - 5), (18, by - 7), (40, by - 4), (64, by - 6),
-                (64, by + 4), (42, by + 5), (18, by + 3), (0, by + 5)], SOIL["light"])
-        for _ in range(6):
-            sx = r(64)
-            t.line([(sx, by - 3 + r(7)), (sx + 4 + r(5), by - 3 + r(7))], SOIL["dry"], 1)
+    # compaction smears: short, broken runs along the traffic direction (never a full band)
+    for _ in range(4 + (v % 3)):
+        sx, sy = r(56) + 4, r(56) + 4
+        t.poly([(sx - 7, sy), (sx - 2, sy - 3), (sx + 6, sy - 2), (sx + 8, sy + 1),
+                (sx + 1, sy + 3), (sx - 5, sy + 2)], SOIL["light"] if r(3) == 0 else SOIL["body_b"])
+        t.line([(sx - 4, sy - 1), (sx + 3, sy)], SOIL["dry"], 1)
 
     # scale 2 - compacted patches: grit and tiny chips in one small area
     for _ in range(3 + (v % 3)):
@@ -395,13 +394,13 @@ def gravel(v: int) -> Image.Image:
     t = Torus(GRAVEL["body"])
     r = rng(6600 + v * 47)
 
-    # broad dirt masses keep the band from reading as a flat grey carpet
-    for _ in range(5):
+    # dirt masses, small enough that a hash-picked neighbour blend stays seamless
+    for _ in range(8):
         x, y = r(64), r(64)
-        w, h = 12 + r(14), 6 + r(7)
-        t.poly([(x - w, y + 1), (x - w // 2, y - h), (x + w // 3, y - h + 2), (x + w, y),
+        w, h = 6 + r(7), 4 + r(5)
+        t.poly([(x - w, y + 1), (x - w // 3, y - h), (x + w // 3, y - h + 1), (x + w, y),
                 (x + w // 2, y + h), (x - w // 2, y + h - 1)],
-               GRAVEL["body_b"] if r(2) else GRAVEL["shade"])
+               GRAVEL["body_b"] if r(3) else GRAVEL["shade"])
 
     # loose grit fields (scale 2), confined to small patches
     for _ in range(3):

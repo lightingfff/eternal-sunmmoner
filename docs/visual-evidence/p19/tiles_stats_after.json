@@ -6,7 +6,7 @@
   },
   "soil": {
     "variants": 6,
-    "colors_min": 10,
+    "colors_min": 11,
     "colors_max": 11
   },
   "cobble": {
