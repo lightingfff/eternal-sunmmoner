@@ -68,6 +68,10 @@ def rgb(hex_str: str) -> int:
 
 
 # graphite-blue Sanctuary stone (the P20 family, kept as the shared language)
+# the same limestone, brought down into the Sanctuary's value range: the pale LIME reads as
+# bleached white against the night grass, so the temple body uses this darker, bluer cut
+LIME_T = dict(mortar="#333b44", dk="#424b55", base="#4c5661", lt="#586472", hi="#67737f",
+              rim="#7f8b97", foot="#39424c")
 STONE = dict(mortar="#222a30", dk="#333d45", base="#414c54", lt="#4f5a62", hi="#616d76",
              rim="#7b8790", foot="#2b333a")
 # pale moonlit limestone (Summoning Hall, Registry trim) -- lighter, still cool
@@ -76,6 +80,10 @@ LIME = dict(mortar="#3b434a", dk="#4b545c", base="#59636b", lt="#69737c", hi="#7
 # hard basalt (Tower Gate) -- darker, chipped, cold
 BASA = dict(mortar="#151a21", dk="#1f252e", base="#2a313b", lt="#36404c", hi="#4a5563",
             rim="#61707f", foot="#1b2027")
+# gate towers stand in front of the curtain wall, so they carry one more value step: the
+# recessed wall keeps BASA and the proud masonry reads against it
+GATE = dict(mortar="#1b2129", dk="#28303a", base="#333c47", lt="#414c59", hi="#55616f",
+            rim="#6f7f8e", foot="#232a32")
 # lime plaster / daub upper storeys
 PLAS = dict(mortar="#2c3339", dk="#343c43", base="#3d454c", lt="#4a535b", hi="#5b646c",
             rim="#6d767e", foot="#2f363c")
@@ -101,6 +109,14 @@ CONTACT = "#151c20"
 def rgba(h: str, a: int = 255):
     h = h.lstrip("#")
     return (int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16), a)
+
+
+def mix_hex(a: str, b: str, t: float) -> str:
+    """Perceptual-ish linear mix of two hex colours, returned as #rrggbb."""
+    pa, pb = rgba(a), rgba(b)
+    t = min(1.0, max(0.0, t))
+    return "#{:02x}{:02x}{:02x}".format(*[int(round(pa[i] + (pb[i] - pa[i]) * t))
+                                          for i in range(3)])
 
 
 class Canvas:
@@ -787,11 +803,14 @@ def build_hero_registry() -> Image.Image:
     c.rect(tur_x - 6, 14, tur_x + 6, 23, PLAS["dk"])
     for yy in range(15, 22, 2):
         c.hline(tur_x - 5, tur_x + 5, yy, OAK["base"])
-    c.ellipse(tur_x, 28, 6, 5, "#4a5560")
-    c.ellipse(tur_x, 28, 5, 4, "#9aa6b0")
-    c.ellipse(tur_x, 28, 4, 3, "#c6cfd6")
-    c.vline(tur_x, 25, 28, "#2b333a")
-    c.px(tur_x + 2, 27, "#2b333a")
+    c.ellipse(tur_x, 28, 7, 6, "#232a31")
+    c.ellipse(tur_x, 28, 6, 5, "#6f5a2c")
+    c.ellipse(tur_x, 28, 5, 4, "#39444d")
+    for ox_, oy_ in ((-3, 0), (3, 0), (0, -2), (0, 2)):
+        c.px(tur_x + ox_, 28 + oy_, "#c9a961")
+    c.vline(tur_x, 26, 28, "#dcc588")
+    c.px(tur_x + 1, 28, "#dcc588")
+    c.px(tur_x + 2, 29, "#dcc588")
 
     window(c, 22, up[0] + 4, 12, 16, glow=AMBER, lit=1.2, pad=2, flowerbox=True)
     window(c, 58, up[0] + 7, 12, 16, glow=AMBER, lit=0.0, pad=2, flowerbox=True)
@@ -1045,16 +1064,16 @@ def build_summoning_hall() -> Image.Image:
     # ---- terraced plaza -------------------------------------------------------------
     tiers = [(124, 40, base - 2), (112, 33, base - 14), (99, 26, base - 26)]
     for i, (rx, ry, cyy) in enumerate(tiers):
-        top = LIME["lt"] if i == 0 else (LIME["base"] if i == 1 else LIME["dk"])
-        c.ellipse(cx, cyy + 3, rx, ry, LIME["foot"])
-        c.ellipse(cx, cyy, rx, ry, LIME["dk"])
+        top = LIME_T["lt"] if i == 0 else (LIME_T["base"] if i == 1 else LIME_T["dk"])
+        c.ellipse(cx, cyy + 3, rx, ry, LIME_T["foot"])
+        c.ellipse(cx, cyy, rx, ry, LIME_T["dk"])
         c.ellipse(cx, cyy - 2, rx - 2, ry - 1, top)
         # front rim: lit band + shadow under the lip
         for x in range(cx - rx + 2, cx + rx - 1):
             dy = ry - 2 - int((ry - 2) * abs(x - cx) / max(1, rx))
             if 0 <= dy:
-                c.blend(x, cyy - 2 + dy, LIME["hi"], 0.35)
-                c.blend(x, cyy - 1 + dy, LIME["foot"], 0.45)
+                c.blend(x, cyy - 2 + dy, LIME_T["hi"], 0.35)
+                c.blend(x, cyy - 1 + dy, LIME_T["foot"], 0.45)
         # radial slab joints across the visible front half
         seg = 22
         for s_i in range(seg):
@@ -1063,7 +1082,7 @@ def build_summoning_hall() -> Image.Image:
             y0 = cyy - 2 + math.sin(a0) * (ry - 3)
             x1 = cx + math.cos(math.pi - a0) * (rx - 16)
             y1 = cyy - 2 + math.sin(a0) * (ry - 5) * 0.58
-            c.line([(x0, y0), (x1, y1)], LIME["mortar"], 1)
+            c.line([(x0, y0), (x1, y1)], LIME_T["mortar"], 1)
     # contact rim on the base row
     for x in range(cx - 124, cx + 124):
         if c.opaque(x, base):
@@ -1071,123 +1090,123 @@ def build_summoning_hall() -> Image.Image:
             c.blend(x, base - 1, AO, 0.18)
 
     # ---- ritual stage: inlaid rune ring at the interaction point -------------------
-    c.ellipse(stage_x, stage_y + 2, 56, 19, LIME["dk"])
-    c.ellipse(stage_x, stage_y, 54, 17, LIME["base"])
-    c.ellipse(stage_x, stage_y - 1, 51, 15, LIME["lt"])
-    c.ring(stage_x, stage_y - 1, 51, 15, LIME["mortar"])
+    c.ellipse(stage_x, stage_y + 2, 56, 19, LIME_T["dk"])
+    c.ellipse(stage_x, stage_y, 54, 17, LIME_T["base"])
+    c.ellipse(stage_x, stage_y - 1, 51, 15, LIME_T["lt"])
+    c.ring(stage_x, stage_y - 1, 51, 15, LIME_T["mortar"])
     arcane_ring(c, stage_x, stage_y - 1, 38, 11, CYAN, marks=8, thickness=2)
 
     # ---- temple: podium, cella wall, colonnade, entablature, roof --------------------
-    thx0, thx1 = 50, 218
+    # The front facade runs x 44..202 and the cella returns to the right up to 232, so the
+    # temple reads as an oblique body under a hipped roof instead of a flat elevation.
+    thx0, thx1 = 44, 202
+    rx1 = 226
     pod_top = 134
-    # podium (three shallow steps in front of the stylobate)
+    # podium (three shallow steps in front of the stylobate), skewed on the return side
     for i in range(3):
         yy = pod_top + 2 + i * 4
-        c.rect(thx0 - 10 + i * 3, yy, thx1 + 10 - i * 3, yy + 3, LIME["base"] if i % 2 else LIME["lt"])
-        c.hline(thx0 - 10 + i * 3, thx1 + 10 - i * 3, yy, LIME["hi"])
-        c.hline(thx0 - 10 + i * 3, thx1 + 10 - i * 3, yy + 3, LIME["foot"])
+        c.poly([(thx0 - 10 + i * 3, yy), (rx1 + 6 - i * 4, yy - 4), (rx1 + 6 - i * 4, yy - 1),
+                (thx0 - 10 + i * 3, yy + 3)], LIME_T["base"] if i % 2 else LIME_T["lt"])
+        c.line([(thx0 - 10 + i * 3, yy), (rx1 + 6 - i * 4, yy - 4)], LIME_T["hi"])
+        c.line([(thx0 - 10 + i * 3, yy + 3), (rx1 + 6 - i * 4, yy - 1)], LIME_T["foot"])
     # cast shadow of the colonnade onto the podium
     c.rect(thx0 - 4, pod_top, thx1 + 4, pod_top + 2, "#1a2128")
 
+    # right return of the cella: it recedes up-right and drops a value step
+    c.poly([(thx1 - 2, 74), (rx1, 60), (rx1, 126), (thx1 - 2, pod_top)], LIME_T["dk"])
+    masonry(c, [(thx1 - 2, 74), (rx1, 60), (rx1, 126), (thx1 - 2, pod_top)],
+            LIME_T, row_h=7, block_w=12, seed=5110)
+    # the returned face turns away from the key light: darken it, never fill it flat
+    for y in range(58, 128):
+        for x in range(thx1 - 3, rx1 + 1):
+            if c.opaque(x, y):
+                c.blend(x, y, "#0b1116", 0.24)
+    for k in range(6):                                  # a lit quoin on the returned corner
+        qy = 74 + k * 10
+        c.rect(thx1 - 2, qy, thx1 + 2, qy + 7, LIME_T["lt"])
+        c.hline(thx1 - 2, thx1 + 2, qy + 7, LIME_T["foot"])
+
     # cella: a recessed dark wall so the columns read as standing *in front* of something
-    cell_x0, cell_x1 = thx0 + 16, thx1 - 16
-    c.rect(cell_x0, 68, cell_x1, pod_top, LIME["dk"])
+    cell_x0, cell_x1 = thx0 + 12, thx1 - 12
+    c.rect(cell_x0, 68, cell_x1, pod_top, LIME_T["dk"])
     masonry(c, [(cell_x0, 74), (cell_x1, 74), (cell_x1, pod_top), (cell_x0, pod_top)],
-            LIME, row_h=7, block_w=15, seed=5101)
+            LIME_T, row_h=7, block_w=15, seed=5101)
     for x in range(cell_x0, cell_x1, 12):     # darkened so it sits behind the columns
         for y in range(74, pod_top):
-            c.blend(x, y, "#0e141a", 0.30)
+            c.blend(x, y, "#0e141a", 0.34)
 
-    # central arched portal through the cella
-    pcx = cx - 4
-    p_top, p_bot = 84, pod_top
-    c.rect(pcx - 24, p_top + 10, pcx + 24, p_bot, LIME["dk"])
-    c.ellipse(pcx, p_top + 10, 24, 14, LIME["dk"])
-    c.rect(pcx - 21, p_top + 10, pcx + 21, p_bot - 1, "#0c1218")
-    c.ellipse(pcx, p_top + 10, 21, 12, "#0c1218")
-    # inner light: cold arcane pool with a bright floor spill
-    c.ellipse(pcx, p_top + 16, 18, 10, CYAN["deep"])
-    c.ellipse(pcx, p_top + 18, 15, 8, CYAN["base"])
-    c.ellipse(pcx, p_top + 20, 11, 6, CYAN["lt"])
-    c.ellipse(pcx, p_top + 22, 6, 4, CYAN["core"])
-    c.ellipse(pcx, p_bot - 2, 20, 4, CYAN["deep"])
-    c.ellipse(pcx, p_bot - 3, 13, 3, CYAN["base"])
+    # central arched portal through the cella: a doorway of light, not an orb
+    pcx = 124
+    p_top, p_bot = 88, pod_top
+    c.rect(pcx - 24, p_top + 8, pcx + 24, p_bot, LIME_T["dk"])
+    c.ellipse(pcx, p_top + 8, 24, 13, LIME_T["dk"])
+    c.rect(pcx - 21, p_top + 8, pcx + 21, p_bot - 1, "#080e13")
+    c.ellipse(pcx, p_top + 8, 21, 11, "#080e13")
+    # interior: near-black at the crown, cold light gathering on the threshold
+    for y in range(p_top + 12, p_bot):
+        t = (y - (p_top + 12)) / float(max(1, p_bot - (p_top + 12)))
+        dy = (p_top + 18) - y
+        half = 19
+        if dy > 0:
+            half = int(19 * max(0.0, 1 - (dy / 17.0) ** 2))
+        if half < 1:
+            continue
+        col = mix_hex("#05090d", CYAN["deep"], min(1.0, (t ** 1.7) * 1.25))
+        c.rect(pcx - half, y, pcx + half, y, col)
+    for y in range(p_bot - 10, p_bot):
+        t = (y - (p_bot - 10)) / 10.0
+        half = int(6 + 5 * t)
+        c.rect(pcx - half, y, pcx + half, y, mix_hex(CYAN["deep"], CYAN["base"], 0.35 + 0.65 * t))
+    c.rect(pcx - 4, p_bot - 3, pcx + 4, p_bot - 1, CYAN["lt"])
+    # bronze doors swung open against the jambs
+    for sgn in (-1, 1):
+        jx = pcx + sgn * 19
+        c.rect(jx - 3 if sgn < 0 else jx, p_top + 12, jx + 1 if sgn < 0 else jx + 3,
+               p_bot - 1, "#4f3b1c")
+        c.vline(jx + sgn * 2, p_top + 12, p_bot - 1, "#6f5527")
+        for yy in range(p_top + 14, p_bot - 2, 6):
+            c.px(jx + sgn, yy, "#8a6b34")
     # voussoirs
     for a in range(11):
         ang = math.pi + a * math.pi / 10
         vx = pcx + math.cos(ang) * 25
-        vy = p_top + 10 + math.sin(ang) * 15
-        c.rect(vx - 2, vy - 2, vx + 2, vy + 2, LIME["lt"])
-        c.hline(vx - 2, vx + 2, vy - 2, LIME["hi"])
-    # bronze doors swung open against the jambs
-    for sgn in (-1, 1):
-        jx = pcx + sgn * 20
-        c.rect(jx - 3 if sgn < 0 else jx, p_top + 14, jx + 1 if sgn < 0 else jx + 3,
-               p_bot - 1, "#5a441f")
-        for yy in range(p_top + 16, p_bot - 2, 6):
-            c.px(jx + sgn, yy, "#8a6b34")
+        vy = p_top + 8 + math.sin(ang) * 14
+        c.rect(vx - 2, vy - 2, vx + 2, vy + 2, LIME_T["lt"])
+        c.hline(vx - 2, vx + 2, vy - 2, LIME_T["hi"])
+        c.hline(vx - 2, vx + 2, vy + 2, LIME_T["foot"])
 
     # six columns across the front, standing proud of the cella
     for i in range(6):
         colx = thx0 + 8 + i * ((thx1 - thx0 - 16) // 5)
-        column(c, colx, 80, pod_top - 1, w=11, mat=LIME)
+        column(c, colx, 80, pod_top - 1, w=11, mat=LIME_T)
     # column shadows raking right-down across the cella
     for i in range(6):
         colx = thx0 + 8 + i * ((thx1 - thx0 - 16) // 5)
         for yy in range(82, pod_top - 2, 3):
-            c.blend(colx + 8 + (yy - 82) // 6, yy, "#080d12", 0.14)
+            c.blend(colx + 8 + (yy - 82) // 6, yy, "#080d12", 0.16)
 
-    # entablature: architrave, frieze with triglyphs, cornice
-    c.rect(thx0 - 6, 62, thx1 + 6, 70, LIME["base"])
-    c.rect(thx0 - 8, 56, thx1 + 8, 63, LIME["lt"])
-    c.hline(thx0 - 8, thx1 + 8, 56, LIME["hi"])
-    c.hline(thx0 - 6, thx1 + 6, 70, LIME["foot"])
-    for fx in range(thx0 - 2, thx1, 12):
-        c.rect(fx, 64, fx + 5, 69, LIME["dk"])
-        c.vline(fx + 2, 64, 69, CYAN["deep"])
+    # entablature: architrave, frieze with triglyphs, cornice -- skewed onto the return
+    c.poly([(thx0 - 6, 62), (thx1 + 6, 62), (rx1 - 2, 50), (rx1 - 14, 50)], LIME_T["base"])
+    c.poly([(thx0 - 8, 56), (thx1 + 8, 56), (rx1, 44), (rx1 - 16, 44)], LIME_T["lt"])
+    c.line([(thx0 - 8, 56), (thx1 + 8, 56)], LIME_T["hi"])
+    c.line([(thx1 + 8, 56), (rx1, 44)], LIME_T["hi"])
+    c.line([(thx0 - 6, 62), (thx1 + 6, 62)], LIME_T["foot"])
+    for fx in range(thx0, thx1 - 4, 12):
+        c.rect(fx, 64, fx + 5, 69, LIME_T["dk"])
+        c.vline(fx + 2, 64, 69, LIME_T["mortar"])
+    c.line([(thx1 + 8, 57), (rx1 - 8, 47)], LIME_T["foot"])
+    c.line([(thx1 + 8, 58), (rx1 - 8, 48)], LIME_T["hi"])
 
-    # roof: two planes, bronze crest, antefixae
-    shingle_plane(c, (thx0 - 18, 56), (thx1 + 18, 56), (cx - 44, 24), (cx + 30, 16),
-                  SLATE, seed=5102, rows=8, shingle=15)
-    shingle_plane(c, (thx1 + 18, 56), (thx1 + 34, 44), (cx + 30, 16), (cx + 30, 16),
-                  SLATE, seed=5109, rows=6, shingle=11)
-    c.line([(cx - 44, 24), (cx + 30, 16)], "#8a6b34", 2)
-    c.line([(cx - 44, 23), (cx + 30, 15)], "#c9a961", 1)
-    c.line([(thx0 - 18, 56), (cx - 44, 24)], SLATE["dk"], 2)
-    c.line([(thx1 + 18, 56), (cx + 30, 16)], SLATE["dk"], 2)
-    c.line([(thx0 - 18, 56), (thx1 + 18, 56)], SLATE["dk"], 2)
-    c.rect(thx0 - 18, 57, thx1 + 18, 60, "#161d23")
-    for ax in range(thx0 - 16, thx1 + 16, 13):     # antefixae along the eave
-        c.px(ax, 55, LIME["hi"])
-        c.px(ax, 54, LIME["lt"])
-    # bronze finial + small star
-    c.vline(cx - 6, 8, 16, "#8a6b34")
-    c.px(cx - 6, 8, "#c9a961")
-    c.px(cx - 6, 9, CYAN["core"])
-    c.px(cx - 7, 11, CYAN["lt"])
-    c.px(cx - 5, 12, CYAN["base"])
-
-    # ---- side wings (lower, behind): each with its own hipped roof and a lit slit ----
-    for sx, sgn in ((thx0 - 16, -1), (thx1 + 16, 1)):
-        c.rect(sx - 14, 104, sx + 14, pod_top + 2, LIME["dk"])
-        masonry(c, [(sx - 14, 108), (sx + 14, 108), (sx + 14, pod_top + 2),
-                    (sx - 14, pod_top + 2)], LIME, row_h=7, block_w=13, seed=5103 + sgn)
-        c.poly([(sx - 19, 104), (sx, 90), (sx + 19, 104)], SLATE["base"])
-        c.line([(sx - 19, 104), (sx, 90)], SLATE["hi"])
-        c.line([(sx, 90), (sx + 19, 104)], SLATE["dk"])
-        c.line([(sx - 19, 104), (sx + 19, 104)], SLATE["dk"], 2)
-        # arched slit window with cyan interior
-        c.rect(sx - 4, 112, sx + 4, 128, LIME["dk"])
-        c.rect(sx - 3, 113, sx + 3, 127, CYAN["deep"])
-        c.rect(sx - 2, 114, sx + 2, 126, CYAN["base"])
-        c.ellipse(sx, 113, 3, 3, CYAN["deep"])
-        c.px(sx, 120, CYAN["core"])
-        # wall pilasters
-        c.vline(sx - 11, 110, pod_top + 1, LIME["lt"])
-        c.vline(sx + 11, 110, pod_top + 1, LIME["lt"])
+    # roof: a hipped volume -- front pitch plus a right return, ridge cap, eave fascia
+    hip_roof(c, (thx0 - 4, 57), (thx1 + 2, 52), (cx - 38, 23), (cx + 30, 14),
+             (rx1 - 2, 43), SLATE, seed=5102, rows=8, shingle=15)
+    c.line([(thx0 - 4, 58), (thx1 + 2, 51)], "#161d23", 2)
+    for ax in range(thx0 - 2, thx1, 13):                 # antefixae along the eave
+        c.px(ax, 56 - int((ax - thx0) * 6 / 158), LIME_T["hi"])
+        c.px(ax, 55 - int((ax - thx0) * 6 / 158), LIME_T["lt"])
 
     # ---- grand stair from the plaza + flanking braziers ----------------------------
-    stairs(c, 60, 30, base - 26, base - 8, LIME, steps=4, widen=4, cheek=True)
+    stairs(c, 60, 30, base - 26, base - 8, LIME_T, steps=4, widen=4, cheek=True)
     for bx in (28, 94):
         c.rect(bx - 4, base - 26, bx + 4, base - 8, IRON["base"])
         c.rect(bx - 3, base - 25, bx + 3, base - 9, IRON["lt"])
@@ -1261,13 +1280,17 @@ def block3d(c: Canvas, x0, x1, y_top, y_bot, mat, seed, side="left", depth=7,
 
 
 def build_tower_gate() -> Image.Image:
-    """260x224 -- the monumental northern gate: battered basalt piers and a deep portal.
+    """260x224 -- the monumental northern gate: two battered towers, a curtain wall, a rift.
 
     Contract: PropKind.FACILITY_TOWER_GATE, obstacle (1960,585), scale 0.96, drawn bottom-centred
     at cx, cy+6s. The renderer strokes an animated rift oval centred at screen (cx, cy-196s) with
-    half-size 32s x 54s, i.e. sprite (130,120) with a 16 x 27 px radius: the painted portal void
-    is authored to that exact box so the animated ring lands on the stone rim and reads as light
+    half-size 32s x 54s, i.e. sprite (130,120) with a 16 x 27 px radius: the painted passage is
+    authored to that exact box so the animated ring lands inside the opening and reads as light
     *inside* the gate. No collider, zone or anchor is touched by this art.
+
+    Composition: the wall is set back and lower, the two towers stand proud and terminate in
+    battlements, and the passage is a dark gradient with a single seam of light instead of a
+    floating orb -- at 0.36 the silhouette reads gatehouse, at 1.48 the masonry reads coursed.
     """
     W, H = 260, 224
     c = Canvas(W, H)
@@ -1286,134 +1309,154 @@ def build_tower_gate() -> Image.Image:
             c.vline(bx, y0 + 1, y1 - 1, BASA["mortar"])
             c.px(bx + 1, y0 + 1, BASA["hi"])
 
-    # ---- gatehouse core (behind the piers) ----------------------------------------
-    gx0, gx1 = cx - 46, cx + 46
-    c.rect(gx0 - 4, 46, gx1 + 4, base - 18, BASA["base"])
-    masonry(c, [(gx0, 52), (gx1, 52), (gx1, base - 18), (gx0, base - 18)], BASA,
-            row_h=8, block_w=15, seed=5301)
-    c.vline(gx0 - 4, 46, base - 18, BASA["lt"])
-    c.vline(gx1 + 4, 46, base - 18, BASA["dk"])
+    # ---- curtain wall between the towers, set back and lower ------------------------
+    wx0, wx1 = cx - 58, cx + 58
+    wall_top, wall_bot = 62, base - 18
+    c.rect(wx0, wall_top - 2, wx1, wall_bot, BASA["foot"])
+    masonry(c, [(wx0, wall_top), (wx1, wall_top), (wx1, wall_bot), (wx0, wall_bot)],
+            BASA, row_h=8, block_w=16, seed=5301)
+    for y in range(wall_top, wall_bot):      # the wall sits in the towers' shade
+        for x in range(wx0, wx1 + 1):
+            c.blend(x, y, "#0a0e12", 0.12)
+    # the towers throw a wide shadow onto the recessed wall
+    for x in range(wx0, wx0 + 16):
+        amt = 0.34 * (1 - (x - wx0) / 16.0)
+        for y in range(wall_top, wall_bot):
+            c.blend(x, y, "#0a0e12", amt)
+    for x in range(wx1 - 16, wx1 + 1):
+        amt = 0.34 * (1 - (wx1 - x) / 16.0)
+        for y in range(wall_top, wall_bot):
+            c.blend(x, y, "#0a0e12", amt)
 
-    # ---- twin battered piers, left one stepping forward --------------------------
-    block3d(c, cx - 112, cx - 44, 22, base - 20, BASA, seed=5201, side="left", depth=8,
-            taper=5)
-    block3d(c, cx + 44, cx + 112, 28, base - 20, BASA, seed=5202, side="right", depth=8,
-            taper=5)
-    # pierced caps + battlements, so the piers terminate decisively instead of as slabs
-    for side in (-1, 1):
-        px0 = cx + side * 112
-        px1 = cx + side * 44
-        c.rect(min(px0, px1), 12, max(px0, px1), 26, BASA["dk"])
-        c.rect(min(px0, px1) + 2, 13, max(px0, px1) - 2, 24, BASA["base"])
-        c.hline(min(px0, px1), max(px0, px1), 12, BASA["hi"])
-        c.hline(min(px0, px1), max(px0, px1), 26, BASA["mortar"])
-        for i, bx in enumerate(range(min(px0, px1) + 4, max(px0, px1) - 6, 12)):
+    # corbelled parapet with crenels: the wall terminates as fortification, not as a gable
+    c.rect(wx0 - 2, 44, wx1 + 2, wall_top, GATE["base"])
+    c.hline(wx0 - 2, wx1 + 2, 44, GATE["hi"])
+    c.hline(wx0 - 2, wx1 + 2, wall_top - 1, BASA["mortar"])
+    c.rect(wx0 - 2, wall_top, wx1 + 2, wall_top + 3, "#0c1116")   # deep shade under the parapet
+    for i, bx in enumerate(range(wx0, wx1 - 8, 17)):
+        h = 9 if i % 2 == 0 else 5
+        c.rect(bx, 44 - h, bx + 9, 44, GATE["lt"] if i % 2 == 0 else GATE["base"])
+        c.hline(bx, bx + 9, 44 - h, BASA["rim"] if i % 2 == 0 else GATE["lt"])
+        c.vline(bx + 9, 44 - h, 43, "#0c1116")
+        c.vline(bx + 8, 44 - h + 1, 43, GATE["dk"])
+
+    # ---- twin battered towers, standing proud of the wall --------------------------
+    for idx, (tx0, tx1, side_mode) in enumerate(((cx - 118, cx - 54, "left"),
+                                                 (cx + 54, cx + 118, "right"))):
+        tow_top, tow_bot = 26, base - 18
+        block3d(c, tx0, tx1, tow_top, tow_bot, GATE, seed=5201 + idx, side=side_mode,
+                depth=9, taper=4)
+        # a quoin strip on the inner corner: alternating long/short stones tie the tower to the
+        # wall without drawing a pipe down the face at gameplay zoom
+        qx = tx1 - 5 if tx0 < cx else tx0
+        quoin_column(c, qx, tow_top + 6, tow_bot - 14, GATE, seed=5211 + idx, width=5,
+                     left=tx0 < cx)
+        # battered plinth, so the tower meets the ground with weight
+        c.rect(tx0 - 2, tow_bot - 12, tx1 + 2, tow_bot, BASA["dk"])
+        c.hline(tx0 - 2, tx1 + 2, tow_bot - 12, GATE["lt"])
+        c.hline(tx0 - 2, tx1 + 2, tow_bot, BASA["mortar"])
+        # string course high on the shaft
+        c.hline(tx0 + 2, tx1 - 2, 96, GATE["lt"])
+        c.hline(tx0 + 2, tx1 - 2, 97, BASA["mortar"])
+        # rune-lit loophole
+        fx = cx - 86 if tx0 < cx else cx + 86
+        c.rect(fx - 3, 52, fx + 3, 90, BASA["dk"])
+        c.rect(fx - 2, 54, fx + 2, 88, "#090f14")
+        c.px(fx, 84, CYAN["base"])
+        c.px(fx, 86, CYAN["dim"])
+        c.px(fx - 1, 85, CYAN["deep"])
+        # carved channel either side of the loophole
+        c.vline(fx - 13, 40, tow_bot - 16, BASA["dk"])
+        c.vline(fx - 12, 40, tow_bot - 16, BASA["lt"])
+        c.vline(fx + 13, 40, tow_bot - 16, BASA["dk"])
+        # battlement cap: a moulded course, then alternating merlons with lit top edges
+        cap_x0, cap_x1 = tx0 - 4, tx1 + 4
+        c.rect(cap_x0, 16, cap_x1, tow_top + 2, GATE["base"])
+        c.rect(cap_x0 + 1, 17, cap_x1 - 1, tow_top + 1, GATE["lt"])
+        c.hline(cap_x0, cap_x1, 16, GATE["rim"])
+        c.hline(cap_x0, cap_x1, tow_top + 2, "#0b0f14")
+        for i, bx in enumerate(range(cap_x0 + 2, cap_x1 - 7, 13)):
             h = 9 if i % 2 == 0 else 5
-            c.rect(bx, 12 - h, bx + 7, 12, BASA["lt"] if i % 2 == 0 else BASA["base"])
-            c.hline(bx, bx + 7, 12 - h, BASA["rim"] if i % 2 == 0 else BASA["lt"])
-            c.vline(bx + 7, 12 - h, 11, BASA["dk"])
-        # pier shoulder: a moulded course where the shaft meets the cap
-        c.rect(min(px0, px1) - 1, 26, max(px0, px1) + 1, 29, BASA["lt"])
-        c.hline(min(px0, px1) - 1, max(px0, px1) + 1, 26, BASA["rim"])
-        c.hline(min(px0, px1) - 1, max(px0, px1) + 1, 29, BASA["mortar"])
+            c.rect(bx, 16 - h, bx + 8, 16, GATE["lt"] if i % 2 == 0 else GATE["base"])
+            c.hline(bx, bx + 8, 16 - h, GATE["rim"] if i % 2 == 0 else GATE["lt"])
+            c.vline(bx + 8, 16 - h, 15, GATE["dk"])
 
-    # carved vertical channels + rune lamps on each pier face
-    for side in (-1, 1):
-        fx = cx + side * 74
-        c.vline(fx, 34, base - 30, BASA["dk"])
-        c.vline(fx + side, 34, base - 30, BASA["lt"])
-        for ry in range(48, base - 44, 28):
-            c.hline(fx - 8, fx + 8, ry, BASA["dk"])
-            c.hline(fx - 8, fx + 8, ry - 1, BASA["lt"])
-        c.rect(fx - 2, 40, fx + 2, 46, BASA["dk"])
-        c.px(fx, 42, CYAN["lt"])
-        c.px(fx, 44, CYAN["base"])
-        c.hline(fx - 1, fx + 1, 45, CYAN["deep"])
-
-    # ---- massive lintel with a heavy cornice --------------------------------------
-    ly0 = 78
-    c.rect(cx - 52, ly0, cx + 52, ly0 + 18, BASA["dk"])
-    c.rect(cx - 50, ly0 + 1, cx + 50, ly0 + 16, BASA["base"])
-    c.rect(cx - 56, ly0 - 5, cx + 56, ly0, BASA["lt"])
-    c.hline(cx - 56, cx + 56, ly0 - 5, BASA["hi"])
-    c.hline(cx - 56, cx + 56, ly0, BASA["dk"])
-    c.hline(cx - 52, cx + 52, ly0 + 18, BASA["mortar"])
-    for bx in range(cx - 50, cx + 50, 15):
-        c.vline(bx, ly0 + 2, ly0 + 15, BASA["mortar"])
-        c.px(bx + 1, ly0 + 2, BASA["lt"])
-    # dentils under the cornice
+    # ---- heavy lintel over the passage --------------------------------------------
+    ly0 = 76
+    c.rect(cx - 56, ly0 - 6, cx + 56, ly0, GATE["lt"])
+    c.hline(cx - 56, cx + 56, ly0 - 6, GATE["rim"])
+    c.rect(cx - 56, ly0 + 1, cx + 56, ly0 + 4, "#0a0e13")      # soffit shade under the cornice
+    c.rect(cx - 52, ly0 + 4, cx + 52, portal_cy - pry, GATE["base"])
+    for bx in range(cx - 48, cx + 48, 16):
+        c.vline(bx, ly0 + 5, portal_cy - pry - 2, GATE["mortar"])
+        c.px(bx + 1, ly0 + 5, GATE["lt"])
     for bx in range(cx - 52, cx + 52, 6):
-        c.rect(bx, ly0 + 1, bx + 2, ly0 + 3, BASA["lt"])
-    # three carved celestial runes only (restraint reads as age, not decoration)
-    for rx in (cx - 26, cx, cx + 26):
-        c.rect(rx - 4, ly0 + 6, rx + 4, ly0 + 13, BASA["dk"])
-        c.px(rx, ly0 + 7, CYAN["lt"])
-        c.hline(rx - 2, rx + 2, ly0 + 9, CYAN["base"])
-        c.px(rx, ly0 + 11, CYAN["core"])
+        c.rect(bx, ly0, bx + 2, ly0 + 1, GATE["lt"])
+    for rx in (cx - 30, cx + 30):
+        c.rect(rx - 5, ly0 + 7, rx + 5, ly0 + 14, BASA["dk"])
+        c.hline(rx - 4, rx + 4, ly0 + 7, BASA["mortar"])
+        c.px(rx, ly0 + 9, CYAN["dim"])
+        c.hline(rx - 2, rx + 2, ly0 + 11, CYAN["deep"])
+        c.px(rx, ly0 + 12, CYAN["dim"])
 
-    # ---- deep portal void, arch ring and rift -------------------------------------
-    c.rect(cx - prx, portal_cy - pry, cx + prx, base - 22, "#0a1015")
-    c.ellipse(cx, portal_cy - pry, prx, 13, "#0a1015")
+    # ---- the passage: dark releasement, lit reveal, one seam of rift light ---------
+    top, bot = portal_cy - pry, base - 22
+    c.rect(cx - prx, top, cx + prx, bot, "#070c11")
+    c.ellipse(cx, top, prx, 13, "#070c11")
+    for y in range(top + 2, bot):
+        t = (y - top) / float(bot - top)
+        half = prx - 2
+        dy = (top + 12) - y
+        if dy > 0:
+            half = (prx - 2) * math.sqrt(max(0.0, 1 - (dy / 12.0) ** 2))
+        if half < 1:
+            continue
+        c.rect(int(cx - half), y, int(cx + half), y,
+               mix_hex("#05080b", "#0d2230", min(1.0, t * 1.15)))
+    # light pools on the threshold and dies a few rows up: a floor glow, not a beam
+    for y in range(bot - 14, bot + 1):
+        t = 1.0 - (bot - y) / 14.0
+        half = int(4 + 10 * t)
+        c.rect(cx - half, y, cx + half, y, mix_hex("#0a1a22", CYAN["deep"], 0.55 + 0.45 * t))
+        c.rect(cx - half + 3, y, cx + half - 3, y,
+               mix_hex(CYAN["deep"], CYAN["base"], t ** 1.4))
+    c.rect(cx - 4, bot - 3, cx + 4, bot, mix_hex(CYAN["base"], CYAN["lt"], 0.55))
+    # reveal: lit left jamb, dark right jamb, inner arch line
+    c.vline(cx - prx + 1, top + 11, bot - 1, BASA["lt"])
+    c.vline(cx - prx + 2, top + 14, bot - 2, mix_hex(BASA["base"], CYAN["deep"], 0.55))
+    c.vline(cx + prx - 1, top + 11, bot - 2, "#03060a")
     # voussoirs around the arch, one block per 15 degrees
     for a in range(13):
         ang = math.pi + a * math.pi / 12
         vx = cx + math.cos(ang) * (prx + 7)
-        vy = portal_cy - pry + 2 + math.sin(ang) * (pry * 0.62)
+        vy = top + 2 + math.sin(ang) * (pry * 0.62)
         c.rect(vx - 2, vy - 2, vx + 2, vy + 2, BASA["lt"])
         c.hline(vx - 2, vx + 2, vy - 2, BASA["hi"])
         c.hline(vx - 2, vx + 2, vy + 2, BASA["mortar"])
-    # keystone
-    c.rect(cx - 3, portal_cy - pry - 12, cx + 3, portal_cy - pry - 5, BASA["lt"])
-    c.hline(cx - 3, cx + 3, portal_cy - pry - 12, BASA["hi"])
-    # jambs: lit inner face on the left of the reveal, deep shade on the right, then the
-    # receding inner arch - that is what makes the opening read as a passage, not a decal
-    c.rect(cx - prx, portal_cy - pry + 9, cx - prx + 3, base - 22, BASA["lt"])
-    c.vline(cx - prx, portal_cy - pry + 9, base - 22, BASA["hi"])
-    c.rect(cx + prx - 2, portal_cy - pry + 9, cx + prx, base - 22, "#070b0f")
-    c.ellipse(cx, portal_cy - pry + 14, prx - 4, pry - 6, "#0e1620")
-    c.rect(cx - prx + 4, portal_cy - pry + 12, cx + prx - 3, base - 23, "#071016")
-    # inner depth bands, then the cold rift core
-    c.ellipse(cx, portal_cy - pry + 12, prx - 6, pry - 8, "#122230")
-    c.ellipse(cx, portal_cy - pry + 15, prx - 8, pry - 12, CYAN["deep"])
-    c.ellipse(cx, portal_cy - pry + 17, max(3, prx - 10), max(4, pry - 17), CYAN["base"])
-    c.ellipse(cx, portal_cy - pry + 19, max(3, prx - 12), max(3, pry - 21), CYAN["lt"])
-    c.ellipse(cx, portal_cy - pry + 21, max(2, prx - 14), max(2, pry - 24), CYAN["core"])
-    c.px(cx, portal_cy - pry + 16, "#ffffff")
-    # light spilling down the passage floor
-    c.ellipse(cx, base - 24, prx + 10, 7, CYAN["deep"])
-    c.ellipse(cx, base - 25, prx + 2, 5, CYAN["base"])
-    c.ellipse(cx, base - 26, prx - 6, 3, CYAN["lt"])
+    # keystone: part of the voussoir ring, one value step proud, flush with the arch intrados
+    c.poly([(cx - 4, top - 5), (cx + 4, top - 5), (cx + 4, top + 2), (cx - 4, top + 2)],
+           GATE["base"])
+    c.line([(cx - 4, top - 5), (cx + 4, top - 5)], GATE["rim"])
+    c.line([(cx + 4, top - 5), (cx + 4, top + 2)], BASA["dk"])
+    c.line([(cx - 4, top + 2), (cx + 4, top + 2)], BASA["mortar"])
 
     # ---- threshold stairs ----------------------------------------------------------
-    stairs(c, cx, 34, base - 25, base - 6, BASA, steps=4, widen=3, cheek=True)
+    stairs(c, cx, 34, bot + 1, base - 6, BASA, steps=4, widen=3, cheek=True)
 
-    # ---- flanking rune obelisks (silhouette markers at overview zoom) -------------
-    for sx in (cx - 120, cx + 120):
-        c.poly([(sx - 4, base - 20), (sx - 2, base - 66), (sx + 2, base - 66),
-                (sx + 4, base - 20)], BASA["base"])
-        c.poly([(sx - 4, base - 20), (sx - 2, base - 66), (sx - 1, base - 66),
-                (sx - 1, base - 20)], BASA["lt"])
-        c.hline(sx - 5, sx + 5, base - 66, BASA["hi"])
-        c.px(sx, base - 58, CYAN["lt"])
-        c.px(sx, base - 56, CYAN["base"])
-        c.px(sx, base - 50, CYAN["deep"])
-        c.rect(sx - 6, base - 71, sx + 6, base - 66, BASA["dk"])
-        c.hline(sx - 6, sx + 6, base - 71, BASA["hi"])
+    # ---- gate braziers on the dais (silhouette markers at overview zoom) -----------
+    for sx in (cx - 96, cx + 96):
+        c.rect(sx - 4, base - 30, sx + 4, base - 10, BASA["dk"])
+        c.rect(sx - 3, base - 29, sx + 3, base - 11, IRON["base"])
+        c.hline(sx - 4, sx + 4, base - 30, IRON["hi"])
+        c.rect(sx - 5, base - 34, sx + 5, base - 30, IRON["lt"])
+        c.ellipse(sx, base - 36, 3, 3, CYAN["base"])
+        c.ellipse(sx, base - 37, 1, 2, CYAN["core"])
+        c.px(sx, base - 39, "#dff8ff")
 
-    # ---- crest between the piers, keeping the sky cleft ----------------------------
+    # weathering: damp moss at the tower feet, hairline cracks on the lit flanks
     for side in (-1, 1):
-        x_in = cx + side * 18
-        x_out = cx + side * 46
-        c.poly([(x_in, ly0 - 6), (x_out, ly0 - 6), (x_out, ly0 - 16),
-                (x_in, ly0 - 28)], BASA["dk"])
-        c.line([(x_in, ly0 - 28), (x_out, ly0 - 16)], BASA["lt"])
-        c.line([(x_out, ly0 - 16), (x_out, ly0 - 6)], BASA["mortar"])
-        c.px(cx + side * 30, ly0 - 20, CYAN["base"])
-
-    # weathering: damp moss at the pier feet, a few hairline cracks on the lit flanks
-    for side in (-1, 1):
-        moss_patch(c, cx + side * 100 - 6, base - 26, n=5, seed=5400 + side, spread=16)
-    for k, (cxp, cyp) in enumerate(((cx - 96, 96), (cx + 88, 128), (cx - 60, 150))):
+        moss_patch(c, cx + side * 92 - 6, base - 24, n=5, seed=5400 + side, spread=15)
+    for cxp, cyp in ((cx - 104, 108), (cx + 100, 138), (cx - 62, 150)):
         c.line([(cxp, cyp), (cxp + 3, cyp + 7), (cxp + 1, cyp + 13)], BASA["mortar"], 1)
         c.px(cxp, cyp, BASA["dk"])
     ground_ao(c, 34, W - 34, base, 0.40)

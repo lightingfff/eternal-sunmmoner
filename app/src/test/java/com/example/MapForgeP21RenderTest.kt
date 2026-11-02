@@ -101,11 +101,15 @@ class MapForgeP21RenderTest {
       render("svc_synthesis_close", 1270f, 525f, 1.48f)
 
       // 3) Hero landmarks: the tower gate (1960,585) and the summoning hall (2430,2005).
-      render("hero_tower_gate_close", 1960f, 700f, 1.48f)
-      render("hero_tower_gate_default", 1960f, 700f, 0.88f)
-      render("hero_tower_gate_actor", 1960f, 690f, 1.48f, listOf(Actor(1960f, 690f)))
-      render("hero_summoning_close", 2400f, 1960f, 1.48f)
-      render("hero_summoning_default", 2400f, 1960f, 0.88f)
+      //    Both canvases are taller than the viewport at 1.48 (224 px * 2 * 0.96 * 1.48 = 636,
+      //    206 px * 2 * 1.08 * 1.48 = 659), so those frames pull the camera north until the
+      //    whole silhouette is inside the 720 px frame instead of cropping the roof.
+      render("hero_tower_gate_whole", 1960f, 300f, 1.48f)
+      render("hero_tower_gate_portal", 1960f, 388f, 1.48f)
+      render("hero_tower_gate_default", 1960f, 480f, 0.88f)
+      render("hero_tower_gate_actor", 1960f, 430f, 1.20f, listOf(Actor(1960f, 640f)))
+      render("hero_summoning_whole", 2400f, 1705f, 1.48f)
+      render("hero_summoning_default", 2400f, 1885f, 0.88f)
       //    Interaction centre of the Summoning Hall (zone 2380,1930) must be on the rune stage.
       render("hero_summoning_zone", 2380f, 1930f, 1.48f,
         listOf(Actor(2380f, 1930f)))

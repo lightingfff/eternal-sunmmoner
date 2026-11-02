@@ -187,7 +187,7 @@
         268,
         206
       ],
-      "sha256": "36163ba9fbefd556f0e5415b03ddc62607df8aff631097487895af38cb2c2936"
+      "sha256": "ae277ce0df7fe1e25c1fe6f7910277f1ea2b25a0960f7fff531dfb9cbe4708ce"
     },
     "tower_gate": {
       "file": "tower_gate.png",
@@ -195,7 +195,7 @@
         260,
         224
       ],
-      "sha256": "76c429056e61f50232252603f516cf20d3b76c4958ca1651d84321db84c8c145"
+      "sha256": "243a6487ff0304bf8890f470474be43dac4bcb261bde0d37ddd2e533c8bce674"
     },
     "hero_registry": {
       "file": "hero_registry.png",
@@ -203,7 +203,7 @@
         188,
         166
       ],
-      "sha256": "180937143ebb40528e1e3739341232100c16fbe2f1c97544a6e9d0366981b981"
+      "sha256": "0b313db2c4e51dc2583514549cd71ec22419e83cf30ce2b14be238238f619432"
     },
     "hero_quarters": {
       "file": "hero_quarters.png",
