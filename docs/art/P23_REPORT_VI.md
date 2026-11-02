@@ -125,6 +125,7 @@ nguồn trăng trên-trái với công trình.
 | CI `Build Eternal Summoner APK` | run `41486894628` — **pass** (trên `4143a8aa`); run `41488123618` chạy lại trên HEAD cuối |
 | CI `Lyra engine render evidence` | run `41486894782` — **pass** (trên `4143a8aa`); run `41488123522` chạy lại trên HEAD cuối |
 | Trong đó | P23 render 24 frame + P23 contract 7 test + P20/P21/P22 contract & render + `SanctuaryMaterialTest` + `SanctuaryEnvironmentArtTest` + `LayoutResponsiveness` + `ScenePerformanceTest` + `LivingWorldTest` |
+| Ghi chú diff | `docs/visual-evidence/p17c…p22/` **đổi byte** một cách hợp lệ: workflow render lại toàn bộ ma trận trên art mới, và các frame P20/P21/P22 có chứa đúng những toà nhà vừa sửa. `ci-diagnostics/` (log lỗi tạm) đã được xoá khỏi nhánh. |
 
 Camera đã kiểm không crop (tính bằng công thức chiếu, không bằng mắt):
 
