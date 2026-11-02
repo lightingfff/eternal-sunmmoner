@@ -1,0 +1,21 @@
+# Codex multi-agent configuration for ETERNAL SUMMONER.
+# Preserve unrelated values if .codex/config.toml already exists.
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 4
+
+[agents.gameplay_architect]
+description = "Implement bounded tactical combat and Hero AI modules; no environment graphics edits."
+config_file = "agents/gameplay-architect.toml"
+
+[agents.tower_encounter_builder]
+description = "Implement Floor 1 rescue mission and narrative state; separate file ownership."
+config_file = "agents/tower-encounter-builder.toml"
+
+[agents.android_performance_auditor]
+description = "Read-only Android Canvas performance and memory audit; no device FPS inventions."
+config_file = "agents/android-performance-auditor.toml"
+
+[agents.integration_reviewer]
+description = "Read-only QA and integration review for gameplay, save, AI, and regressions."
+config_file = "agents/integration-reviewer.toml"

@@ -1,0 +1,13 @@
+ARENA/CODEX PROJECT: ETERNAL SUMMONER — CODEX PARALLEL GAME DEVELOPMENT / MISSION 01
+
+You are the primary Codex Game Director. This task is to get the FIRST REAL TOWER FLOOR 1 RESCUE ENCOUNTER into playable shape, not to overhaul graphics. Start from the latest clean main. Inspect AGENTS.md, .agents/skills/eternal-summoner-skill-router/SKILL.md, docs/GAME_SKILL_SELECTION.md, .agents/skills/codex-eternal-director/SKILL.md, and .agents/skills/codex-tower-rescue/SKILL.md, then repo code. Announce skill choices at task start, limit upstream Scenario reference skills to 1–3 relevant only.
+
+Use Codex subagents with distinct roles, but do not blindly spawn all workers to edit. FIRST spawn 3 read-first investigations in parallel:
+- gameplay_architect: trace actual combat/hero AI/Master command flow; propose a minimal real rescue combat integration and list the files it would own.
+- tower_encounter_builder: trace Tower Floor 1, NPC/objectives/save hooks, design original rescue content and own separate files.
+- android_performance_auditor: read-only audit of frame loop, caching, scene probe, draw costs and likely new gameplay costs; give a baseline methodology and issues only.
+Root synthesizes their findings into a file-ownership matrix and a staged implementation plan. If two writers need same module, root serializes integration. Do not overwrite P23 Environment Cohesion PR #26 or changes from other users. DO NOT auto merge or force push. Keep graph camera Y 0.72, current Sanctuary layout, P16 caching and all P17–P23 art.
+
+Once paths and ownership are agreed, delegate independent module edits and tests; root integrates in order, passes feature through real loop (guest → Sanctuary → Floor1 meadow → rescue combat → outcome/reward/save → return). Arrange 2 paths with different persistent outcome, explicit victory/failure/retry, functional focus/regroup/retreat, distinct scout/flanker or guardian AI and fair tells. No new login, cloud or paid services. Never replace working UI with mock screens. Check gameplay not only images. If environment lacks JDK/SDK, submit CI PR and say what is untested. Have integration_reviewer review after integration, fix blocking findings and present PR for user review, without merging.
+
+Report: (i) branch/commit, (ii) tasks by agent, (iii) exact changed files, (iv) playthrough and test evidence, (v) CI result, (vi) remaining bugs (vii) device FPS/thermal status, and (viii) PR URL. Begin working, not only drafting.
