@@ -231,6 +231,19 @@ def armory() -> Image.Image:
     masonry(LEFT_WALL, ARCH["stone"], ARCH["stone_lt"], ARCH["stone_dk"], 31)
     masonry(RIGHT_WALL, ARCH["stone_dk"], ARCH["stone"], ARCH["mortar"], 47)
 
+    # exposed timber frame on the left face (posts + rail + braces), the language the
+    # neighbouring townhouses already use; keeps the stone base but adds structure
+    for bx in (26, 56, 90):
+        c.line([(bx, 101), (bx, 150)], ARCH["wood_dk"], 3)
+        c.line([(bx + 1, 102), (bx + 1, 148)], ARCH["wood"], 1)
+    c.line([(21, 118), (96, 127)], ARCH["wood_dk"], 3)
+    c.line([(21, 119), (96, 128)], ARCH["wood"], 1)
+    c.line([(26, 140), (56, 132)], ARCH["wood_dk"], 2)      # diagonal brace
+    c.line([(26, 140), (56, 132)], ARCH["wood"], 1)
+    c.line([(97, 112), (176, 94)], ARCH["wood_dk"], 2)      # wall plate under the eave
+    for bx in (104, 128, 158):
+        c.line([(bx, 96), (bx, 112)], ARCH["wood_dk"], 2)
+
     # front corner quoins: alternating long/short blocks tying the two faces together
     for i, yy in enumerate(range(108, 162, 9)):
         c.poly([(90, yy), (99, yy + 2), (99, yy + 9), (90, yy + 7)],
@@ -248,16 +261,17 @@ def armory() -> Image.Image:
     # ---- roof: timber plane + slate return, both with real eave thickness ------------
     c.poly(ROOF_OUTLINE, ARCH["wood"])
     # underside band first (roof overhang shadow falling on the walls)
-    c.poly([(18, 98), (99, 112), (184, 84), (184, 94), (99, 120), (16, 106)], ARCH["shadow"])
+    c.poly([(18, 98), (99, 112), (184, 84), (184, 96), (99, 124), (16, 108)], ARCH["shadow"])
+    c.poly([(18, 104), (99, 118), (184, 92), (184, 96), (99, 124), (16, 108)], ARCH["ao"])
 
     # timber plane: eave edge -> ridge, courses parallel to the ridge
     _shingle_plane(c, (14, 96), (99, 112), (58, 30), (150, 16),
-                   [ARCH["wood_dk"], ARCH["wood"], ARCH["wood_md"]], ARCH["wood_dk"], 7,
-                   rows=8, shingle=13)
+                   [ARCH["wood_dk"], ARCH["wood"], ARCH["wood_lt"]], ARCH["wood_dk"], 7,
+                   rows=10, shingle=12)
     # hip return on the right: triangle from the front eave corner up to the ridge end
     _shingle_plane(c, (99, 112), (186, 84), (150, 16), (150, 16),
-                   [ARCH["slate_dk"], ARCH["slate"], ARCH["slate_lt"]], ARCH["slate_dk"], 11,
-                   rows=8, shingle=7)
+                   [ARCH["slate_dk"], ARCH["slate"], ARCH["slate_hi"]], ARCH["slate_dk"], 11,
+                   rows=9, shingle=8)
 
     # ridge cap and the crisp silhouette edges
     c.line([RIDGE[0], RIDGE[1]], ARCH["wood_hi"], 2)
