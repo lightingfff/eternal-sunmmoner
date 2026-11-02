@@ -352,7 +352,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.soil; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "398092ba0fffaaf91c3ad93257ad566016cc927100705f50d2f449b004f00535"
+      "sha256": "9bb46c3f2ddde2186827f48ed6f0d72ddf2735a6e8cd8bb7ab07cc4fe3fb51dc"
     },
     {
       "id": "soil_2",
@@ -366,7 +366,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.soil; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "827f9cdf3357c7742529c0e1a329cfb2820981cedb5b85ae31be4375d818b8fa"
+      "sha256": "2a57ca72f9c3f399d139e5a60d26fdbcd73b34d3b0dfd696c5b9de60345ac426"
     },
     {
       "id": "soil_3",
@@ -380,7 +380,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.soil; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "a0496d1e03b4eeafe8091922230e6f7039bf35f157f3727eb63f9caca8efa9fa"
+      "sha256": "3ff48b86680dadc346d3af968bc9609c49e5832669a30ccb9cf2008a46ef2c99"
     },
     {
       "id": "soil_4",
@@ -394,7 +394,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.soil; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "bb372f2ad5259a8fca6973e6cd315bde1a07b20b986a710cc3c46bac380e64f9"
+      "sha256": "e5c5ef6fc91d6b2aca6f92898b11955361d4b042eab4492f8031559d65f7158b"
     },
     {
       "id": "soil_5",
@@ -408,7 +408,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.soil; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "0bc72c8d86a01142492a3aedcb44853be4ea2a4123b75af66c8e56d305e6d956"
+      "sha256": "5cdc8d7192b141018e3c4ff735163907b8177abd5634f98c739f535fad04940a"
     },
     {
       "id": "gravel_0",
@@ -436,7 +436,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.gravel; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "643f0a18afbcf768ee519b4fdd1862c6c692c1ba86c86c2fec4e9b74f15738a1"
+      "sha256": "a030c051e751d90dbf9b3f23fc5c287a4f3bfed6fd88dac52a5a30f24ac99b4d"
     },
     {
       "id": "gravel_2",
@@ -450,7 +450,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.gravel; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "8c2a1ede1660a71cf3c8aeab0faeaeea9efa02a04538099dec8abfeb810b7547"
+      "sha256": "4f89bda7c5caa5545c9431c7383807bd8349a4cae9051f46a3b7bd850cf113ad"
     },
     {
       "id": "gravel_3",
@@ -464,7 +464,7 @@
         64
       ],
       "runtime_usage": "PixelTileAtlas.gravel; 64 world units; nearest-neighbor oblique ground",
-      "sha256": "8eff9d53a989dd64df5ec2801a55714c85e3ec5eeb05d00bd2eade54714033ea"
+      "sha256": "42fa13a2673417c0a3af92c5c96710ff4e7b8a08c5875ab5151642fdf3fd5f6b"
     },
     {
       "id": "wood_0",

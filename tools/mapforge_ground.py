@@ -512,15 +512,20 @@ def main():
     by_id = {entry["id"]: entry for entry in manifest["assets"]}
 
     written = []
-    families = [("grass", 8, grass), ("cobble", 6, cobble), ("flagstone", 8, flagstone),
-                ("soil", 6, soil), ("gravel", 4, gravel)]
-    for name, count, fn in families:
+    # Shared 2 px perimeter keeps family adjacency stable for the structured materials.
+    # Earth materials deliberately opt out: their low-frequency masses do not match the
+    # reference border, and the copy paints a visible frame around every soil/gravel tile.
+    families = [
+        ("grass", 8, grass, True), ("cobble", 6, cobble, True), ("flagstone", 8, flagstone, True),
+        ("soil", 6, soil, False), ("gravel", 4, gravel, False),
+    ]
+    for name, count, fn, shared in families:
         reference = fn(0)
         for v in range(count):
             image = fn(v)
-            # shared 2px perimeter: the family adjacency contract the old generator used
-            for box in [(0, 0, 64, 2), (0, 62, 64, 64), (0, 0, 2, 64), (62, 0, 64, 64)]:
-                image.paste(reference.crop(box), box)
+            if shared:
+                for box in [(0, 0, 64, 2), (0, 62, 64, 64), (0, 0, 2, 64), (62, 0, 64, 64)]:
+                    image.paste(reference.crop(box), box)
             path = OUT / f"{name}_{v}.png"
             image.save(path, optimize=True)
             written.append(path.name)
