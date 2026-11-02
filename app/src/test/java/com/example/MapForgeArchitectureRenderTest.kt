@@ -109,6 +109,18 @@ class MapForgeArchitectureRenderTest {
 
       // 4) Armory from the other side, to check the side facade plane and the roof volume.
       render("arch_slice_side", 900f, 660f, 1.48f)
+
+      // 5) A cypress that is NOT occluded by the armory sprite: the north-lawn conifer at
+      //    world (1485, 655). Same sprite, so this is the vegetation read + occlusion test.
+      render("arch_cypress_close", 1485f, 640f, 1.48f)
+      render(
+        "arch_cypress_actor_front", 1485f, 640f, 1.48f,
+        listOf(Actor(1485f, 700f)),          // south of the trunk -> drawn in front
+      )
+      render(
+        "arch_cypress_actor_behind", 1485f, 640f, 1.48f,
+        listOf(Actor(1485f, 612f)),          // north of the trunk -> canopy occludes
+      )
     } finally {
       WorldEnvironment.debugOverride()
       WorldEnvironment.update()
