@@ -599,6 +599,13 @@ assert all(len(POSES[key])==len(times) for key,times in CLIPS.items())
 for name,im in [('kaelen',atlas(False)),('goblin_raider',atlas(True)),('armory',armory()),('smithy_verge',verge())]:
     path=OUT/(name+'.png');im.save(path,optimize=True)
     assets[name]={'file':path.name,'size':list(im.size),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+# P21: this generator owns only the actor atlases, the armory and the verge. Facility PNGs are
+# authored by tools/mapforge_p21_architecture.py; keep their manifest entries instead of erasing
+# them when this script is re-run (rerun order must not change the packaged asset set).
+_prev_manifest = OUT/'manifest.json'
+if _prev_manifest.exists():
+    for _key, _entry in json.loads(_prev_manifest.read_text()).get('assets', {}).items():
+        assets.setdefault(_key, _entry)
 metadata={'version':2,'origin':'Original ETERNAL SUMMONER art; authored polygon/cluster recipes in tools/generate_premium_slice.py; no external art',
           'frame':[W,H],'pivot':[32,90],'world_pixel_scale':1.08,
           'directions':['front_right','front_left','back_right','back_left'],

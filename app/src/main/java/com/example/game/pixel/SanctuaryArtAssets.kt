@@ -27,6 +27,28 @@ object SanctuaryArtAssets {
   internal fun decodeAsset(path: String): ImageBitmap? = context?.assets?.open(path)?.use {
     BitmapFactory.decodeStream(it,null,BitmapFactory.Options().apply { inScaled = false })!!.asImageBitmap()
   }
+  /**
+   * P21 loader: a missing or corrupt *optional* PNG falls back to the procedural sprite instead of
+   * throwing. [asset] uses `decodeAsset(path)!!`, so an absent file would throw before any
+   * `?: fallback` Elvis branch could run — this helper closes that gap without changing [asset].
+   *
+   * A failed read is never cached (one bad file cannot poison the cache); a successful decode is
+   * cached exactly like [asset], so steady-state cost stays one blit per facility per frame.
+   */
+  internal fun assetSafe(path: String): ImageBitmap? {
+    val ctx = context ?: return null
+    images[path]?.let { return it }
+    val decoded = try {
+      ctx.assets.open(path).use {
+        BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inScaled = false })
+          ?.asImageBitmap()
+      }
+    } catch (e: java.io.IOException) {
+      null
+    }
+    if (decoded != null) images[path] = decoded
+    return decoded
+  }
   fun tiles(name: String, count: Int): List<ImageBitmap>? {
     if (context == null) return null
     return families.getOrPut(name) { (0 until count).map { image("${name}_$it")!! } }
