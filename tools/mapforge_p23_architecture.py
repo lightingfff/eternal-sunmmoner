@@ -389,10 +389,10 @@ def recessed_door(c: Canvas, cx, sill, w=24, h=32, mat=STONE, arch=True, leaf="p
         c.vline(cx - 1, leaf_top, sill - 1, OAK["lt"])
     # iron straps + studs + ring handle
     for yy in (leaf_top + h // 3, sill - h // 3):
-        c.hline(x0 + 3, x1 - 3, yy, IRON["base"])
-        c.hline(x0 + 3, x1 - 3, yy - 1, IRON["lt"])
+        c.hline(x0 + 3, x1 - 3, yy, IRON["dk"])
+        c.hline(x0 + 3, x1 - 3, yy - 1, IRON["base"])
         for sx in range(x0 + 5, x1 - 4, 6):
-            c.px(sx, yy, IRON["hi"])
+            c.px(sx, yy - 1, IRON["hi"])
     hy = sill - h // 2
     c.px(cx + w // 4, hy, IRON["hi"])
     c.px(cx + w // 4, hy + 1, IRON["glint"])

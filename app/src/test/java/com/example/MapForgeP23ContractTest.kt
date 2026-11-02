@@ -176,9 +176,10 @@ class MapForgeP23ContractTest {
     assertTrue("the P20 door position must be measurably wrong (was $oldWorldX)",
       kotlin.math.abs(oldWorldX - armoryEntrance.doorWorldX) > 40f)
     // A doorway is a recess: dark leaf at the centre column, lit wall stone either side of it.
-    val leaf = armory.getPixel(94, 150)
-    val leftWall = armory.getPixel(94 - 16, 150)
-    val rightWall = armory.getPixel(94 + 16, 150)
+    // probe row 155: inside the leaf, but clear of the iron straps (which are iron, not stone)
+    val leaf = armory.getPixel(94, 155)
+    val leftWall = armory.getPixel(94 - 16, 155)
+    val rightWall = armory.getPixel(94 + 16, 155)
     fun luma(c: Int) = (((c shr 16) and 0xFF) * 299 + ((c shr 8) and 0xFF) * 587 + (c and 0xFF) * 114) / 1000
     assertTrue("armory door leaf must be dark at canvas centre (luma ${luma(leaf)})", luma(leaf) < 90)
     assertTrue("armory door must be flanked by lit wall stone",

@@ -163,7 +163,7 @@
         190,
         166
       ],
-      "sha256": "8a757bd77b907159892ab2cd6077ef2b6b1d7d9dfccfad8e7f4b848d7f97d803"
+      "sha256": "1faf98862a3e864c5278700dca02441c981438cdefb4e73edaa9187b77e51012"
     },
     "smithy_verge": {
       "file": "smithy_verge.png",
@@ -211,7 +211,7 @@
         200,
         168
       ],
-      "sha256": "8253e9db7669429f39e711b4d67f565e2d01a635378963a7449df0f59daa6dc5"
+      "sha256": "dde71639f45ea79f6e74626fbdec325e164b92b2399b083c8a165fff999ea200"
     },
     "restaurant": {
       "file": "restaurant.png",
@@ -219,7 +219,7 @@
         206,
         172
       ],
-      "sha256": "4ff0a5057d0fba4b9bfc4fcc8bf1d31b5657348ec364c259ce68bfffa10b6095"
+      "sha256": "2109a9dbffab742fa71a9b7e89531c03681a0b0085ab43b76ce0f9f9c61c8df2"
     },
     "synthesis_lab": {
       "file": "synthesis_lab.png",
