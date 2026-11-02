@@ -33,11 +33,12 @@ Art cũ là hình khối procedural một tông màu mỗi mặt, nên ở zoom 
   có cửa vào đúng nghĩa. Mới: 3 tầng sân đàn có rãnh đá, mặt tiền hexastyle có cella lõm tối phía
   sau cột, mái hai mặt phẳng có sống mái đồng, cổng vòm có voussoir + cửa đồng mở, hồ sáng lam
   lạnh, tháp phụ hai bên, thang lớn và brazier (lò than).
-- **Tower Gate** cũ = hai tấm đá phiến phẳng, "portal" là ellipse dán trước đá. Mới: trụ basalt
-  vát (battered) có mặt bên lùi, đỉnh lỗ châu mai, rãnh chạm và đèn rune; lintel nặng có cornice,
-  dentil, 3 rune; **hốc cổng được dựng đúng hộp mà renderer vẽ vòng rift động** (tâm sprite
-  (130,120), nửa kích thước 16×27 px), có jamb sáng/tối, vòng voussoir, keystone, 4 dải độ sâu,
-  ánh sáng tràn xuống bậc thềm; bậc đài 3 tầng; obelisk rune hai bên; rêu + vết nứt.
+- **Tower Gate** cũ = hai tấm đá phiến phẳng, "portal" là ellipse dán trước đá. Mới: tường thành
+  lùi có parapet corbel + lỗ châu mai, hai tháp basalt vát (battered) đứng nhô ra với đỉnh châu mai,
+  quoin, lỗ rune; lintel nặng có cornice + dentil + 2 rune chạm; **hốc cổng vẽ đúng hộp mà renderer
+  vẽ vòng rift động** (tâm sprite (130,120), nửa kích thước 16×27 px) và **cố ý vẽ tối** — vòng rift
+  động là nguồn sáng duy nhất, ánh vẽ tay chỉ còn ở ngưỡng cửa; bậc đài 3 tầng; chậu lửa hai bên;
+  rêu + vết nứt.
 - **Registry / Quarters / Restaurant / Lab** cũ = **cùng một** `paintAnimeHalfTimberHouse` với vài
   tham số khác → 4 nghề trông như 4 bản đổi màu của một nhà. Mới: mỗi cơ sở có khối riêng —
   Registry có tháp chuông + mặt đồng hồ trên sống mái; Quarters có mái ngói gỗ ấm, dormer và
@@ -83,17 +84,46 @@ không làm cả hai.
 
 | hạng mục | trạng thái thực tế |
 |---|---|
-| ART CONTACT SHEET 1x / 2x / 0.88 | **CÓ**, `docs/visual-evidence/p21/P21_ART_CONTACT_SHEET.png` |
-| REAL ENGINE RENDER (Robolectric, `drawWorldBackground` + `drawGroundShadows` + depth-sorted `drawProp` + actor) | **CHƯA CHẠY Ở MÔI TRƯỜNG NÀY.** Test `MapForgeP21RenderTest` đã viết (fixed cameras: service cluster 0.36/0.88/1.00, từng cơ sở 1.48, cửa + actor, tower gate, summoning zone, island overview) và workflow sẽ commit PNG vào `docs/visual-evidence/p21/engine-render/` khi CI chạy trên PR |
-| `python3 tools/validate_assets.py` | **PASS** (chạy tại máy) |
-| `python3 tools/validate_lyra_pack.py` | **PASS** (chạy tại máy, có Pillow) |
-| `MapForgeP21ContractTest` / `assembleDebug` | **CHƯA CHẠY** — sandbox không có JDK, Android SDK, Gradle distribution và không có mạng ra ngoài; CI trên PR sẽ chạy |
+| ART CONTACT SHEET 1x / 2x / 0.88 | **CÓ**, `docs/visual-evidence/p21/P21_ART_CONTACT_SHEET.png` (nhãn ART CONTACT SHEET) |
+| REAL ENGINE RENDER | **CÓ**, 16 ảnh trong `docs/visual-evidence/p21/engine-render/`, do `MapForgeP21RenderTest` sinh ra bằng `drawSanctuaryFloatingWorld` + `drawGroundShadows` + `drawProp` sắp theo depth + `drawCharacterSprite` (Robolectric native graphics), CI tự commit (run `41445386091`) |
+| `MapForgeP21ContractTest` | **PASS** trong CI trên head `227ec20` |
+| `:app:assembleDebug` | **PASS** trong CI ("Build Eternal Summoner APK") trên cùng SHA |
+| `python3 tools/validate_assets.py` / `validate_lyra_pack.py` | **PASS** (chạy tại máy) |
 | FPS / nhiệt độ thiết bị | **KHÔNG ĐO** — không có thiết bị |
 
-Vì sao không chạy được: môi trường soạn thảo này chỉ có Python + Pillow, không có `java`, không có
-`ANDROID_SDK`, và không truy cập được `services.gradle.org` / `dl.google.com` / Maven. Việc "chạy
-thử bằng tay" sẽ là bịa. Do đó toàn bộ gate Kotlin để CI chứng minh, và báo cáo này không tuyên bố
-chúng đã pass.
+Máy soạn thảo này không có JDK/Android SDK/mạng ra ngoài, nên mọi gate Kotlin do CI chạy; số liệu
+trên là kết quả CI thật, không phải suy đoán. **Lưu ý:** `assembleDebug` chỉ chứng minh biên dịch và
+đóng gói, không chứng minh khung hình khi chạy hay cảm ứng.
+
+### 5.1 Ảnh engine đã buộc sửa gì
+
+Bộ ảnh engine đầu tiên là lý do hai công trình chính phải vẽ lại — đây là phần quan trọng nhất của
+báo cáo:
+
+1. `hero_tower_gate_default` cho thấy **một tấm đá phẳng tối với quả cầu sáng trôi**: quả cầu vẽ tay
+   nằm ngay dưới vòng rift động của renderer, hai trụ dính thành một bức tường, lỗ châu mai không có
+   răng. Đã dựng lại: tường thành lùi phía sau có parapet corbel + lỗ châu mai, hai tháp vát đứng
+   nhô ra với đỉnh châu mai, quoin và lỗ rune; **hốc cổng vẽ TỐI** để vòng rift động là nguồn sáng
+   duy nhất chuyển động.
+2. `hero_summoning_default` cho thấy **một cái miếu trắng bệch mặt tiền phẳng**: `LIME` đọc thành
+   trắng bạc trên cỏ đêm, thân chùa không có mặt hông. Đã dựng lại trên `LIME_T` (cùng họ đá nhưng
+   hạ xuống dải sáng của Sanctuary), có cella quay về bên phải dưới mái bốn mặt, cửa vẽ như ô cửa có
+   ánh sáng dồn ở ngưỡng.
+3. Hai khung 1.48 cắt mất mái (cao 636 px và 659 px trên khung 720). Test render nay hạ camera về
+   phía bắc cho `hero_tower_gate_whole` / `hero_summoning_whole` và giữ thêm khung chi tiết
+   `hero_tower_gate_portal`.
+
+Cụm dịch vụ (`svc_cluster_default`, `svc_quarters_door_actor`, …) đọc đúng ngay từ bộ ảnh đầu: bốn
+silhouette khác nhau, cửa vẽ nằm đúng dưới chân nhân vật.
+
+### 5.2 Điểm còn yếu (thấy trong ảnh engine, chưa sửa)
+
+- Đá của Tower Gate tương phản thấp ở 0.88: tường thành và hai tháp gần như cùng giá trị sáng, nên
+  toà nhà đọc thành một khối, chỉ còn lỗ châu mai giữ silhouette.
+- Hốc cổng cao và hẹp; vòm trên của vòng rift nằm trên nền quá tối nên ở 0.88 gần như không thấy.
+- Bốn toà dịch vụ vẫn chung một ngôn ngữ khung gỗ. Chúng khác nhau ở silhouette (tháp chuông / chái
+  thấp / gable nhô / tháp ngưng tụ) nhưng ở 0.36 người xem đọc thành "một ngôi làng", chưa đọc thành
+  bốn cơ sở có tên.
 
 ## 6. Việc cố ý không làm
 
@@ -115,10 +145,11 @@ lần truy cập đầu (thay cho procedural build trước đây), cache trong 
 
 ## 8. Tự phê bình
 
-- **Chưa có ảnh engine thật trong tài liệu này.** Đây là thiếu sót lớn nhất: mọi đánh giá "đọc được
-  ở 0.88" hiện dựa trên contact sheet + tái tạo phép chiếu bằng số học, không phải ảnh chụp từ
-  renderer. Cần chạy `MapForgeP21RenderTest` trên CI (hoặc máy có SDK) rồi đánh giá lại — đặc biệt
-  mái Tower Gate (224 px cao) rất dễ bị camera 1.48 cũ cắt.
+- **Bộ ảnh engine đầu tiên đã phủ định hai công trình chính** (xem §5.1). Đó là bài học: đánh giá
+  trên contact sheet đã bỏ qua việc vòng rift động nằm đè lên quả cầu vẽ tay, và bỏ qua việc đá
+  sáng bị "cháy" trên nền cỏ đêm. Sau khi dựng lại, ảnh engine đã xác nhận cả hai đã đúng.
+- **Vẫn còn hai rủi ro chưa xử lý:** tương phản đá của Tower Gate ở 0.88 (§5.2) và việc bốn toà dịch
+  vụ đọc thành một cụm làng. Đây là hạn chế thật, không phải "ghi chú cho có".
 - **Ba toà dịch vụ vẫn cùng họ "nhà khung gỗ"**: đã khác silhouette (tháp chuông / chái thấp /
   gable nhô) nhưng ở 0.36 có thể vẫn đọc thành một cụm nhà giống nhau. Nếu sau khi xem ảnh engine
   thấy vậy, ưu tiên: làm Registry lùn và ngang hơn nữa, đẩy Restaurant cao hơn 1 tầng.

@@ -142,10 +142,41 @@ The procedural builders are retained (not deleted).
 | manifest `size` + `sha256` refreshed for 6 entries, no other key rewritten | PASS |
 | `python3 tools/validate_assets.py` | PASS (local) |
 | `python3 tools/validate_lyra_pack.py` | PASS (local, Pillow available) |
-| `MapForgeP21ContractTest` (canvas, manifest pins, P20 intact, door↔trigger, world geometry, fallback, gate portal box) | **NOT RUN in this environment** — no JDK/Android SDK/network here; runs in CI |
-| `MapForgeP21RenderTest` (engine frames) | **NOT RUN in this environment**; runs in CI and commits PNGs to `docs/visual-evidence/p21/engine-render/` |
-| `assembleDebug` | **NOT RUN in this environment**; CI `Build Eternal Summoner APK` |
+| `MapForgeP21ContractTest` (canvas, manifest pins, P20 intact, door↔trigger, world geometry, fallback, rift aperture) | **PASS in CI** (run 41445386091, head `227ec20`); not runnable locally (no JDK/SDK/network in the authoring sandbox) |
+| `MapForgeP21RenderTest` (engine frames) | **PASS in CI**; 16 PNGs committed to `docs/visual-evidence/p21/engine-render/` |
+| `:app:assembleDebug` | **PASS in CI** ("Build Eternal Summoner APK") on the same SHA |
 | device FPS / thermal | **NOT TESTED** — no device |
+
+### 5.1 What the engine renders changed in the art
+
+The first engine render set was the reason the two landmarks were rebuilt. This is the honest
+record of that iteration:
+
+1. `hero_tower_gate_default` / `_close` showed a **dark flat slab with a floating orb**: the painted
+   egg of light sat directly under the renderer's animated rift ring, the piers read as one wall,
+   and the parapet had no teeth. Rebuilt: pitched curtain wall set back, corbelled + crenellated
+   parapet, two battered towers with battlement caps, quoins and rune loopholes, and the aperture
+   painted **dark** so the animated ring is the only moving light.
+2. `hero_summoning_default` showed a **pale frontal gazebo**: `LIME` read as bleached white against
+   the night grass and the body had no return face. Rebuilt on `LIME_T` (a cut brought into the
+   Sanctuary value range), with the cella returning to the right under a hipped roof and the portal
+   painted as a doorway whose light gathers at the sill.
+3. Both 1.48 crops were cutting the roofs (636 px and 659 px tall on a 720 px frame). The render test
+   now pulls the camera north for `hero_tower_gate_whole` / `hero_summoning_whole` and keeps a
+   `hero_tower_gate_portal` detail frame.
+
+The service cluster (`svc_cluster_default`, `svc_quarters_door_actor`, …) read correctly on the
+first pass: four distinct silhouettes with the painted doors under the actors.
+
+### 5.2 Remaining weaknesses (seen in the engine renders, not fixed)
+
+- The tower gate's masonry is low-contrast at 0.88: the curtain wall and the towers converge in
+  value, so the gate reads as one mass and the crenellation carries the silhouette alone.
+- The gate's aperture is tall and narrow; the animated ring's upper arc sits in very dark paint, so
+  at 0.88 the ring's top is barely visible against the stone.
+- The service buildings still share one timber-frame language. They are distinguishable by
+  silhouette (clock turret / lean-to / projecting gable / condenser tower) but a viewer at 0.36
+  reads them as "a village", not as four named facilities.
 
 ## 6. Deliberately out of scope
 
