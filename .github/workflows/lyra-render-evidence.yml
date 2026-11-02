@@ -16,6 +16,7 @@ on:
       - 'app/src/test/java/com/example/MapForgeGroundRenderTest.kt'
       - 'app/src/test/java/com/example/MapForgeTerrainRenderTest.kt'
       - 'app/src/test/java/com/example/MapForgeArchitectureRenderTest.kt'
+      - 'app/src/test/java/com/example/MapForgeArchitectureContractTest.kt'
       - '.github/workflows/lyra-render-evidence.yml'
 
 permissions:
@@ -75,6 +76,10 @@ jobs:
       # P20: armory architecture + cypress vegetation slice, fixed cameras incl. actor.
       - name: Render architecture slice (real draw code, Robolectric native graphics)
         run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeArchitectureRenderTest" --stacktrace
+
+      # P20 asset contract: canvas, door box, canopy split, manifest pins, prior slices.
+      - name: Verify P20 asset contract
+        run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeArchitectureContractTest" --stacktrace
 
       # P19: training field / gravel band / cobble joints, fixed cameras for before/after.
       - name: Render terrain slice (real draw code, Robolectric native graphics)
