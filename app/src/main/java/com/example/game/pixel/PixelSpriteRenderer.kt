@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.drawscope.clipRect
@@ -634,6 +635,11 @@ object PixelSpriteRenderer {
     when (obs.propKind) {
       PropKind.FACILITY_TOWER_GATE, PropKind.TOWER_PORTAL_GATE -> {
         val pulse = 0.88f + 0.12f * sin(timeSec * 3.2f)
+        // P26: the gate is the luminous heart of the island. Local light intensity
+        // (stronger at night) makes the energy rings read more at night, while the
+        // aperture below stays a near-black void (P24 protection).
+        val nightBoost = (0.55f + 0.65f * com.example.game.world.WorldEnvironment.lighting.localLightIntensity)
+          .coerceIn(0.55f, 1.20f)
         val portalCoreCol = when {
           highestClearedFloor >= 5 -> Color(0xFFA78BFA)
           highestClearedFloor >= 1 -> Color(0xFF38BDF8)
@@ -651,15 +657,49 @@ object PixelSpriteRenderer {
         drawCrispSprite(PixelStructureAtlas.towerGateMonument, cx, cy + 6f * s, 2.0f * s)
         // Animated swirling portal oval + floor-milestone outer ring inside the split-monolith cleft!
         val riftCenter = Offset(cx, cy - 196f * s)
+        // P26: the aperture stays a real void at every hour (P24 protection) — a dark
+        // fill inside the portal oval, drawn before the energy rings.
         drawOval(
-          color = Color(0xFFE0F2FE).copy(alpha = 0.68f * pulse),
+          color = Color(0xFF02040A).copy(alpha = 0.95f),
+          topLeft = Offset(riftCenter.x - 32f * s, riftCenter.y - 54f * s),
+          size = Size(64f * s, 108f * s),
+          style = Fill,
+        )
+        drawOval(
+          color = Color(0xFFE0F2FE).copy(alpha = 0.68f * pulse * nightBoost),
           topLeft = Offset(riftCenter.x - 32f * s, riftCenter.y - 54f * s),
           size = Size(64f * s, 108f * s),
           style = Stroke(width = 2.4f * s),
         )
+        // P26: a bounded energy aura hugs the portal at night — localized to the gate,
+        // never a screen-wide glow. BALANCED-only so the cheap tiers stay cheap.
+        if (com.example.game.pixel.DepthPresentation.quality == com.example.game.pixel.DepthPresentation.Quality.BALANCED &&
+          com.example.game.world.WorldEnvironment.lighting.localLightIntensity > 0.45f
+        ) {
+          val auraAlpha = (0.18f * com.example.game.world.WorldEnvironment.lighting.localLightIntensity * pulse)
+            .coerceAtMost(0.18f)
+          drawOval(
+            color = portalCoreCol.copy(alpha = auraAlpha),
+            topLeft = Offset(riftCenter.x - 52f * s, riftCenter.y - 72f * s),
+            size = Size(104f * s, 144f * s),
+            style = Stroke(width = 3.2f * s),
+          )
+          // P26: a wider second ring reads as the portal's light in the night sky —
+          // localized to the gate, bounded alpha, BALANCED-only.
+          if (com.example.game.world.WorldEnvironment.lighting.localLightIntensity > 0.55f) {
+            val wideAlpha = (0.15f * com.example.game.world.WorldEnvironment.lighting.localLightIntensity * pulse)
+              .coerceAtMost(0.15f)
+            drawOval(
+              color = portalCoreCol.copy(alpha = wideAlpha),
+              topLeft = Offset(riftCenter.x - 66f * s, riftCenter.y - 90f * s),
+              size = Size(132f * s, 180f * s),
+              style = Stroke(width = 2.6f * s),
+            )
+          }
+        }
         if (highestClearedFloor >= 1) {
           drawOval(
-            color = Color(0xFFF5B841).copy(alpha = 0.58f * pulse),
+            color = Color(0xFFF5B841).copy(alpha = 0.58f * pulse * nightBoost),
             topLeft = Offset(riftCenter.x - 40f * s, riftCenter.y - 62f * s),
             size = Size(80f * s, 124f * s),
             style = Stroke(width = 1.6f * s),

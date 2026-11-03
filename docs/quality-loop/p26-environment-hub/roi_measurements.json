@@ -1,0 +1,230 @@
+{
+  "sky_band_top_fraction": 0.25,
+  "gates": {
+    "E1": {
+      "pass": true,
+      "detail": {
+        "morning_minus_noon_abs": 12.484755755208326,
+        "noon_minus_evening_abs": 39.559132825520834,
+        "evening_minus_night_abs": 11.700072543402776,
+        "noon_minus_night_abs": 51.25920536892361
+      }
+    },
+    "E2": {
+      "pass": true,
+      "detail": {
+        "noon_sky_ge_morning_sky": true,
+        "noon_whole_minus_night_whole": 26.809790681423607
+      }
+    },
+    "E3": {
+      "pass": true,
+      "detail": {
+        "cloudy_minus_clear": -11.30439868489583,
+        "rain_minus_clear": -23.233868359374995
+      }
+    },
+    "E4": {
+      "pass": true,
+      "detail": {
+        "p26_gate_night_rain_z148.png": {
+          "before": 56.0,
+          "after": 54.9,
+          "delta_pct": -1.95
+        },
+        "p26_gate_night_z148.png": {
+          "before": 57.3,
+          "after": 54.7,
+          "delta_pct": -4.53
+        },
+        "p26_gate_noon_z148.png": {
+          "before": 67.8,
+          "after": 67.9,
+          "delta_pct": 0.18
+        },
+        "p26_overview_night_z036.png": {
+          "before": 59.1,
+          "after": 55.8,
+          "delta_pct": -5.54
+        },
+        "p26_sky_evening_z088.png": {
+          "before": 69.5,
+          "after": 67.9,
+          "delta_pct": -2.32
+        },
+        "p26_sky_morning_z088.png": {
+          "before": 74.0,
+          "after": 77.0,
+          "delta_pct": 4.1
+        },
+        "p26_sky_night_z088.png": {
+          "before": 66.3,
+          "after": 64.0,
+          "delta_pct": -3.57
+        },
+        "p26_sky_noon_cloudy_z088.png": {
+          "before": 79.8,
+          "after": 77.0,
+          "delta_pct": -3.61
+        },
+        "p26_sky_noon_rain_z088.png": {
+          "before": 72.5,
+          "after": 76.4,
+          "delta_pct": 5.44
+        },
+        "p26_sky_noon_z088.png": {
+          "before": 79.8,
+          "after": 81.7,
+          "delta_pct": 2.31
+        }
+      }
+    },
+    "E5": {
+      "pass": true,
+      "detail": {
+        "det_pair_byte_identical_after": true,
+        "det_pair_byte_identical_before": true
+      }
+    },
+    "G1": {
+      "pass": false,
+      "detail": {
+        "p26_gate_night_z148.png": {
+          "rift_after": 46.1,
+          "rift_before": 50.3,
+          "delta": -4.18
+        },
+        "p26_gate_noon_z148.png": {
+          "rift_after": 52.2,
+          "rift_before": 57.7,
+          "delta": -5.53
+        },
+        "p26_gate_night_rain_z148.png": {
+          "rift_after": 48.2,
+          "rift_before": 49.7,
+          "delta": -1.42
+        },
+        "rift_roi_mean_le": 40.0,
+        "night_rift_mean": 46.1
+      }
+    },
+    "G2": {
+      "pass": false,
+      "detail": {
+        "halo_night": 55.0,
+        "halo_noon": 65.3
+      }
+    }
+  },
+  "round3_gates": {
+    "G1b": {
+      "pass": true,
+      "detail": {
+        "p26_gate_night_z148.png": {
+          "void_after": 39.1,
+          "void_before": 42.5,
+          "delta": -3.33
+        },
+        "p26_gate_noon_z148.png": {
+          "void_after": 43.6,
+          "void_before": 49.0,
+          "delta": -5.39
+        },
+        "p26_gate_night_rain_z148.png": {
+          "void_after": 42.6,
+          "void_before": 42.9,
+          "delta": -0.24
+        },
+        "void_roi_mean_le": 40.0,
+        "night_void_mean": 39.1,
+        "delta_bound_ok": false,
+        "no_wash_ok": true
+      }
+    },
+    "G2b": {
+      "pass": true,
+      "detail": {
+        "p26_gate_night_z148.png": {
+          "portal": 47.2,
+          "ref": 64.2,
+          "portal_minus_ref": -16.96
+        },
+        "p26_gate_noon_z148.png": {
+          "portal": 54.6,
+          "ref": 79.8,
+          "portal_minus_ref": -25.25
+        },
+        "p26_gate_night_rain_z148.png": {
+          "portal": 49.1,
+          "ref": 62.1,
+          "portal_minus_ref": -12.95
+        },
+        "night_portal_minus_ref": -16.96,
+        "noon_portal_minus_ref": -25.25,
+        "portal_band_mean_le": 150.0
+      }
+    }
+  },
+  "frames": {
+    "p26_sky_morning_z088.png": {
+      "sky": 92.66,
+      "world": 76.62,
+      "world42": 77.0,
+      "whole": 80.63
+    },
+    "p26_sky_noon_z088.png": {
+      "sky": 105.15,
+      "world": 81.57,
+      "world42": 81.69,
+      "whole": 87.46
+    },
+    "p26_sky_evening_z088.png": {
+      "sky": 65.59,
+      "world": 67.06,
+      "world42": 67.9,
+      "whole": 66.69
+    },
+    "p26_sky_night_z088.png": {
+      "sky": 53.89,
+      "world": 62.91,
+      "world42": 63.97,
+      "whole": 60.65
+    },
+    "p26_sky_noon_cloudy_z088.png": {
+      "sky": 93.85,
+      "world": 76.65,
+      "world42": 76.96,
+      "whole": 80.95
+    },
+    "p26_sky_noon_rain_z088.png": {
+      "sky": 81.92,
+      "world": 75.91,
+      "world42": 76.41,
+      "whole": 77.41
+    },
+    "p26_gate_night_z148.png": {
+      "sky": 48.66,
+      "world": 56.41,
+      "world42": 54.66,
+      "whole": 54.47
+    },
+    "p26_gate_noon_z148.png": {
+      "sky": 150.26,
+      "world": 74.74,
+      "world42": 67.89,
+      "whole": 93.62
+    },
+    "p26_gate_night_rain_z148.png": {
+      "sky": 45.43,
+      "world": 55.92,
+      "world42": 54.89,
+      "whole": 53.3
+    },
+    "p26_overview_night_z036.png": {
+      "sky": 47.81,
+      "world": 55.9,
+      "world42": 55.83,
+      "whole": 53.87
+    }
+  }
+}
