@@ -26,6 +26,11 @@ jobs:
           python3 tools/validate_assets.py
           gradle :app:assembleDebug :app:testDebugUnitTest --console=plain \
             --tests 'com.example.LostCourier*' \
+            --tests 'com.example.Mission01BPlaythroughTest' \
+            --tests 'com.example.HeroAgencyTest' \
+            --tests 'com.example.TowerOffFieldMasterTest' \
+            --tests 'com.example.ui.HeroAgencyAlertUiTest' \
+            --tests 'com.example.RescueJourney*' \
             --tests 'com.example.RescueTacticalCommandsTest' \
             --tests 'com.example.CourierChoiceInteractionTest' \
             --tests 'com.example.data.LostCourier*' \

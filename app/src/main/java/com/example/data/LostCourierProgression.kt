@@ -11,7 +11,12 @@ object LostCourierProgression {
   const val FLAG_SUPPLIES_MISSED = "COURIER_SUPPLIES_MISSED"
   const val RESCUE_MEMORY = "Đã vượt sợ hãi, đưa người đưa thư về cổng nhờ lệnh Master."
 
-  fun isPermanentFlag(flag: String): Boolean = flag == FLAG_RESCUED || flag == FLAG_FAILED ||
+  const val FLAG_ALARM_SILENCED = "DISC_m01b_alarm_silenced"
+  const val FLAG_SCOUT_RESCUED = "DISC_m01b_scout_rescued"
+  const val FLAG_JOURNEY_COMPLETE = "DISC_m01b_debrief"
+
+  fun isPermanentFlag(flag: String): Boolean = flag == FLAG_ALARM_SILENCED || flag == FLAG_SCOUT_RESCUED ||
+    flag == FLAG_JOURNEY_COMPLETE || flag == FLAG_RESCUED || flag == FLAG_FAILED ||
     flag == FLAG_SUPPORTED || flag == FLAG_SUPPLIES_RECOVERED || flag == FLAG_SUPPLIES_MISSED
 
   fun isRescue(outcome: CourierOutcome?): Boolean =

@@ -1101,6 +1101,61 @@ object TowerFloorCatalog {
     return best
   }
 
+  /** Additive rescue district: the original meadow and every old prop retain their coordinates. */
+  fun buildRescueJourneyMap(spec: TowerFloorSpec): GeneratedMapLayout {
+    val base = buildTowerFloorMap(spec)
+    if (spec.floorNumber != 1) return base
+    val route = com.example.game.combat.RescueJourneyContent.routePoints
+    val roads = route.zipWithNext { a, b ->
+      PathSegment(a.first, a.second, b.first, b.second, 138f, 0xFFA69886L, 0xFF9E5A2BL)
+    }
+    val fieldRoads = com.example.game.combat.RescueJourneyContent.chapters.flatMap { chapter ->
+      val site = route[chapter.routeEnd]
+      val action = com.example.game.combat.RescueFieldActions.forChapter(chapter.id, site)
+      if (action == null || site.first < base.width && site.second < base.height) emptyList()
+      else (listOf(site) + action.targets.map { it.x to it.y } + listOf(site)).zipWithNext { a,b ->
+        PathSegment(a.first,a.second,b.first,b.second,90f,0xFFA69886L,0xFF9E5A2BL)
+      }
+    }
+    val additions = mutableListOf<WorldObstacle>()
+    val fields = mutableListOf<TerrainPatch>()
+    val rng = Random(10102)
+    // Landmarks sit beside objective clearings, never on the travel corridor.
+    val landmarkKinds = mapOf(
+      "wardens" to PropKind.ANCIENT_RUIN_ARCH,
+      "signal" to PropKind.ANCIENT_MONOLITH,
+      "crossing" to PropKind.ANCIENT_RUIN_ARCH,
+      "medicine" to PropKind.ASTRAL_HERB_SHRINE,
+      "seal" to PropKind.TREASURE_CHEST_CLOSED,
+    )
+    val landmarks = com.example.game.combat.RescueJourneyContent.chapters.mapNotNull { chapter ->
+      val kind = landmarkKinds[chapter.id] ?: return@mapNotNull null
+      val site = route[chapter.routeEnd]
+      Triple(site.first + 230f, site.second + 180f, kind)
+    }
+    landmarks.forEachIndexed { i, (x, y, kind) ->
+      additions += WorldObstacle("journey_landmark_$i", x, y, 24f, false, kind, 1.04f)
+    }
+    repeat(155) { i ->
+      val x = 200f + rng.nextFloat() * 5800f
+      val y = 230f + rng.nextFloat() * 3100f
+      if ((x > base.width + 140f || y > base.height + 140f) && distToAnyPath(x, y, roads + fieldRoads) > 235f &&
+        landmarks.all { hypot(x-it.first, y-it.second) > 160f }) {
+        val kind = when (i % 5) {
+          0 -> PropKind.MOSSY_BOULDER
+          1 -> PropKind.FOREST_CANOPY_BUSH
+          2 -> PropKind.PINE_SPIRIT_TREE
+          else -> PropKind.OAK_TREE
+        }
+        additions += WorldObstacle("journey_grove_$i", x, y, 22f, true, kind, 1f,
+          occludesUpperCanopy = kind == PropKind.OAK_TREE || kind == PropKind.PINE_SPIRIT_TREE)
+        fields += TerrainPatch(x,y,200f,130f,0x28296638L,isTallGrass=i%2==0)
+      }
+    }
+    return base.copy(width=6200f,height=3600f, paths=base.paths+roads+fieldRoads,
+      obstacles=base.obstacles+additions,patches=base.patches+fields)
+  }
+
   fun buildTowerFloorMap(spec: TowerFloorSpec): GeneratedMapLayout {
     val rng = Random(spec.floorNumber * 9173)
     val patches = mutableListOf<TerrainPatch>()

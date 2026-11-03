@@ -32,8 +32,10 @@ data class CourierTelegraph(
 class LostCourierEncounter internal constructor(
   private val engine: TowerCombatEngine,
   records: List<HeroRecord>,
+  enableRescueJourney: Boolean = false,
 ) {
   val courier = CourierCombatUnit()
+  val journey: RescueJourney? = if (enableRescueJourney) RescueJourney(engine, courier) else null
   var choice: CourierChoice? = null
     private set
   val supplyX = 1220f
@@ -42,7 +44,7 @@ class LostCourierEncounter internal constructor(
     private set
   private var supplyWorkSeconds = 0f
   val choiceAvailable: Boolean
-    get() = outcome == null && choice == null && courier.x >= 1100f
+    get() = outcome == null && choice == null && journey?.active != true && courier.x >= 1100f
 
   /** A committed field decision, never a reward toggle in the result screen. */
   fun chooseChoice(selected: CourierChoice): Boolean {
@@ -118,6 +120,10 @@ class LostCourierEncounter internal constructor(
       phase = CourierPhase.ESCORT
       statusVi = "Người đưa thư: Cảm ơn! Hãy đi gần tôi. Bảo vệ sẽ giữ đội hình quanh tôi."
       engine.postFeedback(statusVi)
+    }
+    if (phase != CourierPhase.CLEAR_PATH && journey?.active == true) {
+      journey.step(dt)
+      return
     }
     if (choice == CourierChoice.RECOVER_SUPPLIES && !suppliesRecovered) {
       val working = engine.heroes.any { !it.knockedOut && hypot(it.x - supplyX, it.y - supplyY) <= 90f }
@@ -269,7 +275,7 @@ class LostCourierEncounter internal constructor(
     enemy.x = pos.first; enemy.y = pos.second; enemy.isMoving = true
   }
 
-  private fun damageCourier(raw: Int) {
+  internal fun damageCourier(raw: Int) {
     val protected = engine.activeOrder == TacticalOrder.PROTECT_ALLY && engine.heroes.any {
       !it.knockedOut && hypot(it.x - courier.x, it.y - courier.y) <= 165f
     }
