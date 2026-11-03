@@ -21,3 +21,9 @@ specific Unity/Godot/Unreal/Roblox instructions must not replace Kotlin/Compose.
 Preserve the 2.5D rules above; upstream top-down examples and suggested frame sizes
 do not override this game's projection, pivots, gameplay timing or existing systems.
 The local skill is saved project guidance, not a promise of memory in unrelated chats.
+
+## Arena iterative game studio
+When Arena Agent Mode develops or refines ETERNAL SUMMONER, first read `.agents/skills/eternal-arena-quality-loop/SKILL.md` in addition to `eternal-summoner-skill-router`. Treat subroles as logical roles unless verified native subagent tools exist. For meaningful code/art changes run baseline -> implement -> evidence -> critique -> targeted fix -> re-test (max 3 refinement cycles). Preserve all original graphics, gameplay and Android constraints. Never fake CI, true device FPS, image review, provider QA score, or parallel worker execution. Do not merge PRs without owner approval.
+
+## Arena specialist skill orchestration
+When Arena works on ETERNAL SUMMONER, read `.agents/skills/eternal-summoner-skill-router/SKILL.md` and `.agents/skills/eternal-arena-quality-loop/SKILL.md`, then select relevant specialist skills by actual task. Preserve the original AGENTS.md and all project contracts. Use native parallel subagents only if verified available; otherwise execute roles sequentially with file ownership and honest role labels. Require baseline, real tests/render/playthrough evidence, targeted corrections (at most 3 rounds), final QA and PR for owner. Never fake CI or device measurements. Never auto-merge.
