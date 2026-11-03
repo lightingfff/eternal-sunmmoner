@@ -41,6 +41,23 @@ object SanctuaryWorldRenderer {
    */
   private const val GRASS_BLOCK_MIN_TILE_SCREEN_PX = 25
 
+  // P26C: neo mây trên khung (screen-space), khai báo một lần ở cấp object
+  // để KHÔNG cấp phát list/đối tượng mới mỗi lần vẽ frame.
+  private data class CloudAnchor(val x: Float, val y: Float, val scale: Float, val parallax: Float, val depth: Int)
+  private val cloudSpecs = listOf(
+    // Lớp xa: mựn mờ, bay chậm, alpha thấp
+    CloudAnchor(-180f, 70f, 0.85f, 0.12f, 0),
+    CloudAnchor(420f, 110f, 0.95f, 0.18f, 0),
+    CloudAnchor(950f, 50f, 0.80f, 0.10f, 0),
+    // Lớp trung: cumulus có khối, 3 cấp sáng/tối, bụng có shade
+    CloudAnchor(90f, 190f, 1.10f, 0.42f, 1),
+    CloudAnchor(680f, 140f, 1.15f, 0.48f, 1),
+    CloudAnchor(1050f, 175f, 1.00f, 0.38f, 1),
+    // Lớp trước: sợi mây lửng lơ, bay nhanh hơn, alpha thấp hơn
+    CloudAnchor(260f, 270f, 0.65f, 0.60f, 2),
+    CloudAnchor(820f, 230f, 0.70f, 0.55f, 2),
+  )
+
   fun DrawScope.drawSanctuaryFloatingWorld(
     camX: Float,
     camY: Float,
@@ -518,7 +535,8 @@ object SanctuaryWorldRenderer {
     // P26C: mây nằm trong layer bầu trời (screen-space, vùng trên cùng của khung), có parallax nhẹ
     // theo camera world. Không đặt mây ở world Y cố định ngoài vùng nhìn rồi chụp camera riêng.
     // Cloud cover theo thời tiết: CLEAR < CLOUDY < RAIN < STORM.
-    val cloudCover = when (weather) {
+    val weatherType = weather.weatherType
+    val cloudCover = when (weatherType) {
       com.example.game.world.WorldWeather.CLEAR -> 0.30f
       com.example.game.world.WorldWeather.CLOUDY -> 0.70f
       com.example.game.world.WorldWeather.RAIN -> 0.85f
@@ -526,7 +544,7 @@ object SanctuaryWorldRenderer {
       else -> 0.30f
     }
     // STORM: mây tối hơn (màu xám-than), các thời tiết khác giữ cloudColor từ lighting model.
-    val cloudCol = if (weather == com.example.game.world.WorldWeather.STORM) {
+    val cloudCol = if (weatherType == com.example.game.world.WorldWeather.STORM) {
       Color(0xff4A5568)
     } else {
       baseCloudCol
@@ -538,24 +556,7 @@ object SanctuaryWorldRenderer {
     // Parallax nhẹ: mây di chuyển theo camera nhưng chậm hơn đảo (0.15f hệ số).
     val parallaxX = camX * 0.15f
 
-    // Các neo mây trong không gian màn hình (vùng bầu trời trên cùng), kèm hệ số parallax riêng
-    // cho từng lớp khoảng cách: xa (mựn mờ, bay chậm), trung (cumulus có khối), trước (sợi mây).
-    // Mỗi neo: (screenX, screenY, scale, parallax, depthLayer)
-    data class CloudAnchor(val x: Float, val y: Float, val scale: Float, val parallax: Float, val depth: Int)
-    val cloudSpecs = listOf(
-      // Lớp xa: mựn mỏng mờ, bay chậm, alpha thấp
-      CloudAnchor(-180f, 70f, 0.85f, 0.12f, 0),
-      CloudAnchor(420f, 110f, 0.95f, 0.18f, 0),
-      CloudAnchor(950f, 50f, 0.80f, 0.10f, 0),
-      // Lớp trung: cumulus có khối, 3 cấp sáng/tối, bụng có shade
-      CloudAnchor(90f, 190f, 1.10f, 0.42f, 1),
-      CloudAnchor(680f, 140f, 1.15f, 0.48f, 1),
-      CloudAnchor(1050f, 175f, 1.00f, 0.38f, 1),
-      // Lớp trước: sợi mây lửng lơ, bay nhanh hơn, alpha thấp hơn
-      CloudAnchor(260f, 270f, 0.65f, 0.60f, 2),
-      CloudAnchor(820f, 230f, 0.70f, 0.55f, 2),
-    )
-
+    // cloudSpecs là hằng số cấp object-level (đ khai báo một lần, không cấp phát mỗi frame).
     cloudSpecs.forEachIndexed { idx, anchor ->
       val cx = anchor.x
       val cy = anchor.y
