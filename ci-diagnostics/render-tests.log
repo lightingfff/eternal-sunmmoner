@@ -1,0 +1,17 @@
+### test results
+total 8
+-rw-r--r-- 1 runner runner 1208 Nov  3 18:37 TEST-com.example.MapForgeP23ContractTest.xml
+drwxr-xr-x 2 runner runner 4096 Nov  3 18:37 binary
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.MapForgeP23ContractTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-03T18:37:10.779Z" hostname="runnervmnwato" time="5.984">
+  <properties/>
+  <testcase name="propsReachTheGroundRowAndLanternFramesAreLocked" classname="com.example.MapForgeP23ContractTest" time="4.872"/>
+  <testcase name="enterableDoorsSitOnTheirWorldTriggers" classname="com.example.MapForgeP23ContractTest" time="0.097"/>
+  <testcase name="reAuthoredPropsCastApprovedSilhouetteShadows" classname="com.example.MapForgeP23ContractTest" time="0.252"/>
+  <testcase name="manifestsPinTheNewPngsAndFallbacksStillExist" classname="com.example.MapForgeP23ContractTest" time="0.061"/>
+  <testcase name="everyAuthoredBuildingHasNoInteriorAlphaHole" classname="com.example.MapForgeP23ContractTest" time="0.168"/>
+  <testcase name="worldGeometryEntrancesAndCameraAreUntouched" classname="com.example.MapForgeP23ContractTest" time="0.031"/>
+  <testcase name="roofSilhouetteIsContinuousAcrossEveryBuilding" classname="com.example.MapForgeP23ContractTest" time="0.093"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
