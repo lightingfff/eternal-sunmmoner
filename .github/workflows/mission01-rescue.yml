@@ -13,12 +13,30 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - uses: android-actions/setup-android@v3
+      # Use the runner's command-line tools, as in the APK workflow. The setup
+      # action's default legacy 'tools' package is no longer published.
+      - name: Install Android SDK packages
+        run: |
+          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager | head -n 1)
+          test -n "$SDKMANAGER"
+          set +o pipefail
+          yes | "$SDKMANAGER" --licenses
+          license_status=${PIPESTATUS[1]}
+          set -o pipefail
+          test "$license_status" -eq 0
+          "$SDKMANAGER" --install \
+            'platforms;android-36.1' 'build-tools;36.0.0' 'platform-tools'
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.3.1'
-      - name: Install pinned Android packages
-        run: sdkmanager 'platforms;android-36.1' 'build-tools;36.0.0' 'platform-tools'
+      - name: Add temporary Google Sign-In resource
+        run: |
+          mkdir -p app/src/debug/res/values
+          cat > app/src/debug/res/values/google_services_placeholder.xml <<'EOF'
+          <resources>
+              <string name="default_web_client_id" translatable="false">debug-placeholder.apps.googleusercontent.com</string>
+          </resources>
+          EOF
       - name: Create development signing key
         run: keytool -genkeypair -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
       - name: Assets, APK and rescue acceptance
@@ -31,6 +49,8 @@ jobs:
             --tests 'com.example.TowerOffFieldMasterTest' \
             --tests 'com.example.ui.HeroAgencyAlertUiTest' \
             --tests 'com.example.RescueJourney*' \
+            --tests 'com.example.RescueFieldActionsTest' \
+            --tests 'com.example.RescueEnemyTargetingTest' \
             --tests 'com.example.RescueTacticalCommandsTest' \
             --tests 'com.example.CourierChoiceInteractionTest' \
             --tests 'com.example.data.LostCourier*' \

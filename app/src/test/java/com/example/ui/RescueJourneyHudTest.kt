@@ -46,6 +46,10 @@ class RescueJourneyHudTest {
     assertEquals(1,completed)
     rule.runOnIdle { canInteract=true }
     rule.onNodeWithTag("rescue_journey_interact").assertIsEnabled()
+    rule.onNodeWithText("Bản đồ đã bị xé.", substring=true).assertDoesNotExist()
+    rule.onNodeWithTag("rescue_journey_details").performClick()
+    rule.onNodeWithText("Bản đồ đã bị xé.", substring=true).assertIsDisplayed()
+    rule.onNodeWithTag("rescue_journey_details").performClick()
     saveView(host!!,"journey_portrait.png")
     rule.onNodeWithTag("rescue_journey_interact").performClick()
     assertEquals(2,completed)
@@ -65,6 +69,9 @@ class RescueJourneyHudTest {
       }
     }
     rule.onNodeWithTag("rescue_journey_interact").assertIsNotEnabled()
+    rule.onNodeWithTag("rescue_journey_details").performClick()
+    rule.onNodeWithText("Trinh sát bị kẹt", substring=true).assertIsDisplayed()
+    rule.onNodeWithTag("rescue_journey_details").performClick()
     rule.onNodeWithTag("rescue_journey_silence").assertIsDisplayed().assertIsEnabled()
     rule.onNodeWithTag("rescue_journey_rescue_scout").assertIsDisplayed().assertIsEnabled()
     saveView(host!!,"journey_signal_landscape.png")

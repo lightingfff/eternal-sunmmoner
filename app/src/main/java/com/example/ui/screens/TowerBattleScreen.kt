@@ -846,7 +846,7 @@ fun TowerBattleScreen(
         modifier = Modifier
           .fillMaxWidth()
           .statusBarsPadding()
-          .padding(horizontal = 10.dp, vertical = 6.dp)
+          .padding(horizontal = 10.dp, vertical = if (isWideScreen) 0.dp else 6.dp)
           .onSizeChanged { topHudHeightPx = it.height }
           .testTag("tower_battle_top_hud"),
         verticalArrangement = Arrangement.spacedBy(5.dp),
