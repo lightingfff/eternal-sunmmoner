@@ -145,6 +145,7 @@ class P26SkyRenderTest {
       record(props, "p26_overview_night_z036", 1600f, 1380f, 0.36f, 0f, 0f, "CLEAR", "BALANCED")
 
       // Determinism: same camera/hour/weather rendered twice at timeSec 0 must be byte-identical.
+      prepare(12f, WorldWeather.CLEAR)
       val first = File(outDir, "p26_sky_noon_z088.png").readBytes()
       render("p26_sky_noon_z088_det", 960f, 860f, 0.88f)
       val second = File(outDir, "p26_sky_noon_z088_det.png").readBytes()
