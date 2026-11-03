@@ -2,18 +2,18 @@
 Calculating task graph as no cached configuration is available for tasks: :app:compileDebugKotlin
 > Task :app:preBuild UP-TO-DATE
 > Task :app:preDebugBuild UP-TO-DATE
-> Task :app:processDebugNavigationResources UP-TO-DATE
-> Task :app:generateDebugResources UP-TO-DATE
-> Task :app:generateDebugBuildConfig UP-TO-DATE
 > Task :app:processDebugGoogleServices UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
 > Task :app:kspDebugKotlin SKIPPED
 > Task :app:packageDebugResources UP-TO-DATE
 > Task :app:parseDebugLocalResources UP-TO-DATE
 > Task :app:generateDebugRFile UP-TO-DATE
 > Task :app:compileDebugKotlin UP-TO-DATE
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_23-1793721665279.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_23-1793722671945.json
 
-BUILD SUCCESSFUL in 3s
+BUILD SUCCESSFUL in 4s
 8 actionable tasks: 8 up-to-date
 Configuration cache entry stored.
 ### :app:compileDebugUnitTestKotlin
@@ -21,21 +21,21 @@ Calculating task graph as no cached configuration is available for tasks: :app:c
 > Task :app:preBuild UP-TO-DATE
 > Task :app:preDebugBuild UP-TO-DATE
 > Task :app:processDebugGoogleServices UP-TO-DATE
-> Task :app:generateDebugBuildConfig UP-TO-DATE
-> Task :app:kspDebugKotlin SKIPPED
 > Task :app:generateDebugResources UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
 > Task :app:javaPreCompileDebug UP-TO-DATE
-> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:kspDebugKotlin SKIPPED
 > Task :app:packageDebugResources UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
 > Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
 > Task :app:checkDebugAarMetadata UP-TO-DATE
 > Task :app:preDebugUnitTestBuild UP-TO-DATE
-> Task :app:extractDeepLinksDebug UP-TO-DATE
-> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:generateDebugRFile UP-TO-DATE
 > Task :app:mergeDebugResources UP-TO-DATE
 > Task :app:compileDebugNavigationResources UP-TO-DATE
-> Task :app:parseDebugLocalResources UP-TO-DATE
-> Task :app:generateDebugRFile UP-TO-DATE
 > Task :app:processDebugMainManifest UP-TO-DATE
 > Task :app:processDebugManifest UP-TO-DATE
 > Task :app:processDebugManifestForPackage UP-TO-DATE
@@ -46,42 +46,9 @@ Calculating task graph as no cached configuration is available for tasks: :app:c
 > Task :app:kspDebugUnitTestKotlin SKIPPED
 
 > Task :app:compileDebugUnitTestKotlin FAILED
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:54:30 Unresolved reference 'WeatherState'.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:55:30 Unresolved reference 'WeatherState'.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:56:30 Unresolved reference 'WeatherState'.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:57:30 Unresolved reference 'WeatherState'.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:58:30 Unresolved reference 'WeatherState'.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:59:30 Unresolved reference 'WeatherState'.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:60:17 Cannot infer type for this parameter. Specify it explicitly.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:108:17 Unresolved reference 'toArgb'.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:109:21 None of the following candidates is applicable:
-fun times(other: Byte): Float
-fun times(other: Short): Float
-fun times(other: Int): Float
-fun times(other: Long): Float
-fun times(other: Float): Float
-fun times(other: Double): Double
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:109:35 'infix' modifier is required on 'FirNamedFunctionSymbol java/math/BigInteger.and'.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:109:39 Argument type mismatch: actual type is 'Int', but 'BigInteger!' was expected.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:109:54 None of the following candidates is applicable:
-fun times(other: Byte): Float
-fun times(other: Short): Float
-fun times(other: Int): Float
-fun times(other: Long): Float
-fun times(other: Float): Float
-fun times(other: Double): Double
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:109:67 'infix' modifier is required on 'FirNamedFunctionSymbol java/math/BigInteger.and'.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:109:71 Argument type mismatch: actual type is 'Int', but 'BigInteger!' was expected.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:109:86 None of the following candidates is applicable:
-fun times(other: Byte): Float
-fun times(other: Short): Float
-fun times(other: Int): Float
-fun times(other: Long): Float
-fun times(other: Float): Float
-fun times(other: Double): Double
 e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormRenderTest.kt:40:2 Unresolved reference 'GraphicsMode'.
 e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormRenderTest.kt:40:15 Unresolved reference 'GraphicsMode'.
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_23-1793721669167.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_23-1793722676551.json
 
 FAILURE: Build failed with an exception.
 
