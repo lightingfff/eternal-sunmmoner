@@ -187,7 +187,7 @@
         268,
         206
       ],
-      "sha256": "29c1197974129c7a2c063470024c5c31b73bf5746955a42e9303ab698d50256f"
+      "sha256": "bc8adb3cb4c211345b311cd61b8898a9397c8fdf52e8acad587f67d0df185180"
     },
     "tower_gate": {
       "file": "tower_gate.png",
@@ -211,7 +211,7 @@
         200,
         168
       ],
-      "sha256": "dde71639f45ea79f6e74626fbdec325e164b92b2399b083c8a165fff999ea200"
+      "sha256": "c8ae5d0c21fb3f94049c0e4e84a4a0dc89a56655f7921ef552207f239a3b5c02"
     },
     "restaurant": {
       "file": "restaurant.png",
@@ -219,7 +219,7 @@
         206,
         172
       ],
-      "sha256": "2109a9dbffab742fa71a9b7e89531c03681a0b0085ab43b76ce0f9f9c61c8df2"
+      "sha256": "517f0e1802aa19e4d9d98d6d7bdd8d215f4f40822f70b26f37e488530ea16910"
     },
     "synthesis_lab": {
       "file": "synthesis_lab.png",
