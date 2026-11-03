@@ -59,7 +59,8 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref || github.ref_name }}
+          # Pin tests to the triggering SHA even if the render bot updates the PR meanwhile.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Set up Java 21
         uses: actions/setup-java@v5
@@ -93,6 +94,17 @@ jobs:
               <string name="default_web_client_id" translatable="false">debug-placeholder.apps.googleusercontent.com</string>
           </resources>
           EOF
+
+      # Sequence required for PR #33: compile -> targeted contract -> targeted render
+      # -> complete render/contract regression below -> assembleDebug.
+      - name: Compile all debug unit tests (P26C included)
+        run: gradle :app:compileDebugUnitTestKotlin --stacktrace
+
+      - name: Verify P26C cloud/storm contract
+        run: gradle :app:testDebugUnitTest --tests "com.example.P26CCloudStormContractTest" --stacktrace
+
+      - name: Render P26C cloud and storm matrix (real draw code, Robolectric native graphics)
+        run: gradle :app:testDebugUnitTest --tests "com.example.P26CCloudStormRenderTest" --stacktrace
 
       - name: Render Lyra (real draw code, Robolectric native graphics)
         run: gradle :app:testDebugUnitTest --tests "com.example.LyraEngineRenderTest" --stacktrace
@@ -154,14 +166,6 @@ jobs:
       - name: Verify P26 sky contract
         run: gradle :app:testDebugUnitTest --tests "com.example.P26SkyContractTest" --stacktrace
 
-      # P26C: cloud/storm render matrix through the real draw path, locked cameras.
-      - name: Render P26C cloud and storm matrix (real draw code, Robolectric native graphics)
-        run: gradle :app:testDebugUnitTest --tests "com.example.P26CCloudStormRenderTest" --stacktrace
-
-      # P26C: contract — STORM state exists, distinct from rain/clear, deterministic sky bands.
-      - name: Verify P26C cloud/storm contract
-        run: gradle :app:testDebugUnitTest --tests "com.example.P26CCloudStormContractTest" --stacktrace
-
       # P26: premium hub shell UI captures (Compose UI, Robolectric native graphics).
       - name: Render P26 UI hub shell (real Compose UI, Robolectric native graphics)
         run: gradle :app:testDebugUnitTest --tests "com.example.ui.P26UiShellTest" --stacktrace
@@ -179,6 +183,18 @@ jobs:
       # P19: training field / gravel band / cobble joints, fixed cameras for before/after.
       - name: Render terrain slice (real draw code, Robolectric native graphics)
         run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeTerrainRenderTest" --stacktrace
+
+      - name: Assemble debug APK after the complete render and contract regression
+        run: |
+          # The build workflow provides the downloadable, signature-preserving APK;
+          # this job independently verifies assembleDebug *after* all tests passed.
+          if [ ! -f debug.keystore ]; then
+            keytool -genkeypair -noprompt -keystore debug.keystore -storepass android \
+              -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 \
+              -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+          gradle :app:assembleDebug --stacktrace
+          test -s app/build/outputs/apk/debug/app-debug.apk
 
       # The PNGs are also committed so reviewers (and the agent) can open them straight from
       # the branch; the artifact below is the same bytes for offline download.

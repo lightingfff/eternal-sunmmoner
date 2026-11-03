@@ -20,7 +20,7 @@ import org.robolectric.annotation.Config
  * P26C ROUND 1 contract test: STORM weather state + visible clouds in gameplay camera.
  *
  * MODEL-level assertions (deterministic, no pixels); pixel-level gates are measured by
- * render evidence (docs/visual-evidence/p26c/) and tools/p26_measure_sky.py.
+ * render evidence (docs/visual-evidence/p26c/) and tools/p26c_measure_clouds.py.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [36])
@@ -60,6 +60,21 @@ class P26CCloudStormContractTest {
     val slot4 = WeatherState.at(960000L).weatherType
     val slot5 = WeatherState.at(1200000L).weatherType
     val types = listOf(slot0, slot1, slot2, slot3, slot4, slot5)
+    // At a slot boundary the 30-second blend starts at the previous state (FOG at t=0).
+    assertEquals("Trạng thái ngay ranh giới sáu slot", listOf(
+      WorldWeather.FOG, WorldWeather.CLEAR, WorldWeather.CLOUDY,
+      WorldWeather.RAIN, WorldWeather.STORM, WorldWeather.CLEAR,
+    ), types)
+    // After 30 seconds the next state must have fully arrived, not merely appear in the enum.
+    val settled = (0L..5L).map { slot -> WeatherState.at(slot * 240000L + 30000L).weatherType }
+    assertEquals("Thứ tự chu kỳ sau khi chuyển trạng thái", listOf(
+      WorldWeather.CLEAR, WorldWeather.CLOUDY, WorldWeather.RAIN,
+      WorldWeather.STORM, WorldWeather.CLEAR, WorldWeather.FOG,
+    ), settled)
+    assertEquals("Chu kỳ lặp lại sau 24 phút", WorldWeather.CLEAR,
+      WeatherState.at(1440000L + 30000L).weatherType)
+    assertEquals("Giông có mưa, không bị gộp thành RAIN", WorldWeather.STORM,
+      WeatherState.at(3L * 240000L + 30000L).weatherType)
     assertTrue("Chu kỳ thời tiết phải chứa STORM (đã có: $types)", types.contains(WorldWeather.STORM))
     assertTrue("Chu kỳ thời tiết phải chứa CLEAR", types.contains(WorldWeather.CLEAR))
     assertTrue("Chu kỳ thời tiết phải chứa CLOUDY", types.contains(WorldWeather.CLOUDY))
