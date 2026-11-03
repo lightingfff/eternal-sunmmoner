@@ -511,33 +511,98 @@ object SanctuaryWorldRenderer {
     zoom: Float,
     timeSec: Float,
   ) {
-    val cloudSpecs = listOf(
-      Triple(-120f, 260f, 1.25f),
-      Triple(160f, 1650f, 1.35f),
-      Triple(2980f, 420f, 1.20f),
-      Triple(3080f, 1520f, 1.45f),
-      Triple(420f, 2580f, 1.30f),
-      Triple(2780f, 2560f, 1.35f),
-    )
-    // P26: cloud colour and character answer the time of day and weather (white noon
-    // clouds, warm sunset bands, thin dark night cloud, denser cover when it rains).
     val lighting = com.example.game.world.WorldEnvironment.lighting
-    val cloudCol = lighting.cloudColor
-    val alphaScale = (lighting.cloudDensity * lighting.cloudBrightness).coerceIn(0f, 1f)
+    val weather = com.example.game.world.WorldEnvironment.weather
+    val baseCloudCol = lighting.cloudColor
+
+    // P26C: mây nằm trong layer bầu trời (screen-space, vùng trên cùng của khung), có parallax nhẹ
+    // theo camera world. Không đặt mây ở world Y cố định ngoài vùng nhìn rồi chụp camera riêng.
+    // Cloud cover theo thời tiết: CLEAR < CLOUDY < RAIN < STORM.
+    val cloudCover = when (weather) {
+      com.example.game.world.WorldWeather.CLEAR -> 0.30f
+      com.example.game.world.WorldWeather.CLOUDY -> 0.70f
+      com.example.game.world.WorldWeather.RAIN -> 0.85f
+      com.example.game.world.WorldWeather.STORM -> 1.00f
+      else -> 0.30f
+    }
+    // STORM: mây tối hơn (màu xám-than), các thời tiết khác giữ cloudColor từ lighting model.
+    val cloudCol = if (weather == com.example.game.world.WorldWeather.STORM) {
+      Color(0xff4A5568)
+    } else {
+      baseCloudCol
+    }
+    val alphaScale = (lighting.cloudDensity * lighting.cloudBrightness * cloudCover).coerceIn(0f, 1f)
+
     val halfW = size.width / 2f
     val halfH = size.height / 2f
-    cloudSpecs.forEachIndexed { idx, (wx, wy, cScale) ->
-      val drift = sin(timeSec * 0.22f + idx * 1.4f) * 28f
-      val cx = ObliqueCamera.worldToScreenX(wx + drift, camX, zoom, halfW)
-      val cy = ObliqueCamera.worldToScreenY(wy, camY, zoom, halfH)
-      val s = zoom * cScale
-      if (cx in -320f..(size.width + 320f) && cy in -220f..(size.height + 220f)) {
-        drawOval(cloudCol.copy(alpha = 0.45f * alphaScale), Offset(cx - 120f * s, cy - 18f * s), Size(240f * s, 54f * s))
-        drawOval(cloudCol.copy(alpha = 0.38f * alphaScale), Offset(cx - 108f * s, cy - 34f * s), Size(110f * s, 52f * s))
-        drawOval(cloudCol.copy(alpha = 0.32f * alphaScale), Offset(cx - 46f * s, cy - 52f * s), Size(118f * s, 64f * s))
-        drawOval(cloudCol.copy(alpha = 0.38f * alphaScale), Offset(cx + 28f * s, cy - 32f * s), Size(92f * s, 48f * s))
+    // Parallax nhẹ: mây di chuyển theo camera nhưng chậm hơn đảo (0.15f hệ số).
+    val parallaxX = camX * 0.15f
+
+    // Các neo mây trong không gian màn hình (vùng bầu trời trên cùng), kèm hệ số parallax riêng
+    // cho từng lớp khoảng cách: xa (mựn mờ, bay chậm), trung (cumulus có khối), trước (sợi mây).
+    // Mỗi neo: (screenX, screenY, scale, parallax, depthLayer)
+    data class CloudAnchor(val x: Float, val y: Float, val scale: Float, val parallax: Float, val depth: Int)
+    val cloudSpecs = listOf(
+      // Lớp xa: mựn mỏng mờ, bay chậm, alpha thấp
+      CloudAnchor(-180f, 70f, 0.85f, 0.12f, 0),
+      CloudAnchor(420f, 110f, 0.95f, 0.18f, 0),
+      CloudAnchor(950f, 50f, 0.80f, 0.10f, 0),
+      // Lớp trung: cumulus có khối, 3 cấp sáng/tối, bụng có shade
+      CloudAnchor(90f, 190f, 1.10f, 0.42f, 1),
+      CloudAnchor(680f, 140f, 1.15f, 0.48f, 1),
+      CloudAnchor(1050f, 175f, 1.00f, 0.38f, 1),
+      // Lớp trước: sợi mây lửng lơ, bay nhanh hơn, alpha thấp hơn
+      CloudAnchor(260f, 270f, 0.65f, 0.60f, 2),
+      CloudAnchor(820f, 230f, 0.70f, 0.55f, 2),
+    )
+
+    cloudSpecs.forEachIndexed { idx, anchor ->
+      val cx = anchor.x
+      val cy = anchor.y
+      val scale = anchor.scale
+      val parallax = anchor.parallax
+      val depth = anchor.depth
+      // Drift deterministic: sin(timeSec) với chu kỳ khác nhau theo layer, không giật khi zoom/quay lại.
+      val drift = sin(timeSec * (0.12f + depth * 0.06f) + idx * 2.1f) * (35f + depth * 12f)
+      // Parallax X: camera di chuyển làm mây dịch nhẹ ngược hướng.
+      val screenX = halfW + cx - parallaxX * parallax + drift
+      val screenY = cy
+      val s = zoom * scale
+
+      // Cull: không vẽ mây hoàn toàn ngoài màn hình (dành margin để mây vào khung mượt).
+      if (screenX !in -300f..(size.width + 300f) || screenY !in -120f..(size.height * 0.72f)) return@forEachIndexed
+
+      val layerAlpha = when (depth) {
+        0 -> 0.50f // xa: mờ hơn
+        1 -> 0.62f // trung: rõ nét nhất
+        else -> 0.40f // trước: lửng lơ
       }
+
+      drawCloudPuff(screenX, screenY, s, cloudCol, alphaScale * layerAlpha, idx)
     }
+  }
+
+  /** Vẽ một cụm mây kiểu pixel-art: nhiều oval chồng lớp, 3 cấp sáng/tối, bụng mây có shade,
+   *  bên đón nắng, viền không rung khi zoom. Không dùng gradient brush mỗi frame. */
+  private fun DrawScope.drawCloudPuff(
+    cx: Float,
+    cy: Float,
+    s: Float,
+    color: Color,
+    alphaScale: Float,
+    puffIdx: Int,
+  ) {
+    val a = alphaScale
+    // Thân mây chính (cấp medium)
+    drawOval(color.copy(alpha = 0.50f * a), Offset(cx - 95f * s, cy - 16f * s), Size(190f * s, 44f * s))
+    drawOval(color.copy(alpha = 0.44f * a), Offset(cx - 80f * s, cy - 30f * s), Size(100f * s, 40f * s))
+    drawOval(color.copy(alpha = 0.38f * a), Offset(cx - 38f * s, cy - 46f * s), Size(95f * s, 52f * s))
+    drawOval(color.copy(alpha = 0.44f * a), Offset(cx + 22f * s, cy - 28f * s), Size(75f * s, 40f * s))
+    // Bụng mây tối hơn (shade) — tạo khối, không phải ellipse phẳng
+    drawOval(color.copy(alpha = 0.30f * a), Offset(cx - 70f * s, cy - 6f * s), Size(150f * s, 30f * s))
+    // Viền đón nắng sáng hơn (highlight) — tạo cảm giác nguồn sáng phía trên
+    drawOval(color.copy(alpha = 0.22f * a), Offset(cx - 62f * s, cy - 34f * s), Size(65f * s, 28f * s))
+    drawOval(color.copy(alpha = 0.18f * a), Offset(cx + 8f * s, cy - 20f * s), Size(50f * s, 24f * s))
   }
 
   private fun DrawScope.drawFloatingIslandCliffUnderside(
