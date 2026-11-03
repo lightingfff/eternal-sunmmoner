@@ -4,6 +4,8 @@ import com.example.game.pixel.SanctuaryWorldRenderer
 import com.example.game.world.WorldEnvironment
 import com.example.game.world.WorldLighting
 import com.example.game.world.WorldWeather
+import com.example.game.world.WeatherState
+import androidx.compose.ui.graphics.toArgb
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -51,12 +53,12 @@ class P26CCloudStormContractTest {
   @Test
   fun weatherCycleIncludesStorm() {
     // Chu kỳ 6 slot (24 phút) phải chứa STORM.
-    val slot0 = WorldWeather.WeatherState.at(0L).weatherType
-    val slot1 = WorldWeather.WeatherState.at(240000L).weatherType
-    val slot2 = WorldWeather.WeatherState.at(480000L).weatherType
-    val slot3 = WorldWeather.WeatherState.at(720000L).weatherType
-    val slot4 = WorldWeather.WeatherState.at(960000L).weatherType
-    val slot5 = WorldWeather.WeatherState.at(1200000L).weatherType
+    val slot0 = WeatherState.at(0L).weatherType
+    val slot1 = WeatherState.at(240000L).weatherType
+    val slot2 = WeatherState.at(480000L).weatherType
+    val slot3 = WeatherState.at(720000L).weatherType
+    val slot4 = WeatherState.at(960000L).weatherType
+    val slot5 = WeatherState.at(1200000L).weatherType
     val types = listOf(slot0, slot1, slot2, slot3, slot4, slot5)
     assertTrue("Chu kỳ thời tiết phải chứa STORM (đã có: $types)", types.contains(WorldWeather.STORM))
     assertTrue("Chu kỳ thời tiết phải chứa CLEAR", types.contains(WorldWeather.CLEAR))
@@ -115,8 +117,8 @@ class P26CCloudStormContractTest {
   @Test
   fun skyBandColorsCachedNotReallocated() {
     // Clouds và sky bands không được cấp phát mỗi frame (P26C perf).
-    val a = SanctuaryWorldRenderer.skyBandColors(12f, com.example.game.world.WeatherState())
-    val b = SanctuaryWorldRenderer.skyBandColors(12f, com.example.game.world.WeatherState())
+    val a = SanctuaryWorldRenderer.skyBandColors(12f, WeatherState())
+    val b = SanctuaryWorldRenderer.skyBandColors(12f, WeatherState())
     assertTrue("sky band colours must be cached (no per-frame allocation)", a === b)
   }
 
