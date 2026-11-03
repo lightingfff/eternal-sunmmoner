@@ -1,0 +1,527 @@
+[
+  {
+    "file": "sanctuary_overview_z036.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 1600,
+    "camY": 1380,
+    "zoom": 0.36000001430511475,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "monument_tower_gate",
+        "kind": "FACILITY_TOWER_GATE",
+        "x": 1960,
+        "y": 585,
+        "scale": 0.9599999785423279
+      },
+      {
+        "id": "building_summon_hall",
+        "kind": "FACILITY_SUMMONING_HALL",
+        "x": 2430,
+        "y": 2005,
+        "scale": 1.0800000429153442
+      },
+      {
+        "id": "building_armory",
+        "kind": "FACILITY_ARMORY",
+        "x": 995,
+        "y": 655,
+        "scale": 0.800000011920929
+      },
+      {
+        "id": "building_hero_quarters",
+        "kind": "FACILITY_HERO_QUARTERS",
+        "x": 825,
+        "y": 790,
+        "scale": 0.800000011920929
+      },
+      {
+        "id": "building_restaurant",
+        "kind": "FACILITY_RESTAURANT",
+        "x": 1105,
+        "y": 925,
+        "scale": 0.800000011920929
+      },
+      {
+        "id": "building_hero_registry",
+        "kind": "FACILITY_HERO_REGISTRY",
+        "x": 785,
+        "y": 1185,
+        "scale": 0.800000011920929
+      },
+      {
+        "id": "building_synthesis_lab",
+        "kind": "FACILITY_SYNTHESIS_LAB",
+        "x": 1270,
+        "y": 555,
+        "scale": 0.800000011920929
+      }
+    ]
+  },
+  {
+    "file": "service_cluster_z088.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "building_armory",
+        "kind": "FACILITY_ARMORY",
+        "x": 995,
+        "y": 655,
+        "scale": 0.800000011920929
+      },
+      {
+        "id": "building_hero_quarters",
+        "kind": "FACILITY_HERO_QUARTERS",
+        "x": 825,
+        "y": 790,
+        "scale": 0.800000011920929
+      },
+      {
+        "id": "building_restaurant",
+        "kind": "FACILITY_RESTAURANT",
+        "x": 1105,
+        "y": 925,
+        "scale": 0.800000011920929
+      },
+      {
+        "id": "building_hero_registry",
+        "kind": "FACILITY_HERO_REGISTRY",
+        "x": 785,
+        "y": 1185,
+        "scale": 0.800000011920929
+      },
+      {
+        "id": "nw_outer_slate_house",
+        "kind": "MEDIEVAL_TOWNHOUSE_B",
+        "x": 655,
+        "y": 930,
+        "scale": 0.8399999737739563
+      }
+    ]
+  },
+  {
+    "file": "service_cluster_z100.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 1,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "building_armory",
+        "kind": "FACILITY_ARMORY",
+        "x": 995,
+        "y": 655,
+        "scale": 0.800000011920929
+      },
+      {
+        "id": "building_hero_quarters",
+        "kind": "FACILITY_HERO_QUARTERS",
+        "x": 825,
+        "y": 790,
+        "scale": 0.800000011920929
+      },
+      {
+        "id": "building_restaurant",
+        "kind": "FACILITY_RESTAURANT",
+        "x": 1105,
+        "y": 925,
+        "scale": 0.800000011920929
+      },
+      {
+        "id": "building_hero_registry",
+        "kind": "FACILITY_HERO_REGISTRY",
+        "x": 785,
+        "y": 1185,
+        "scale": 0.800000011920929
+      }
+    ]
+  },
+  {
+    "file": "armory_full_z088.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 995,
+    "camY": 580,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "building_armory",
+        "kind": "FACILITY_ARMORY",
+        "x": 995,
+        "y": 655,
+        "scale": 0.800000011920929
+      }
+    ]
+  },
+  {
+    "file": "armory_full_z100.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 995,
+    "camY": 580,
+    "zoom": 1,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "building_armory",
+        "kind": "FACILITY_ARMORY",
+        "x": 995,
+        "y": 655,
+        "scale": 0.800000011920929
+      }
+    ]
+  },
+  {
+    "file": "armory_full_z148.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 995,
+    "camY": 560,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "building_armory",
+        "kind": "FACILITY_ARMORY",
+        "x": 995,
+        "y": 655,
+        "scale": 0.800000011920929
+      }
+    ]
+  },
+  {
+    "file": "armory_door_trigger_actor_z148.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 995,
+    "camY": 585,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "building_armory",
+        "kind": "FACILITY_ARMORY",
+        "x": 995,
+        "y": 655,
+        "scale": 0.800000011920929
+      }
+    ]
+  },
+  {
+    "file": "armory_behind_occlusion_z148.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 995,
+    "camY": 555,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "building_armory",
+        "kind": "FACILITY_ARMORY",
+        "x": 995,
+        "y": 655,
+        "scale": 0.800000011920929
+      }
+    ]
+  },
+  {
+    "file": "quarters_door_actor_z148.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 825,
+    "camY": 710,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "building_hero_quarters",
+        "kind": "FACILITY_HERO_QUARTERS",
+        "x": 825,
+        "y": 790,
+        "scale": 0.800000011920929
+      }
+    ]
+  },
+  {
+    "file": "restaurant_door_actor_z148.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 1105,
+    "camY": 845,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "building_restaurant",
+        "kind": "FACILITY_RESTAURANT",
+        "x": 1105,
+        "y": 925,
+        "scale": 0.800000011920929
+      }
+    ]
+  },
+  {
+    "file": "registry_close_z148.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 785,
+    "camY": 1105,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "building_hero_registry",
+        "kind": "FACILITY_HERO_REGISTRY",
+        "x": 785,
+        "y": 1185,
+        "scale": 0.800000011920929
+      }
+    ]
+  },
+  {
+    "file": "cottages_nw_z148.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 575,
+    "camY": 865,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "nw_outer_slate_house",
+        "kind": "MEDIEVAL_TOWNHOUSE_B",
+        "x": 655,
+        "y": 930,
+        "scale": 0.8399999737739563
+      },
+      {
+        "id": "nw_outer_brown_cottage",
+        "kind": "SANCTUARY_COTTAGE_BROWN",
+        "x": 495,
+        "y": 1075,
+        "scale": 0.8600000143051147
+      }
+    ]
+  },
+  {
+    "file": "synthesis_cottage_z148.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 1320,
+    "camY": 480,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "building_synthesis_lab",
+        "kind": "FACILITY_SYNTHESIS_LAB",
+        "x": 1270,
+        "y": 555,
+        "scale": 0.800000011920929
+      },
+      {
+        "id": "inner_slate_wing_cottage",
+        "kind": "SANCTUARY_COTTAGE_SLATE",
+        "x": 1395,
+        "y": 675,
+        "scale": 0.8199999928474426
+      }
+    ]
+  },
+  {
+    "file": "summoning_hall_whole_z148.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 2430,
+    "camY": 1715,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "building_summon_hall",
+        "kind": "FACILITY_SUMMONING_HALL",
+        "x": 2430,
+        "y": 2005,
+        "scale": 1.0800000429153442
+      }
+    ]
+  },
+  {
+    "file": "summoning_hall_zone_actor_z100.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 2405,
+    "camY": 1855,
+    "zoom": 1,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "building_summon_hall",
+        "kind": "FACILITY_SUMMONING_HALL",
+        "x": 2430,
+        "y": 2005,
+        "scale": 1.0800000429153442
+      }
+    ]
+  },
+  {
+    "file": "tower_gate_whole_z148.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 1960,
+    "camY": 310,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "monument_tower_gate",
+        "kind": "FACILITY_TOWER_GATE",
+        "x": 1960,
+        "y": 585,
+        "scale": 0.9599999785423279
+      }
+    ]
+  },
+  {
+    "file": "tower_gate_portal_actor_z100.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 1960,
+    "camY": 460,
+    "zoom": 1,
+    "timeSec": 0.25,
+    "props": [
+      {
+        "id": "monument_tower_gate",
+        "kind": "FACILITY_TOWER_GATE",
+        "x": 1960,
+        "y": 585,
+        "scale": 0.9599999785423279
+      }
+    ]
+  },
+  {
+    "file": "avenue_props_lantern_f0_z148.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 1185,
+    "camY": 1015,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "props": []
+  },
+  {
+    "file": "avenue_props_lantern_f1_z148.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 1185,
+    "camY": 1015,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0.18000000715255737,
+    "props": []
+  },
+  {
+    "file": "south_gate_training_z088.png",
+    "scene": "SANCTUARY_ASTRAL",
+    "camX": 1320,
+    "camY": 1980,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "south_gate_tower_west",
+        "kind": "SOUTHERN_GATE_TOWER",
+        "x": 1360,
+        "y": 2395,
+        "scale": 1.0199999809265137
+      },
+      {
+        "id": "south_gate_tower_east",
+        "kind": "SOUTHERN_GATE_TOWER",
+        "x": 1860,
+        "y": 2395,
+        "scale": 1.0199999809265137
+      }
+    ]
+  },
+  {
+    "file": "tower_f1_ruins_lantern_z088.png",
+    "scene": "FIRST_FIELD_MEADOW",
+    "camX": 580,
+    "camY": 1090,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "f1_ruin_arch_0",
+        "kind": "ANCIENT_RUIN_ARCH",
+        "x": 520,
+        "y": 1290,
+        "scale": 1.059999942779541
+      },
+      {
+        "id": "f1_ruin_arch_1",
+        "kind": "ANCIENT_RUIN_ARCH",
+        "x": 640,
+        "y": 930,
+        "scale": 1.059999942779541
+      },
+      {
+        "id": "f1_lantern_w",
+        "kind": "STREET_LANTERN",
+        "x": 495,
+        "y": 965,
+        "scale": 1
+      }
+    ]
+  },
+  {
+    "file": "tower_f1_ruin_arch_close_z148.png",
+    "scene": "FIRST_FIELD_MEADOW",
+    "camX": 640,
+    "camY": 890,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "f1_ruin_arch_1",
+        "kind": "ANCIENT_RUIN_ARCH",
+        "x": 640,
+        "y": 930,
+        "scale": 1.059999942779541
+      },
+      {
+        "id": "f1_lantern_w",
+        "kind": "STREET_LANTERN",
+        "x": 495,
+        "y": 965,
+        "scale": 1
+      }
+    ]
+  },
+  {
+    "file": "tower_f2_ruin_arch_plum_z088.png",
+    "scene": "ELDERWOOD_FOREST",
+    "camX": 511.9107666015625,
+    "camY": 639.0784912109375,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "f2_obs_30",
+        "kind": "ANCIENT_RUIN_ARCH",
+        "x": 511.9107666015625,
+        "y": 669.0784912109375,
+        "scale": 1.0399999618530273
+      }
+    ]
+  },
+  {
+    "file": "tower_f4_obsidian_column_z148.png",
+    "scene": "SUNKEN_RUINS",
+    "camX": 1591.59130859375,
+    "camY": 562.3473510742188,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "props": [
+      {
+        "id": "f3_obs_20",
+        "kind": "OBSIDIAN_COLUMN",
+        "x": 1591.59130859375,
+        "y": 597.3473510742188,
+        "scale": 1.100000023841858
+      }
+    ]
+  }
+]

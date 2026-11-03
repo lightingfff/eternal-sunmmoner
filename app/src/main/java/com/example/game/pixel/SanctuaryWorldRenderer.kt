@@ -18,6 +18,7 @@ import com.example.game.map.PathSegment
 import com.example.game.map.SanctuaryIslandGeometry
 import kotlin.math.cos
 import kotlin.math.hypot
+import kotlin.math.PI
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
@@ -53,26 +54,14 @@ object SanctuaryWorldRenderer {
     fun sx(wx: Float) = ObliqueCamera.worldToScreenX(wx, camX, zoom, halfW)
     fun sy(wy: Float, z: Float = 0f) = ObliqueCamera.worldToScreenY(wy, camY, zoom, halfH, z)
 
-    // 1. Sunlit Anime Cerulean Sky Gradient + Clouds + Floating Sky Islands
-    // Dark Fantasy Twilight Sky - deep indigo to dusky violet, not sunny cerulean
-    drawRect(
-      brush = Brush.verticalGradient(
-        colors = listOf(
-          Color(0xFF0D0F1A), // zenith - near black indigo
-          Color(0xFF181B2E), // mid-upper - deep slate violet
-          Color(0xFF242742), // mid - cold dusk blue-grey
-          Color(0xFF2E314F), // horizon - muted violet haze (faint aurora)
-        ),
-        startY = 0f,
-        endY = size.height,
-      ),
-    )
-    // Faint cold moon glow near top-right, subtle
-    drawOval(Color(0xFF8A9AB8).copy(alpha = 0.08f), Offset(size.width*0.78f, size.height*0.12f), Size(220f, 140f))
-    drawOval(Color(0xFFB8C8E6).copy(alpha = 0.06f), Offset(size.width*0.81f, size.height*0.13f), Size(110f, 70f))
-
-
+    // 1. Time-of-day sky gradient, celestial discs, clouds and horizon haze.
+    // P26: the sky is the mood carrier. Morning / noon / evening / night each read
+    // differently (bright noon blue, warm dawn/evening, deep night) instead of one
+    // fixed dark twilight gradient.
+    drawSkyBands()
+    drawCelestialDiscs()
     drawDriftingSkyClouds(camX, camY, zoom, timeSec)
+    drawHorizonHaze()
     val daylight = ((com.example.game.world.WorldEnvironment.lighting.ambientIntensity-.73f)/.27f).coerceIn(0f,1f)
     drawRect(com.example.game.world.WorldEnvironment.lighting.skyTint.copy(alpha=daylight*.26f))
     with(DepthPresentation) { drawDistantFocus(camX,camY,zoom,timeSec) }
@@ -208,8 +197,8 @@ object SanctuaryWorldRenderer {
       )
     }
 
-    // 7. Pale Moonlight Beams & Cold Night Haze (subtle, not warm sunny)
-    drawDiagonalMoonlightRays()
+    // 7. Time-of-day sky rays (warm gold sunbeams by day, cool moonlight at night)
+    drawSkyRays()
 
     // 8. Local Light Glows - warm amber from gate braziers + cold rune light on plaza
     drawSanctuaryLocalLights(::sx, ::sy, zoom, timeSec)
@@ -423,6 +412,99 @@ object SanctuaryWorldRenderer {
     }
   }
 
+  /** P26: pre-interpolated 12-band sky colours (RGB floats, 0..255). Cached by quantised
+   *  hour + weather buckets, so the render loop never allocates a gradient brush or a
+   *  colour list per frame. Same state key => the same buffer instance (contract-tested). */
+  private val skyBandCache = mutableMapOf<Long, FloatArray>()
+  fun skyBandColors(hour: Float, weather: com.example.game.world.WeatherState): FloatArray {
+    val hb = ((hour * 4f).roundToInt() and 0xFF).toLong() // 0.25h sky buckets
+    val rb = ((weather.rain * 3f).roundToInt().coerceIn(0, 3)).toLong()
+    val cb = ((weather.cloud * 3f).roundToInt().coerceIn(0, 3)).toLong()
+    val fb = ((weather.fog * 3f).roundToInt().coerceIn(0, 3)).toLong()
+    val key = hb * 64L + rb * 16L + cb * 4L + fb
+    val cached = skyBandCache[key]
+    if (cached != null) return cached
+    val lighting = com.example.game.world.WorldLighting.at(hour).withWeather(weather)
+    val stops = lighting.skyColors
+    val bands = FloatArray(36)
+    for (b in 0 until 12) {
+      val t = b / 12f
+      val col = when {
+        t < .333f -> androidx.compose.ui.graphics.lerp(stops[0], stops[1], t / .333f)
+        t < .666f -> androidx.compose.ui.graphics.lerp(stops[1], stops[2], (t - .333f) / .333f)
+        else -> androidx.compose.ui.graphics.lerp(stops[2], stops[3], (t - .666f) / .334f)
+      }
+      val k = lighting.skyBrightness
+      bands[b * 3] = col.red * 255f * k
+      bands[b * 3 + 1] = col.green * 255f * k
+      bands[b * 3 + 2] = col.blue * 255f * k
+    }
+    skyBandCache[key] = bands
+    return bands
+  }
+
+  private fun DrawScope.drawSkyBands() {
+    val lighting = com.example.game.world.WorldEnvironment.lighting
+    val bands = skyBandColors(lighting.hour, com.example.game.world.WorldEnvironment.weather)
+    val bandH = size.height / 12f
+    for (b in 0 until 12) {
+      drawRect(
+        color = Color(
+          red = bands[b * 3].coerceIn(0f, 255f).toInt(),
+          green = bands[b * 3 + 1].coerceIn(0f, 255f).toInt(),
+          blue = bands[b * 3 + 2].coerceIn(0f, 255f).toInt(),
+        ),
+        Offset(0f, b * bandH),
+        Size(size.width, bandH + 1f),
+      )
+    }
+  }
+
+  private fun celestialScreen(elevation: Float, dirX: Float): Pair<Float, Float> {
+    // Horizon sits at ~0.62 of the frame; elevation 0..π/2 lifts the disc to the zenith.
+    val yFrac = (0.62f - (elevation.coerceIn(0f, PI.toFloat() / 2) / (PI.toFloat() / 2)) * 0.55f)
+      .coerceIn(0.05f, 0.62f)
+    val xFrac = (0.5f + dirX * 0.30f).coerceIn(0.18f, 0.82f)
+    return xFrac to yFrac
+  }
+
+  private fun DrawScope.drawCelestialDiscs() {
+    val lighting = com.example.game.world.WorldEnvironment.lighting
+    if (lighting.sunIntensity > 0.02f) {
+      val (xFrac, yFrac) = celestialScreen(lighting.sunElevation, lighting.directionX)
+      drawCelestialDisc(size.width * xFrac, size.height * yFrac, lighting.sunColor, lighting.sunIntensity)
+    }
+    if (lighting.moonIntensity > 0.02f) {
+      val (xFrac, yFrac) = celestialScreen(lighting.moonElevation, lighting.directionX)
+      drawCelestialDisc(size.width * xFrac, size.height * yFrac, lighting.moonColor, lighting.moonIntensity)
+    }
+  }
+
+  private fun DrawScope.drawCelestialDisc(x: Float, y: Float, color: Color, intensity: Float) {
+    // Glow halo + crisp disc. Alpha is bounded by intensity so noon never washes the frame.
+    drawOval(
+      color = color.copy(alpha = (0.12f * intensity).coerceAtMost(0.12f)),
+      topLeft = Offset(x - 110f, y - 110f),
+      size = Size(220f, 220f),
+    )
+    drawCircle(
+      color = color.copy(alpha = (0.55f * intensity).coerceAtMost(0.55f)),
+      radius = 24f,
+      center = Offset(x, y),
+    )
+  }
+
+  private fun DrawScope.drawHorizonHaze() {
+    val lighting = com.example.game.world.WorldEnvironment.lighting
+    if (lighting.hazeDensity <= 0.02f) return
+    // One wide, flat haze band straddling the horizon (more at evening/night/fog/rain).
+    drawOval(
+      color = lighting.hazeColor.copy(alpha = (lighting.hazeDensity * 0.30f).coerceAtMost(0.30f)),
+      topLeft = Offset(-size.width * 0.2f, size.height * 0.40f),
+      size = Size(size.width * 1.4f, size.height * 0.24f),
+    )
+  }
+
   private fun DrawScope.drawDriftingSkyClouds(
     camX: Float,
     camY: Float,
@@ -437,6 +519,11 @@ object SanctuaryWorldRenderer {
       Triple(420f, 2580f, 1.30f),
       Triple(2780f, 2560f, 1.35f),
     )
+    // P26: cloud colour and character answer the time of day and weather (white noon
+    // clouds, warm sunset bands, thin dark night cloud, denser cover when it rains).
+    val lighting = com.example.game.world.WorldEnvironment.lighting
+    val cloudCol = lighting.cloudColor
+    val alphaScale = (lighting.cloudDensity * lighting.cloudBrightness).coerceIn(0f, 1f)
     val halfW = size.width / 2f
     val halfH = size.height / 2f
     cloudSpecs.forEachIndexed { idx, (wx, wy, cScale) ->
@@ -445,10 +532,10 @@ object SanctuaryWorldRenderer {
       val cy = ObliqueCamera.worldToScreenY(wy, camY, zoom, halfH)
       val s = zoom * cScale
       if (cx in -320f..(size.width + 320f) && cy in -220f..(size.height + 220f)) {
-        drawOval(Color(0xFF2A2E4A).copy(alpha = 0.45f), Offset(cx - 120f * s, cy - 18f * s), Size(240f * s, 54f * s))
-        drawOval(Color(0xFF34385A).copy(alpha = 0.38f), Offset(cx - 108f * s, cy - 34f * s), Size(110f * s, 52f * s))
-        drawOval(Color(0xFF3D405E).copy(alpha = 0.32f), Offset(cx - 46f * s, cy - 52f * s), Size(118f * s, 64f * s))
-        drawOval(Color(0xFF34385A).copy(alpha = 0.38f), Offset(cx + 28f * s, cy - 32f * s), Size(92f * s, 48f * s))
+        drawOval(cloudCol.copy(alpha = 0.45f * alphaScale), Offset(cx - 120f * s, cy - 18f * s), Size(240f * s, 54f * s))
+        drawOval(cloudCol.copy(alpha = 0.38f * alphaScale), Offset(cx - 108f * s, cy - 34f * s), Size(110f * s, 52f * s))
+        drawOval(cloudCol.copy(alpha = 0.32f * alphaScale), Offset(cx - 46f * s, cy - 52f * s), Size(118f * s, 64f * s))
+        drawOval(cloudCol.copy(alpha = 0.38f * alphaScale), Offset(cx + 28f * s, cy - 32f * s), Size(92f * s, 48f * s))
       }
     }
   }
@@ -1119,10 +1206,19 @@ object SanctuaryWorldRenderer {
     }
   }
 
-  private fun DrawScope.drawDiagonalMoonlightRays() {
+  private fun DrawScope.drawSkyRays() {
+    val lighting = com.example.game.world.WorldEnvironment.lighting
+    if (lighting.rayAlpha <= 0.02f) return
+    // Warm gold sunbeams by day, cool moonlight at night. Solid rects with a bounded
+    // alpha and a vertical fade (bright at the top, fading out before the world plane):
+    // no gradient brush allocation per frame and no screen-wide flood of the lower frame.
     withTransform({
       rotate(degrees = -34f, pivot = Offset(0f, 0f))
     }) {
+      val rayCol = lighting.rayColor
+      val aFull = lighting.rayAlpha.coerceAtMost(0.14f)
+      val aMid = aFull * 0.5f
+      val aFaint = aFull * 0.22f
       val raySpecs = listOf(
         80f to 130f,
         290f to 95f,
@@ -1130,19 +1226,9 @@ object SanctuaryWorldRenderer {
         760f to 85f,
       )
       raySpecs.forEach { (offsetX, widthPx) ->
-        drawRect(
-          brush = Brush.verticalGradient(
-            colors = listOf(
-              Color(0x1A8A9AB8),
-              Color(0x0E5A6A9A),
-              Color.Transparent,
-            ),
-            startY = 0f,
-            endY = size.height * 1.35f,
-          ),
-          topLeft = Offset(offsetX, -80f),
-          size = Size(widthPx, size.height * 1.45f),
-        )
+        drawRect(color = rayCol.copy(alpha = aFull), topLeft = Offset(offsetX, -80f), size = Size(widthPx, size.height * 0.42f))
+        drawRect(color = rayCol.copy(alpha = aMid), topLeft = Offset(offsetX, size.height * 0.34f), size = Size(widthPx, size.height * 0.41f))
+        drawRect(color = rayCol.copy(alpha = aFaint), topLeft = Offset(offsetX, size.height * 0.70f), size = Size(widthPx, size.height * 0.75f))
       }
     }
   }
@@ -1183,19 +1269,35 @@ object SanctuaryWorldRenderer {
   private fun DrawScope.drawSanctuaryLocalLights(
     sx:(Float)->Float,sy:(Float,Float)->Float,zoom:Float,timeSec:Float,
   ) {
-    val intensity=com.example.game.world.WorldEnvironment.lighting.localLightIntensity
-    val flicker=.94f+.06f*sin(timeSec*3.1f+1.7f)
-    with(DepthPresentation) {
-      // Emissive-only bloom; world grade/weather own atmosphere. No stacked ground haze,
-      // whole-screen vignette/chasm darkening or duplicate generic landmark shadows.
-      for(i in 0..1) {
-        val wx=if(i==0) 1490f else 1730f
-        val x=sx(wx);val y=sy(2155f,0f)
-        drawLightStamp(Offset(x,y),70f*zoom,50f*zoom,DepthPresentation.LightTint.WARM_AMBER,.13f*intensity*flicker)
+    if (DepthPresentation.quality == DepthPresentation.Quality.OFF || zoom <= 0f) return
+    val exposure = HdrLightResponse.exposureBalance()
+    val flicker = .94f + .06f * sin(timeSec*3.1f + 1.7f)
+    with(HdrLightResponse) {
+      // P24: ONE controlled focal point on the plaza, on the .72 ground plane. The
+      // exposure balance raises it at night without lifting the whole scene.
+      val px = sx(SanctuaryIslandGeometry.PLAZA_CENTER_X)
+      val py = sy(SanctuaryIslandGeometry.PLAZA_CENTER_Y, 0f)
+      drawHdrStamp(
+        Offset(px, py), 120f*zoom, 120f*zoom*ObliqueCamera.OBLIQUE_Y_SCALE,
+        HdrLightResponse.Tint.MOON, (.160f*exposure).coerceAtMost(.30f),
+      )
+      // Tower Gate is the strongest cold source; its pool reaches the monolith stairs.
+      // The emissive core/rift halo itself is drawn by drawProp AFTER the monument sprite.
+      val gx = sx(1960f); val gy = sy(585f, 0f)
+      drawHdrStamp(
+        Offset(gx, gy + 12f*zoom), 118f*zoom, 118f*zoom*ObliqueCamera.OBLIQUE_Y_SCALE,
+        HdrLightResponse.Tint.AETHER, (.13f*exposure*flicker).coerceAtMost(.22f),
+      )
+      if (DepthPresentation.quality == DepthPresentation.Quality.BALANCED) {
+        // Two warm posts near the southern approach keep the amber/cold hierarchy.
+        for (i in 0..1) {
+          val wx = if (i == 0) 1490f else 1730f
+          drawHdrStamp(
+            Offset(sx(wx), sy(2155f, 0f)), 62f*zoom, 62f*zoom*ObliqueCamera.OBLIQUE_Y_SCALE,
+            HdrLightResponse.Tint.AMBER, (.10f*exposure*flicker).coerceAtMost(.22f),
+          )
+        }
       }
-      val x=sx(SanctuaryIslandGeometry.PLAZA_CENTER_X)
-      val y=sy(SanctuaryIslandGeometry.PLAZA_CENTER_Y,0f)
-      drawLightStamp(Offset(x,y),65f*zoom,46f*zoom,DepthPresentation.LightTint.COOL_AETHER,.08f*intensity)
     }
   }
 }

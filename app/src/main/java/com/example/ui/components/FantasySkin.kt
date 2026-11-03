@@ -14,7 +14,8 @@ import androidx.compose.ui.unit.dp
 
 /** Shared controls across management, inventory, tower preparation and settlement. */
 object FantasySkin {
-  val Panel=Color(0xff1c242e)
+  // P26: dark glass panel instead of an opaque slab, so the world reads through.
+  val Panel=Color(0xB5141D2A)
   val Gold=Color(0xffc6b27f)
   @Composable fun buttonColors(containerColor: Color=Panel,contentColor: Color=Gold,
     disabledContainerColor: Color=Color(0xff242a30),disabledContentColor: Color=Color(0xff80868d)): ButtonColors {

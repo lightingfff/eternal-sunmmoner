@@ -1,0 +1,102 @@
+[
+  {
+    "file": "p26_sky_morning_z088.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "hour": 7,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26_sky_noon_z088.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "hour": 12,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26_sky_evening_z088.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "hour": 18.5,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26_sky_night_z088.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "hour": 0,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26_sky_noon_cloudy_z088.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "hour": 12,
+    "weather": "CLOUDY",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26_sky_noon_rain_z088.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "hour": 12,
+    "weather": "RAIN",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26_gate_night_z148.png",
+    "camX": 1960,
+    "camY": 310,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "hour": 0,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26_gate_noon_z148.png",
+    "camX": 1960,
+    "camY": 310,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "hour": 12,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26_gate_night_rain_z148.png",
+    "camX": 1960,
+    "camY": 310,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "hour": 0,
+    "weather": "RAIN",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26_overview_night_z036.png",
+    "camX": 1600,
+    "camY": 1380,
+    "zoom": 0.36000001430511475,
+    "timeSec": 0,
+    "hour": 0,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  }
+]

@@ -12,18 +12,17 @@ object LivingWorldRenderer {
   // Unit-space gradient is transformed with the fog oval and reused at every camera position.
   private val fogBrush = Brush.radialGradient(listOf(Color(0xff9bb0bb), Color.Transparent), Offset.Zero, 1f)
 
-  private data class LocalLight(
-    val tint: DepthPresentation.LightTint,
-    val groundRadius: Float,
-    val groundAlpha: Float,
-    val haloRadius: Float,
-    val haloAlpha: Float,
-    val flickers: Boolean = false,
-  )
-  private val lanternLight = LocalLight(DepthPresentation.LightTint.WARM_AMBER,58f,.085f,20f,.09f,true)
-  private val brazierLight = LocalLight(DepthPresentation.LightTint.COOL_AETHER,64f,.08f,22f,.085f,true)
-  private val gateLight = LocalLight(DepthPresentation.LightTint.COOL_AETHER,86f,.075f,28f,.065f)
-  private val windowLight = LocalLight(DepthPresentation.LightTint.WINDOW_GOLD,48f,.055f,18f,.045f)
+  // P24: light stamps are owned by HdrLightResponse (single pipeline, see drawProp).
+  // This lobby-only pass keeps just the wet ground reflection beside real emitters.
+  private fun wetTint(kind: PropKind): Color? = when (kind) {
+    PropKind.STREET_LANTERN, PropKind.FACILITY_RESTAURANT, PropKind.FACILITY_ARMORY,
+    PropKind.FACILITY_HERO_QUARTERS, PropKind.FACILITY_HERO_REGISTRY,
+    PropKind.FACILITY_SYNTHESIS_LAB, PropKind.SANCTUARY_COTTAGE_BROWN,
+    PropKind.SANCTUARY_COTTAGE_SLATE -> Color(0xffefbb7f.toInt())
+    PropKind.ARCANE_BRAZIER, PropKind.FACILITY_TOWER_GATE,
+    PropKind.TOWER_PORTAL_GATE -> Color(0xff75c9d7.toInt())
+    else -> null
+  }
 
   fun DrawScope.drawWorldGrade() {
     val light=WorldEnvironment.lighting
@@ -59,58 +58,30 @@ object LivingWorldRenderer {
       }
     }
   }
+  /**
+   * P24: per-prop ground spill, emissive core, halo and paired key/shade material
+   * response now live in `PixelSpriteRenderer.drawProp` -> `HdrLightResponse`, which
+   * runs in BOTH the lobby and the Robolectric render harness. Keeping the old stamps
+   * here would double every local light, so this pass owns only the rain reflection:
+   * one short wet streak on stone beside a real emitter. No per-frame allocation.
+   */
   fun DrawScope.drawLocalLights(obstacles: List<WorldObstacle>,camX: Float,camY: Float,zoom: Float) {
     if (DepthPresentation.quality == DepthPresentation.Quality.OFF || zoom <= 0f) return
-    val intensity=WorldEnvironment.lighting.localLightIntensity
-    val time=WorldEnvironment.elapsedSeconds
-    for(obs in obstacles) {
-      val light=when(obs.propKind) {
-        PropKind.STREET_LANTERN -> lanternLight
-        PropKind.ARCANE_BRAZIER -> brazierLight
-        PropKind.FACILITY_TOWER_GATE,PropKind.TOWER_PORTAL_GATE -> gateLight
-        PropKind.FACILITY_RESTAURANT,PropKind.FACILITY_ARMORY,PropKind.FACILITY_HERO_QUARTERS,
-        PropKind.FACILITY_HERO_REGISTRY,PropKind.FACILITY_SYNTHESIS_LAB,
-        PropKind.SANCTUARY_COTTAGE_BROWN,PropKind.SANCTUARY_COTTAGE_SLATE -> windowLight
-        else -> continue
-      }
-      val x=ObliqueCamera.worldToScreenX(obs.x,camX,zoom,size.width/2)
-      val y=ObliqueCamera.worldToScreenY(obs.y,camY,zoom,size.height/2,obs.elevationZ)
-      val scale=zoom*obs.scale
-      val radius=light.groundRadius*scale
-      // Cull a conservative upright envelope BEFORE looking up the shared cached sprite.
-      if(x+radius<0 || x-radius>size.width || y+radius<0 || y-500f*scale>size.height) continue
-      val flicker=if(light.flickers) .96f+.04f*sin(time*3.7f+obs.x*.03f) else 1f
-      val sprite=if(obs.propKind==PropKind.ARCANE_BRAZIER) PixelStructureAtlas.brazierFrames[0]
-        else SanctuaryEnvironmentShadows.sprite(obs)
-      val spriteScale=if(obs.propKind==PropKind.ARCANE_BRAZIER) 1.95f else ObliqueSpriteGeometry.pixelScale(obs.propKind)
-      val footOffset=if(sprite==null) 0f else if(obs.propKind==PropKind.ARCANE_BRAZIER) 4f
-        else ObliqueSpriteGeometry.drawFootOffset(obs.propKind,sprite)
-      val emitterHeight=if(sprite==null) 48f else when(obs.propKind) {
-        // Actual source glass/flame pixels; do not float halos at an unrelated fixed height.
-        PropKind.STREET_LANTERN -> (sprite.height-22f)*spriteScale-footOffset
-        PropKind.ARCANE_BRAZIER -> (sprite.height-18f)*spriteScale-footOffset
-        else -> {
-          val bounds=ObliqueSpriteGeometry.bounds(sprite)
-          (bounds.bottomPadding+bounds.visibleHeight*.25f)*spriteScale-footOffset
-        }
-      }
-      val emitterOffsetX=if(obs.propKind==PropKind.STREET_LANTERN && sprite!=null)
-        (22f-sprite.width/2f)*spriteScale*scale else 0f
-      with(DepthPresentation) {
-        // Broadest component lives on the .72 ground plane; the emissive core remains crisp.
-        drawLightStamp(Offset(x+emitterOffsetX,y+5f*scale),radius,radius*ObliqueCamera.OBLIQUE_Y_SCALE,
-          light.tint,light.groundAlpha*intensity*flicker)
-        if(quality==DepthPresentation.Quality.BALANCED) {
-          val haloRadius=light.haloRadius*scale
-          drawLightStamp(Offset(x+emitterOffsetX,y-emitterHeight*scale),haloRadius,haloRadius,
-            light.tint,light.haloAlpha*intensity*flicker)
-        }
-      }
-      if(WorldEnvironment.weather.rain>.1f) {
-        val color=if(light.tint==DepthPresentation.LightTint.COOL_AETHER) Color(0xff75c9d7) else Color(0xffefbb7f)
-        drawLine(color.copy(alpha=.08f*intensity*WorldEnvironment.weather.rain),
-          Offset(x-5f*scale,y+4f*scale),Offset(x+5f*scale,y+4f*scale),scale)
-      }
+    val rain = WorldEnvironment.weather.rain
+    if (rain <= 0.1f) return
+    val intensity = WorldEnvironment.lighting.localLightIntensity
+    for (obs in obstacles) {
+      val tint = wetTint(obs.propKind) ?: continue
+      val x = ObliqueCamera.worldToScreenX(obs.x,camX,zoom,size.width/2)
+      val y = ObliqueCamera.worldToScreenY(obs.y,camY,zoom,size.height/2,obs.elevationZ)
+      if (x < -40f || x > size.width + 40f || y < -40f || y > size.height + 40f) continue
+      val scale = zoom*obs.scale
+      drawLine(
+        tint.copy(alpha = .08f*intensity*rain),
+        Offset(x-5f*scale,y+4f*scale),
+        Offset(x+5f*scale,y+4f*scale),
+        scale,
+      )
     }
   }
 }

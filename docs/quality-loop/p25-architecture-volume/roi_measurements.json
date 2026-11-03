@@ -1,0 +1,4988 @@
+{
+  "thresholds": {
+    "front_minus_side_min": 12.0,
+    "roof_key_minus_return_min": 10.0,
+    "roof_front_abs_min": 10.0,
+    "front_minus_soffit_min": 18.0,
+    "roof_key_spread_min": 14.0,
+    "door_reveal_max_below_front": 20.0,
+    "no_flood_max_abs_mean_pct": 8.0
+  },
+  "assets": {
+    "hero_quarters": {
+      "before": {
+        "roof_key_pitch": {
+          "n": 4145,
+          "mean": 44.11,
+          "p10": 26.0,
+          "p90": 58.8,
+          "spread": 32.8
+        },
+        "roof_shaded_return": {
+          "n": 1544,
+          "mean": 38.97,
+          "p10": 26.0,
+          "p90": 48.9,
+          "spread": 22.8
+        },
+        "front_wall": {
+          "n": 6272,
+          "mean": 55.19,
+          "p10": 22.3,
+          "p90": 74.2,
+          "spread": 52.0
+        },
+        "side_wall": {
+          "n": 3224,
+          "mean": 56.76,
+          "p10": 40.7,
+          "p90": 59.5,
+          "spread": 18.7
+        },
+        "soffit_eave": {
+          "n": 416,
+          "mean": 28.24,
+          "p10": 27.9,
+          "p90": 28.3,
+          "spread": 0.4
+        },
+        "door_reveal": {
+          "n": 560,
+          "mean": 33.66,
+          "p10": 22.3,
+          "p90": 45.0,
+          "spread": 22.7
+        },
+        "plinth_foundation": {
+          "n": 686,
+          "mean": 61.45,
+          "p10": 22.3,
+          "p90": 88.2,
+          "spread": 66.0
+        }
+      },
+      "after": {
+        "roof_key_pitch": {
+          "n": 4145,
+          "mean": 46.92,
+          "p10": 26.0,
+          "p90": 69.9,
+          "spread": 43.8
+        },
+        "roof_shaded_return": {
+          "n": 1544,
+          "mean": 35.79,
+          "p10": 26.0,
+          "p90": 38.5,
+          "spread": 12.4
+        },
+        "front_wall": {
+          "n": 6272,
+          "mean": 60.78,
+          "p10": 22.3,
+          "p90": 86.4,
+          "spread": 64.2
+        },
+        "side_wall": {
+          "n": 3224,
+          "mean": 41.01,
+          "p10": 22.3,
+          "p90": 41.9,
+          "spread": 19.6
+        },
+        "soffit_eave": {
+          "n": 416,
+          "mean": 19.77,
+          "p10": 19.4,
+          "p90": 19.7,
+          "spread": 0.3
+        },
+        "door_reveal": {
+          "n": 560,
+          "mean": 33.66,
+          "p10": 22.3,
+          "p90": 45.0,
+          "spread": 22.7
+        },
+        "plinth_foundation": {
+          "n": 686,
+          "mean": 54.5,
+          "p10": 22.3,
+          "p90": 78.2,
+          "spread": 55.9
+        }
+      },
+      "checks": {
+        "front_minus_side": {
+          "before": -1.57,
+          "after": 19.77,
+          "min": 12.0,
+          "pass": true
+        },
+        "roof_key_minus_return": {
+          "before": 5.14,
+          "after": 11.13,
+          "min": 10.0,
+          "pass": true
+        },
+        "roof_front_abs": {
+          "before": 11.08,
+          "after": 13.86,
+          "min": 10.0,
+          "pass": true
+        },
+        "front_minus_soffit": {
+          "before": 26.95,
+          "after": 41.01,
+          "min": 18.0,
+          "pass": true
+        },
+        "roof_key_spread": {
+          "before": 32.8,
+          "after": 43.8,
+          "min": 14.0,
+          "pass": true
+        },
+        "door_below_front": {
+          "before": 21.53,
+          "after": 27.12,
+          "min": 20.0,
+          "pass": true
+        }
+      },
+      "all_pass": true
+    },
+    "restaurant": {
+      "before": {
+        "roof_key_pitch": {
+          "n": 4630,
+          "mean": 65.93,
+          "p10": 61.2,
+          "p90": 74.0,
+          "spread": 12.9
+        },
+        "roof_shaded_return": {
+          "n": 1686,
+          "mean": 64.99,
+          "p10": 61.2,
+          "p90": 74.0,
+          "spread": 12.9
+        },
+        "front_wall": {
+          "n": 6864,
+          "mean": 63.73,
+          "p10": 23.1,
+          "p90": 88.2,
+          "spread": 65.2
+        },
+        "side_wall": {
+          "n": 3501,
+          "mean": 63.59,
+          "p10": 40.7,
+          "p90": 88.2,
+          "spread": 47.5
+        },
+        "soffit_eave": {
+          "n": 440,
+          "mean": 28.49,
+          "p10": 27.9,
+          "p90": 28.3,
+          "spread": 0.4
+        },
+        "door_reveal": {
+          "n": 560,
+          "mean": 34.17,
+          "p10": 22.3,
+          "p90": 45.0,
+          "spread": 22.7
+        },
+        "plinth_foundation": {
+          "n": 728,
+          "mean": 64.98,
+          "p10": 35.2,
+          "p90": 88.2,
+          "spread": 53.1
+        }
+      },
+      "after": {
+        "roof_key_pitch": {
+          "n": 4630,
+          "mean": 57.56,
+          "p10": 51.6,
+          "p90": 68.2,
+          "spread": 16.6
+        },
+        "roof_shaded_return": {
+          "n": 1686,
+          "mean": 33.82,
+          "p10": 29.2,
+          "p90": 44.8,
+          "spread": 15.7
+        },
+        "front_wall": {
+          "n": 6864,
+          "mean": 73.23,
+          "p10": 23.1,
+          "p90": 107.6,
+          "spread": 84.5
+        },
+        "side_wall": {
+          "n": 3501,
+          "mean": 49.72,
+          "p10": 25.9,
+          "p90": 76.4,
+          "spread": 50.4
+        },
+        "soffit_eave": {
+          "n": 440,
+          "mean": 20.02,
+          "p10": 19.4,
+          "p90": 19.7,
+          "spread": 0.3
+        },
+        "door_reveal": {
+          "n": 560,
+          "mean": 34.17,
+          "p10": 22.3,
+          "p90": 45.0,
+          "spread": 22.7
+        },
+        "plinth_foundation": {
+          "n": 728,
+          "mean": 58.38,
+          "p10": 27.7,
+          "p90": 80.0,
+          "spread": 52.3
+        }
+      },
+      "checks": {
+        "front_minus_side": {
+          "before": 0.14,
+          "after": 23.51,
+          "min": 12.0,
+          "pass": true
+        },
+        "roof_key_minus_return": {
+          "before": 0.94,
+          "after": 23.74,
+          "min": 10.0,
+          "pass": true
+        },
+        "roof_front_abs": {
+          "before": 2.2,
+          "after": 15.67,
+          "min": 10.0,
+          "pass": true
+        },
+        "front_minus_soffit": {
+          "before": 35.24,
+          "after": 53.21,
+          "min": 18.0,
+          "pass": true
+        },
+        "roof_key_spread": {
+          "before": 12.9,
+          "after": 16.6,
+          "min": 14.0,
+          "pass": true
+        },
+        "door_below_front": {
+          "before": 29.56,
+          "after": 39.06,
+          "min": 20.0,
+          "pass": true
+        }
+      },
+      "all_pass": true
+    },
+    "summoning_hall": {
+      "before": {
+        "roof_key_pitch": {
+          "n": 2357,
+          "mean": 64.86,
+          "p10": 47.7,
+          "p90": 74.0,
+          "spread": 26.3
+        },
+        "roof_shaded_return": {
+          "n": 432,
+          "mean": 72.84,
+          "p10": 66.7,
+          "p90": 73.8,
+          "spread": 7.1
+        },
+        "front_wall": {
+          "n": 9296,
+          "mean": 80.01,
+          "p10": 57.9,
+          "p90": 98.5,
+          "spread": 40.5
+        },
+        "side_wall": {
+          "n": 1728,
+          "mean": 67.87,
+          "p10": 57.9,
+          "p90": 76.5,
+          "spread": 18.6
+        },
+        "soffit_eave": {
+          "n": 688,
+          "mean": 79.7,
+          "p10": 64.8,
+          "p90": 84.7,
+          "spread": 19.9
+        },
+        "plinth_foundation": {
+          "n": 3200,
+          "mean": 86.29,
+          "p10": 64.8,
+          "p90": 113.3,
+          "spread": 48.5
+        },
+        "rune_stage": {
+          "n": 1344,
+          "mean": 103.4,
+          "p10": 73.8,
+          "p90": 124.7,
+          "spread": 50.9
+        }
+      },
+      "after": {
+        "roof_key_pitch": {
+          "n": 2357,
+          "mean": 66.08,
+          "p10": 44.7,
+          "p90": 77.3,
+          "spread": 32.6
+        },
+        "roof_shaded_return": {
+          "n": 432,
+          "mean": 43.96,
+          "p10": 36.4,
+          "p90": 45.2,
+          "spread": 8.7
+        },
+        "front_wall": {
+          "n": 9296,
+          "mean": 84.24,
+          "p10": 59.2,
+          "p90": 106.8,
+          "spread": 47.7
+        },
+        "side_wall": {
+          "n": 1728,
+          "mean": 51.08,
+          "p10": 36.4,
+          "p90": 61.0,
+          "spread": 24.5
+        },
+        "soffit_eave": {
+          "n": 688,
+          "mean": 24.22,
+          "p10": 7.9,
+          "p90": 29.7,
+          "spread": 21.7
+        },
+        "plinth_foundation": {
+          "n": 3200,
+          "mean": 73.67,
+          "p10": 50.0,
+          "p90": 98.5,
+          "spread": 48.4
+        },
+        "rune_stage": {
+          "n": 1344,
+          "mean": 103.4,
+          "p10": 73.8,
+          "p90": 124.7,
+          "spread": 50.9
+        }
+      },
+      "checks": {
+        "front_minus_side": {
+          "before": 12.14,
+          "after": 33.16,
+          "min": 12.0,
+          "pass": true
+        },
+        "roof_key_minus_return": {
+          "before": -7.98,
+          "after": 22.12,
+          "min": 10.0,
+          "pass": true
+        },
+        "roof_front_abs": {
+          "before": 15.15,
+          "after": 18.16,
+          "min": 10.0,
+          "pass": true
+        },
+        "front_minus_soffit": {
+          "before": 0.31,
+          "after": 60.02,
+          "min": 18.0,
+          "pass": true
+        },
+        "roof_key_spread": {
+          "before": 26.3,
+          "after": 32.6,
+          "min": 14.0,
+          "pass": true
+        }
+      },
+      "all_pass": true
+    },
+    "armory": {
+      "before": {
+        "roof_key_pitch": {
+          "n": 4144,
+          "mean": 40.91,
+          "p10": 38.5,
+          "p90": 48.9,
+          "spread": 10.4
+        },
+        "roof_shaded_return": {
+          "n": 1810,
+          "mean": 39.77,
+          "p10": 38.5,
+          "p90": 48.9,
+          "spread": 10.4
+        },
+        "front_wall": {
+          "n": 5670,
+          "mean": 59.42,
+          "p10": 22.3,
+          "p90": 88.2,
+          "spread": 66.0
+        },
+        "side_wall": {
+          "n": 3276,
+          "mean": 61.85,
+          "p10": 40.7,
+          "p90": 74.2,
+          "spread": 33.5
+        },
+        "soffit_eave": {
+          "n": 384,
+          "mean": 28.23,
+          "p10": 27.9,
+          "p90": 28.3,
+          "spread": 0.4
+        },
+        "door_reveal": {
+          "n": 520,
+          "mean": 34.0,
+          "p10": 22.3,
+          "p90": 45.0,
+          "spread": 22.7
+        },
+        "plinth_foundation": {
+          "n": 450,
+          "mean": 70.83,
+          "p10": 40.7,
+          "p90": 107.1,
+          "spread": 66.4
+        }
+      },
+      "after": {
+        "roof_key_pitch": {
+          "n": 4144,
+          "mean": 49.06,
+          "p10": 38.5,
+          "p90": 77.4,
+          "spread": 38.9
+        },
+        "roof_shaded_return": {
+          "n": 1810,
+          "mean": 34.71,
+          "p10": 15.8,
+          "p90": 38.5,
+          "spread": 22.6
+        },
+        "front_wall": {
+          "n": 5670,
+          "mean": 64.25,
+          "p10": 22.3,
+          "p90": 101.7,
+          "spread": 79.5
+        },
+        "side_wall": {
+          "n": 3276,
+          "mean": 44.53,
+          "p10": 25.9,
+          "p90": 56.7,
+          "spread": 30.7
+        },
+        "soffit_eave": {
+          "n": 384,
+          "mean": 19.89,
+          "p10": 19.4,
+          "p90": 20.4,
+          "spread": 1.0
+        },
+        "door_reveal": {
+          "n": 520,
+          "mean": 34.0,
+          "p10": 22.3,
+          "p90": 45.0,
+          "spread": 22.7
+        },
+        "plinth_foundation": {
+          "n": 450,
+          "mean": 62.31,
+          "p10": 26.9,
+          "p90": 107.1,
+          "spread": 80.2
+        }
+      },
+      "checks": {
+        "front_minus_side": {
+          "before": -2.43,
+          "after": 19.72,
+          "min": 12.0,
+          "pass": true
+        },
+        "roof_key_minus_return": {
+          "before": 1.14,
+          "after": 14.35,
+          "min": 10.0,
+          "pass": true
+        },
+        "roof_front_abs": {
+          "before": 18.51,
+          "after": 15.19,
+          "min": 10.0,
+          "pass": true
+        },
+        "front_minus_soffit": {
+          "before": 31.19,
+          "after": 44.36,
+          "min": 18.0,
+          "pass": true
+        },
+        "roof_key_spread": {
+          "before": 10.4,
+          "after": 38.9,
+          "min": 14.0,
+          "pass": true
+        },
+        "door_below_front": {
+          "before": 25.42,
+          "after": 30.25,
+          "min": 20.0,
+          "pass": true
+        }
+      },
+      "all_pass": true
+    },
+    "hero_registry": {
+      "before": {
+        "roof_key_pitch": {
+          "n": 4264,
+          "mean": 63.72,
+          "p10": 59.5,
+          "p90": 74.0,
+          "spread": 14.6
+        },
+        "roof_shaded_return": {
+          "n": 1685,
+          "mean": 62.5,
+          "p10": 47.7,
+          "p90": 74.0,
+          "spread": 26.3
+        },
+        "front_wall": {
+          "n": 6370,
+          "mean": 59.46,
+          "p10": 23.1,
+          "p90": 88.2,
+          "spread": 65.2
+        },
+        "side_wall": {
+          "n": 3380,
+          "mean": 58.37,
+          "p10": 35.2,
+          "p90": 74.2,
+          "spread": 39.1
+        },
+        "soffit_eave": {
+          "n": 416,
+          "mean": 29.77,
+          "p10": 27.9,
+          "p90": 35.2,
+          "spread": 7.3
+        },
+        "plinth_foundation": {
+          "n": 490,
+          "mean": 63.43,
+          "p10": 43.8,
+          "p90": 74.2,
+          "spread": 30.4
+        }
+      },
+      "after": {
+        "roof_key_pitch": {
+          "n": 4264,
+          "mean": 55.98,
+          "p10": 50.7,
+          "p90": 69.3,
+          "spread": 18.7
+        },
+        "roof_shaded_return": {
+          "n": 1685,
+          "mean": 29.88,
+          "p10": 12.7,
+          "p90": 43.7,
+          "spread": 31.1
+        },
+        "front_wall": {
+          "n": 6370,
+          "mean": 67.09,
+          "p10": 23.1,
+          "p90": 100.9,
+          "spread": 77.9
+        },
+        "side_wall": {
+          "n": 3380,
+          "mean": 43.01,
+          "p10": 25.9,
+          "p90": 58.7,
+          "spread": 32.7
+        },
+        "soffit_eave": {
+          "n": 416,
+          "mean": 20.24,
+          "p10": 18.3,
+          "p90": 25.7,
+          "spread": 7.4
+        },
+        "plinth_foundation": {
+          "n": 490,
+          "mean": 56.45,
+          "p10": 34.5,
+          "p90": 67.5,
+          "spread": 32.9
+        }
+      },
+      "checks": {
+        "front_minus_side": {
+          "before": 1.09,
+          "after": 24.08,
+          "min": 12.0,
+          "pass": true
+        },
+        "roof_key_minus_return": {
+          "before": 1.22,
+          "after": 26.1,
+          "min": 10.0,
+          "pass": true
+        },
+        "roof_front_abs": {
+          "before": 4.26,
+          "after": 11.11,
+          "min": 10.0,
+          "pass": true
+        },
+        "front_minus_soffit": {
+          "before": 29.69,
+          "after": 46.85,
+          "min": 18.0,
+          "pass": true
+        },
+        "roof_key_spread": {
+          "before": 14.6,
+          "after": 18.7,
+          "min": 14.0,
+          "pass": true
+        }
+      },
+      "all_pass": true
+    },
+    "synthesis_lab": {
+      "before": {
+        "roof_key_pitch": {
+          "n": 4214,
+          "mean": 63.18,
+          "p10": 61.2,
+          "p90": 74.0,
+          "spread": 12.9
+        },
+        "roof_shaded_return": {
+          "n": 1800,
+          "mean": 68.04,
+          "p10": 47.7,
+          "p90": 93.1,
+          "spread": 45.4
+        },
+        "front_wall": {
+          "n": 6110,
+          "mean": 59.53,
+          "p10": 23.1,
+          "p90": 88.2,
+          "spread": 65.2
+        },
+        "side_wall": {
+          "n": 3546,
+          "mean": 63.88,
+          "p10": 40.7,
+          "p90": 86.2,
+          "spread": 45.5
+        },
+        "soffit_eave": {
+          "n": 400,
+          "mean": 28.17,
+          "p10": 27.9,
+          "p90": 28.3,
+          "spread": 0.4
+        },
+        "plinth_foundation": {
+          "n": 470,
+          "mean": 65.1,
+          "p10": 43.8,
+          "p90": 88.2,
+          "spread": 44.4
+        }
+      },
+      "after": {
+        "roof_key_pitch": {
+          "n": 4214,
+          "mean": 53.86,
+          "p10": 51.1,
+          "p90": 68.7,
+          "spread": 17.6
+        },
+        "roof_shaded_return": {
+          "n": 1800,
+          "mean": 33.77,
+          "p10": 20.4,
+          "p90": 58.4,
+          "spread": 38.0
+        },
+        "front_wall": {
+          "n": 6110,
+          "mean": 64.33,
+          "p10": 23.1,
+          "p90": 93.8,
+          "spread": 70.7
+        },
+        "side_wall": {
+          "n": 3546,
+          "mean": 50.43,
+          "p10": 21.6,
+          "p90": 74.2,
+          "spread": 52.7
+        },
+        "soffit_eave": {
+          "n": 400,
+          "mean": 19.83,
+          "p10": 19.4,
+          "p90": 20.4,
+          "spread": 1.0
+        },
+        "plinth_foundation": {
+          "n": 470,
+          "mean": 65.43,
+          "p10": 44.0,
+          "p90": 88.2,
+          "spread": 44.3
+        }
+      },
+      "checks": {
+        "front_minus_side": {
+          "before": -4.35,
+          "after": 13.9,
+          "min": 12.0,
+          "pass": true
+        },
+        "roof_key_minus_return": {
+          "before": -4.86,
+          "after": 20.09,
+          "min": 10.0,
+          "pass": true
+        },
+        "roof_front_abs": {
+          "before": 3.65,
+          "after": 10.47,
+          "min": 10.0,
+          "pass": true
+        },
+        "front_minus_soffit": {
+          "before": 31.36,
+          "after": 44.5,
+          "min": 18.0,
+          "pass": true
+        },
+        "roof_key_spread": {
+          "before": 12.9,
+          "after": 17.6,
+          "min": 14.0,
+          "pass": true
+        }
+      },
+      "all_pass": true
+    },
+    "tower_gate": {
+      "before": {
+        "roof_key_pitch": {
+          "n": 1736,
+          "mean": 61.97,
+          "p10": 32.3,
+          "p90": 74.6,
+          "spread": 42.3
+        },
+        "roof_shaded_return": {
+          "n": 939,
+          "mean": 43.34,
+          "p10": 32.3,
+          "p90": 47.0,
+          "spread": 14.7
+        },
+        "front_wall": {
+          "n": 10112,
+          "mean": 60.66,
+          "p10": 32.3,
+          "p90": 74.6,
+          "spread": 42.3
+        },
+        "side_wall": {
+          "n": 10112,
+          "mean": 60.07,
+          "p10": 32.3,
+          "p90": 74.6,
+          "spread": 42.3
+        },
+        "soffit_eave": {
+          "n": 832,
+          "mean": 46.95,
+          "p10": 16.3,
+          "p90": 74.6,
+          "spread": 58.3
+        },
+        "plinth_foundation": {
+          "n": 6000,
+          "mean": 38.48,
+          "p10": 25.4,
+          "p90": 48.2,
+          "spread": 22.8
+        },
+        "portal_aperture": {
+          "n": 3264,
+          "mean": 20.36,
+          "p10": 11.0,
+          "p90": 23.4,
+          "spread": 12.4
+        }
+      },
+      "after": {
+        "roof_key_pitch": {
+          "n": 1736,
+          "mean": 52.81,
+          "p10": 32.3,
+          "p90": 65.9,
+          "spread": 33.6
+        },
+        "roof_shaded_return": {
+          "n": 939,
+          "mean": 30.18,
+          "p10": 29.5,
+          "p90": 32.3,
+          "spread": 2.8
+        },
+        "front_wall": {
+          "n": 10112,
+          "mean": 68.5,
+          "p10": 32.3,
+          "p90": 89.7,
+          "spread": 57.4
+        },
+        "side_wall": {
+          "n": 10112,
+          "mean": 42.4,
+          "p10": 25.6,
+          "p90": 56.2,
+          "spread": 30.6
+        },
+        "soffit_eave": {
+          "n": 832,
+          "mean": 25.74,
+          "p10": 3.9,
+          "p90": 52.4,
+          "spread": 48.5
+        },
+        "plinth_foundation": {
+          "n": 6000,
+          "mean": 36.01,
+          "p10": 25.4,
+          "p90": 36.4,
+          "spread": 10.9
+        },
+        "portal_aperture": {
+          "n": 3264,
+          "mean": 20.36,
+          "p10": 11.0,
+          "p90": 23.4,
+          "spread": 12.4
+        }
+      },
+      "checks": {
+        "front_minus_side": {
+          "before": 0.59,
+          "after": 26.1,
+          "min": 12.0,
+          "pass": true
+        },
+        "roof_key_minus_return": {
+          "before": 18.63,
+          "after": 22.63,
+          "min": 10.0,
+          "pass": true
+        },
+        "roof_front_abs": {
+          "before": 1.31,
+          "after": 15.69,
+          "min": 10.0,
+          "pass": true
+        },
+        "front_minus_soffit": {
+          "before": 13.71,
+          "after": 42.76,
+          "min": 18.0,
+          "pass": true
+        },
+        "roof_key_spread": {
+          "before": 42.3,
+          "after": 33.6,
+          "min": 14.0,
+          "pass": true
+        }
+      },
+      "all_pass": true
+    }
+  },
+  "full_frame": {
+    "armory_behind_occlusion_z148.png": {
+      "before": {
+        "n": 921600,
+        "mean": 60.27,
+        "p10": 32.9,
+        "p90": 83.1,
+        "spread": 50.2
+      },
+      "after": {
+        "n": 921600,
+        "mean": 59.38,
+        "p10": 29.0,
+        "p90": 84.2,
+        "spread": 55.3
+      },
+      "d_mean": -0.89,
+      "d_mean_pct": -1.48,
+      "d_spread": 5.1
+    },
+    "armory_door_trigger_actor_z148.png": {
+      "before": {
+        "n": 921600,
+        "mean": 59.71,
+        "p10": 32.5,
+        "p90": 83.2,
+        "spread": 50.6
+      },
+      "after": {
+        "n": 921600,
+        "mean": 58.79,
+        "p10": 28.3,
+        "p90": 84.3,
+        "spread": 56.0
+      },
+      "d_mean": -0.92,
+      "d_mean_pct": -1.54,
+      "d_spread": 5.4
+    },
+    "armory_full_z088.png": {
+      "before": {
+        "n": 921600,
+        "mean": 64.24,
+        "p10": 36.4,
+        "p90": 85.4,
+        "spread": 49.0
+      },
+      "after": {
+        "n": 921600,
+        "mean": 63.74,
+        "p10": 34.1,
+        "p90": 86.0,
+        "spread": 51.9
+      },
+      "d_mean": -0.5,
+      "d_mean_pct": -0.78,
+      "d_spread": 2.9
+    },
+    "armory_full_z100.png": {
+      "before": {
+        "n": 921600,
+        "mean": 63.16,
+        "p10": 35.2,
+        "p90": 85.2,
+        "spread": 50.0
+      },
+      "after": {
+        "n": 921600,
+        "mean": 62.52,
+        "p10": 32.8,
+        "p90": 85.5,
+        "spread": 52.8
+      },
+      "d_mean": -0.64,
+      "d_mean_pct": -1.01,
+      "d_spread": 2.8
+    },
+    "armory_full_z148.png": {
+      "before": {
+        "n": 921600,
+        "mean": 60.24,
+        "p10": 32.8,
+        "p90": 83.2,
+        "spread": 50.3
+      },
+      "after": {
+        "n": 921600,
+        "mean": 59.34,
+        "p10": 29.0,
+        "p90": 84.3,
+        "spread": 55.4
+      },
+      "d_mean": -0.9,
+      "d_mean_pct": -1.49,
+      "d_spread": 5.1
+    },
+    "avenue_props_lantern_f0_z148.png": {
+      "before": {
+        "n": 921600,
+        "mean": 64.19,
+        "p10": 36.3,
+        "p90": 91.4,
+        "spread": 55.1
+      },
+      "after": {
+        "n": 921600,
+        "mean": 63.43,
+        "p10": 33.2,
+        "p90": 93.4,
+        "spread": 60.2
+      },
+      "d_mean": -0.76,
+      "d_mean_pct": -1.18,
+      "d_spread": 5.1
+    },
+    "avenue_props_lantern_f1_z148.png": {
+      "before": {
+        "n": 921600,
+        "mean": 64.58,
+        "p10": 36.4,
+        "p90": 91.5,
+        "spread": 55.1
+      },
+      "after": {
+        "n": 921600,
+        "mean": 63.81,
+        "p10": 33.2,
+        "p90": 94.0,
+        "spread": 60.9
+      },
+      "d_mean": -0.77,
+      "d_mean_pct": -1.19,
+      "d_spread": 5.8
+    },
+    "cottages_nw_z148.png": {
+      "before": {
+        "n": 921600,
+        "mean": 61.23,
+        "p10": 33.8,
+        "p90": 89.7,
+        "spread": 56.0
+      },
+      "after": {
+        "n": 921600,
+        "mean": 60.82,
+        "p10": 31.6,
+        "p90": 90.5,
+        "spread": 59.0
+      },
+      "d_mean": -0.41,
+      "d_mean_pct": -0.67,
+      "d_spread": 3.0
+    },
+    "hdr_balanced_day_z088.png": {
+      "before": {
+        "n": 921600,
+        "mean": 79.91,
+        "p10": 54.8,
+        "p90": 102.2,
+        "spread": 47.4
+      },
+      "after": {
+        "n": 921600,
+        "mean": 79.49,
+        "p10": 53.8,
+        "p90": 104.1,
+        "spread": 50.3
+      },
+      "d_mean": -0.42,
+      "d_mean_pct": -0.53,
+      "d_spread": 2.9
+    },
+    "hdr_balanced_night_overview_z036.png": {
+      "before": {
+        "n": 921600,
+        "mean": 58.87,
+        "p10": 38.7,
+        "p90": 79.1,
+        "spread": 40.4
+      },
+      "after": {
+        "n": 921600,
+        "mean": 58.74,
+        "p10": 38.6,
+        "p90": 79.2,
+        "spread": 40.5
+      },
+      "d_mean": -0.13,
+      "d_mean_pct": -0.22,
+      "d_spread": 0.1
+    },
+    "hdr_balanced_night_rain_z088.png": {
+      "before": {
+        "n": 921600,
+        "mean": 61.43,
+        "p10": 42.0,
+        "p90": 80.0,
+        "spread": 37.9
+      },
+      "after": {
+        "n": 921600,
+        "mean": 61.15,
+        "p10": 40.5,
+        "p90": 81.2,
+        "spread": 40.6
+      },
+      "d_mean": -0.28,
+      "d_mean_pct": -0.46,
+      "d_spread": 2.7
+    },
+    "hdr_balanced_night_tower_gate_z100.png": {
+      "before": {
+        "n": 921600,
+        "mean": 60.78,
+        "p10": 37.0,
+        "p90": 88.2,
+        "spread": 51.3
+      },
+      "after": {
+        "n": 921600,
+        "mean": 60.48,
+        "p10": 36.9,
+        "p90": 88.2,
+        "spread": 51.4
+      },
+      "d_mean": -0.3,
+      "d_mean_pct": -0.49,
+      "d_spread": 0.1
+    },
+    "hdr_balanced_night_tower_gate_z148.png": {
+      "before": {
+        "n": 921600,
+        "mean": 57.05,
+        "p10": 36.5,
+        "p90": 82.1,
+        "spread": 45.6
+      },
+      "after": {
+        "n": 921600,
+        "mean": 56.56,
+        "p10": 36.5,
+        "p90": 85.0,
+        "spread": 48.5
+      },
+      "d_mean": -0.49,
+      "d_mean_pct": -0.86,
+      "d_spread": 2.9
+    },
+    "hdr_balanced_night_z088.png": {
+      "before": {
+        "n": 921600,
+        "mean": 63.47,
+        "p10": 40.8,
+        "p90": 84.5,
+        "spread": 43.6
+      },
+      "after": {
+        "n": 921600,
+        "mean": 63.15,
+        "p10": 40.0,
+        "p90": 85.1,
+        "spread": 45.1
+      },
+      "d_mean": -0.32,
+      "d_mean_pct": -0.5,
+      "d_spread": 1.5
+    },
+    "hdr_off_z088.png": {
+      "before": {
+        "n": 921600,
+        "mean": 79.96,
+        "p10": 55.0,
+        "p90": 103.3,
+        "spread": 48.3
+      },
+      "after": {
+        "n": 921600,
+        "mean": 79.41,
+        "p10": 54.5,
+        "p90": 103.3,
+        "spread": 48.8
+      },
+      "d_mean": -0.55,
+      "d_mean_pct": -0.69,
+      "d_spread": 0.5
+    },
+    "hdr_reduced_z088.png": {
+      "before": {
+        "n": 921600,
+        "mean": 80.22,
+        "p10": 55.0,
+        "p90": 103.3,
+        "spread": 48.3
+      },
+      "after": {
+        "n": 921600,
+        "mean": 79.67,
+        "p10": 54.6,
+        "p90": 104.5,
+        "spread": 49.9
+      },
+      "d_mean": -0.55,
+      "d_mean_pct": -0.69,
+      "d_spread": 1.6
+    },
+    "quarters_door_actor_z148.png": {
+      "before": {
+        "n": 921600,
+        "mean": 58.32,
+        "p10": 32.2,
+        "p90": 82.2,
+        "spread": 50.0
+      },
+      "after": {
+        "n": 921600,
+        "mean": 57.46,
+        "p10": 27.9,
+        "p90": 83.2,
+        "spread": 55.3
+      },
+      "d_mean": -0.86,
+      "d_mean_pct": -1.47,
+      "d_spread": 5.3
+    },
+    "registry_close_z148.png": {
+      "before": {
+        "n": 921600,
+        "mean": 56.85,
+        "p10": 32.6,
+        "p90": 81.4,
+        "spread": 48.8
+      },
+      "after": {
+        "n": 921600,
+        "mean": 56.59,
+        "p10": 31.0,
+        "p90": 83.1,
+        "spread": 52.1
+      },
+      "d_mean": -0.26,
+      "d_mean_pct": -0.46,
+      "d_spread": 3.3
+    },
+    "restaurant_door_actor_z148.png": {
+      "before": {
+        "n": 921600,
+        "mean": 57.25,
+        "p10": 32.2,
+        "p90": 83.6,
+        "spread": 51.4
+      },
+      "after": {
+        "n": 921600,
+        "mean": 56.25,
+        "p10": 27.9,
+        "p90": 85.5,
+        "spread": 57.7
+      },
+      "d_mean": -1.0,
+      "d_mean_pct": -1.75,
+      "d_spread": 6.3
+    },
+    "sanctuary_overview_z036.png": {
+      "before": {
+        "n": 921600,
+        "mean": 70.6,
+        "p10": 39.4,
+        "p90": 97.0,
+        "spread": 57.6
+      },
+      "after": {
+        "n": 921600,
+        "mean": 70.4,
+        "p10": 39.4,
+        "p90": 97.0,
+        "spread": 57.6
+      },
+      "d_mean": -0.2,
+      "d_mean_pct": -0.28,
+      "d_spread": 0.0
+    },
+    "service_cluster_z088.png": {
+      "before": {
+        "n": 921600,
+        "mean": 62.76,
+        "p10": 34.7,
+        "p90": 87.7,
+        "spread": 53.1
+      },
+      "after": {
+        "n": 921600,
+        "mean": 62.29,
+        "p10": 33.5,
+        "p90": 89.5,
+        "spread": 56.0
+      },
+      "d_mean": -0.47,
+      "d_mean_pct": -0.75,
+      "d_spread": 2.9
+    },
+    "service_cluster_z100.png": {
+      "before": {
+        "n": 921600,
+        "mean": 61.44,
+        "p10": 33.8,
+        "p90": 86.5,
+        "spread": 52.7
+      },
+      "after": {
+        "n": 921600,
+        "mean": 61.02,
+        "p10": 32.2,
+        "p90": 87.9,
+        "spread": 55.6
+      },
+      "d_mean": -0.42,
+      "d_mean_pct": -0.68,
+      "d_spread": 2.9
+    },
+    "south_gate_training_z088.png": {
+      "before": {
+        "n": 921600,
+        "mean": 61.37,
+        "p10": 35.0,
+        "p90": 90.9,
+        "spread": 55.9
+      },
+      "after": {
+        "n": 921600,
+        "mean": 61.37,
+        "p10": 35.0,
+        "p90": 90.9,
+        "spread": 55.9
+      },
+      "d_mean": 0.0,
+      "d_mean_pct": 0.0,
+      "d_spread": 0.0
+    },
+    "summoning_hall_whole_z148.png": {
+      "before": {
+        "n": 921600,
+        "mean": 67.59,
+        "p10": 39.4,
+        "p90": 98.7,
+        "spread": 59.3
+      },
+      "after": {
+        "n": 921600,
+        "mean": 66.97,
+        "p10": 39.4,
+        "p90": 99.9,
+        "spread": 60.4
+      },
+      "d_mean": -0.62,
+      "d_mean_pct": -0.92,
+      "d_spread": 1.1
+    },
+    "summoning_hall_zone_actor_z100.png": {
+      "before": {
+        "n": 921600,
+        "mean": 67.15,
+        "p10": 39.4,
+        "p90": 97.0,
+        "spread": 57.6
+      },
+      "after": {
+        "n": 921600,
+        "mean": 66.88,
+        "p10": 39.4,
+        "p90": 97.2,
+        "spread": 57.9
+      },
+      "d_mean": -0.27,
+      "d_mean_pct": -0.4,
+      "d_spread": 0.3
+    },
+    "synthesis_cottage_z148.png": {
+      "before": {
+        "n": 921600,
+        "mean": 58.58,
+        "p10": 32.2,
+        "p90": 84.0,
+        "spread": 51.8
+      },
+      "after": {
+        "n": 921600,
+        "mean": 57.48,
+        "p10": 29.2,
+        "p90": 85.2,
+        "spread": 56.0
+      },
+      "d_mean": -1.1,
+      "d_mean_pct": -1.88,
+      "d_spread": 4.2
+    },
+    "tower_f1_ruin_arch_close_z148.png": {
+      "before": {
+        "n": 921600,
+        "mean": 78.55,
+        "p10": 41.6,
+        "p90": 140.7,
+        "spread": 99.0
+      },
+      "after": {
+        "n": 921600,
+        "mean": 78.55,
+        "p10": 41.6,
+        "p90": 140.7,
+        "spread": 99.0
+      },
+      "d_mean": 0.0,
+      "d_mean_pct": 0.0,
+      "d_spread": 0.0
+    },
+    "tower_f1_ruins_lantern_z088.png": {
+      "before": {
+        "n": 921600,
+        "mean": 76.55,
+        "p10": 30.2,
+        "p90": 119.5,
+        "spread": 89.3
+      },
+      "after": {
+        "n": 921600,
+        "mean": 76.55,
+        "p10": 30.2,
+        "p90": 119.5,
+        "spread": 89.3
+      },
+      "d_mean": 0.0,
+      "d_mean_pct": 0.0,
+      "d_spread": 0.0
+    },
+    "tower_f2_ruin_arch_plum_z088.png": {
+      "before": {
+        "n": 921600,
+        "mean": 39.8,
+        "p10": 19.6,
+        "p90": 45.4,
+        "spread": 25.8
+      },
+      "after": {
+        "n": 921600,
+        "mean": 39.8,
+        "p10": 19.6,
+        "p90": 45.4,
+        "spread": 25.8
+      },
+      "d_mean": 0.0,
+      "d_mean_pct": 0.0,
+      "d_spread": 0.0
+    },
+    "tower_f4_obsidian_column_z148.png": {
+      "before": {
+        "n": 921600,
+        "mean": 39.53,
+        "p10": 13.6,
+        "p90": 55.7,
+        "spread": 42.1
+      },
+      "after": {
+        "n": 921600,
+        "mean": 39.53,
+        "p10": 13.6,
+        "p90": 55.7,
+        "spread": 42.1
+      },
+      "d_mean": 0.0,
+      "d_mean_pct": 0.0,
+      "d_spread": 0.0
+    },
+    "tower_gate_portal_actor_z100.png": {
+      "before": {
+        "n": 921600,
+        "mean": 64.69,
+        "p10": 33.4,
+        "p90": 91.4,
+        "spread": 58.0
+      },
+      "after": {
+        "n": 921600,
+        "mean": 64.27,
+        "p10": 32.2,
+        "p90": 91.4,
+        "spread": 59.2
+      },
+      "d_mean": -0.42,
+      "d_mean_pct": -0.65,
+      "d_spread": 1.2
+    },
+    "tower_gate_whole_z148.png": {
+      "before": {
+        "n": 921600,
+        "mean": 59.35,
+        "p10": 28.4,
+        "p90": 85.0,
+        "spread": 56.6
+      },
+      "after": {
+        "n": 921600,
+        "mean": 58.66,
+        "p10": 26.7,
+        "p90": 87.0,
+        "spread": 60.3
+      },
+      "d_mean": -0.69,
+      "d_mean_pct": -1.16,
+      "d_spread": 3.7
+    }
+  },
+  "engine_roi": {
+    "service_cluster_z088.png": {
+      "armory:roof_key_pitch": {
+        "before_mean": 51.27,
+        "after_mean": 59.57,
+        "before_spread": 26.3,
+        "after_spread": 52.6,
+        "n": 8231,
+        "projection": {
+          "cx": 670.8,
+          "cy": 230.1,
+          "left": 537,
+          "top": 0,
+          "dst": [
+            268,
+            234
+          ],
+          "screen_box": [
+            568,
+            40,
+            707,
+            125
+          ]
+        }
+      },
+      "armory:roof_shaded_return": {
+        "before_mean": 36.39,
+        "after_mean": 32.17,
+        "before_spread": 13.0,
+        "after_spread": 20.3,
+        "n": 3599,
+        "projection": {
+          "cx": 670.8,
+          "cy": 230.1,
+          "left": 537,
+          "top": 0,
+          "dst": [
+            268,
+            234
+          ],
+          "screen_box": [
+            692,
+            40,
+            795,
+            125
+          ]
+        }
+      },
+      "armory:front_wall": {
+        "before_mean": 46.42,
+        "after_mean": 45.78,
+        "before_spread": 50.8,
+        "after_spread": 58.9,
+        "n": 11303,
+        "projection": {
+          "cx": 670.8,
+          "cy": 230.1,
+          "left": 537,
+          "top": 0,
+          "dst": [
+            268,
+            234
+          ],
+          "screen_box": [
+            566,
+            138,
+            699,
+            234
+          ]
+        }
+      },
+      "armory:side_wall": {
+        "before_mean": 50.97,
+        "after_mean": 41.34,
+        "before_spread": 42.8,
+        "after_spread": 50.9,
+        "n": 6572,
+        "projection": {
+          "cx": 670.8,
+          "cy": 230.1,
+          "left": 537,
+          "top": 0,
+          "dst": [
+            268,
+            234
+          ],
+          "screen_box": [
+            704,
+            113,
+            784,
+            231
+          ]
+        }
+      },
+      "armory:soffit_eave": {
+        "before_mean": 29.92,
+        "after_mean": 22.12,
+        "before_spread": 11.0,
+        "after_spread": 10.1,
+        "n": 810,
+        "projection": {
+          "cx": 670.8,
+          "cy": 230.1,
+          "left": 537,
+          "top": 0,
+          "dst": [
+            268,
+            234
+          ],
+          "screen_box": [
+            566,
+            131,
+            707,
+            143
+          ]
+        }
+      },
+      "armory:plinth_foundation": {
+        "before_mean": 55.91,
+        "after_mean": 48.83,
+        "before_spread": 52.1,
+        "after_spread": 56.5,
+        "n": 889,
+        "projection": {
+          "cx": 670.8,
+          "cy": 230.1,
+          "left": 537,
+          "top": 0,
+          "dst": [
+            268,
+            234
+          ],
+          "screen_box": [
+            566,
+            223,
+            699,
+            237
+          ]
+        }
+      },
+      "hero_quarters:roof_key_pitch": {
+        "before_mean": 49.3,
+        "after_mean": 51.96,
+        "before_spread": 28.8,
+        "after_spread": 39.1,
+        "n": 8188,
+        "projection": {
+          "cx": 521.2,
+          "cy": 315.6,
+          "left": 380,
+          "top": 83,
+          "dst": [
+            282,
+            237
+          ],
+          "screen_box": [
+            411,
+            131,
+            562,
+            208
+          ]
+        }
+      },
+      "hero_quarters:roof_shaded_return": {
+        "before_mean": 36.43,
+        "after_mean": 33.68,
+        "before_spread": 19.6,
+        "after_spread": 11.7,
+        "n": 3073,
+        "projection": {
+          "cx": 521.2,
+          "cy": 315.6,
+          "left": 380,
+          "top": 83,
+          "dst": [
+            282,
+            237
+          ],
+          "screen_box": [
+            550,
+            131,
+            646,
+            208
+          ]
+        }
+      },
+      "hero_quarters:front_wall": {
+        "before_mean": 51.04,
+        "after_mean": 54.48,
+        "before_spread": 46.3,
+        "after_spread": 56.7,
+        "n": 12420,
+        "projection": {
+          "cx": 521.2,
+          "cy": 315.6,
+          "left": 380,
+          "top": 83,
+          "dst": [
+            282,
+            237
+          ],
+          "screen_box": [
+            409,
+            222,
+            553,
+            318
+          ]
+        }
+      },
+      "hero_quarters:side_wall": {
+        "before_mean": 47.47,
+        "after_mean": 35.7,
+        "before_spread": 20.1,
+        "after_spread": 17.0,
+        "n": 6472,
+        "projection": {
+          "cx": 521.2,
+          "cy": 315.6,
+          "left": 380,
+          "top": 83,
+          "dst": [
+            282,
+            237
+          ],
+          "screen_box": [
+            558,
+            199,
+            638,
+            315
+          ]
+        }
+      },
+      "hero_quarters:soffit_eave": {
+        "before_mean": 29.22,
+        "after_mean": 21.08,
+        "before_spread": 7.3,
+        "after_spread": 7.2,
+        "n": 882,
+        "projection": {
+          "cx": 521.2,
+          "cy": 315.6,
+          "left": 380,
+          "top": 83,
+          "dst": [
+            282,
+            237
+          ],
+          "screen_box": [
+            409,
+            215,
+            562,
+            227
+          ]
+        }
+      },
+      "hero_quarters:door_reveal": {
+        "before_mean": 36.18,
+        "after_mean": 36.18,
+        "before_spread": 30.5,
+        "after_spread": 30.5,
+        "n": 1092,
+        "projection": {
+          "cx": 521.2,
+          "cy": 315.6,
+          "left": 380,
+          "top": 83,
+          "dst": [
+            282,
+            237
+          ],
+          "screen_box": [
+            504,
+            272,
+            539,
+            318
+          ]
+        }
+      },
+      "hero_quarters:plinth_foundation": {
+        "before_mean": 54.49,
+        "after_mean": 52.08,
+        "before_spread": 64.4,
+        "after_spread": 64.2,
+        "n": 1380,
+        "projection": {
+          "cx": 521.2,
+          "cy": 315.6,
+          "left": 380,
+          "top": 83,
+          "dst": [
+            282,
+            237
+          ],
+          "screen_box": [
+            409,
+            306,
+            553,
+            323
+          ]
+        }
+      },
+      "restaurant:roof_key_pitch": {
+        "before_mean": 70.72,
+        "after_mean": 62.78,
+        "before_spread": 20.0,
+        "after_spread": 24.7,
+        "n": 9160,
+        "projection": {
+          "cx": 767.6,
+          "cy": 401.2,
+          "left": 623,
+          "top": 163,
+          "dst": [
+            290,
+            242
+          ],
+          "screen_box": [
+            651,
+            211,
+            810,
+            291
+          ]
+        }
+      },
+      "restaurant:roof_shaded_return": {
+        "before_mean": 59.31,
+        "after_mean": 32.25,
+        "before_spread": 13.9,
+        "after_spread": 14.7,
+        "n": 3341,
+        "projection": {
+          "cx": 767.6,
+          "cy": 401.2,
+          "left": 623,
+          "top": 163,
+          "dst": [
+            290,
+            242
+          ],
+          "screen_box": [
+            795,
+            211,
+            897,
+            291
+          ]
+        }
+      },
+      "restaurant:front_wall": {
+        "before_mean": 61.03,
+        "after_mean": 70.34,
+        "before_spread": 58.9,
+        "after_spread": 76.6,
+        "n": 13524,
+        "projection": {
+          "cx": 767.6,
+          "cy": 401.2,
+          "left": 623,
+          "top": 163,
+          "dst": [
+            290,
+            242
+          ],
+          "screen_box": [
+            649,
+            304,
+            801,
+            403
+          ]
+        }
+      },
+      "restaurant:side_wall": {
+        "before_mean": 52.93,
+        "after_mean": 42.41,
+        "before_spread": 38.6,
+        "after_spread": 39.4,
+        "n": 6949,
+        "projection": {
+          "cx": 767.6,
+          "cy": 401.2,
+          "left": 623,
+          "top": 163,
+          "dst": [
+            290,
+            242
+          ],
+          "screen_box": [
+            806,
+            279,
+            889,
+            400
+          ]
+        }
+      },
+      "restaurant:soffit_eave": {
+        "before_mean": 30.29,
+        "after_mean": 22.17,
+        "before_spread": 8.9,
+        "after_spread": 8.5,
+        "n": 930,
+        "projection": {
+          "cx": 767.6,
+          "cy": 401.2,
+          "left": 623,
+          "top": 163,
+          "dst": [
+            290,
+            242
+          ],
+          "screen_box": [
+            649,
+            297,
+            810,
+            309
+          ]
+        }
+      },
+      "restaurant:door_reveal": {
+        "before_mean": 36.56,
+        "after_mean": 36.56,
+        "before_spread": 30.6,
+        "after_spread": 30.6,
+        "n": 1092,
+        "projection": {
+          "cx": 767.6,
+          "cy": 401.2,
+          "left": 623,
+          "top": 163,
+          "dst": [
+            290,
+            242
+          ],
+          "screen_box": [
+            751,
+            357,
+            786,
+            403
+          ]
+        }
+      },
+      "restaurant:plinth_foundation": {
+        "before_mean": 48.88,
+        "after_mean": 46.28,
+        "before_spread": 55.3,
+        "after_spread": 51.7,
+        "n": 1470,
+        "projection": {
+          "cx": 767.6,
+          "cy": 401.2,
+          "left": 623,
+          "top": 163,
+          "dst": [
+            290,
+            242
+          ],
+          "screen_box": [
+            649,
+            391,
+            801,
+            408
+          ]
+        }
+      },
+      "hero_registry:roof_key_pitch": {
+        "before_mean": 68.39,
+        "after_mean": 60.93,
+        "before_spread": 23.9,
+        "after_spread": 27.6,
+        "n": 8424,
+        "projection": {
+          "cx": 486.0,
+          "cy": 565.9,
+          "left": 354,
+          "top": 336,
+          "dst": [
+            265,
+            234
+          ],
+          "screen_box": [
+            374,
+            379,
+            524,
+            458
+          ]
+        }
+      },
+      "hero_registry:roof_shaded_return": {
+        "before_mean": 57.44,
+        "after_mean": 29.14,
+        "before_spread": 24.3,
+        "after_spread": 27.5,
+        "n": 3345,
+        "projection": {
+          "cx": 486.0,
+          "cy": 565.9,
+          "left": 354,
+          "top": 336,
+          "dst": [
+            265,
+            234
+          ],
+          "screen_box": [
+            509,
+            379,
+            612,
+            458
+          ]
+        }
+      },
+      "hero_registry:front_wall": {
+        "before_mean": 57.39,
+        "after_mean": 64.59,
+        "before_spread": 62.9,
+        "after_spread": 74.9,
+        "n": 12696,
+        "projection": {
+          "cx": 486.0,
+          "cy": 565.9,
+          "left": 354,
+          "top": 336,
+          "dst": [
+            265,
+            234
+          ],
+          "screen_box": [
+            371,
+            472,
+            516,
+            570
+          ]
+        }
+      },
+      "hero_registry:side_wall": {
+        "before_mean": 48.45,
+        "after_mean": 36.89,
+        "before_spread": 30.3,
+        "after_spread": 25.7,
+        "n": 6689,
+        "projection": {
+          "cx": 486.0,
+          "cy": 565.9,
+          "left": 354,
+          "top": 336,
+          "dst": [
+            265,
+            234
+          ],
+          "screen_box": [
+            521,
+            446,
+            600,
+            567
+          ]
+        }
+      },
+      "hero_registry:soffit_eave": {
+        "before_mean": 31.65,
+        "after_mean": 22.51,
+        "before_spread": 16.2,
+        "after_spread": 15.4,
+        "n": 876,
+        "projection": {
+          "cx": 486.0,
+          "cy": 565.9,
+          "left": 354,
+          "top": 336,
+          "dst": [
+            265,
+            234
+          ],
+          "screen_box": [
+            371,
+            465,
+            524,
+            477
+          ]
+        }
+      },
+      "hero_registry:plinth_foundation": {
+        "before_mean": 53.31,
+        "after_mean": 47.5,
+        "before_spread": 33.3,
+        "after_spread": 32.8,
+        "n": 966,
+        "projection": {
+          "cx": 486.0,
+          "cy": 565.9,
+          "left": 354,
+          "top": 336,
+          "dst": [
+            265,
+            234
+          ],
+          "screen_box": [
+            371,
+            559,
+            516,
+            573
+          ]
+        }
+      }
+    },
+    "service_cluster_z100.png": {
+      "armory:roof_key_pitch": {
+        "before_mean": 52.35,
+        "after_mean": 59.71,
+        "before_spread": 28.3,
+        "after_spread": 53.7,
+        "n": 10573,
+        "projection": {
+          "cx": 675.0,
+          "cy": 212.4,
+          "left": 523,
+          "top": -49,
+          "dst": [
+            304,
+            266
+          ],
+          "screen_box": [
+            559,
+            0,
+            716,
+            93
+          ]
+        }
+      },
+      "armory:roof_shaded_return": {
+        "before_mean": 36.28,
+        "after_mean": 32.04,
+        "before_spread": 13.2,
+        "after_spread": 20.8,
+        "n": 4639,
+        "projection": {
+          "cx": 675.0,
+          "cy": 212.4,
+          "left": 523,
+          "top": -49,
+          "dst": [
+            304,
+            266
+          ],
+          "screen_box": [
+            700,
+            0,
+            815,
+            93
+          ]
+        }
+      },
+      "armory:front_wall": {
+        "before_mean": 46.87,
+        "after_mean": 46.29,
+        "before_spread": 55.4,
+        "after_spread": 61.8,
+        "n": 14544,
+        "projection": {
+          "cx": 675.0,
+          "cy": 212.4,
+          "left": 523,
+          "top": -49,
+          "dst": [
+            304,
+            266
+          ],
+          "screen_box": [
+            556,
+            109,
+            706,
+            216
+          ]
+        }
+      },
+      "armory:side_wall": {
+        "before_mean": 50.68,
+        "after_mean": 41.16,
+        "before_spread": 39.4,
+        "after_spread": 50.2,
+        "n": 8381,
+        "projection": {
+          "cx": 675.0,
+          "cy": 212.4,
+          "left": 523,
+          "top": -49,
+          "dst": [
+            304,
+            266
+          ],
+          "screen_box": [
+            713,
+            80,
+            802,
+            213
+          ]
+        }
+      },
+      "armory:soffit_eave": {
+        "before_mean": 30.57,
+        "after_mean": 22.89,
+        "before_spread": 12.7,
+        "after_spread": 11.4,
+        "n": 1078,
+        "projection": {
+          "cx": 675.0,
+          "cy": 212.4,
+          "left": 523,
+          "top": -49,
+          "dst": [
+            304,
+            266
+          ],
+          "screen_box": [
+            556,
+            101,
+            716,
+            114
+          ]
+        }
+      },
+      "armory:plinth_foundation": {
+        "before_mean": 55.7,
+        "after_mean": 48.85,
+        "before_spread": 54.2,
+        "after_spread": 59.1,
+        "n": 1152,
+        "projection": {
+          "cx": 675.0,
+          "cy": 212.4,
+          "left": 523,
+          "top": -49,
+          "dst": [
+            304,
+            266
+          ],
+          "screen_box": [
+            556,
+            205,
+            706,
+            220
+          ]
+        }
+      },
+      "hero_quarters:roof_key_pitch": {
+        "before_mean": 50.35,
+        "after_mean": 53.08,
+        "before_spread": 27.4,
+        "after_spread": 37.9,
+        "n": 10646,
+        "projection": {
+          "cx": 505.0,
+          "cy": 309.6,
+          "left": 345,
+          "top": 45,
+          "dst": [
+            320,
+            269
+          ],
+          "screen_box": [
+            381,
+            100,
+            551,
+            187
+          ]
+        }
+      },
+      "hero_quarters:roof_shaded_return": {
+        "before_mean": 36.1,
+        "after_mean": 33.43,
+        "before_spread": 18.9,
+        "after_spread": 11.7,
+        "n": 3956,
+        "projection": {
+          "cx": 505.0,
+          "cy": 309.6,
+          "left": 345,
+          "top": 45,
+          "dst": [
+            320,
+            269
+          ],
+          "screen_box": [
+            538,
+            100,
+            647,
+            187
+          ]
+        }
+      },
+      "hero_quarters:front_wall": {
+        "before_mean": 50.49,
+        "after_mean": 53.74,
+        "before_spread": 46.0,
+        "after_spread": 56.3,
+        "n": 16171,
+        "projection": {
+          "cx": 505.0,
+          "cy": 309.6,
+          "left": 345,
+          "top": 45,
+          "dst": [
+            320,
+            269
+          ],
+          "screen_box": [
+            378,
+            203,
+            541,
+            312
+          ]
+        }
+      },
+      "hero_quarters:side_wall": {
+        "before_mean": 46.09,
+        "after_mean": 34.78,
+        "before_spread": 20.2,
+        "after_spread": 16.8,
+        "n": 8239,
+        "projection": {
+          "cx": 505.0,
+          "cy": 309.6,
+          "left": 345,
+          "top": 45,
+          "dst": [
+            320,
+            269
+          ],
+          "screen_box": [
+            547,
+            177,
+            637,
+            308
+          ]
+        }
+      },
+      "hero_quarters:soffit_eave": {
+        "before_mean": 29.77,
+        "after_mean": 21.69,
+        "before_spread": 8.4,
+        "after_spread": 8.4,
+        "n": 1169,
+        "projection": {
+          "cx": 505.0,
+          "cy": 309.6,
+          "left": 345,
+          "top": 45,
+          "dst": [
+            320,
+            269
+          ],
+          "screen_box": [
+            378,
+            195,
+            551,
+            208
+          ]
+        }
+      },
+      "hero_quarters:door_reveal": {
+        "before_mean": 37.54,
+        "after_mean": 37.54,
+        "before_spread": 31.0,
+        "after_spread": 31.0,
+        "n": 1440,
+        "projection": {
+          "cx": 505.0,
+          "cy": 309.6,
+          "left": 345,
+          "top": 45,
+          "dst": [
+            320,
+            269
+          ],
+          "screen_box": [
+            487,
+            260,
+            525,
+            312
+          ]
+        }
+      },
+      "hero_quarters:plinth_foundation": {
+        "before_mean": 53.77,
+        "after_mean": 51.5,
+        "before_spread": 61.0,
+        "after_spread": 60.7,
+        "n": 1727,
+        "projection": {
+          "cx": 505.0,
+          "cy": 309.6,
+          "left": 345,
+          "top": 45,
+          "dst": [
+            320,
+            269
+          ],
+          "screen_box": [
+            378,
+            299,
+            541,
+            317
+          ]
+        }
+      },
+      "restaurant:roof_key_pitch": {
+        "before_mean": 71.25,
+        "after_mean": 63.3,
+        "before_spread": 21.7,
+        "after_spread": 25.7,
+        "n": 11856,
+        "projection": {
+          "cx": 785.0,
+          "cy": 406.8,
+          "left": 620,
+          "top": 137,
+          "dst": [
+            330,
+            275
+          ],
+          "screen_box": [
+            653,
+            192,
+            832,
+            282
+          ]
+        }
+      },
+      "restaurant:roof_shaded_return": {
+        "before_mean": 58.55,
+        "after_mean": 31.99,
+        "before_spread": 14.6,
+        "after_spread": 14.7,
+        "n": 4321,
+        "projection": {
+          "cx": 785.0,
+          "cy": 406.8,
+          "left": 620,
+          "top": 137,
+          "dst": [
+            330,
+            275
+          ],
+          "screen_box": [
+            816,
+            192,
+            932,
+            282
+          ]
+        }
+      },
+      "restaurant:front_wall": {
+        "before_mean": 60.26,
+        "after_mean": 69.15,
+        "before_spread": 59.1,
+        "after_spread": 76.5,
+        "n": 17702,
+        "projection": {
+          "cx": 785.0,
+          "cy": 406.8,
+          "left": 620,
+          "top": 137,
+          "dst": [
+            330,
+            275
+          ],
+          "screen_box": [
+            650,
+            298,
+            823,
+            410
+          ]
+        }
+      },
+      "restaurant:side_wall": {
+        "before_mean": 51.44,
+        "after_mean": 41.24,
+        "before_spread": 37.6,
+        "after_spread": 38.4,
+        "n": 9034,
+        "projection": {
+          "cx": 785.0,
+          "cy": 406.8,
+          "left": 620,
+          "top": 137,
+          "dst": [
+            330,
+            275
+          ],
+          "screen_box": [
+            829,
+            269,
+            922,
+            407
+          ]
+        }
+      },
+      "restaurant:soffit_eave": {
+        "before_mean": 30.7,
+        "after_mean": 22.65,
+        "before_spread": 9.9,
+        "after_spread": 9.4,
+        "n": 1056,
+        "projection": {
+          "cx": 785.0,
+          "cy": 406.8,
+          "left": 620,
+          "top": 137,
+          "dst": [
+            330,
+            275
+          ],
+          "screen_box": [
+            650,
+            290,
+            832,
+            303
+          ]
+        }
+      },
+      "restaurant:door_reveal": {
+        "before_mean": 37.28,
+        "after_mean": 37.28,
+        "before_spread": 30.5,
+        "after_spread": 30.5,
+        "n": 1440,
+        "projection": {
+          "cx": 785.0,
+          "cy": 406.8,
+          "left": 620,
+          "top": 137,
+          "dst": [
+            330,
+            275
+          ],
+          "screen_box": [
+            766,
+            358,
+            805,
+            410
+          ]
+        }
+      },
+      "restaurant:plinth_foundation": {
+        "before_mean": 47.48,
+        "after_mean": 44.69,
+        "before_spread": 52.8,
+        "after_spread": 51.7,
+        "n": 1837,
+        "projection": {
+          "cx": 785.0,
+          "cy": 406.8,
+          "left": 620,
+          "top": 137,
+          "dst": [
+            330,
+            275
+          ],
+          "screen_box": [
+            650,
+            397,
+            823,
+            415
+          ]
+        }
+      },
+      "hero_registry:roof_key_pitch": {
+        "before_mean": 69.53,
+        "after_mean": 62.27,
+        "before_spread": 24.6,
+        "after_spread": 29.6,
+        "n": 11032,
+        "projection": {
+          "cx": 465.0,
+          "cy": 594.0,
+          "left": 314,
+          "top": 333,
+          "dst": [
+            301,
+            266
+          ],
+          "screen_box": [
+            337,
+            382,
+            507,
+            472
+          ]
+        }
+      },
+      "hero_registry:roof_shaded_return": {
+        "before_mean": 57.0,
+        "after_mean": 29.38,
+        "before_spread": 24.3,
+        "after_spread": 27.5,
+        "n": 4316,
+        "projection": {
+          "cx": 465.0,
+          "cy": 594.0,
+          "left": 314,
+          "top": 333,
+          "dst": [
+            301,
+            266
+          ],
+          "screen_box": [
+            491,
+            382,
+            606,
+            472
+          ]
+        }
+      },
+      "hero_registry:front_wall": {
+        "before_mean": 56.83,
+        "after_mean": 63.82,
+        "before_spread": 61.7,
+        "after_spread": 73.9,
+        "n": 16328,
+        "projection": {
+          "cx": 465.0,
+          "cy": 594.0,
+          "left": 314,
+          "top": 333,
+          "dst": [
+            301,
+            266
+          ],
+          "screen_box": [
+            334,
+            488,
+            497,
+            598
+          ]
+        }
+      },
+      "hero_registry:side_wall": {
+        "before_mean": 47.4,
+        "after_mean": 36.41,
+        "before_spread": 30.0,
+        "after_spread": 25.7,
+        "n": 8646,
+        "projection": {
+          "cx": 465.0,
+          "cy": 594.0,
+          "left": 314,
+          "top": 333,
+          "dst": [
+            301,
+            266
+          ],
+          "screen_box": [
+            504,
+            459,
+            593,
+            595
+          ]
+        }
+      },
+      "hero_registry:soffit_eave": {
+        "before_mean": 31.05,
+        "after_mean": 21.96,
+        "before_spread": 10.1,
+        "after_spread": 9.2,
+        "n": 1002,
+        "projection": {
+          "cx": 465.0,
+          "cy": 594.0,
+          "left": 314,
+          "top": 333,
+          "dst": [
+            301,
+            266
+          ],
+          "screen_box": [
+            334,
+            480,
+            507,
+            493
+          ]
+        }
+      },
+      "hero_registry:plinth_foundation": {
+        "before_mean": 55.37,
+        "after_mean": 49.99,
+        "before_spread": 32.6,
+        "after_spread": 32.0,
+        "n": 1256,
+        "projection": {
+          "cx": 465.0,
+          "cy": 594.0,
+          "left": 314,
+          "top": 333,
+          "dst": [
+            301,
+            266
+          ],
+          "screen_box": [
+            334,
+            587,
+            497,
+            602
+          ]
+        }
+      }
+    },
+    "quarters_door_actor_z148.png": {
+      "hero_quarters:roof_key_pitch": {
+        "before_mean": 51.69,
+        "after_mean": 54.41,
+        "before_spread": 28.5,
+        "after_spread": 39.6,
+        "n": 23410,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 403,
+          "top": 54,
+          "dst": [
+            474,
+            398
+          ],
+          "screen_box": [
+            457,
+            137,
+            706,
+            263
+          ]
+        }
+      },
+      "hero_quarters:roof_shaded_return": {
+        "before_mean": 35.57,
+        "after_mean": 32.9,
+        "before_spread": 18.7,
+        "after_spread": 11.8,
+        "n": 8672,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 403,
+          "top": 54,
+          "dst": [
+            474,
+            398
+          ],
+          "screen_box": [
+            690,
+            137,
+            849,
+            263
+          ]
+        }
+      },
+      "hero_quarters:front_wall": {
+        "before_mean": 51.35,
+        "after_mean": 54.67,
+        "before_spread": 47.8,
+        "after_spread": 57.2,
+        "n": 35264,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 403,
+          "top": 54,
+          "dst": [
+            474,
+            398
+          ],
+          "screen_box": [
+            453,
+            288,
+            692,
+            447
+          ]
+        }
+      },
+      "hero_quarters:side_wall": {
+        "before_mean": 44.35,
+        "after_mean": 33.77,
+        "before_spread": 19.9,
+        "after_spread": 15.9,
+        "n": 18214,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 403,
+          "top": 54,
+          "dst": [
+            474,
+            398
+          ],
+          "screen_box": [
+            704,
+            251,
+            834,
+            443
+          ]
+        }
+      },
+      "hero_quarters:soffit_eave": {
+        "before_mean": 29.85,
+        "after_mean": 21.84,
+        "before_spread": 10.0,
+        "after_spread": 9.4,
+        "n": 2470,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 403,
+          "top": 54,
+          "dst": [
+            474,
+            398
+          ],
+          "screen_box": [
+            453,
+            277,
+            706,
+            293
+          ]
+        }
+      },
+      "hero_quarters:door_reveal": {
+        "before_mean": 45.31,
+        "after_mean": 45.31,
+        "before_spread": 53.3,
+        "after_spread": 53.3,
+        "n": 3216,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 403,
+          "top": 54,
+          "dst": [
+            474,
+            398
+          ],
+          "screen_box": [
+            614,
+            374,
+            669,
+            447
+          ]
+        }
+      },
+      "hero_quarters:plinth_foundation": {
+        "before_mean": 52.39,
+        "after_mean": 50.14,
+        "before_spread": 57.3,
+        "after_spread": 55.2,
+        "n": 3944,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 403,
+          "top": 54,
+          "dst": [
+            474,
+            398
+          ],
+          "screen_box": [
+            453,
+            431,
+            692,
+            455
+          ]
+        }
+      }
+    },
+    "restaurant_door_actor_z148.png": {
+      "restaurant:roof_key_pitch": {
+        "before_mean": 72.43,
+        "after_mean": 64.6,
+        "before_spread": 23.5,
+        "after_spread": 28.3,
+        "n": 25913,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 396,
+          "top": 45,
+          "dst": [
+            488,
+            407
+          ],
+          "screen_box": [
+            446,
+            128,
+            709,
+            258
+          ]
+        }
+      },
+      "restaurant:roof_shaded_return": {
+        "before_mean": 57.36,
+        "after_mean": 31.63,
+        "before_spread": 14.1,
+        "after_spread": 14.8,
+        "n": 9464,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 396,
+          "top": 45,
+          "dst": [
+            488,
+            407
+          ],
+          "screen_box": [
+            687,
+            128,
+            856,
+            258
+          ]
+        }
+      },
+      "restaurant:front_wall": {
+        "before_mean": 60.92,
+        "after_mean": 69.71,
+        "before_spread": 61.8,
+        "after_spread": 79.3,
+        "n": 38779,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 396,
+          "top": 45,
+          "dst": [
+            488,
+            407
+          ],
+          "screen_box": [
+            441,
+            284,
+            695,
+            447
+          ]
+        }
+      },
+      "restaurant:side_wall": {
+        "before_mean": 48.37,
+        "after_mean": 39.0,
+        "before_spread": 33.4,
+        "after_spread": 33.4,
+        "n": 19700,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 396,
+          "top": 45,
+          "dst": [
+            488,
+            407
+          ],
+          "screen_box": [
+            706,
+            241,
+            841,
+            443
+          ]
+        }
+      },
+      "restaurant:soffit_eave": {
+        "before_mean": 30.68,
+        "after_mean": 22.69,
+        "before_spread": 11.1,
+        "after_spread": 11.1,
+        "n": 2349,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 396,
+          "top": 45,
+          "dst": [
+            488,
+            407
+          ],
+          "screen_box": [
+            441,
+            272,
+            709,
+            289
+          ]
+        }
+      },
+      "restaurant:door_reveal": {
+        "before_mean": 45.29,
+        "after_mean": 45.29,
+        "before_spread": 53.3,
+        "after_spread": 53.3,
+        "n": 3216,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 396,
+          "top": 45,
+          "dst": [
+            488,
+            407
+          ],
+          "screen_box": [
+            614,
+            374,
+            669,
+            447
+          ]
+        }
+      },
+      "restaurant:plinth_foundation": {
+        "before_mean": 48.83,
+        "after_mean": 46.16,
+        "before_spread": 53.9,
+        "after_spread": 53.9,
+        "n": 4199,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 396,
+          "top": 45,
+          "dst": [
+            488,
+            407
+          ],
+          "screen_box": [
+            441,
+            431,
+            695,
+            455
+          ]
+        }
+      }
+    },
+    "armory_full_z148.png": {
+      "armory:roof_key_pitch": {
+        "before_mean": 54.69,
+        "after_mean": 61.92,
+        "before_spread": 31.3,
+        "after_spread": 56.4,
+        "n": 23326,
+        "projection": {
+          "cx": 640.0,
+          "cy": 461.2,
+          "left": 415,
+          "top": 75,
+          "dst": [
+            450,
+            393
+          ],
+          "screen_box": [
+            469,
+            144,
+            699,
+            283
+          ]
+        }
+      },
+      "armory:roof_shaded_return": {
+        "before_mean": 36.38,
+        "after_mean": 32.21,
+        "before_spread": 13.8,
+        "after_spread": 20.8,
+        "n": 10143,
+        "projection": {
+          "cx": 640.0,
+          "cy": 461.2,
+          "left": 415,
+          "top": 75,
+          "dst": [
+            450,
+            393
+          ],
+          "screen_box": [
+            678,
+            144,
+            846,
+            283
+          ]
+        }
+      },
+      "armory:front_wall": {
+        "before_mean": 46.76,
+        "after_mean": 46.22,
+        "before_spread": 53.9,
+        "after_spread": 61.9,
+        "n": 31737,
+        "projection": {
+          "cx": 640.0,
+          "cy": 461.2,
+          "left": 415,
+          "top": 75,
+          "dst": [
+            450,
+            393
+          ],
+          "screen_box": [
+            465,
+            309,
+            685,
+            466
+          ]
+        }
+      },
+      "armory:side_wall": {
+        "before_mean": 51.21,
+        "after_mean": 41.68,
+        "before_spread": 41.3,
+        "after_spread": 52.2,
+        "n": 18346,
+        "projection": {
+          "cx": 640.0,
+          "cy": 461.2,
+          "left": 415,
+          "top": 75,
+          "dst": [
+            450,
+            393
+          ],
+          "screen_box": [
+            697,
+            267,
+            827,
+            461
+          ]
+        }
+      },
+      "armory:soffit_eave": {
+        "before_mean": 30.9,
+        "after_mean": 23.16,
+        "before_spread": 14.5,
+        "after_spread": 13.3,
+        "n": 2043,
+        "projection": {
+          "cx": 640.0,
+          "cy": 461.2,
+          "left": 415,
+          "top": 75,
+          "dst": [
+            450,
+            393
+          ],
+          "screen_box": [
+            465,
+            297,
+            699,
+            314
+          ]
+        }
+      },
+      "armory:plinth_foundation": {
+        "before_mean": 55.99,
+        "after_mean": 49.33,
+        "before_spread": 51.8,
+        "after_spread": 61.3,
+        "n": 2556,
+        "projection": {
+          "cx": 640.0,
+          "cy": 461.2,
+          "left": 415,
+          "top": 75,
+          "dst": [
+            450,
+            393
+          ],
+          "screen_box": [
+            465,
+            451,
+            685,
+            471
+          ]
+        }
+      }
+    },
+    "armory_door_trigger_actor_z148.png": {
+      "armory:roof_key_pitch": {
+        "before_mean": 54.58,
+        "after_mean": 61.82,
+        "before_spread": 31.3,
+        "after_spread": 56.4,
+        "n": 23326,
+        "projection": {
+          "cx": 640.0,
+          "cy": 434.6,
+          "left": 415,
+          "top": 49,
+          "dst": [
+            450,
+            393
+          ],
+          "screen_box": [
+            469,
+            118,
+            699,
+            257
+          ]
+        }
+      },
+      "armory:roof_shaded_return": {
+        "before_mean": 36.34,
+        "after_mean": 32.17,
+        "before_spread": 13.6,
+        "after_spread": 20.8,
+        "n": 10143,
+        "projection": {
+          "cx": 640.0,
+          "cy": 434.6,
+          "left": 415,
+          "top": 49,
+          "dst": [
+            450,
+            393
+          ],
+          "screen_box": [
+            678,
+            118,
+            846,
+            257
+          ]
+        }
+      },
+      "armory:front_wall": {
+        "before_mean": 47.37,
+        "after_mean": 46.82,
+        "before_spread": 54.9,
+        "after_spread": 62.7,
+        "n": 31737,
+        "projection": {
+          "cx": 640.0,
+          "cy": 434.6,
+          "left": 415,
+          "top": 49,
+          "dst": [
+            450,
+            393
+          ],
+          "screen_box": [
+            465,
+            283,
+            685,
+            440
+          ]
+        }
+      },
+      "armory:side_wall": {
+        "before_mean": 51.43,
+        "after_mean": 41.94,
+        "before_spread": 41.3,
+        "after_spread": 53.0,
+        "n": 18346,
+        "projection": {
+          "cx": 640.0,
+          "cy": 434.6,
+          "left": 415,
+          "top": 49,
+          "dst": [
+            450,
+            393
+          ],
+          "screen_box": [
+            697,
+            241,
+            827,
+            435
+          ]
+        }
+      },
+      "armory:soffit_eave": {
+        "before_mean": 30.83,
+        "after_mean": 23.09,
+        "before_spread": 14.0,
+        "after_spread": 13.3,
+        "n": 2043,
+        "projection": {
+          "cx": 640.0,
+          "cy": 434.6,
+          "left": 415,
+          "top": 49,
+          "dst": [
+            450,
+            393
+          ],
+          "screen_box": [
+            465,
+            271,
+            699,
+            288
+          ]
+        }
+      },
+      "armory:plinth_foundation": {
+        "before_mean": 56.18,
+        "after_mean": 49.51,
+        "before_spread": 50.6,
+        "after_spread": 61.3,
+        "n": 2556,
+        "projection": {
+          "cx": 640.0,
+          "cy": 434.6,
+          "left": 415,
+          "top": 49,
+          "dst": [
+            450,
+            393
+          ],
+          "screen_box": [
+            465,
+            425,
+            685,
+            445
+          ]
+        }
+      }
+    },
+    "registry_close_z148.png": {
+      "hero_registry:roof_key_pitch": {
+        "before_mean": 70.67,
+        "after_mean": 63.44,
+        "before_spread": 26.9,
+        "after_spread": 30.9,
+        "n": 23893,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 418,
+          "top": 59,
+          "dst": [
+            445,
+            393
+          ],
+          "screen_box": [
+            453,
+            132,
+            702,
+            263
+          ]
+        }
+      },
+      "hero_registry:roof_shaded_return": {
+        "before_mean": 55.73,
+        "after_mean": 28.7,
+        "before_spread": 24.2,
+        "after_spread": 26.7,
+        "n": 9433,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 418,
+          "top": 59,
+          "dst": [
+            445,
+            393
+          ],
+          "screen_box": [
+            681,
+            132,
+            849,
+            263
+          ]
+        }
+      },
+      "hero_registry:front_wall": {
+        "before_mean": 56.31,
+        "after_mean": 62.99,
+        "before_spread": 61.1,
+        "after_spread": 74.8,
+        "n": 35728,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 418,
+          "top": 59,
+          "dst": [
+            445,
+            393
+          ],
+          "screen_box": [
+            449,
+            289,
+            688,
+            450
+          ]
+        }
+      },
+      "hero_registry:side_wall": {
+        "before_mean": 45.05,
+        "after_mean": 34.63,
+        "before_spread": 26.4,
+        "after_spread": 22.7,
+        "n": 18922,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 418,
+          "top": 59,
+          "dst": [
+            445,
+            393
+          ],
+          "screen_box": [
+            700,
+            246,
+            830,
+            445
+          ]
+        }
+      },
+      "hero_registry:soffit_eave": {
+        "before_mean": 31.91,
+        "after_mean": 22.9,
+        "before_spread": 16.0,
+        "after_spread": 15.5,
+        "n": 2460,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 418,
+          "top": 59,
+          "dst": [
+            445,
+            393
+          ],
+          "screen_box": [
+            449,
+            277,
+            702,
+            294
+          ]
+        }
+      },
+      "hero_registry:plinth_foundation": {
+        "before_mean": 53.24,
+        "after_mean": 48.43,
+        "before_spread": 36.6,
+        "after_spread": 40.7,
+        "n": 2784,
+        "projection": {
+          "cx": 640.0,
+          "cy": 445.2,
+          "left": 418,
+          "top": 59,
+          "dst": [
+            445,
+            393
+          ],
+          "screen_box": [
+            449,
+            435,
+            688,
+            455
+          ]
+        }
+      }
+    },
+    "synthesis_cottage_z148.png": {
+      "synthesis_lab:roof_key_pitch": {
+        "before_mean": 71.24,
+        "after_mean": 62.58,
+        "before_spread": 23.9,
+        "after_spread": 28.7,
+        "n": 23652,
+        "projection": {
+          "cx": 566.0,
+          "cy": 439.9,
+          "left": 343,
+          "top": 49,
+          "dst": [
+            445,
+            398
+          ],
+          "screen_box": [
+            378,
+            122,
+            618,
+            258
+          ]
+        }
+      },
+      "synthesis_lab:roof_shaded_return": {
+        "before_mean": 61.0,
+        "after_mean": 32.41,
+        "before_spread": 42.8,
+        "after_spread": 36.6,
+        "n": 10091,
+        "projection": {
+          "cx": 566.0,
+          "cy": 439.9,
+          "left": 343,
+          "top": 49,
+          "dst": [
+            445,
+            398
+          ],
+          "screen_box": [
+            596,
+            122,
+            769,
+            258
+          ]
+        }
+      },
+      "synthesis_lab:front_wall": {
+        "before_mean": 56.83,
+        "after_mean": 61.06,
+        "before_spread": 60.1,
+        "after_spread": 65.6,
+        "n": 34342,
+        "projection": {
+          "cx": 566.0,
+          "cy": 439.9,
+          "left": 343,
+          "top": 49,
+          "dst": [
+            445,
+            398
+          ],
+          "screen_box": [
+            374,
+            283,
+            604,
+            445
+          ]
+        }
+      },
+      "synthesis_lab:side_wall": {
+        "before_mean": 65.63,
+        "after_mean": 63.59,
+        "before_spread": 44.6,
+        "after_spread": 54.1,
+        "n": 19700,
+        "projection": {
+          "cx": 566.0,
+          "cy": 439.9,
+          "left": 343,
+          "top": 49,
+          "dst": [
+            445,
+            398
+          ],
+          "screen_box": [
+            615,
+            236,
+            750,
+            440
+          ]
+        }
+      },
+      "synthesis_lab:soffit_eave": {
+        "before_mean": 30.57,
+        "after_mean": 22.63,
+        "before_spread": 11.1,
+        "after_spread": 11.1,
+        "n": 2370,
+        "projection": {
+          "cx": 566.0,
+          "cy": 439.9,
+          "left": 343,
+          "top": 49,
+          "dst": [
+            445,
+            398
+          ],
+          "screen_box": [
+            374,
+            272,
+            618,
+            288
+          ]
+        }
+      },
+      "synthesis_lab:plinth_foundation": {
+        "before_mean": 52.74,
+        "after_mean": 52.94,
+        "before_spread": 30.6,
+        "after_spread": 30.4,
+        "n": 2676,
+        "projection": {
+          "cx": 566.0,
+          "cy": 439.9,
+          "left": 343,
+          "top": 49,
+          "dst": [
+            445,
+            398
+          ],
+          "screen_box": [
+            374,
+            430,
+            604,
+            450
+          ]
+        }
+      }
+    },
+    "summoning_hall_whole_z148.png": {
+      "summoning_hall:roof_key_pitch": {
+        "before_mean": 75.65,
+        "after_mean": 76.74,
+        "before_spread": 40.1,
+        "after_spread": 45.8,
+        "n": 23981,
+        "projection": {
+          "cx": 640.0,
+          "cy": 669.0,
+          "left": 212,
+          "top": 20,
+          "dst": [
+            857,
+            659
+          ],
+          "screen_box": [
+            350,
+            145,
+            832,
+            224
+          ]
+        }
+      },
+      "summoning_hall:roof_shaded_return": {
+        "before_mean": 57.64,
+        "after_mean": 36.91,
+        "before_spread": 9.0,
+        "after_spread": 8.9,
+        "n": 4428,
+        "projection": {
+          "cx": 640.0,
+          "cy": 669.0,
+          "left": 212,
+          "top": 20,
+          "dst": [
+            857,
+            659
+          ],
+          "screen_box": [
+            875,
+            209,
+            960,
+            294
+          ]
+        }
+      },
+      "summoning_hall:front_wall": {
+        "before_mean": 79.73,
+        "after_mean": 83.42,
+        "before_spread": 44.2,
+        "after_spread": 49.9,
+        "n": 95049,
+        "projection": {
+          "cx": 640.0,
+          "cy": 669.0,
+          "left": 212,
+          "top": 20,
+          "dst": [
+            857,
+            659
+          ],
+          "screen_box": [
+            318,
+            299,
+            857,
+            486
+          ]
+        }
+      },
+      "summoning_hall:side_wall": {
+        "before_mean": 49.47,
+        "after_mean": 38.68,
+        "before_spread": 13.9,
+        "after_spread": 16.4,
+        "n": 17506,
+        "projection": {
+          "cx": 640.0,
+          "cy": 669.0,
+          "left": 212,
+          "top": 20,
+          "dst": [
+            857,
+            659
+          ],
+          "screen_box": [
+            881,
+            241,
+            966,
+            531
+          ]
+        }
+      },
+      "summoning_hall:soffit_eave": {
+        "before_mean": 85.28,
+        "after_mean": 35.5,
+        "before_spread": 31.8,
+        "after_spread": 35.7,
+        "n": 7150,
+        "projection": {
+          "cx": 640.0,
+          "cy": 669.0,
+          "left": 212,
+          "top": 20,
+          "dst": [
+            857,
+            659
+          ],
+          "screen_box": [
+            312,
+            273,
+            870,
+            294
+          ]
+        }
+      },
+      "summoning_hall:plinth_foundation": {
+        "before_mean": 76.21,
+        "after_mean": 66.01,
+        "before_spread": 54.4,
+        "after_spread": 56.8,
+        "n": 32640,
+        "projection": {
+          "cx": 640.0,
+          "cy": 669.0,
+          "left": 212,
+          "top": 20,
+          "dst": [
+            857,
+            659
+          ],
+          "screen_box": [
+            312,
+            485,
+            960,
+            544
+          ]
+        }
+      }
+    },
+    "tower_gate_whole_z148.png": {
+      "tower_gate:roof_key_pitch": {
+        "before_mean": 81.96,
+        "after_mean": 74.17,
+        "before_spread": 35.4,
+        "after_spread": 29.0,
+        "n": 14080,
+        "projection": {
+          "cx": 640.0,
+          "cy": 653.0,
+          "left": 270,
+          "top": 25,
+          "dst": [
+            739,
+            637
+          ],
+          "screen_box": [
+            347,
+            108,
+            531,
+            195
+          ]
+        }
+      },
+      "tower_gate:roof_shaded_return": {
+        "before_mean": 33.71,
+        "after_mean": 26.18,
+        "before_spread": 12.9,
+        "after_spread": 4.8,
+        "n": 7593,
+        "projection": {
+          "cx": 640.0,
+          "cy": 653.0,
+          "left": 270,
+          "top": 25,
+          "dst": [
+            739,
+            637
+          ],
+          "screen_box": [
+            927,
+            91,
+            952,
+            559
+          ]
+        }
+      },
+      "tower_gate:front_wall": {
+        "before_mean": 70.49,
+        "after_mean": 77.78,
+        "before_spread": 45.1,
+        "after_spread": 49.4,
+        "n": 81269,
+        "projection": {
+          "cx": 640.0,
+          "cy": 653.0,
+          "left": 270,
+          "top": 25,
+          "dst": [
+            739,
+            637
+          ],
+          "screen_box": [
+            347,
+            114,
+            537,
+            571
+          ]
+        }
+      },
+      "tower_gate:side_wall": {
+        "before_mean": 48.41,
+        "after_mean": 35.8,
+        "before_spread": 33.2,
+        "after_spread": 24.7,
+        "n": 81718,
+        "projection": {
+          "cx": 640.0,
+          "cy": 653.0,
+          "left": 270,
+          "top": 25,
+          "dst": [
+            739,
+            637
+          ],
+          "screen_box": [
+            739,
+            114,
+            929,
+            571
+          ]
+        }
+      },
+      "tower_gate:soffit_eave": {
+        "before_mean": 55.22,
+        "after_mean": 37.21,
+        "before_spread": 50.4,
+        "after_spread": 45.5,
+        "n": 6501,
+        "projection": {
+          "cx": 640.0,
+          "cy": 653.0,
+          "left": 270,
+          "top": 25,
+          "dst": [
+            739,
+            637
+          ],
+          "screen_box": [
+            341,
+            193,
+            940,
+            212
+          ]
+        }
+      },
+      "tower_gate:plinth_foundation": {
+        "before_mean": 33.92,
+        "after_mean": 32.16,
+        "before_spread": 21.9,
+        "after_spread": 15.4,
+        "n": 48365,
+        "projection": {
+          "cx": 640.0,
+          "cy": 653.0,
+          "left": 270,
+          "top": 25,
+          "dst": [
+            739,
+            637
+          ],
+          "screen_box": [
+            353,
+            569,
+            929,
+            662
+          ]
+        }
+      }
+    },
+    "sanctuary_overview_z036.png": {
+      "tower_gate:roof_key_pitch": {
+        "before_mean": 72.75,
+        "after_mean": 63.74,
+        "before_spread": 15.8,
+        "after_spread": 18.1,
+        "n": 817,
+        "projection": {
+          "cx": 769.6,
+          "cy": 153.9,
+          "left": 680,
+          "top": 1,
+          "dst": [
+            180,
+            155
+          ],
+          "screen_box": [
+            697,
+            19,
+            746,
+            44
+          ]
+        }
+      },
+      "tower_gate:roof_shaded_return": {
+        "before_mean": 38.73,
+        "after_mean": 26.94,
+        "before_spread": 11.9,
+        "after_spread": 3.1,
+        "n": 435,
+        "projection": {
+          "cx": 769.6,
+          "cy": 153.9,
+          "left": 680,
+          "top": 1,
+          "dst": [
+            180,
+            155
+          ],
+          "screen_box": [
+            838,
+            15,
+            848,
+            133
+          ]
+        }
+      },
+      "tower_gate:front_wall": {
+        "before_mean": 65.56,
+        "after_mean": 73.43,
+        "before_spread": 38.1,
+        "after_spread": 52.1,
+        "n": 4905,
+        "projection": {
+          "cx": 769.6,
+          "cy": 153.9,
+          "left": 680,
+          "top": 1,
+          "dst": [
+            180,
+            155
+          ],
+          "screen_box": [
+            697,
+            21,
+            747,
+            136
+          ]
+        }
+      },
+      "tower_gate:side_wall": {
+        "before_mean": 52.6,
+        "after_mean": 38.06,
+        "before_spread": 34.3,
+        "after_spread": 26.5,
+        "n": 4796,
+        "projection": {
+          "cx": 769.6,
+          "cy": 153.9,
+          "left": 680,
+          "top": 1,
+          "dst": [
+            180,
+            155
+          ],
+          "screen_box": [
+            792,
+            21,
+            842,
+            136
+          ]
+        }
+      },
+      "tower_gate:soffit_eave": {
+        "before_mean": 48.53,
+        "after_mean": 29.15,
+        "before_spread": 45.8,
+        "after_spread": 39.7,
+        "n": 288,
+        "projection": {
+          "cx": 769.6,
+          "cy": 153.9,
+          "left": 680,
+          "top": 1,
+          "dst": [
+            180,
+            155
+          ],
+          "screen_box": [
+            696,
+            40,
+            845,
+            48
+          ]
+        }
+      },
+      "tower_gate:plinth_foundation": {
+        "before_mean": 35.38,
+        "after_mean": 33.5,
+        "before_spread": 20.0,
+        "after_spread": 16.4,
+        "n": 2898,
+        "projection": {
+          "cx": 769.6,
+          "cy": 153.9,
+          "left": 680,
+          "top": 1,
+          "dst": [
+            180,
+            155
+          ],
+          "screen_box": [
+            698,
+            131,
+            842,
+            158
+          ]
+        }
+      },
+      "summoning_hall:roof_key_pitch": {
+        "before_mean": 70.14,
+        "after_mean": 71.32,
+        "before_spread": 33.1,
+        "after_spread": 39.2,
+        "n": 1410,
+        "projection": {
+          "cx": 938.8,
+          "cy": 522.0,
+          "left": 835,
+          "top": 364,
+          "dst": [
+            208,
+            160
+          ],
+          "screen_box": [
+            867,
+            393,
+            987,
+            415
+          ]
+        }
+      },
+      "summoning_hall:roof_shaded_return": {
+        "before_mean": 64.82,
+        "after_mean": 40.41,
+        "before_spread": 8.9,
+        "after_spread": 9.6,
+        "n": 266,
+        "projection": {
+          "cx": 938.8,
+          "cy": 522.0,
+          "left": 835,
+          "top": 364,
+          "dst": [
+            208,
+            160
+          ],
+          "screen_box": [
+            994,
+            408,
+            1018,
+            433
+          ]
+        }
+      },
+      "summoning_hall:front_wall": {
+        "before_mean": 79.79,
+        "after_mean": 83.72,
+        "before_spread": 40.6,
+        "after_spread": 48.4,
+        "n": 5676,
+        "projection": {
+          "cx": 938.8,
+          "cy": 522.0,
+          "left": 835,
+          "top": 364,
+          "dst": [
+            208,
+            160
+          ],
+          "screen_box": [
+            859,
+            430,
+            994,
+            479
+          ]
+        }
+      },
+      "summoning_hall:side_wall": {
+        "before_mean": 58.07,
+        "after_mean": 44.61,
+        "before_spread": 15.9,
+        "after_spread": 18.8,
+        "n": 1064,
+        "projection": {
+          "cx": 938.8,
+          "cy": 522.0,
+          "left": 835,
+          "top": 364,
+          "dst": [
+            208,
+            160
+          ],
+          "screen_box": [
+            995,
+            416,
+            1020,
+            490
+          ]
+        }
+      },
+      "summoning_hall:soffit_eave": {
+        "before_mean": 80.58,
+        "after_mean": 27.8,
+        "before_spread": 28.8,
+        "after_spread": 30.7,
+        "n": 399,
+        "projection": {
+          "cx": 938.8,
+          "cy": 522.0,
+          "left": 835,
+          "top": 364,
+          "dst": [
+            208,
+            160
+          ],
+          "screen_box": [
+            857,
+            424,
+            997,
+            433
+          ]
+        }
+      },
+      "summoning_hall:plinth_foundation": {
+        "before_mean": 81.52,
+        "after_mean": 70.1,
+        "before_spread": 50.4,
+        "after_spread": 54.8,
+        "n": 2015,
+        "projection": {
+          "cx": 938.8,
+          "cy": 522.0,
+          "left": 835,
+          "top": 364,
+          "dst": [
+            208,
+            160
+          ],
+          "screen_box": [
+            857,
+            475,
+            1018,
+            493
+          ]
+        }
+      },
+      "armory:roof_key_pitch": {
+        "before_mean": 41.05,
+        "after_mean": 49.97,
+        "before_spread": 10.4,
+        "after_spread": 38.9,
+        "n": 1400,
+        "projection": {
+          "cx": 422.2,
+          "cy": 172.1,
+          "left": 368,
+          "top": 78,
+          "dst": [
+            109,
+            96
+          ],
+          "screen_box": [
+            379,
+            93,
+            439,
+            131
+          ]
+        }
+      },
+      "armory:roof_shaded_return": {
+        "before_mean": 39.76,
+        "after_mean": 34.63,
+        "before_spread": 10.4,
+        "after_spread": 22.6,
+        "n": 603,
+        "projection": {
+          "cx": 422.2,
+          "cy": 172.1,
+          "left": 368,
+          "top": 78,
+          "dst": [
+            109,
+            96
+          ],
+          "screen_box": [
+            430,
+            93,
+            474,
+            131
+          ]
+        }
+      },
+      "armory:front_wall": {
+        "before_mean": 48.68,
+        "after_mean": 47.85,
+        "before_spread": 52.0,
+        "after_spread": 55.8,
+        "n": 1836,
+        "projection": {
+          "cx": 422.2,
+          "cy": 172.1,
+          "left": 368,
+          "top": 78,
+          "dst": [
+            109,
+            96
+          ],
+          "screen_box": [
+            378,
+            133,
+            435,
+            175
+          ]
+        }
+      },
+      "armory:side_wall": {
+        "before_mean": 62.48,
+        "after_mean": 47.63,
+        "before_spread": 47.5,
+        "after_spread": 47.7,
+        "n": 1093,
+        "projection": {
+          "cx": 422.2,
+          "cy": 172.1,
+          "left": 368,
+          "top": 78,
+          "dst": [
+            109,
+            96
+          ],
+          "screen_box": [
+            434,
+            123,
+            470,
+            174
+          ]
+        }
+      },
+      "armory:soffit_eave": {
+        "before_mean": 28.96,
+        "after_mean": 20.79,
+        "before_spread": 7.3,
+        "after_spread": 8.3,
+        "n": 110,
+        "projection": {
+          "cx": 422.2,
+          "cy": 172.1,
+          "left": 368,
+          "top": 78,
+          "dst": [
+            109,
+            96
+          ],
+          "screen_box": [
+            378,
+            130,
+            439,
+            138
+          ]
+        }
+      },
+      "armory:plinth_foundation": {
+        "before_mean": 60.2,
+        "after_mean": 50.76,
+        "before_spread": 24.3,
+        "after_spread": 43.7,
+        "n": 102,
+        "projection": {
+          "cx": 422.2,
+          "cy": 172.1,
+          "left": 368,
+          "top": 78,
+          "dst": [
+            109,
+            96
+          ],
+          "screen_box": [
+            378,
+            168,
+            435,
+            177
+          ]
+        }
+      },
+      "hero_quarters:roof_key_pitch": {
+        "before_mean": 45.01,
+        "after_mean": 48.43,
+        "before_spread": 21.0,
+        "after_spread": 32.1,
+        "n": 1389,
+        "projection": {
+          "cx": 361.0,
+          "cy": 207.1,
+          "left": 303,
+          "top": 112,
+          "dst": [
+            115,
+            97
+          ],
+          "screen_box": [
+            314,
+            130,
+            379,
+            165
+          ]
+        }
+      },
+      "hero_quarters:roof_shaded_return": {
+        "before_mean": 39.12,
+        "after_mean": 36.28,
+        "before_spread": 22.8,
+        "after_spread": 12.4,
+        "n": 512,
+        "projection": {
+          "cx": 361.0,
+          "cy": 207.1,
+          "left": 303,
+          "top": 112,
+          "dst": [
+            115,
+            97
+          ],
+          "screen_box": [
+            371,
+            130,
+            413,
+            165
+          ]
+        }
+      },
+      "hero_quarters:front_wall": {
+        "before_mean": 54.19,
+        "after_mean": 57.74,
+        "before_spread": 51.2,
+        "after_spread": 55.9,
+        "n": 2072,
+        "projection": {
+          "cx": 361.0,
+          "cy": 207.1,
+          "left": 303,
+          "top": 112,
+          "dst": [
+            115,
+            97
+          ],
+          "screen_box": [
+            313,
+            167,
+            375,
+            210
+          ]
+        }
+      },
+      "hero_quarters:side_wall": {
+        "before_mean": 56.93,
+        "after_mean": 42.01,
+        "before_spread": 28.8,
+        "after_spread": 37.2,
+        "n": 1038,
+        "projection": {
+          "cx": 361.0,
+          "cy": 207.1,
+          "left": 303,
+          "top": 112,
+          "dst": [
+            115,
+            97
+          ],
+          "screen_box": [
+            374,
+            158,
+            410,
+            209
+          ]
+        }
+      },
+      "hero_quarters:soffit_eave": {
+        "before_mean": 27.87,
+        "after_mean": 19.51,
+        "before_spread": 0.0,
+        "after_spread": 0.0,
+        "n": 118,
+        "projection": {
+          "cx": 361.0,
+          "cy": 207.1,
+          "left": 303,
+          "top": 112,
+          "dst": [
+            115,
+            97
+          ],
+          "screen_box": [
+            313,
+            164,
+            379,
+            172
+          ]
+        }
+      },
+      "hero_quarters:door_reveal": {
+        "before_mean": 38.91,
+        "after_mean": 38.91,
+        "before_spread": 35.9,
+        "after_spread": 35.9,
+        "n": 176,
+        "projection": {
+          "cx": 361.0,
+          "cy": 207.1,
+          "left": 303,
+          "top": 112,
+          "dst": [
+            115,
+            97
+          ],
+          "screen_box": [
+            352,
+            188,
+            369,
+            210
+          ]
+        }
+      },
+      "hero_quarters:plinth_foundation": {
+        "before_mean": 63.14,
+        "after_mean": 60.7,
+        "before_spread": 75.0,
+        "after_spread": 74.6,
+        "n": 224,
+        "projection": {
+          "cx": 361.0,
+          "cy": 207.1,
+          "left": 303,
+          "top": 112,
+          "dst": [
+            115,
+            97
+          ],
+          "screen_box": [
+            313,
+            202,
+            375,
+            212
+          ]
+        }
+      },
+      "restaurant:roof_key_pitch": {
+        "before_mean": 66.08,
+        "after_mean": 57.8,
+        "before_spread": 12.9,
+        "after_spread": 16.6,
+        "n": 1550,
+        "projection": {
+          "cx": 461.8,
+          "cy": 242.1,
+          "left": 402,
+          "top": 145,
+          "dst": [
+            119,
+            99
+          ],
+          "screen_box": [
+            412,
+            163,
+            480,
+            199
+          ]
+        }
+      },
+      "restaurant:roof_shaded_return": {
+        "before_mean": 65.21,
+        "after_mean": 34.54,
+        "before_spread": 12.9,
+        "after_spread": 15.7,
+        "n": 562,
+        "projection": {
+          "cx": 461.8,
+          "cy": 242.1,
+          "left": 402,
+          "top": 145,
+          "dst": [
+            119,
+            99
+          ],
+          "screen_box": [
+            471,
+            163,
+            516,
+            199
+          ]
+        }
+      },
+      "restaurant:front_wall": {
+        "before_mean": 63.5,
+        "after_mean": 73.2,
+        "before_spread": 62.0,
+        "after_spread": 81.4,
+        "n": 2280,
+        "projection": {
+          "cx": 461.8,
+          "cy": 242.1,
+          "left": 402,
+          "top": 145,
+          "dst": [
+            119,
+            99
+          ],
+          "screen_box": [
+            411,
+            201,
+            477,
+            245
+          ]
+        }
+      },
+      "restaurant:side_wall": {
+        "before_mean": 62.98,
+        "after_mean": 48.96,
+        "before_spread": 47.5,
+        "after_spread": 50.4,
+        "n": 1156,
+        "projection": {
+          "cx": 461.8,
+          "cy": 242.1,
+          "left": 402,
+          "top": 145,
+          "dst": [
+            119,
+            99
+          ],
+          "screen_box": [
+            476,
+            191,
+            513,
+            244
+          ]
+        }
+      },
+      "restaurant:soffit_eave": {
+        "before_mean": 28.61,
+        "after_mean": 20.18,
+        "before_spread": 0.0,
+        "after_spread": 0.0,
+        "n": 126,
+        "projection": {
+          "cx": 461.8,
+          "cy": 242.1,
+          "left": 402,
+          "top": 145,
+          "dst": [
+            119,
+            99
+          ],
+          "screen_box": [
+            411,
+            198,
+            480,
+            206
+          ]
+        }
+      },
+      "restaurant:door_reveal": {
+        "before_mean": 38.78,
+        "after_mean": 38.78,
+        "before_spread": 35.1,
+        "after_spread": 35.1,
+        "n": 176,
+        "projection": {
+          "cx": 461.8,
+          "cy": 242.1,
+          "left": 402,
+          "top": 145,
+          "dst": [
+            119,
+            99
+          ],
+          "screen_box": [
+            453,
+            223,
+            470,
+            245
+          ]
+        }
+      },
+      "restaurant:plinth_foundation": {
+        "before_mean": 54.2,
+        "after_mean": 51.6,
+        "before_spread": 65.9,
+        "after_spread": 57.6,
+        "n": 240,
+        "projection": {
+          "cx": 461.8,
+          "cy": 242.1,
+          "left": 402,
+          "top": 145,
+          "dst": [
+            119,
+            99
+          ],
+          "screen_box": [
+            411,
+            237,
+            477,
+            247
+          ]
+        }
+      },
+      "hero_registry:roof_key_pitch": {
+        "before_mean": 63.38,
+        "after_mean": 55.49,
+        "before_spread": 26.3,
+        "after_spread": 34.2,
+        "n": 1423,
+        "projection": {
+          "cx": 346.6,
+          "cy": 309.5,
+          "left": 293,
+          "top": 215,
+          "dst": [
+            108,
+            96
+          ],
+          "screen_box": [
+            300,
+            231,
+            364,
+            267
+          ]
+        }
+      },
+      "hero_registry:roof_shaded_return": {
+        "before_mean": 62.61,
+        "after_mean": 30.43,
+        "before_spread": 26.3,
+        "after_spread": 31.1,
+        "n": 560,
+        "projection": {
+          "cx": 346.6,
+          "cy": 309.5,
+          "left": 293,
+          "top": 215,
+          "dst": [
+            108,
+            96
+          ],
+          "screen_box": [
+            355,
+            231,
+            399,
+            267
+          ]
+        }
+      },
+      "hero_registry:front_wall": {
+        "before_mean": 60.95,
+        "after_mean": 68.73,
+        "before_spread": 65.2,
+        "after_spread": 86.1,
+        "n": 2072,
+        "projection": {
+          "cx": 346.6,
+          "cy": 309.5,
+          "left": 293,
+          "top": 215,
+          "dst": [
+            108,
+            96
+          ],
+          "screen_box": [
+            299,
+            269,
+            360,
+            312
+          ]
+        }
+      },
+      "hero_registry:side_wall": {
+        "before_mean": 57.89,
+        "after_mean": 42.24,
+        "before_spread": 33.5,
+        "after_spread": 32.7,
+        "n": 1128,
+        "projection": {
+          "cx": 346.6,
+          "cy": 309.5,
+          "left": 293,
+          "top": 215,
+          "dst": [
+            108,
+            96
+          ],
+          "screen_box": [
+            359,
+            259,
+            395,
+            311
+          ]
+        }
+      },
+      "hero_registry:soffit_eave": {
+        "before_mean": 27.76,
+        "after_mean": 18.17,
+        "before_spread": 0.0,
+        "after_spread": 0.0,
+        "n": 120,
+        "projection": {
+          "cx": 346.6,
+          "cy": 309.5,
+          "left": 293,
+          "top": 215,
+          "dst": [
+            108,
+            96
+          ],
+          "screen_box": [
+            299,
+            266,
+            364,
+            274
+          ]
+        }
+      },
+      "hero_registry:plinth_foundation": {
+        "before_mean": 64.54,
+        "after_mean": 58.24,
+        "before_spread": 28.7,
+        "after_spread": 30.2,
+        "n": 112,
+        "projection": {
+          "cx": 346.6,
+          "cy": 309.5,
+          "left": 293,
+          "top": 215,
+          "dst": [
+            108,
+            96
+          ],
+          "screen_box": [
+            299,
+            305,
+            360,
+            314
+          ]
+        }
+      },
+      "synthesis_lab:roof_key_pitch": {
+        "before_mean": 63.18,
+        "after_mean": 53.88,
+        "before_spread": 12.9,
+        "after_spread": 17.6,
+        "n": 1433,
+        "projection": {
+          "cx": 521.2,
+          "cy": 146.2,
+          "left": 467,
+          "top": 51,
+          "dst": [
+            108,
+            97
+          ],
+          "screen_box": [
+            474,
+            67,
+            536,
+            104
+          ]
+        }
+      },
+      "synthesis_lab:roof_shaded_return": {
+        "before_mean": 69.11,
+        "after_mean": 36.22,
+        "before_spread": 45.4,
+        "after_spread": 38.0,
+        "n": 598,
+        "projection": {
+          "cx": 521.2,
+          "cy": 146.2,
+          "left": 467,
+          "top": 51,
+          "dst": [
+            108,
+            97
+          ],
+          "screen_box": [
+            527,
+            67,
+            572,
+            104
+          ]
+        }
+      },
+      "synthesis_lab:front_wall": {
+        "before_mean": 61.42,
+        "after_mean": 66.37,
+        "before_spread": 66.5,
+        "after_spread": 72.9,
+        "n": 1998,
+        "projection": {
+          "cx": 521.2,
+          "cy": 146.2,
+          "left": 467,
+          "top": 51,
+          "dst": [
+            108,
+            97
+          ],
+          "screen_box": [
+            473,
+            106,
+            532,
+            149
+          ]
+        }
+      },
+      "synthesis_lab:side_wall": {
+        "before_mean": 63.64,
+        "after_mean": 60.66,
+        "before_spread": 26.5,
+        "after_spread": 36.1,
+        "n": 1172,
+        "projection": {
+          "cx": 521.2,
+          "cy": 146.2,
+          "left": 467,
+          "top": 51,
+          "dst": [
+            108,
+            97
+          ],
+          "screen_box": [
+            531,
+            95,
+            568,
+            148
+          ]
+        }
+      },
+      "synthesis_lab:soffit_eave": {
+        "before_mean": 27.75,
+        "after_mean": 19.25,
+        "before_spread": 0.0,
+        "after_spread": 0.0,
+        "n": 114,
+        "projection": {
+          "cx": 521.2,
+          "cy": 146.2,
+          "left": 467,
+          "top": 51,
+          "dst": [
+            108,
+            97
+          ],
+          "screen_box": [
+            473,
+            103,
+            536,
+            111
+          ]
+        }
+      },
+      "synthesis_lab:plinth_foundation": {
+        "before_mean": 63.16,
+        "after_mean": 63.38,
+        "before_spread": 27.0,
+        "after_spread": 26.8,
+        "n": 108,
+        "projection": {
+          "cx": 521.2,
+          "cy": 146.2,
+          "left": 467,
+          "top": 51,
+          "dst": [
+            108,
+            97
+          ],
+          "screen_box": [
+            473,
+            142,
+            532,
+            151
+          ]
+        }
+      }
+    }
+  },
+  "gates": {
+    "no_flood": {
+      "frames": {
+        "sanctuary_overview_z036.png": -0.28,
+        "service_cluster_z088.png": -0.75,
+        "tower_gate_whole_z148.png": -1.16
+      },
+      "max_abs_mean_pct": 1.16,
+      "limit": 8.0,
+      "pass": true
+    },
+    "max_abs_mean_pct_all_frames": 1.88,
+    "p24_full_frame_contrast": {
+      "per_frame_d_spread": {
+        "sanctuary_overview_z036.png": 0.0,
+        "service_cluster_z088.png": 2.9,
+        "tower_gate_whole_z148.png": 3.7
+      },
+      "gain_at_least_3_count": 1,
+      "gate": "P24 original: p90-p10 gain >= +3 on >= 2/3 (disclosed independently; NOT relabelled)"
+    },
+    "roi": {
+      "all_pass": true,
+      "assets": {
+        "hero_quarters": true,
+        "restaurant": true,
+        "summoning_hall": true,
+        "armory": true,
+        "hero_registry": true,
+        "synthesis_lab": true,
+        "tower_gate": true
+      }
+    }
+  }
+}

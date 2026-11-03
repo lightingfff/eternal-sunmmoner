@@ -163,7 +163,7 @@
         190,
         166
       ],
-      "sha256": "1faf98862a3e864c5278700dca02441c981438cdefb4e73edaa9187b77e51012"
+      "sha256": "18794a36f4270e71ecdcabe733742fb1092c9264ed072f863fc02ec54c561084"
     },
     "smithy_verge": {
       "file": "smithy_verge.png",
@@ -187,7 +187,7 @@
         268,
         206
       ],
-      "sha256": "29c1197974129c7a2c063470024c5c31b73bf5746955a42e9303ab698d50256f"
+      "sha256": "bc8adb3cb4c211345b311cd61b8898a9397c8fdf52e8acad587f67d0df185180"
     },
     "tower_gate": {
       "file": "tower_gate.png",
@@ -195,7 +195,7 @@
         260,
         224
       ],
-      "sha256": "271a44c3f07e089bcba8446c3ad06f61db8d4067d8274aacbdd0ef57ef072425"
+      "sha256": "d2efd9d1f521f4fa945379f01fdd8c3e75d70b13945410281f0a9f5242cac26a"
     },
     "hero_registry": {
       "file": "hero_registry.png",
@@ -203,7 +203,7 @@
         188,
         166
       ],
-      "sha256": "d9ed2e4a69b66d3217fe73500c9edefb55b7d132681274444ca88d253f368c8f"
+      "sha256": "5ce2f7a6b0374c53723a94c64b973ef12e70b0332d92488c8859a2820abbe66e"
     },
     "hero_quarters": {
       "file": "hero_quarters.png",
@@ -211,7 +211,7 @@
         200,
         168
       ],
-      "sha256": "dde71639f45ea79f6e74626fbdec325e164b92b2399b083c8a165fff999ea200"
+      "sha256": "c8ae5d0c21fb3f94049c0e4e84a4a0dc89a56655f7921ef552207f239a3b5c02"
     },
     "restaurant": {
       "file": "restaurant.png",
@@ -219,7 +219,7 @@
         206,
         172
       ],
-      "sha256": "2109a9dbffab742fa71a9b7e89531c03681a0b0085ab43b76ce0f9f9c61c8df2"
+      "sha256": "517f0e1802aa19e4d9d98d6d7bdd8d215f4f40822f70b26f37e488530ea16910"
     },
     "synthesis_lab": {
       "file": "synthesis_lab.png",
@@ -227,7 +227,7 @@
         188,
         168
       ],
-      "sha256": "bfb4cbd089052f505c432713a824968578dab362ecd0201348b12c08ec05abab"
+      "sha256": "1785d2ec21b2cb37aa4a7be051606c337b484613b687d5f095dd9976443d8942"
     }
   },
   "sample": {

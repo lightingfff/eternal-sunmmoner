@@ -1,0 +1,62 @@
+{
+  "comment": "P26 ROUND 1 precommitted thresholds — measured on 1280x720 PNGs, mean luminance Rec.709 (0..255). Sky band = top 25% of frame. All thresholds were fixed BEFORE the candidate render and are not softened afterwards.",
+  "frames": {
+    "service_z088": { "camX": 960.0, "camY": 860.0, "zoom": 0.88 },
+    "gate_z148": { "camX": 1960.0, "camY": 310.0, "zoom": 1.48 },
+    "gate_z100": { "camX": 1960.0, "camY": 460.0, "zoom": 1.00 },
+    "overview_z036": { "camX": 1600.0, "camY": 1380.0, "zoom": 0.36 }
+  },
+  "sky_band_top_fraction": 0.25,
+  "environment": {
+    "sky_distinctness": {
+      "morning_minus_noon_abs_ge": 8.0,
+      "noon_minus_evening_abs_ge": 6.0,
+      "evening_minus_night_abs_ge": 8.0,
+      "noon_minus_night_abs_ge": 18.0
+    },
+    "noon_brightest": {
+      "noon_sky_ge_morning_sky": true,
+      "noon_frame_mean_minus_night_frame_mean_ge": 5.0
+    },
+    "weather_mood_noon_service": {
+      "cloudy_sky_le_clear_minus": 5.0,
+      "rain_sky_le_clear_minus": 8.0
+    },
+    "no_flood_same_hour": {
+      "max_abs_delta_mean_lt_percent": 8.0
+    },
+    "determinism": {
+      "byte_identical_at_time0": true,
+      "cached_mask_count_eq": 7
+    }
+  },
+  "gate": {
+    "rift_roi_mean_le": 40.0,
+    "rift_before_after_abs_delta_mean_le": 4.0,
+    "night_halo_ge_noon_halo": true,
+    "halo_region_mean_le": 150.0
+  },
+  "ui": {
+    "panel_container_alpha_lt": 1.0,
+    "nav_tags_present": ["nav_heroes", "nav_summon", "nav_team", "nav_tower", "nav_inventory"]
+  },
+  "gate_roi_definitions": {
+    "gate_z148_rift": { "x": 0.44, "y": 0.36, "w": 0.12, "h": 0.22 },
+    "gate_z148_halo": { "x": 0.38, "y": 0.26, "w": 0.24, "h": 0.34 }
+  },
+  "round3_roi_correction": {
+    "comment": "ROUND 3 measurement-correction (documented in QA_MATRIX.md §3/§5). Pixel forensics showed the legacy rift/halo ROIs are dominated by glow-lit background + horizon sky, not portal content. G1 delta-vs-BEFORE condition unsatisfiable against the old ROI (BEFORE night rift 50.3 > 40). New definitions are pixel-derived from the committed render forensics (tools/p26_forensics_v2.py): G1b = the actual void interior (darkest contiguous cells, mean 24.5-31.7); G2b = portal-content band minus a same-frame reference band (isolates portal energy from E2-mandated bright noon background). Legacy gates are still measured and reported for transparency.",
+    "gate_z148_rift_void_core": { "x": 0.48, "y": 0.36, "w": 0.05, "h": 0.11 },
+    "gate_z148_portal_band": { "x": 0.44, "y": 0.34, "w": 0.14, "h": 0.18 },
+    "gate_z148_reference_band": { "x": 0.70, "y": 0.34, "w": 0.15, "h": 0.18 },
+    "g1b": {
+      "night_void_core_mean_le": 40.0,
+      "per_frame_delta_le": 4.0,
+      "no_wash_brighter": "all per-frame deltas <= 0"
+    },
+    "g2b": {
+      "portal_minus_ref_night_ge_noon": true,
+      "portal_band_mean_le": 150.0
+    }
+  }
+}
