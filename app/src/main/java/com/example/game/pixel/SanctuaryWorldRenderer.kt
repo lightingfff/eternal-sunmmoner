@@ -1183,19 +1183,35 @@ object SanctuaryWorldRenderer {
   private fun DrawScope.drawSanctuaryLocalLights(
     sx:(Float)->Float,sy:(Float,Float)->Float,zoom:Float,timeSec:Float,
   ) {
-    val intensity=com.example.game.world.WorldEnvironment.lighting.localLightIntensity
-    val flicker=.94f+.06f*sin(timeSec*3.1f+1.7f)
-    with(DepthPresentation) {
-      // Emissive-only bloom; world grade/weather own atmosphere. No stacked ground haze,
-      // whole-screen vignette/chasm darkening or duplicate generic landmark shadows.
-      for(i in 0..1) {
-        val wx=if(i==0) 1490f else 1730f
-        val x=sx(wx);val y=sy(2155f,0f)
-        drawLightStamp(Offset(x,y),70f*zoom,50f*zoom,DepthPresentation.LightTint.WARM_AMBER,.13f*intensity*flicker)
+    if (DepthPresentation.quality == DepthPresentation.Quality.OFF || zoom <= 0f) return
+    val exposure = HdrLightResponse.exposureBalance()
+    val flicker = .94f + .06f * sin(timeSec*3.1f + 1.7f)
+    with(HdrLightResponse) {
+      // P24: ONE controlled focal point on the plaza, on the .72 ground plane. The
+      // exposure balance raises it at night without lifting the whole scene.
+      val px = sx(SanctuaryIslandGeometry.PLAZA_CENTER_X)
+      val py = sy(SanctuaryIslandGeometry.PLAZA_CENTER_Y, 0f)
+      drawHdrStamp(
+        Offset(px, py), 96f*zoom, 96f*zoom*ObliqueCamera.OBLIQUE_Y_SCALE,
+        HdrLightResponse.Tint.MOON, (.105f*exposure).coerceAtMost(.22f),
+      )
+      // Tower Gate is the strongest cold source; its pool reaches the monolith stairs.
+      // The emissive core/rift halo itself is drawn by drawProp AFTER the monument sprite.
+      val gx = sx(1960f); val gy = sy(585f, 0f)
+      drawHdrStamp(
+        Offset(gx, gy + 12f*zoom), 118f*zoom, 118f*zoom*ObliqueCamera.OBLIQUE_Y_SCALE,
+        HdrLightResponse.Tint.AETHER, (.13f*exposure*flicker).coerceAtMost(.22f),
+      )
+      if (DepthPresentation.quality == DepthPresentation.Quality.BALANCED) {
+        // Two warm posts near the southern approach keep the amber/cold hierarchy.
+        for (i in 0..1) {
+          val wx = if (i == 0) 1490f else 1730f
+          drawHdrStamp(
+            Offset(sx(wx), sy(2155f, 0f)), 62f*zoom, 62f*zoom*ObliqueCamera.OBLIQUE_Y_SCALE,
+            HdrLightResponse.Tint.AMBER, (.10f*exposure*flicker).coerceAtMost(.22f),
+          )
+        }
       }
-      val x=sx(SanctuaryIslandGeometry.PLAZA_CENTER_X)
-      val y=sy(SanctuaryIslandGeometry.PLAZA_CENTER_Y,0f)
-      drawLightStamp(Offset(x,y),65f*zoom,46f*zoom,DepthPresentation.LightTint.COOL_AETHER,.08f*intensity)
     }
   }
 }

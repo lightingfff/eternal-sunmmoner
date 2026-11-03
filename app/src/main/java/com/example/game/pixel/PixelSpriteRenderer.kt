@@ -624,6 +624,11 @@ object PixelSpriteRenderer {
     val s = zoom * obs.scale
     if (cx < -380f || cx > size.width + 380f || cy < -400f || cy > size.height + 380f) return
 
+    // P24: cached, culled HDR ground spill + short contact rim are drawn BEFORE the
+    // sprite, so the light pool sits on the .72 ground plane instead of painting over
+    // the facade. Same call path for the lobby and the Robolectric render harness.
+    with(HdrLightResponse) { drawHdrGround(obs, cx, cy, s, timeSec) }
+
     // null selects the existing projected-shadow pass, after camera culling.
     val legacyShadow = renderShadow ?: (SanctuaryEnvironmentShadows.sprite(obs) == null)
     when (obs.propKind) {
@@ -1064,6 +1069,10 @@ object PixelSpriteRenderer {
         drawForeshortenedGlow(doorCx, doorCy + 4f * s, 22f * s * zoom.coerceIn(0.6f, 1f), Color(0xFFF5B841).copy(alpha = doorGlowAlpha))
       }
     }
+    // P24: emissive core + very light halo + paired key/shade material response are
+    // drawn AFTER the sprite, so the light belongs to the architecture. No fullscreen
+    // pass; every stamp is cached and culled, and OFF/REDUCED shed the expensive parts.
+    with(HdrLightResponse) { drawHdrEmissive(obs, cx, cy, s, timeSec) }
   }
 
   /**
