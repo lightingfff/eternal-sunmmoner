@@ -2,7 +2,7 @@
 
 Quy ước: mọi bằng chứng ảnh là `REAL ENGINE ROBOLECTRIC RENDER` (Canvas thật, Robolectric native graphics), không phải contact sheet, không phải emulator, không phải máy thật. Điểm mềm chỉ chấm khi có PNG engine và chỉ số đo được.
 
-- Code SHA cuối: `c0e2c034f9d97364179f9c9b6a6ff59cecd3a89b`. Head nhánh: `dcdc870479b618fa5a96a0e3e5468603bb287245` (bot, chỉ PNG). PR #30 OPEN, chưa merge.
+- Code SHA cuối: `c0e2c034f9d97364179f9c9b6a6ff59cecd3a89b`. Mọi commit sau đó trên nhánh chỉ là **PNG evidence** (bot `dcdc870`) và **báo cáo docs** — không đổi source. PR #30 OPEN, chưa merge.
 - BEFORE: `docs/visual-evidence/p24/engine-render-before/` — 24 PNG / **7 356 408 B**. AFTER: `docs/visual-evidence/p23/engine-render/` — 32 PNG. `camera_props.json` không đổi.
 
 ## Blocker gates

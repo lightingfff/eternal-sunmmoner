@@ -1,6 +1,6 @@
 # ROUND 4 — CORRECTION #3 (VÒNG CUỐI) → KẾT LUẬN: `BLOCKED`, KHÔNG TỰ NHẬN PASS
 
-- **SHA code cuối**: `c0e2c034f9d97364179f9c9b6a6ff59cecd3a89b` · **SHA đầu nhánh** (bot evidence, chỉ PNG): `dcdc870479b618fa5a96a0e3e5468603bb287245`.
+- **SHA code cuối**: `c0e2c034f9d97364179f9c9b6a6ff59cecd3a89b` · các commit sau đó trên nhánh chỉ là **PNG evidence** (bot `dcdc870`) và **báo cáo docs**, không đổi source.
 - **CI thật trên `c0e2c03`**:
   - `https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41589948067` — `Build Eternal Summoner APK`: **success** ở attempt 2. Attempt 1 `failure` **chỉ** ở step `Download and verify the actual uploaded artifact ZIP`; các step `Build APK`, `Verify signed APK`, `Upload APK` đều `success`. Rerun job lỗi (`POST .../rerun-failed-jobs`) → step 13 `success`. Đây là lỗi tải artifact hạ tầng, không phải lỗi biên dịch; đã ghi nhận trung thực, không giấu.
   - `https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41589948058` — `Lyra engine render evidence`: **success**, 15/15 step render/verify/publish/upload `success` (kể cả `Render P24 HDR light-response matrix`, `Verify P23 architecture and props contract`, `Verify Sanctuary environment art, manifest, layout, and performance regressions`).
