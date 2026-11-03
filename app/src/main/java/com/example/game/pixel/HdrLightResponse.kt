@@ -191,7 +191,7 @@ object HdrLightResponse {
     // The rift keeps its DARK aperture (QA contract). No filled core here: the cold
     // ground pool, the violet halo and the existing animated ring carry the source.
     PropKind.FACILITY_TOWER_GATE, PropKind.TOWER_PORTAL_GATE -> LightSpec(
-      Tint.VIOLET, Material.CRYSTAL, 158f, .195f, 0f, .00f, 58f, .20f, 196f, true,
+      Tint.VIOLET, Material.CRYSTAL, 158f, .160f, 0f, .00f, 58f, .17f, 196f, true,
     )
     PropKind.FACILITY_SUMMONING_HALL -> LightSpec(
       Tint.AETHER, Material.STONE, 100f, .135f, 0f, .00f, 34f, .13f, 70f, false,
@@ -373,7 +373,7 @@ object HdrLightResponse {
     s: Float,
     spec: LightSpec?,
   ) {
-    if (!balanced() || s < .45f) return
+    if (!balanced() || s < .30f) return
     val bmp = SanctuaryEnvironmentShadows.sprite(obs) ?: return
     val ps = ObliqueSpriteGeometry.pixelScale(obs.propKind) * s
     val bounds = ObliqueSpriteGeometry.bounds(bmp)
@@ -388,18 +388,26 @@ object HdrLightResponse {
     ) return
 
     val material = spec?.material ?: materialFor(obs.propKind)
-    val key = keyStrength(material)
+    // A whole-island 0.36 read must not get the same punch as a 1.48 closeup.
+    val zoomFactor = (s / .88f).coerceIn(.55f, 1.10f)
+    val key = keyStrength(material) * zoomFactor
     // Night/rain lift only the LOCAL grade, capped so shadows never get crushed.
     val exposure = exposureBalance().coerceAtMost(1.30f)
     val roof = highlightTint(material)
     val keyCol = Color(0xffe8e0c8.toInt()) // unified key light = SanctuaryLight colour
+    // Mean-neutral, contrast-expanding tone curve. Round 2 proved a bright-dominant
+    // ramp raises mean ~10% ("washed"); the shade side must be ~3x the highlight side
+    // because blending toward near-white moves luminance much further than blending
+    // toward deep navy. Highlights pop, shadows deepen but keep their detail.
+    // Direction is vertically biased so ROOF -> FRONT -> FOUNDATION separate, with a
+    // residual NW->SE tilt for the left/right plane.
     val brush = Brush.linearGradient(
-      0f to roof.copy(alpha = (key * 1.55f * exposure).coerceAtMost(.34f)),
-      .36f to keyCol.copy(alpha = (key * exposure).coerceAtMost(.24f)),
-      .58f to Color.Transparent,
-      1f to Color(0xff070c18.toInt()).copy(alpha = (key * 1.35f * exposure).coerceAtMost(.30f)),
-      start = Offset(-bmp.width / 2f, bounds.visibleHeight.toFloat()),
-      end = Offset(bmp.width / 2f, 0f),
+      0f to roof.copy(alpha = (key * .62f * exposure).coerceAtMost(.16f)),
+      .30f to keyCol.copy(alpha = (key * .40f * exposure).coerceAtMost(.11f)),
+      .44f to Color.Transparent,
+      1f to Color(0xff0a1220.toInt()).copy(alpha = (key * 2.15f * exposure).coerceAtMost(.36f)),
+      start = Offset(-bmp.width * .30f, bounds.visibleHeight.toFloat()),
+      end = Offset(bmp.width * .30f, 0f),
     )
     withTransform({
       translate(cx, baseY)
