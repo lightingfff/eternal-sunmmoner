@@ -12,6 +12,7 @@ import com.example.game.lobby.SanctuaryLobbyEngine
 import com.example.game.map.PropKind
 import com.example.game.pixel.DepthPresentation
 import com.example.game.pixel.HdrLightResponse
+import com.example.game.pixel.LivingWorldRenderer
 import com.example.game.pixel.PixelSpriteRenderer.drawProp
 import com.example.game.pixel.SanctuaryArtAssets
 import com.example.game.pixel.SanctuaryEnvironmentShadows.drawGroundShadows
@@ -67,6 +68,14 @@ class HdrLightingRenderTest {
       drawGroundShadows(layout.obstacles, camX, camY, zoom, clipToIsland = true)
       for (obs in layout.obstacles.sortedBy { it.y + it.sortYBias }) {
         drawProp(obs, camX, camY, zoom, timeSec, renderShadow = null)
+      }
+      // P24 round-2: the real SanctuaryLobbyScreen post pass (grade + remaining local
+      // lights + foreground weather). The 24 P23 evidence frames deliberately keep the
+      // bare harness for a clean before/after diff; the HDR matrix shows the lobby.
+      with(LivingWorldRenderer) {
+        drawWorldGrade()
+        drawLocalLights(layout.obstacles, camX, camY, zoom)
+        drawWeather(camX, camY, zoom, foreground = true)
       }
     }
     val file = File(outDir, "$name.png")

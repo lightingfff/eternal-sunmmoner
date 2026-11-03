@@ -2,11 +2,13 @@ package com.example.game.pixel
 
 import android.graphics.Bitmap
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.example.game.map.ObliqueCamera
@@ -62,7 +64,9 @@ object HdrLightResponse {
   )
 
   private const val MASK_SIZE = 48
-  private const val MAX_STAMP_ALPHA = 0.22f
+  // Still bounded: these are LOCAL stamps, never a fullscreen overlay.
+  private const val MAX_STAMP_ALPHA = 0.30f
+  private const val MAX_HALO_ALPHA = 0.22f
   private const val MAX_CORE_ALPHA = 0.46f
 
   @Volatile
@@ -126,7 +130,7 @@ object HdrLightResponse {
     val lighting = WorldEnvironment.lighting
     val night = (1f - lighting.ambientIntensity).coerceIn(0f, 1f)
     val wet = WorldEnvironment.weather.rain.coerceIn(0f, 1f)
-    return (0.92f + night * 1.35f + wet * 0.16f).coerceIn(0.80f, 1.65f)
+    return (1.00f + night * 1.30f + wet * 0.16f).coerceIn(0.90f, 1.65f)
   }
 
   /** Soft-knee highlight cap: strong cores approach [cap] without a hard white clip. */
@@ -179,36 +183,36 @@ object HdrLightResponse {
   /** One authored light spec per real emitting prop. Null = no local source (no invented lights). */
   fun specFor(kind: PropKind): LightSpec? = when (kind) {
     PropKind.STREET_LANTERN -> LightSpec(
-      Tint.AMBER, Material.METAL, 58f, .100f, 7f, .30f, 20f, .10f, 46f, true,
+      Tint.AMBER, Material.METAL, 64f, .155f, 7f, .32f, 22f, .17f, 46f, true,
     )
     PropKind.ARCANE_BRAZIER -> LightSpec(
-      Tint.AETHER, Material.CRYSTAL, 66f, .095f, 9f, .32f, 24f, .10f, 54f, true,
+      Tint.AETHER, Material.CRYSTAL, 72f, .150f, 9f, .34f, 26f, .17f, 54f, true,
     )
     // The rift keeps its DARK aperture (QA contract). No filled core here: the cold
     // ground pool, the violet halo and the existing animated ring carry the source.
     PropKind.FACILITY_TOWER_GATE, PropKind.TOWER_PORTAL_GATE -> LightSpec(
-      Tint.VIOLET, Material.CRYSTAL, 150f, .150f, 0f, .00f, 54f, .14f, 196f, true,
+      Tint.VIOLET, Material.CRYSTAL, 158f, .195f, 0f, .00f, 58f, .20f, 196f, true,
     )
     PropKind.FACILITY_SUMMONING_HALL -> LightSpec(
-      Tint.AETHER, Material.STONE, 96f, .090f, 0f, .00f, 32f, .09f, 70f, false,
+      Tint.AETHER, Material.STONE, 100f, .135f, 0f, .00f, 34f, .13f, 70f, false,
     )
     PropKind.FACILITY_ARMORY -> LightSpec(
-      Tint.EMBER, Material.STONE, 72f, .085f, 0f, .00f, 22f, .075f, 78f, false,
+      Tint.EMBER, Material.METAL, 78f, .130f, 0f, .00f, 24f, .12f, 78f, false,
     )
     PropKind.FACILITY_HERO_QUARTERS, PropKind.FACILITY_RESTAURANT,
     PropKind.FACILITY_HERO_REGISTRY, PropKind.FACILITY_SYNTHESIS_LAB,
     PropKind.MEDIEVAL_TOWNHOUSE_A, PropKind.MEDIEVAL_TOWNHOUSE_B,
     PropKind.SANCTUARY_COTTAGE_BROWN, PropKind.SANCTUARY_COTTAGE_SLATE -> LightSpec(
-      Tint.GOLD, Material.WOOD, 48f, .072f, 0f, .00f, 16f, .055f, 62f, false,
+      Tint.GOLD, Material.WOOD, 54f, .115f, 0f, .00f, 18f, .10f, 62f, false,
     )
     PropKind.FORGE_ANVIL_STATION, PropKind.ALCHEMICAL_CRUCIBLE,
     PropKind.TAVERN_HEARTH_FIREPLACE -> LightSpec(
-      Tint.EMBER, Material.METAL, 56f, .100f, 10f, .30f, 20f, .09f, 26f, true,
+      Tint.EMBER, Material.METAL, 60f, .155f, 10f, .32f, 22f, .15f, 26f, true,
     )
     PropKind.CRIMSON_CRYSTAL, PropKind.OBSIDIAN_COLUMN,
     PropKind.ANCIENT_MONOLITH, PropKind.SUMMON_OBELISK,
     PropKind.ASTRAL_HERB_SHRINE -> LightSpec(
-      Tint.VIOLET, Material.CRYSTAL, 52f, .085f, 9f, .28f, 18f, .08f, 40f, false,
+      Tint.VIOLET, Material.CRYSTAL, 56f, .130f, 9f, .30f, 20f, .13f, 40f, false,
     )
     else -> null
   }
@@ -251,16 +255,8 @@ object HdrLightResponse {
   ) {
     if (!enabled() || s <= 0f) return
     val wet = WorldEnvironment.weather.rain.coerceIn(0f, 1f)
-    if (isBuilding(obs.propKind)) {
-      // Short, SE-biased contact AO. Not a generic oval: it sits on the same ground
-      // plane and follows the authored shadow direction.
-      val rimW = 76f * s
-      drawHdrStamp(
-        Offset(cx + 8f * s, cy + 2f * s),
-        rimW, rimW * ObliqueCamera.OBLIQUE_Y_SCALE * 0.22f,
-        Tint.SHADE, .13f,
-      )
-    }
+    // Contact AO is drawn AFTER the sprite (see drawHdrEmissive): a stamp placed before
+    // the sprite would sit entirely under the building footprint and never be visible.
     val spec = specFor(obs.propKind) ?: return
     val exposure = exposureBalance()
     val pulse = flicker(spec, obs, timeSec)
@@ -295,6 +291,18 @@ object HdrLightResponse {
     timeSec: Float,
   ) {
     if (!enabled() || s <= 0f) return
+    // Shape-aware face grading for EVERY building, including those without a local
+    // source. This is what separates roof / front / side values instead of a vague glow.
+    if (isBuilding(obs.propKind)) drawVolumeGrade(obs, cx, cy, s, specFor(obs.propKind))
+    // Wide, flat contact AO on the .72 ground plane, AFTER the sprite so it is visible.
+    // The long directional silhouette remains owned by SanctuaryEnvironmentShadows.
+    if (isBuilding(obs.propKind) && balanced()) {
+      drawHdrStamp(
+        Offset(cx + 12f * s, cy + 8f * s),
+        124f * s, 124f * s * ObliqueCamera.OBLIQUE_Y_SCALE * .26f,
+        Tint.SHADE, .17f,
+      )
+    }
     val spec = specFor(obs.propKind) ?: return
     val exposure = exposureBalance()
     val pulse = flicker(spec, obs, timeSec)
@@ -307,7 +315,7 @@ object HdrLightResponse {
     if (balanced() && spec.haloAlpha > 0f) {
       drawHdrStamp(
         Offset(cx, top), spec.haloRadius * s, spec.haloRadius * s,
-        spec.tint, boundedAlpha(spec.haloAlpha * exposure * pulse, .14f),
+        spec.tint, boundedAlpha(spec.haloAlpha * exposure * pulse, MAX_HALO_ALPHA),
       )
     }
     // Crisp core: one solid circle at the actual glass/flame/rift pixel. Windows and
@@ -320,46 +328,84 @@ object HdrLightResponse {
         spec.coreRadius * s * 0.40f, Offset(cx, top),
       )
     }
-    drawMaterialResponse(obs, cx, cy, s, spec, exposure)
+  }
+
+  private fun materialFor(kind: PropKind): Material = when (kind) {
+    PropKind.FACILITY_TOWER_GATE, PropKind.TOWER_PORTAL_GATE -> Material.CRYSTAL
+    PropKind.FACILITY_ARMORY, PropKind.FORTRESS_CORNER_TOWER,
+    PropKind.SOUTHERN_GATE_TOWER -> Material.METAL
+    PropKind.SANCTUARY_COTTAGE_BROWN, PropKind.MEDIEVAL_TOWNHOUSE_A,
+    PropKind.MEDIEVAL_TOWNHOUSE_B, PropKind.FACILITY_RESTAURANT -> Material.WOOD
+    else -> Material.STONE
+  }
+
+  /** Roof/edge highlight hue answers differently per material. */
+  private fun highlightTint(material: Material): Color = when (material) {
+    Material.STONE -> Color(0xffdce8f5.toInt())
+    Material.WOOD -> Color(0xffffd8a0.toInt())
+    Material.METAL -> Color(0xfff0f8ff.toInt())
+    Material.ROOF -> Color(0xffc9d6e8.toInt())
+    Material.FOLIAGE -> Color(0xffb8d8a8.toInt())
+    Material.CRYSTAL -> Color(0xffc4b5fd.toInt())
+  }
+
+  private fun keyStrength(material: Material): Float = when (material) {
+    Material.STONE -> .155f
+    Material.WOOD -> .125f
+    Material.METAL -> .205f
+    Material.ROOF -> .175f
+    Material.FOLIAGE -> .100f
+    Material.CRYSTAL -> .190f
   }
 
   /**
-   * Local tone/volume grade: the key-lit NW plane gains a cool highlight, the opposite
-   * SE plane gains a paired shade. Both are cached stamps with low alpha, so this
-   * expands LOCAL contrast (richer light) without a global brightness or blur pass.
-   * Skipped below gameplay size, where the extra work would not be visible.
+   * P24 round-2 fix for "glow but still flat": grade the ACTUAL cached alpha silhouette
+   * of the building (the same Path used for projected shadows), with a diagonal
+   * key-light gradient. One cached path + one gradient drawPath per building, culled
+   * offscreen and BALANCED-only. This is a local tone map on the architecture itself,
+   * not a fullscreen pass, not a blur and not a sticker rectangle: roof, front and side
+   * planes gain separate values while pixel art stays sharp.
    */
-  private fun DrawScope.drawMaterialResponse(
+  private fun DrawScope.drawVolumeGrade(
     obs: WorldObstacle,
     cx: Float,
     cy: Float,
     s: Float,
-    spec: LightSpec,
-    exposure: Float,
+    spec: LightSpec?,
   ) {
-    if (s < 0.45f || !balanced()) return
-    val wet = WorldEnvironment.weather.rain.coerceIn(0f, 1f)
-    val key = when (spec.material) {
-      Material.STONE -> .085f
-      Material.WOOD -> .065f
-      Material.METAL -> .140f
-      Material.ROOF -> .100f
-      Material.FOLIAGE -> .050f
-      Material.CRYSTAL -> .130f
+    if (!balanced() || s < .45f) return
+    val bmp = SanctuaryEnvironmentShadows.sprite(obs) ?: return
+    val ps = ObliqueSpriteGeometry.pixelScale(obs.propKind) * s
+    val bounds = ObliqueSpriteGeometry.bounds(bmp)
+    // Screen y of the bottom opaque sprite row. The silhouette Path uses y = 0 there
+    // and grows upward, so the canvas needs a negative Y scale to line it up.
+    val footY = cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, bmp) * s
+    val baseY = footY - (bounds.bottomPadding + 1f) * ps
+    val halfW = bmp.width * ps * .5f
+    val heightPx = bounds.visibleHeight.toFloat() * ps
+    if (cx + halfW < 0f || cx - halfW > size.width ||
+      baseY + ps * 2f < 0f || baseY - heightPx > size.height
+    ) return
+
+    val material = spec?.material ?: materialFor(obs.propKind)
+    val key = keyStrength(material)
+    // Night/rain lift only the LOCAL grade, capped so shadows never get crushed.
+    val exposure = exposureBalance().coerceAtMost(1.30f)
+    val roof = highlightTint(material)
+    val keyCol = Color(0xffe8e0c8.toInt()) // unified key light = SanctuaryLight colour
+    val brush = Brush.linearGradient(
+      0f to roof.copy(alpha = (key * 1.55f * exposure).coerceAtMost(.34f)),
+      .36f to keyCol.copy(alpha = (key * exposure).coerceAtMost(.24f)),
+      .58f to Color.Transparent,
+      1f to Color(0xff070c18.toInt()).copy(alpha = (key * 1.35f * exposure).coerceAtMost(.30f)),
+      start = Offset(-bmp.width / 2f, bounds.visibleHeight.toFloat()),
+      end = Offset(bmp.width / 2f, 0f),
+    )
+    withTransform({
+      translate(cx, baseY)
+      scale(ps, -ps, Offset.Zero)
+    }) {
+      drawPath(SanctuaryEnvironmentShadows.silhouette(bmp), brush)
     }
-    val w = 78f * s
-    val h = 96f * s
-    drawHdrStamp(
-      Offset(cx - w * 0.45f, cy - h * 0.72f),
-      w * 0.95f, h * 0.78f,
-      Tint.MOON,
-      boundedAlpha(key * exposure * (1f + wet * 0.5f), .16f),
-    )
-    drawHdrStamp(
-      Offset(cx + w * 0.52f, cy - h * 0.30f),
-      w * 0.92f, h * 0.70f,
-      Tint.SHADE,
-      boundedAlpha(key * 0.85f * exposure, .14f),
-    )
   }
 }
