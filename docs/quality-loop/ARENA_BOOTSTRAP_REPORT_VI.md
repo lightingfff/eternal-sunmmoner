@@ -130,25 +130,42 @@ file nào phải bỏ qua.
 - Local: **KHÔNG CHẠY** — thiếu JDK 21, Gradle và Android SDK (`java: command not found`,
   `gradle: command not found`, `ANDROID_HOME` unset). Không bịa kết quả `assembleDebug`/unit test.
 - CI nền đã có thật (mục 2) là của `main`/PR #28, không phải của PR này.
-- CI của chính PR cài đặt: **sẽ cập nhật sau khi push + mở PR**, đọc bằng
-  `gh run list --commit <candidate_sha>` trên đúng SHA; nếu chưa chạy xong sẽ ghi đúng trạng thái
-  `queued`/`in_progress`, không ghi `success` giả. Vì PR chỉ đổi `.agents/**`, `docs/**`, `AGENTS.md`,
-  workflow `lyra-render-evidence.yml` (path filter `app/src/main/**`) sẽ **không** chạy → không có ảnh
-  render engine mới; hạn chế này được ghi rõ.
+- CI của chính PR cài đặt — **kết quả thật** trên candidate SHA
+  `999292807a2aef533fd843e31c22d3c81c69c930` (đọc bằng `gh api
+  repos/lightingfff/eternal-sunmmoner/actions/runs?head_sha=…`; `gh 2.23` không có
+  `gh run list --commit`, nên đã đổi lệnh, không bịa output):
+  - run `41583171747` — `Build Eternal Summoner APK`, event `pull_request`,
+    `status=completed`, **`conclusion=success`**, tạo `2026-11-03T05:18:44Z`, xong
+    `2026-11-03T05:20:07Z` → https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41583171747
+  - `gh pr checks 29`: `Build Android APK` = **pass** (1m21s); job
+    `Publish direct APK to Release` = `skipping` (điều kiện `github.ref == refs/heads/main` không thoả).
+  - `total_count=1` workflow run trên SHA này: `lyra-render-evidence.yml` **không chạy** đúng path
+    filter `app/src/main/**` → **không có ảnh render engine mới** cho PR cài đặt này. Đây là hạn chế
+    thật, không được hiểu là "đã có visual QA evidence".
+  - CI `success` ở đây chứng minh bản build APK compile được; **không** chứng minh gameplay hay chất
+    lượng hình ảnh (đúng tinh thần "test xanh ≠ hình đẹp").
 
 ## 8. PR & cách owner kiểm tra
 
-<!-- CI_CANDIDATE_SLOT -->
+**PR #29**: https://github.com/lightingfff/eternal-sunmmoner/pull/29 —
+`state=OPEN`, `isDraft=false`, `mergedAt=null`, `base=main`,
+`head=arena/56e30acd-eternal-sunmmoner`, **CHƯA MERGE** (owner duyệt). PR được mở tại commit
+`9992928` (push thật, xác minh bằng `git ls-remote`); commit thứ hai chỉ cập nhật file báo cáo Markdown
+này với kết quả CI thật, nên không làm thay đổi 13 file hay bất kỳ file game nào. Một phiên = một PR:
+PR #28 (gameplay, Draft) vẫn mở nguyên, không bị đụng. Kết quả CI trên SHA HEAD cuối cùng được ghi
+trong phần thảo luận của PR (không giả mạo trong file này).
 
-PR ở trạng thái **chưa merge** (owner duyệt). Cách kiểm tra:
+Cách kiểm tra:
 
 ```bash
 git fetch origin arena/56e30acd-eternal-sunmmoner
 git diff --stat origin/main...origin/arena/56e30acd-eternal-sunmmoner       # phải đúng 13 file
 git diff --check origin/main...origin/arena/56e30acd-eternal-sunmmoner       # sạch
 git diff origin/main...origin/arena/56e30acd-eternal-sunmmoner -- AGENTS.md  # chỉ append 2 section
-gh pr view <PR_NUMBER> --json state,isDraft,headRefName,baseRefName,url
-gh run list --commit <candidate_sha> --json workflowName,status,conclusion,url
+gh pr view 29 --json state,isDraft,mergedAt,headRefOid,url
+SHA=$(gh pr view 29 --json headRefOid --jq .headRefOid)
+gh api "repos/lightingfff/eternal-sunmmoner/actions/runs?head_sha=$SHA" \
+  --jq '.workflow_runs[] | "\(.name) \(.status) \(.conclusion) \(.html_url)"'
 ```
 
 Sau khi PR được merge, phiên Arena **mới** (chat mới trỏ `main`) sẽ tự đọc skill đã lưu trong repo;
