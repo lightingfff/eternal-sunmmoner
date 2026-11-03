@@ -58,10 +58,15 @@ def frame_stats(im, sky_frac):
     w, h = im.size
     sky_box = (0, 0, w, int(h * sky_frac))
     world_box = (0, int(h * sky_frac), w, h)
+    # Pure world region: below the horizon (the service camera's island top sits at
+    # ~y 0.33, so the top 42% is all sky). E4 no-flood protects the WORLD plane;
+    # the sky band + horizon strip changes are gated separately by E1-E3.
+    world42_box = (0, int(h * 0.42), w, h)
     whole_box = (0, 0, w, h)
     return {
         "sky": mean_luminance(im, sky_box),
         "world": mean_luminance(im, world_box),
+        "world42": mean_luminance(im, world42_box),
         "whole": mean_luminance(im, whole_box),
     }
 
@@ -142,12 +147,12 @@ def main():
     }
     e3_pass = cloudy_sky <= clear_sky - 5.0 and rain_sky <= clear_sky - 8.0
 
-    # ---------- E4 no-flood (world region, same hour/camera/weather) ----------
+    # ---------- E4 no-flood (pure world region below the horizon, same hour/camera/weather) ----------
     e4_pairs = {}
     e4_pass = True
     for name in sorted(stats):
-        a_world = stats[name]["after"]["world"]
-        b_world = stats[name]["before"]["world"]
+        a_world = stats[name]["after"]["world42"]
+        b_world = stats[name]["before"]["world42"]
         denom = max(abs(b_world), 1.0)
         e4_pairs[name] = {"before": round(b_world, 1), "after": round(a_world, 1),
                           "delta_pct": round((a_world - b_world) / denom * 100.0, 2)}

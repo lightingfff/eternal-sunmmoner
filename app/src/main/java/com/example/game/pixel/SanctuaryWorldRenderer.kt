@@ -1210,11 +1210,15 @@ object SanctuaryWorldRenderer {
     val lighting = com.example.game.world.WorldEnvironment.lighting
     if (lighting.rayAlpha <= 0.02f) return
     // Warm gold sunbeams by day, cool moonlight at night. Solid rects with a bounded
-    // alpha: no gradient brush allocation per frame and no screen-wide flood.
+    // alpha and a vertical fade (bright at the top, fading out before the world plane):
+    // no gradient brush allocation per frame and no screen-wide flood of the lower frame.
     withTransform({
       rotate(degrees = -34f, pivot = Offset(0f, 0f))
     }) {
-      val rayCol = lighting.rayColor.copy(alpha = lighting.rayAlpha.coerceAtMost(0.14f))
+      val rayCol = lighting.rayColor
+      val aFull = lighting.rayAlpha.coerceAtMost(0.14f)
+      val aMid = aFull * 0.5f
+      val aFaint = aFull * 0.22f
       val raySpecs = listOf(
         80f to 130f,
         290f to 95f,
@@ -1222,11 +1226,9 @@ object SanctuaryWorldRenderer {
         760f to 85f,
       )
       raySpecs.forEach { (offsetX, widthPx) ->
-        drawRect(
-          color = rayCol,
-          topLeft = Offset(offsetX, -80f),
-          size = Size(widthPx, size.height * 1.45f),
-        )
+        drawRect(color = rayCol.copy(alpha = aFull), topLeft = Offset(offsetX, -80f), size = Size(widthPx, size.height * 0.42f))
+        drawRect(color = rayCol.copy(alpha = aMid), topLeft = Offset(offsetX, size.height * 0.34f), size = Size(widthPx, size.height * 0.41f))
+        drawRect(color = rayCol.copy(alpha = aFaint), topLeft = Offset(offsetX, size.height * 0.70f), size = Size(widthPx, size.height * 0.75f))
       }
     }
   }

@@ -1,24 +1,24 @@
 P26 ROUND 1 MEASUREMENT (real Robolectric render evidence, 1280x720, Rec.709)
 ======================================================================
-E1 sky distinctness: FAIL |m-n|=8.1 |n-e|=17.5 |e-ng|=6.6 |n-ng|=24.1 (morn=71.8 noon=79.9 eve=62.3 night=55.8)
-E2 noon brightest: PASS noon_sky>=morn_sky=True noon_whole-night_whole=16.3
-E3 weather mood: FAIL cloudy-clear=0.0 rain-clear=-9.1
-E4 no-flood (world region): PASS
-    p26_gate_night_rain_z148.png: +0.0% (57.3 -> 57.3)
-    p26_gate_night_z148.png: +0.0% (58.8 -> 58.8)
-    p26_gate_noon_z148.png: +0.0% (71.2 -> 71.2)
-    p26_overview_night_z036.png: +0.0% (59.0 -> 59.0)
-    p26_sky_evening_z088.png: +0.0% (68.4 -> 68.4)
-    p26_sky_morning_z088.png: +0.0% (73.0 -> 73.0)
-    p26_sky_night_z088.png: +0.0% (65.2 -> 65.2)
-    p26_sky_noon_cloudy_z088.png: +0.0% (78.9 -> 78.9)
-    p26_sky_noon_rain_z088.png: +0.0% (71.6 -> 71.6)
-    p26_sky_noon_z088.png: +0.0% (78.9 -> 78.9)
+E1 sky distinctness: PASS |m-n|=12.8 |n-e|=39.8 |e-ng|=17.3 |n-ng|=57.1 (morn=93.5 noon=106.2 eve=66.4 night=49.1)
+E2 noon brightest: PASS noon_sky>=morn_sky=True noon_whole-night_whole=33.3
+E3 weather mood: PASS cloudy-clear=-11.9 rain-clear=-22.7
+E4 no-flood (world region): FAIL
+    p26_gate_night_rain_z148.png: -15.3% (57.3 -> 48.5)
+    p26_gate_night_z148.png: -12.9% (58.8 -> 51.2)
+    p26_gate_noon_z148.png: +5.5% (71.2 -> 75.2)
+    p26_overview_night_z036.png: -18.0% (59.0 -> 48.4)
+    p26_sky_evening_z088.png: -0.4% (68.4 -> 68.1)
+    p26_sky_morning_z088.png: +6.8% (73.0 -> 77.9)
+    p26_sky_night_z088.png: -10.8% (65.2 -> 58.2)
+    p26_sky_noon_cloudy_z088.png: -1.8% (78.9 -> 77.5)
+    p26_sky_noon_rain_z088.png: +10.3% (71.6 -> 79.0)
+    p26_sky_noon_z088.png: +5.9% (78.9 -> 83.6)
 E5 determinism: PASS after det==noon=True
-G1 rift dark: FAIL night rift=50.3 (<=40), |delta|<=4 per frame
-    p26_gate_night_z148.png: {'rift_after': 50.3, 'rift_before': 50.3, 'delta': 0.0}
-    p26_gate_noon_z148.png: {'rift_after': 57.7, 'rift_before': 57.7, 'delta': 0.0}
-    p26_gate_night_rain_z148.png: {'rift_after': 49.7, 'rift_before': 49.7, 'delta': 0.0}
-G2 night gate energy: FAIL halo night=58.1 noon=67.5 (night>=noon, <=150)
+G1 rift dark: FAIL night rift=42.8 (<=40), |delta|<=4 per frame
+    p26_gate_night_z148.png: {'rift_after': 42.8, 'rift_before': 50.3, 'delta': -7.47}
+    p26_gate_noon_z148.png: {'rift_after': 54.5, 'rift_before': 57.7, 'delta': -3.18}
+    p26_gate_night_rain_z148.png: {'rift_after': 42.8, 'rift_before': 49.7, 'delta': -6.9}
+G2 night gate energy: FAIL halo night=50.2 noon=66.1 (night>=noon, <=150)
 ======================================================================
-TOTAL: 3/7 gates PASS
+TOTAL: 4/7 gates PASS

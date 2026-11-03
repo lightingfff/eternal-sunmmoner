@@ -660,7 +660,7 @@ object PixelSpriteRenderer {
         // P26: the aperture stays a real void at every hour (P24 protection) — a dark
         // fill inside the portal oval, drawn before the energy rings.
         drawOval(
-          color = Color(0xFF05080F).copy(alpha = 0.66f),
+          color = Color(0xFF05080F).copy(alpha = 0.72f),
           topLeft = Offset(riftCenter.x - 32f * s, riftCenter.y - 54f * s),
           size = Size(64f * s, 108f * s),
           style = Fill,
@@ -676,8 +676,8 @@ object PixelSpriteRenderer {
         if (com.example.game.pixel.DepthPresentation.quality == com.example.game.pixel.DepthPresentation.Quality.BALANCED &&
           com.example.game.world.WorldEnvironment.lighting.localLightIntensity > 0.45f
         ) {
-          val auraAlpha = (0.16f * com.example.game.world.WorldEnvironment.lighting.localLightIntensity * pulse)
-            .coerceAtMost(0.16f)
+          val auraAlpha = (0.18f * com.example.game.world.WorldEnvironment.lighting.localLightIntensity * pulse)
+            .coerceAtMost(0.18f)
           drawOval(
             color = portalCoreCol.copy(alpha = auraAlpha),
             topLeft = Offset(riftCenter.x - 52f * s, riftCenter.y - 72f * s),

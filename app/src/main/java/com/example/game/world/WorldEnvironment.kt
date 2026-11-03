@@ -67,7 +67,7 @@ data class WorldLighting(
 ) {
   /** Weather multipliers: mood must change with weather, not just particle counts. */
   fun withWeather(state: WeatherState): WorldLighting = copy(
-    ambientIntensity = ambientIntensity * (1f - 0.08f * state.cloud - 0.15f * state.rain - 0.02f * state.fog),
+    ambientIntensity = ambientIntensity * (1f - 0.08f * state.cloud - 0.10f * state.rain - 0.02f * state.fog),
     shadowStrength = shadowStrength * (1f - 0.20f * state.rain - 0.15f * state.fog),
     sunIntensity = sunIntensity * (1f - 0.45f * state.cloud - 0.65f * state.rain),
     cloudDensity = cloudDensity * (1f + 0.50f * state.cloud + 0.60f * state.rain + 0.10f * state.fog),
@@ -98,8 +98,8 @@ data class WorldLighting(
       Color(0xffF0A06A), Color(0xff4A4D7E), Color(0xff3A3D6E),
     )
     private val ambientCols = listOf(
-      Color(0xff3A4A78), Color(0xffB8C8E0), Color(0xffDCE8F8), Color(0xffF0F6FF),
-      Color(0xffE8B88A), Color(0xff40507A), Color(0xff3A4A78),
+      Color(0xff617ca6), Color(0xffB8C8E0), Color(0xffDCE8F8), Color(0xffF0F6FF),
+      Color(0xffE8B88A), Color(0xff40507A), Color(0xff617ca6),
     )
     private val ambientIntensities = floatArrayOf(.73f, .80f, .90f, 1f, .88f, .75f, .73f)
     private val shadowStrengths = floatArrayOf(.78f, .75f, .72f, .85f, .80f, .78f, .78f)
