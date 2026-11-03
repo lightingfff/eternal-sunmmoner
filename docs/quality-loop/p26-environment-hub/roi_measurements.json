@@ -21,7 +21,7 @@
       "pass": true,
       "detail": {
         "cloudy_minus_clear": -11.30439868489583,
-        "rain_minus_clear": -23.23970532552083
+        "rain_minus_clear": -23.228101627604175
       }
     },
     "E4": {
@@ -30,17 +30,17 @@
         "p26_gate_night_rain_z148.png": {
           "before": 56.0,
           "after": 55.0,
-          "delta_pct": -1.82
+          "delta_pct": -1.81
         },
         "p26_gate_night_z148.png": {
           "before": 57.3,
           "after": 54.8,
-          "delta_pct": -4.36
+          "delta_pct": -4.35
         },
         "p26_gate_noon_z148.png": {
           "before": 67.8,
           "after": 68.0,
-          "delta_pct": 0.36
+          "delta_pct": 0.32
         },
         "p26_overview_night_z036.png": {
           "before": 59.1,
@@ -90,29 +90,29 @@
       "pass": false,
       "detail": {
         "p26_gate_night_z148.png": {
-          "rift_after": 48.4,
+          "rift_after": 48.1,
           "rift_before": 50.3,
-          "delta": -1.91
+          "delta": -2.19
         },
         "p26_gate_noon_z148.png": {
-          "rift_after": 54.5,
+          "rift_after": 54.0,
           "rift_before": 57.7,
-          "delta": -3.2
+          "delta": -3.68
         },
         "p26_gate_night_rain_z148.png": {
-          "rift_after": 50.0,
+          "rift_after": 49.7,
           "rift_before": 49.7,
-          "delta": 0.35
+          "delta": 0.08
         },
         "rift_roi_mean_le": 40.0,
-        "night_rift_mean": 48.4
+        "night_rift_mean": 48.1
       }
     },
     "G2": {
       "pass": false,
       "detail": {
         "halo_night": 55.7,
-        "halo_noon": 66.1
+        "halo_noon": 66.0
       }
     }
   },
@@ -148,28 +148,28 @@
       "whole": 80.95
     },
     "p26_sky_noon_rain_z088.png": {
-      "sky": 81.91,
+      "sky": 81.92,
       "world": 75.91,
       "world42": 76.41,
       "whole": 77.41
     },
     "p26_gate_night_z148.png": {
       "sky": 48.66,
-      "world": 56.48,
-      "world42": 54.76,
-      "whole": 54.52
+      "world": 56.49,
+      "world42": 54.77,
+      "whole": 54.53
     },
     "p26_gate_noon_z148.png": {
       "sky": 150.26,
-      "world": 74.84,
-      "world42": 68.02,
-      "whole": 93.69
+      "world": 74.82,
+      "world42": 67.99,
+      "whole": 93.68
     },
     "p26_gate_night_rain_z148.png": {
-      "sky": 45.43,
-      "world": 55.97,
-      "world42": 54.96,
-      "whole": 53.34
+      "sky": 45.42,
+      "world": 55.99,
+      "world42": 54.97,
+      "whole": 53.35
     },
     "p26_overview_night_z036.png": {
       "sky": 47.82,

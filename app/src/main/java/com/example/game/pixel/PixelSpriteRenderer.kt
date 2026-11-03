@@ -637,9 +637,9 @@ object PixelSpriteRenderer {
         val pulse = 0.88f + 0.12f * sin(timeSec * 3.2f)
         // P26: the gate is the luminous heart of the island. Local light intensity
         // (stronger at night) makes the energy rings read more at night, while the
-        // aperture below stays a dark void (P24 protection).
-        val nightBoost = (0.60f + 0.90f * com.example.game.world.WorldEnvironment.lighting.localLightIntensity)
-          .coerceIn(0.60f, 1.5f)
+        // aperture below stays a near-black void (P24 protection).
+        val nightBoost = (0.55f + 0.65f * com.example.game.world.WorldEnvironment.lighting.localLightIntensity)
+          .coerceIn(0.55f, 1.20f)
         val portalCoreCol = when {
           highestClearedFloor >= 5 -> Color(0xFFA78BFA)
           highestClearedFloor >= 1 -> Color(0xFF38BDF8)
@@ -660,7 +660,7 @@ object PixelSpriteRenderer {
         // P26: the aperture stays a real void at every hour (P24 protection) — a dark
         // fill inside the portal oval, drawn before the energy rings.
         drawOval(
-          color = Color(0xFF05080F).copy(alpha = 0.85f),
+          color = Color(0xFF02040A).copy(alpha = 0.95f),
           topLeft = Offset(riftCenter.x - 32f * s, riftCenter.y - 54f * s),
           size = Size(64f * s, 108f * s),
           style = Fill,
@@ -687,8 +687,8 @@ object PixelSpriteRenderer {
           // P26: a wider second ring reads as the portal's light in the night sky —
           // localized to the gate, bounded alpha, BALANCED-only.
           if (com.example.game.world.WorldEnvironment.lighting.localLightIntensity > 0.55f) {
-            val wideAlpha = (0.12f * com.example.game.world.WorldEnvironment.lighting.localLightIntensity * pulse)
-              .coerceAtMost(0.12f)
+            val wideAlpha = (0.15f * com.example.game.world.WorldEnvironment.lighting.localLightIntensity * pulse)
+              .coerceAtMost(0.15f)
             drawOval(
               color = portalCoreCol.copy(alpha = wideAlpha),
               topLeft = Offset(riftCenter.x - 66f * s, riftCenter.y - 90f * s),
