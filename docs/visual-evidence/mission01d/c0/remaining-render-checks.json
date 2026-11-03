@@ -1,0 +1,83 @@
+[
+  {
+    "name": "Render Lyra (real draw code, Robolectric native graphics)",
+    "command": "gradle :app:testDebugUnitTest --tests \"com.example.LyraEngineRenderTest\" --stacktrace --offline --console=plain",
+    "exit_code": 0,
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "Render ground slice (real draw code, Robolectric native graphics)",
+    "command": "gradle :app:testDebugUnitTest --tests \"com.example.MapForgeGroundRenderTest\" --stacktrace --offline --console=plain",
+    "exit_code": 0,
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "Render architecture slice (real draw code, Robolectric native graphics)",
+    "command": "gradle :app:testDebugUnitTest --tests \"com.example.MapForgeArchitectureRenderTest\" --stacktrace --offline --console=plain",
+    "exit_code": 0,
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "Verify P20 asset contract",
+    "command": "gradle :app:testDebugUnitTest --tests \"com.example.MapForgeArchitectureContractTest\" --stacktrace --offline --console=plain",
+    "exit_code": 0,
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "Render P21 premium facilities (real draw code, Robolectric native graphics)",
+    "command": "gradle :app:testDebugUnitTest --tests \"com.example.MapForgeP21RenderTest\" --stacktrace --offline --console=plain",
+    "exit_code": 0,
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "Verify P21 asset and geometry contract",
+    "command": "gradle :app:testDebugUnitTest --tests \"com.example.MapForgeP21ContractTest\" --stacktrace --offline --console=plain",
+    "exit_code": 0,
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "Render P22 vegetation matrix (real draw code, Robolectric native graphics)",
+    "command": "gradle :app:testDebugUnitTest --tests \"com.example.MapForgeP22RenderTest\" --stacktrace --offline --console=plain",
+    "exit_code": 0,
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "Verify P22 vegetation asset and geometry contract",
+    "command": "gradle :app:testDebugUnitTest --tests \"com.example.MapForgeP22ContractTest\" --stacktrace --offline --console=plain",
+    "exit_code": 0,
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "Verify Sanctuary environment art, manifest, layout, and performance regressions",
+    "command": "gradle :app:testDebugUnitTest --tests \"com.example.SanctuaryMaterialTest.manifestAssetsDecodeAndMatchRuntimeAtlas\" --tests \"com.example.SanctuaryEnvironmentArtTest\" --tests \"com.example.ui.LayoutResponsivenessRobolectricTest\" --tests \"com.example.performance.ScenePerformanceTest\" --tests \"com.example.LivingWorldTest\" --stacktrace --offline --console=plain",
+    "exit_code": 1,
+    "tests": 20,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 1
+  }
+]

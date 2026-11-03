@@ -52,7 +52,7 @@ object AutonomousHeroAi {
     // The sample's contact frame is also the real damage event. Keep the existing
     // Knight skill values/cooldowns; only its delivery gains a visible windup.
     if (hero.premiumSample && hero.contactAttack.active) {
-      if (order == TacticalOrder.RETREAT) {
+      if (order == TacticalOrder.RETREAT || order == TacticalOrder.REGROUP || order == TacticalOrder.MOVE_TO) {
         hero.contactAttack.cancel()
         hero.attackAnim = 0f
       } else {
@@ -111,7 +111,7 @@ object AutonomousHeroAi {
       val formPos = formationSlotAround(masterX, masterY, hero)
       val distToSlot = hypot(formPos.first - hero.x, formPos.second - hero.y)
       if (distToSlot > 52f) {
-        hero.aiIntentLabelVi = "Tập hợp quanh Master"
+        hero.aiIntentLabelVi = if (protectedAllyPosition != null) "Tập hợp quanh người đưa thư" else "Tập hợp quanh Master"
         moveTowards(hero, formPos.first, formPos.second, hero.effectiveSpeed * 1.18f, dt, mapLayout)
         return
       }

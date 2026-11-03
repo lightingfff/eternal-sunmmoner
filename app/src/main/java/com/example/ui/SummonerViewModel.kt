@@ -166,6 +166,13 @@ class SummonerViewModel(
     _screenMode.value = GameScreenMode.SANCTUARY_LOBBY
   }
 
+  fun retryTowerExpedition() {
+    // Only retry a settled attempt; normal preparation/launch still enforces healthy heroes.
+    if (_isBusyAction.value || _lastSettlement.value == null) return
+    _lastSettlement.value = null
+    _screenMode.value = GameScreenMode.SQUAD_PREPARATION
+  }
+
   fun launchTowerExpedition() {
     val state = uiState.value
     val activeHealthySquad = state.heroes.filter { it.inActiveSquad && !it.isCurrentlyInjured() }

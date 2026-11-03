@@ -903,6 +903,18 @@ private fun SynthesisLabContent(
         if (LostCourierProgression.FLAG_RESCUED in profile.storyFlags) {
           Text("Ân tình người đưa thư: giảm vĩnh viễn 25% phí Vàng chế tác.", style = MaterialTheme.typography.labelSmall, color = EmeraldVitality)
         }
+        if (LostCourierProgression.FLAG_ALARM_SILENCED in profile.storyFlags) {
+          Text("Trạm báo hiệu đã im tiếng: hành lang sơ tán thoát khỏi vòng vây cung thủ.", style = MaterialTheme.typography.labelSmall, color = RuneSilver)
+        }
+        if (LostCourierProgression.FLAG_SCOUT_RESCUED in profile.storyFlags) {
+          Text("Người gác trạm sống sót: Thánh Địa nhận được lời khai về kẻ phá ấn cổng.", style = MaterialTheme.typography.labelSmall, color = RuneSilver)
+        }
+        if (LostCourierProgression.FLAG_SUPPORTED in profile.storyFlags) {
+          Text("Ký ức đồng đội: Master đã ưu tiên băng bó người đưa thư trên đường về.", style = MaterialTheme.typography.labelSmall, color = RuneSilver)
+        }
+        if (LostCourierProgression.FLAG_SUPPLIES_RECOVERED in profile.storyFlags) {
+          Text("Tiếp vận đã về: người đưa thư ghi công đội đã mang túi hàng qua vòng vây.", style = MaterialTheme.typography.labelSmall, color = RuneSilver)
+        }
         if (!canSynthesize) {
           Spacer(modifier = Modifier.height(4.dp))
           Text(

@@ -31,6 +31,65 @@ class LostCourierPersistenceRobolectricTest {
   }
 
   @Test
+  fun `missed supplies survive restart without support reward until actual support completion`() = runTest {
+    val manager = LocalGuestSaveManager(context)
+    val initial = manager.startOrResumeGuestSession("Missed Supplies Master")
+    val source = LocalGuestDataSource(manager)
+    val missed = source.settleExpedition(initial.profile, initial.heroes, emptySet(), 1, true,
+      courierOutcome = CourierOutcome.RESCUED_WITHOUT_SUPPLIES)
+    assertEquals(CourierOutcome.RESCUED_WITHOUT_SUPPLIES, missed.courierOutcome)
+    assertTrue(missed.courierForgeUnlocked)
+    val restarted = LocalGuestSaveManager(context)
+    val flags = restarted.guestSnapshot.value!!.profile.storyFlags
+    assertTrue(LostCourierProgression.FLAG_RESCUED in flags)
+    assertTrue(LostCourierProgression.FLAG_SUPPLIES_MISSED in flags)
+    assertFalse(LostCourierProgression.FLAG_SUPPORTED in flags)
+    assertFalse(LostCourierProgression.FLAG_SUPPLIES_RECOVERED in flags)
+    val resumed = LocalGuestDataSource(restarted)
+    val replay = resumed.settleExpedition(initial.profile, initial.heroes, emptySet(), 1, true,
+      courierOutcome = CourierOutcome.RESCUED_WITHOUT_SUPPLIES)
+    assertEquals(missed.manaEarned, replay.manaEarned)
+    assertEquals(missed.goldEarned, replay.goldEarned)
+    assertFalse(replay.courierForgeUnlocked)
+    val support = resumed.settleExpedition(initial.profile, initial.heroes, emptySet(), 1, true,
+      courierOutcome = CourierOutcome.RESCUED)
+    assertEquals(20L, support.manaEarned - replay.manaEarned)
+    assertTrue(LostCourierProgression.FLAG_SUPPORTED in LocalGuestSaveManager(context).guestSnapshot.value!!.profile.storyFlags)
+    assertEquals(1, LocalGuestSaveManager(context).guestSnapshot.value!!.heroes.count {
+      LostCourierProgression.hasRescueMemory(it.bondSummary)
+    })
+  }
+
+  @Test
+  fun `both rescue choices survive restart and stale replays cannot repeat branch bonuses`() = runTest {
+    val manager = LocalGuestSaveManager(context)
+    val initial = manager.startOrResumeGuestSession("Branch Master")
+    val source = LocalGuestDataSource(manager)
+    val supplies = source.settleExpedition(initial.profile, initial.heroes, emptySet(), 1, true,
+      courierOutcome = CourierOutcome.SUPPLIES_RECOVERED)
+    assertEquals(CourierOutcome.SUPPLIES_RECOVERED, supplies.courierOutcome)
+    assertTrue(supplies.courierForgeUnlocked)
+    val restarted = LocalGuestSaveManager(context)
+    assertTrue(LostCourierProgression.FLAG_SUPPLIES_RECOVERED in restarted.guestSnapshot.value!!.profile.storyFlags)
+    val restartedSource = LocalGuestDataSource(restarted)
+    val supplyReplay = restartedSource.settleExpedition(initial.profile, initial.heroes, emptySet(), 1, true,
+      courierOutcome = CourierOutcome.SUPPLIES_RECOVERED)
+    assertFalse(supplyReplay.courierForgeUnlocked)
+    assertEquals(60L, supplies.goldEarned - supplyReplay.goldEarned)
+    val support = restartedSource.settleExpedition(initial.profile, initial.heroes, emptySet(), 1, true,
+      courierOutcome = CourierOutcome.RESCUED)
+    val supportReplay = restartedSource.settleExpedition(initial.profile, initial.heroes, emptySet(), 1, true,
+      courierOutcome = CourierOutcome.RESCUED)
+    assertEquals(20L, support.manaEarned - supportReplay.manaEarned)
+    val final = LocalGuestSaveManager(context).guestSnapshot.value!!
+    assertTrue(final.profile.storyFlags.containsAll(listOf(LostCourierProgression.FLAG_RESCUED,
+      LostCourierProgression.FLAG_SUPPORTED, LostCourierProgression.FLAG_SUPPLIES_RECOVERED)))
+    assertEquals(initial.profile.gold + supplies.goldEarned + supplyReplay.goldEarned +
+      support.goldEarned + supportReplay.goldEarned, final.profile.gold)
+    assertEquals(1, final.heroes.count { LostCourierProgression.hasRescueMemory(it.bondSummary) })
+  }
+
+  @Test
   fun `rescue unlock and one hero memory survive restart and stale-profile replay`() = runTest {
     val manager = LocalGuestSaveManager(context)
     val initial = manager.startOrResumeGuestSession("Courier Master")

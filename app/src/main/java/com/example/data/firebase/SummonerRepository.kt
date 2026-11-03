@@ -954,7 +954,7 @@ class SummonerRepository(
     val uid = requireUserId()
     val userRef = db.collection("users").document(uid)
     val escortOutcome = courierOutcome?.let {
-      if (floorNumber == 1 && victory && it == CourierOutcome.RESCUED) CourierOutcome.RESCUED else CourierOutcome.FAILED
+      if (floorNumber == 1 && victory && LostCourierProgression.isRescue(it)) it else CourierOutcome.FAILED
     }
     try {
       // Read before writing: a retry or a stale UI profile cannot grant the service/memory twice.
@@ -1029,8 +1029,8 @@ class SummonerRepository(
       retreatUsed -> 18L + floorNumber * 5L
       else -> 10L
     }
-    val goldEarned = ((baseGold + bonusGold) * dockMult).toLong()
-    val manaEarned = ((baseMana + bonusMana) * dockMult).toLong()
+    val goldEarned = ((baseGold + bonusGold + LostCourierProgression.bonusGold(profile.storyFlags, courierOutcome)) * dockMult).toLong()
+    val manaEarned = ((baseMana + bonusMana + LostCourierProgression.bonusMana(profile.storyFlags, courierOutcome)) * dockMult).toLong()
     val shardsEarned = when {
       victory -> 15L + floorNumber * 8L
       retreatUsed -> 5L + floorNumber * 2L

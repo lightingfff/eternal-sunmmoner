@@ -251,10 +251,10 @@ class LostCourierVisualTest {
 
   @Test
   @Config(qualifiers = "w400dp-h720dp-port-mdpi")
-  fun actualTowerScreenShowsMovingEscortAndScoutAtGameplayZoom() =
-    captureFullBattle("tower_scout_gameplay_400dp", advanceToScout = true)
+  fun actualTowerScreenShowsJourneyWaypointAtGameplayZoom() =
+    captureFullBattle("tower_journey_gameplay_400dp", advanceToJourney = true)
 
-  private fun captureFullBattle(name: String, advanceToScout: Boolean = false) {
+  private fun captureFullBattle(name: String, advanceToJourney: Boolean = false) {
     val base = org.robolectric.RuntimeEnvironment.getApplication()
     val files = java.nio.file.Files.createTempDirectory(base.cacheDir.toPath(), "courier-ui-").toFile()
     val context = object : android.content.ContextWrapper(base) {
@@ -272,21 +272,21 @@ class LostCourierVisualTest {
         com.example.ui.screens.TowerBattleScreen(
           state = com.example.ui.SummonerUiState(profile = initial.profile, heroes = initial.heroes,
             equipment = initial.equipment, isBootstrapping = false),
-          onFinishExpedition = { _, _ -> }, onReturnToSanctuary = {}, sceneActive = advanceToScout)
+          onFinishExpedition = { _, _ -> }, onReturnToSanctuary = {}, sceneActive = advanceToJourney)
       }
     }
     compose.onNodeWithTag("start_combat_button").performClick()
     compose.onNodeWithTag("start_combat_button").performClick()
     compose.mainClock.advanceTimeByFrame()
     compose.waitForIdle()
-    if (advanceToScout) {
+    if (advanceToJourney) {
       compose.mainClock.advanceTimeBy(20_500L)
       compose.waitForIdle()
       saveView(host!!, name)
-      compose.onNodeWithText("Trinh sát gọi viện sau", substring = true).assertExists()
-      compose.onNodeWithTag("courier_intercept_order").assertIsEnabled()
+      compose.onNodeWithText("Hành trình", substring = true).assertExists()
+      compose.onNodeWithTag("rescue_journey_follow").assertIsEnabled()
     }
-    val mission = compose.onNodeWithTag("courier_mission_hud").fetchSemanticsNode().boundsInRoot
+    val mission = compose.onNodeWithTag("rescue_journey_hud").fetchSemanticsNode().boundsInRoot
     val command = compose.onNodeWithTag("order_follow").fetchSemanticsNode().boundsInRoot
     assertTrue("Mission HUD must leave battlefield space above the command strip", command.top - mission.bottom >= 60f)
     saveView(host!!, name)

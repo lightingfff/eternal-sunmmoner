@@ -32,8 +32,34 @@ data class CourierTelegraph(
 class LostCourierEncounter internal constructor(
   private val engine: TowerCombatEngine,
   records: List<HeroRecord>,
+  enableRescueJourney: Boolean = false,
 ) {
   val courier = CourierCombatUnit()
+  val journey: RescueJourney? = if (enableRescueJourney) RescueJourney(engine, courier) else null
+  var choice: CourierChoice? = null
+    private set
+  val supplyX = 1220f
+  val supplyY = 1130f
+  var suppliesRecovered = false
+    private set
+  private var supplyWorkSeconds = 0f
+  val choiceAvailable: Boolean
+    get() = outcome == null && choice == null && journey?.active != true && courier.x >= 1100f
+
+  /** A committed field decision, never a reward toggle in the result screen. */
+  fun chooseChoice(selected: CourierChoice): Boolean {
+    if (!choiceAvailable || engine.stage != MissionStage.IN_PROGRESS) return false
+    choice = selected
+    if (selected == CourierChoice.SUPPORT_COURIER) {
+      courier.hp = (courier.hp + 60).coerceAtMost(courier.maxHp)
+      statusVi = "Ưu tiên cứu người: đã băng bó +60 HP. Hộ tống tới cổng để lưu ký ức và +20 Mana lần đầu."
+    } else {
+      statusVi = "Thu hồi túi tiếp vận tại đường mòn (1220, 1130): giữ Anh hùng ở đó 3s rồi hộ tống tới cổng. +60 vàng lần đầu."
+    }
+    engine.postFeedback(statusVi)
+    return true
+  }
+
   val waypoints = listOf(680f to 1040f, 1220f to 1130f, 1780f to 990f, 2360f to 1080f, 2860f to 1066f)
   var phase = CourierPhase.CLEAR_PATH
     private set
@@ -94,6 +120,19 @@ class LostCourierEncounter internal constructor(
       phase = CourierPhase.ESCORT
       statusVi = "Người đưa thư: Cảm ơn! Hãy đi gần tôi. Bảo vệ sẽ giữ đội hình quanh tôi."
       engine.postFeedback(statusVi)
+    }
+    if (phase != CourierPhase.CLEAR_PATH && journey?.active == true) {
+      journey.step(dt)
+      return
+    }
+    if (choice == CourierChoice.RECOVER_SUPPLIES && !suppliesRecovered) {
+      val working = engine.heroes.any { !it.knockedOut && hypot(it.x - supplyX, it.y - supplyY) <= 90f }
+      supplyWorkSeconds = if (working) supplyWorkSeconds + dt else 0f
+      if (supplyWorkSeconds >= 3f) {
+        suppliesRecovered = true
+        statusVi = "Đã thu hồi tiếp vận! Bảo vệ người đưa thư tới cổng để nhận thưởng."
+        engine.postFeedback(statusVi)
+      }
     }
     courier.isMoving = false
     if (phase != CourierPhase.CLEAR_PATH && waypointIndex < waypoints.size &&
@@ -236,7 +275,7 @@ class LostCourierEncounter internal constructor(
     enemy.x = pos.first; enemy.y = pos.second; enemy.isMoving = true
   }
 
-  private fun damageCourier(raw: Int) {
+  internal fun damageCourier(raw: Int) {
     val protected = engine.activeOrder == TacticalOrder.PROTECT_ALLY && engine.heroes.any {
       !it.knockedOut && hypot(it.x - courier.x, it.y - courier.y) <= 165f
     }
@@ -263,7 +302,10 @@ class LostCourierEncounter internal constructor(
     if (courier.hp <= 0 || engine.heroes.none { !it.knockedOut }) {
       fail(if (courier.hp <= 0) "Người đưa thư đã gục ngã. Thử lại và giữ đội hình bảo vệ." else "Đội hình đã gục ngã. Có thể chuẩn bị rồi thử lại.")
     } else if (waypointIndex >= waypoints.size && eliteEnemyId != null && engine.enemies.any { it.id == eliteEnemyId && it.dead }) {
-      outcome = CourierOutcome.RESCUED
+      outcome = if (choice == CourierChoice.RECOVER_SUPPLIES && suppliesRecovered)
+        CourierOutcome.SUPPLIES_RECOVERED
+      else if (choice == CourierChoice.RECOVER_SUPPLIES) CourierOutcome.RESCUED_WITHOUT_SUPPLIES
+      else CourierOutcome.RESCUED
       phase = CourierPhase.RESCUED
       courier.isMoving = false
       statusVi = "Đã cứu người đưa thư! Mở dịch vụ rèn tiếp vận và lưu ký ức đồng đội."

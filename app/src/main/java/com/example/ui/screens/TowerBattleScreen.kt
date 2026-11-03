@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -46,6 +47,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -186,11 +188,51 @@ private class BattleDrawQueue {
   }
 }
 
+/** Confirmation issues a real order; the engine settles only after extraction. */
+internal fun issueRetreatFromConfirmation(engine: TowerCombatEngine) {
+  engine.issueTacticalOrder(TacticalOrder.RETREAT)
+}
+
+/** A brief actionable message from a hero; the engine owns the fear state and response. */
+@Composable
+fun HeroAgencyAlertCard(
+  heroName: String,
+  message: String,
+  onRegroup: () -> Unit,
+  onProtect: () -> Unit,
+  onRetreat: () -> Unit,
+  onDismiss: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  Surface(
+    modifier = modifier.testTag("hero_agency_alert").border(1.dp, Color(0xFFC9BEA2), RoundedCornerShape(8.dp)),
+    shape = RoundedCornerShape(8.dp), color = Color(0xEE141519),
+  ) {
+    Column(Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+      Text(heroName, color = Color(0xFFF1DCAD), style = MaterialTheme.typography.labelSmall,
+        maxLines = 1, overflow = TextOverflow.Ellipsis)
+      Text(message, color = Color(0xFFF4F0E4), style = MaterialTheme.typography.labelSmall,
+        maxLines = 2, overflow = TextOverflow.Ellipsis)
+      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+        TextButton(onClick = onRegroup, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("hero_alert_regroup"),
+          contentPadding = PaddingValues(horizontal = 2.dp, vertical = 2.dp)) { Text("Tập hợp", style = MaterialTheme.typography.labelSmall, maxLines = 1) }
+        TextButton(onClick = onProtect, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("hero_alert_protect"),
+          contentPadding = PaddingValues(horizontal = 2.dp, vertical = 2.dp)) { Text("Bảo vệ", style = MaterialTheme.typography.labelSmall, maxLines = 1) }
+        TextButton(onClick = onRetreat, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("hero_alert_retreat"),
+          contentPadding = PaddingValues(horizontal = 2.dp, vertical = 2.dp)) { Text("Rút lui", style = MaterialTheme.typography.labelSmall, maxLines = 1) }
+        TextButton(onClick = onDismiss, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("hero_alert_dismiss"),
+          contentPadding = PaddingValues(horizontal = 2.dp, vertical = 2.dp)) { Text("Đóng", style = MaterialTheme.typography.labelSmall, maxLines = 1) }
+      }
+    }
+  }
+}
+
 @Composable
 fun TowerBattleScreen(
   state: SummonerUiState,
   onFinishExpedition: (Boolean, Set<String>) -> Unit,
   onReturnToSanctuary: () -> Unit,
+  onPrepareRetry: (() -> Unit)? = null,
   settings: GameSettings = GameSettings(),
   sceneActive: Boolean = true,
   onFinishExpeditionDetailed: ((Boolean, Set<String>, Boolean, Long, Long, Set<String>, com.example.data.model.CourierOutcome?, String?) -> Unit)? = null,
@@ -215,6 +257,7 @@ fun TowerBattleScreen(
       feastBuffActive = feastBuffActive,
       activeMealRecipe = activeMealRecipe,
       enableLostCourier = state.selectedFloor.floorNumber == 1,
+      enableRescueJourney = state.selectedFloor.floorNumber == 1,
     )
   }
 
@@ -224,9 +267,9 @@ fun TowerBattleScreen(
   val introBeats = remember(state.selectedFloor.floorNumber) {
     if(state.selectedFloor.floorNumber==1) listOf(
       com.example.game.story.DialogueBeat("Người đưa tin", "Người đưa tin thất lạc", "Bị thương", com.example.data.model.HeroClassType.PRIEST,
-        "Tôi phải đưa thư về cổng an toàn… Xin Master cho tôi đi cùng!"),
+        "Cổng đã bị khóa. Hồ sơ ở trạm bắc sẽ chỉ đường tìm ấn mở cổng… Xin Master đưa đội đi cùng tôi!"),
       com.example.game.story.DialogueBeat("Kaelen", "Khiên thép tiền phong", "Cảnh giác", com.example.data.model.HeroClassType.KNIGHT,
-        "Đưa đội tới gần người đưa tin để bắt đầu hộ tống. Bảo vệ giúp anh ấy sống sót; chặn trinh sát trước khi nó gọi viện binh!")
+        "Hộ tống người đưa tin tới từng dấu hiệu, dọn hiểm họa rồi Khảo sát. Tại trạm tín hiệu, Master quyết định cách mở đường rút.")
     ) else ManhwaStoryData.floorIntroBeats(state.selectedFloor.floorNumber)
   }
   var introIndex by remember { mutableIntStateOf(0) }
@@ -266,7 +309,7 @@ fun TowerBattleScreen(
 
   BackHandler {
     if (combatEngine.stage == MissionStage.VICTORY || combatEngine.stage == MissionStage.DEFEAT) {
-      onReturnToSanctuary()
+      if (!state.isBusyAction && state.lastSettlement != null) onReturnToSanctuary()
     } else {
       showRetreatConfirm = !showRetreatConfirm
     }
@@ -687,6 +730,49 @@ fun TowerBattleScreen(
         }
       }
 
+      // Mission waypoint uses the existing ground projection; it never changes world geometry.
+      combatEngine.lostCourier?.let { mission ->
+        mission.journey?.takeIf { it.active }?.let { journey ->
+          val fieldTarget = journey.fieldAction?.currentTarget?.takeIf { journey.fieldReady }
+          val sx = ObliqueCamera.worldToScreenX(fieldTarget?.x ?: journey.targetX, camX, zoom, halfW)
+          val sy = ObliqueCamera.worldToScreenY(fieldTarget?.y ?: journey.targetY, camY, zoom, halfH)
+          if (sx in -100f..(size.width+100f) && sy in -100f..(size.height+100f)) {
+            val rx = 34f*zoom
+            val ry = rx*ObliqueCamera.OBLIQUE_Y_SCALE
+            drawOval(PortalCyan.copy(alpha=.9f),Offset(sx-rx,sy-ry),Size(rx*2f,ry*2f),style=Stroke(2.5f*zoom))
+            drawLine(PortalCyan,Offset(sx-10f*zoom,sy),Offset(sx+10f*zoom,sy),2f*zoom)
+            drawLine(PortalCyan,Offset(sx,sy-7f*zoom),Offset(sx,sy+7f*zoom),2f*zoom)
+            val label = textMeasurer.measure(fieldTarget?.labelVi ?: if(journey.canInteract) "Khảo sát tại đây" else "Lối tới mục tiêu",
+              style=TextStyle(color=PortalCyan,fontSize=9.5.sp,fontWeight=FontWeight.Bold))
+            val ly=sy-46f*zoom
+            if(ly in (topHudSafePx+8f)..(size.height-96f)) {
+              val lx=(sx-label.size.width/2f).coerceIn(12f,(size.width-label.size.width-12f).coerceAtLeast(12f))
+              drawRoundRect(Color(0xDD0D1322),Offset(lx-6f,ly-2f),Size(label.size.width+12f,label.size.height+4f),CornerRadius(6f,6f))
+              drawText(label,topLeft=Offset(lx,ly))
+            }
+          }
+        }
+        if ((mission.choiceAvailable || mission.choice == com.example.game.combat.CourierChoice.RECOVER_SUPPLIES) &&
+          !mission.suppliesRecovered) {
+          val sx = ObliqueCamera.worldToScreenX(mission.supplyX, camX, zoom, halfW)
+          val sy = ObliqueCamera.worldToScreenY(mission.supplyY, camY, zoom, halfH)
+          val rx = 26f * zoom
+          val ry = rx * ObliqueCamera.OBLIQUE_Y_SCALE
+          drawOval(SummonerGold.copy(alpha = .9f), Offset(sx-rx,sy-ry), Size(rx*2,ry*2),
+            style = Stroke(2f*zoom))
+          drawLine(SummonerGold,Offset(sx-8f*zoom,sy),Offset(sx+8f*zoom,sy),2f*zoom)
+          drawLine(SummonerGold,Offset(sx,sy-6f*zoom),Offset(sx,sy+6f*zoom),2f*zoom)
+          val label = textMeasurer.measure("Tiếp vận • đứng cạnh 3s",
+            style = TextStyle(color=SummonerGold,fontSize=9.5.sp,fontWeight=FontWeight.Bold))
+          val ly = sy - 42f*zoom
+          if (sx in 18f..(size.width-18f) && ly in (topHudSafePx+8f)..(size.height-96f)) {
+            drawRoundRect(Color(0xDD0D1322),Offset(sx-label.size.width/2f-6f,ly-2f),
+              Size(label.size.width+12f,label.size.height+4f),CornerRadius(6f,6f))
+            drawText(label,topLeft=Offset(sx-label.size.width/2f,ly))
+          }
+        }
+      }
+
       // Unclaimed Exploration Discovery Callouts
       combatEngine.discoveryNodes.filter { !it.discovered }.forEach { node ->
         val nx = ObliqueCamera.worldToScreenX(node.x, camX, zoom, halfW)
@@ -760,7 +846,7 @@ fun TowerBattleScreen(
         modifier = Modifier
           .fillMaxWidth()
           .statusBarsPadding()
-          .padding(horizontal = 10.dp, vertical = 6.dp)
+          .padding(horizontal = 10.dp, vertical = if (isWideScreen) 0.dp else 6.dp)
           .onSizeChanged { topHudHeightPx = it.height }
           .testTag("tower_battle_top_hud"),
         verticalArrangement = Arrangement.spacedBy(5.dp),
@@ -892,6 +978,31 @@ fun TowerBattleScreen(
             }
             append(mission.statusVi)
           }
+          val journey = mission.journey
+          if (journey != null && journey.active) {
+            com.example.ui.components.RescueJourneyHud(
+              objective=journey.objectiveVi,status=journey.statusVi,
+              completedObjectives=journey.chapterIndex,totalObjectives=journey.chapterCount,
+              courierHp=mission.courier.hp,courierMaxHp=mission.courier.maxHp,
+              canInteract=journey.canInteract,decisionPending=journey.decisionPending,
+              onFollow={combatEngine.chooseCourierOrder(com.example.game.combat.CourierOrder.PROTECT);hudRevision++},
+              onInteract={journey.interact();hudRevision++},
+              onSilenceAlarm={journey.chooseRoute(true);hudRevision++},
+              onRescueScout={journey.chooseRoute(false);hudRevision++},
+              fieldTargetLabel=journey.fieldAction?.currentTarget?.labelVi?.takeIf { journey.fieldReady },
+              fieldHint=journey.fieldAction?.hintVi,
+              fieldCanInteract=journey.fieldReady && journey.fieldAction?.canInteract(
+                combatEngine.heroes.filter { !it.knockedOut }.map { it.x to it.y }) == true,
+              onFieldTravel={
+                journey.fieldAction?.currentTarget?.takeIf { journey.fieldReady }?.let { target ->
+                  combatEngine.issueTacticalOrder(TacticalOrder.MOVE_TO)
+                  combatEngine.onBattlefieldTapped(target.x,target.y)
+                  hudRevision++
+                }
+              },
+              onFieldInteract={journey.interactField();hudRevision++},
+              modifier=Modifier.fillMaxWidth(),compact=isWideScreen)
+          } else {
           com.example.ui.components.CourierMissionHud(mission.objectiveVi,missionHint,
             mission.courier.hp,mission.courier.maxHp,mission.progress,
             combatEngine.activeOrder == TacticalOrder.PROTECT_ALLY,
@@ -901,7 +1012,31 @@ fun TowerBattleScreen(
             interceptAvailable=combatEngine.enemies.any { !it.dead && it.id==mission.scoutEnemyId },
             compact=isWideScreen,
             intercepting=combatEngine.activeOrder==TacticalOrder.ATTACK_TARGET &&
-              combatEngine.designatedTargetId==mission.scoutEnemyId)
+              combatEngine.designatedTargetId==mission.scoutEnemyId,
+            choiceAvailable=mission.choiceAvailable,
+            onSupport={mission.chooseChoice(com.example.game.combat.CourierChoice.SUPPORT_COURIER);hudRevision++},
+            onRecoverSupplies={mission.chooseChoice(com.example.game.combat.CourierChoice.RECOVER_SUPPLIES);hudRevision++},
+            suppliesPending=mission.choice==com.example.game.combat.CourierChoice.RECOVER_SUPPLIES && !mission.suppliesRecovered,
+            onGoToSupplies={
+              combatEngine.issueTacticalOrder(TacticalOrder.MOVE_TO)
+              combatEngine.onBattlefieldTapped(mission.supplyX,mission.supplyY)
+              hudRevision++
+            })
+          }
+        }
+
+        if (introDismissed && !settlementDispatched && !showRetreatConfirm) {
+          combatEngine.heroAgencyAlert?.let { alert ->
+            HeroAgencyAlertCard(
+              heroName = alert.heroName,
+              message = alert.messageVi,
+              onRegroup = { combatEngine.issueTacticalOrder(TacticalOrder.REGROUP); hudRevision++ },
+              onProtect = { combatEngine.issueTacticalOrder(TacticalOrder.PROTECT_ALLY); hudRevision++ },
+              onRetreat = { showRetreatConfirm = true },
+              onDismiss = { combatEngine.dismissHeroAgencyAlert(); hudRevision++ },
+              modifier = Modifier.fillMaxWidth().widthIn(max = 540.dp),
+            )
+          }
         }
 
         // Narrow Portrait: Place Squad Skill Strip cleanly on a slim horizontal row!
@@ -1176,6 +1311,9 @@ fun TowerBattleScreen(
                     introIndex++
                   } else {
                     combatEngine.stage = MissionStage.IN_PROGRESS
+                    if (combatEngine.lostCourier?.journey?.active == true) {
+                      combatEngine.chooseCourierOrder(com.example.game.combat.CourierOrder.PROTECT)
+                    }
                     introDismissed = true
                     hudRevision++
                   }
@@ -1228,7 +1366,7 @@ fun TowerBattleScreen(
               color = WarningAmber,
             )
             Text(
-              text = "Đội hình sẽ lập tức được dịch chuyển an toàn về The Sanctuary. Các Anh hùng đang trọng thương sẽ được đưa tới Khu Nghỉ Ngơi để hồi phục.",
+              text = "Anh hùng sẽ di chuyển về điểm rút lui. Bảo vệ họ trên đường; nhiệm vụ kết thúc khi những người còn đứng vững tới nơi.",
               style = MaterialTheme.typography.bodySmall,
               color = ParchmentLight,
             )
@@ -1247,7 +1385,8 @@ fun TowerBattleScreen(
               Button(
                 onClick = {
                   showRetreatConfirm = false
-                  combatEngine.confirmTacticalRetreat()
+                  issueRetreatFromConfirmation(combatEngine)
+                  hudRevision++
                 },
                 modifier = Modifier.heightIn(min = 48.dp).testTag("confirm_retreat_button"),
                 colors = FantasySkin.buttonColors(
@@ -1367,9 +1506,7 @@ fun TowerBattleScreen(
                     )
                   }
                   if(settlement.courierOutcome!=null) {
-                    Text(if(settlement.courierOutcome==com.example.data.model.CourierOutcome.RESCUED)
-                      "Đã cứu người đưa tin. Dịch vụ lò rèn: phí chế tạo còn 90 vàng. Ký ức đồng đội đã lưu."
-                      else "Người đưa tin chưa tới cổng. Có thể trở lại Tầng 1 để thử hộ tống lần nữa.",
+                    Text(com.example.data.LostCourierProgression.outcomeDescription(settlement.courierOutcome),
                       color=PortalCyan,style=MaterialTheme.typography.bodySmall)
                   }
                   if (settlement.leveledUpHeroNames.isNotEmpty()) {
@@ -1394,6 +1531,14 @@ fun TowerBattleScreen(
                   }
                 }
               }
+            }
+
+            if (!isWin && onPrepareRetry != null) {
+              OutlinedButton(
+                onClick = onPrepareRetry,
+                enabled = !state.isBusyAction && settlement != null,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("prepare_rescue_retry_button"),
+              ) { Text("Chuẩn bị thử lại • Giữ tiến trình và thương tích") }
             }
 
             Button(
