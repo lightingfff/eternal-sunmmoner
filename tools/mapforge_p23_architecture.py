@@ -2052,13 +2052,32 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--preview", default=None)
     ap.add_argument("--check", action="store_true")
+    # P25: restrict a regeneration to an explicit asset list so a face-grammar
+    # experiment can never silently rewrite the other ten authored sprites.
+    ap.add_argument("--only", nargs="*", default=None,
+                    help="regenerate/validate only these BUILDERS keys (exact regenerated assets are then auditable)")
     args = ap.parse_args()
+    if args.only:
+        unknown = [k for k in args.only if k not in BUILDERS]
+        if unknown:
+            raise SystemExit(f"unknown BUILDERS keys: {unknown}")
+
+    from p25_face_grammar import apply_face_grade, load_spec as p25_spec
+    p25 = p25_spec()
 
     report = {}
+    face_report = {}
     for key, (fn, w, h, folder) in BUILDERS.items():
+        if args.only and key not in args.only:
+            continue
         c = fn()
         seal_seams(c)
         prune_specks(c)
+        # P25: bake per-face value ramps into the authored PNG (offline, once).
+        # Geometry/alpha/size/pivot/door positions are untouched; only opaque
+        # mid-tone pixels inside authored face polygons are re-graded.
+        if key in p25["assets"]:
+            face_report[key] = apply_face_grade(c.im, key, p25)
         rep = validate(key, c)
         report[key] = {"size": rep["size"], "opaque_pct": rep["opaque_pct"],
                        "col_gaps": rep["col_gaps"], "colors": rep["colors"],
@@ -2083,7 +2102,9 @@ def main() -> int:
         write_contact_sheet(Path(args.preview) / "P23_ARCH_CONTACT_SHEET.png")
 
     print(json.dumps({"assets": report, "door_targets": doors,
-                      "mode": "check" if args.check else "write"}, indent=2))
+                      "face_grade": face_report,
+                      "mode": "check" if args.check else "write",
+                      "regenerated": sorted(args.only) if args.only else "all"}, indent=2))
     return 0
 
 
