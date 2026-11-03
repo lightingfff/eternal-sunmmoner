@@ -6,6 +6,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Backpack
+import androidx.compose.material.icons.filled.Castle
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material3.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
@@ -16,9 +22,10 @@ import androidx.compose.ui.window.Dialog
 import com.example.data.model.HeroRecord
 
 private val Gold=Color(0xffbda46d)
-private val Ink=Color(0xf51b222b)
+/** P26: dark glass instead of opaque ink — the world stays visible behind panels. */
+val PanelGlass=Color(0xB8121B2E)
 @Composable fun FantasyPanel(modifier: Modifier=Modifier,content: @Composable ()->Unit) {
-  Surface(modifier,shape=RoundedCornerShape(10.dp),color=Ink,border=BorderStroke(1.dp,Gold.copy(alpha=.55f)),content=content)
+  Surface(modifier,shape=RoundedCornerShape(12.dp),color=PanelGlass,border=BorderStroke(1.dp,Gold.copy(alpha=.55f)),content=content)
 }
 @Composable fun FantasyAction(text: String,onClick: ()->Unit,modifier: Modifier=Modifier,enabled: Boolean=true) {
   OutlinedButton(onClick,modifier.heightIn(min=48.dp),enabled=enabled,shape=RoundedCornerShape(8.dp),
@@ -30,9 +37,19 @@ private val Ink=Color(0xf51b222b)
 @Composable fun SanctuaryManagementNav(onNavigate: (String)->Unit,modifier: Modifier=Modifier) {
   FantasyPanel(modifier.testTag("management_navigation")) {
     Row(Modifier.fillMaxWidth().padding(horizontal=4.dp),horizontalArrangement=Arrangement.SpaceEvenly) {
-      for((id,title) in listOf("heroes" to "♟ Anh hùng","summon" to "✧ Triệu hồi","team" to "⚑ Đội hình","tower" to "♜ Tháp","inventory" to "▣ Túi đồ")) {
+      // P26: framed tabs with icons read like a real game nav, not a debug strip.
+      for((id,title,icon) in listOf(
+        Triple("heroes","Anh hùng",Icons.Default.Groups),
+        Triple("summon","Triệu hồi",Icons.Default.AutoAwesome),
+        Triple("team","Đội hình",Icons.Default.Group),
+        Triple("tower","Tháp",Icons.Default.Castle),
+        Triple("inventory","Túi đồ",Icons.Default.Backpack),
+      )) {
         TextButton({onNavigate(id)},modifier=Modifier.weight(1f).heightIn(min=48.dp).testTag("nav_$id"),contentPadding=PaddingValues(2.dp)) {
-          Text(title,color=Gold,maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.labelSmall)
+          Column(horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(1.dp)) {
+            Icon(icon,contentDescription=null,tint=Gold,modifier=Modifier.size(18.dp))
+            Text(title,color=Gold,maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.labelSmall)
+          }
         }
       }
     }

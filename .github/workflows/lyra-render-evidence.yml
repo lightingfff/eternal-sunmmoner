@@ -146,6 +146,14 @@ jobs:
       - name: Render P26 sky and time-of-day matrix (real draw code, Robolectric native graphics)
         run: gradle :app:testDebugUnitTest --tests "com.example.P26SkyRenderTest" --stacktrace
 
+      # P26: contract — sky states distinct, weather mood, cached colours, invariants kept.
+      - name: Verify P26 sky contract
+        run: gradle :app:testDebugUnitTest --tests "com.example.P26SkyContractTest" --stacktrace
+
+      # P26: premium hub shell UI captures (Compose UI, Robolectric native graphics).
+      - name: Render P26 UI hub shell (real Compose UI, Robolectric native graphics)
+        run: gradle :app:testDebugUnitTest --tests "com.example.ui.P26UiShellTest" --stacktrace
+
       - name: Verify Sanctuary environment art, manifest, layout, and performance regressions
         run: >-
           gradle :app:testDebugUnitTest
