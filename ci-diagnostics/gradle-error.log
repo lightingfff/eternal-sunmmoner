@@ -2,47 +2,27 @@
 Calculating task graph as no cached configuration is available for tasks: :app:compileDebugKotlin
 > Task :app:preBuild UP-TO-DATE
 > Task :app:preDebugBuild UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:processDebugGoogleServices UP-TO-DATE
 > Task :app:processDebugNavigationResources UP-TO-DATE
 > Task :app:generateDebugBuildConfig UP-TO-DATE
-> Task :app:generateDebugResources UP-TO-DATE
 > Task :app:kspDebugKotlin SKIPPED
-> Task :app:processDebugGoogleServices UP-TO-DATE
 > Task :app:packageDebugResources UP-TO-DATE
 > Task :app:parseDebugLocalResources UP-TO-DATE
 > Task :app:generateDebugRFile UP-TO-DATE
-> Task :app:compileDebugKotlin
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/SanctuaryWorldRenderer.kt:522:7 Incompatible types 'WeatherState' and 'WorldWeather'.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/SanctuaryWorldRenderer.kt:523:7 Incompatible types 'WeatherState' and 'WorldWeather'.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/SanctuaryWorldRenderer.kt:524:7 Incompatible types 'WeatherState' and 'WorldWeather'.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/SanctuaryWorldRenderer.kt:525:7 Incompatible types 'WeatherState' and 'WorldWeather'.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/SanctuaryWorldRenderer.kt:529:24 Operator '==' cannot be applied to 'WeatherState' and 'WorldWeather'.
+> Task :app:compileDebugKotlin UP-TO-DATE
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_23-1793721082379.json
 
-> Task :app:compileDebugKotlin FAILED
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_23-1793720624367.json
-
-FAILURE: Build failed with an exception.
-
-* What went wrong:
-Execution failed for task ':app:compileDebugKotlin'.
-> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
-   > Compilation error. See log for more details
-
-* Try:
-> Run with --stacktrace option to get the stack trace.
-> Run with --info or --debug option to get more log output.
-> Run with --scan to get full insights from a Build Scan (powered by Develocity).
-> Get more help at https://help.gradle.org.
-
-BUILD FAILED in 33s
-8 actionable tasks: 1 executed, 7 up-to-date
+BUILD SUCCESSFUL in 3s
+8 actionable tasks: 8 up-to-date
 Configuration cache entry stored.
 ### :app:compileDebugUnitTestKotlin
 Calculating task graph as no cached configuration is available for tasks: :app:compileDebugUnitTestKotlin
 > Task :app:preBuild UP-TO-DATE
 > Task :app:preDebugBuild UP-TO-DATE
-> Task :app:generateDebugResources UP-TO-DATE
-> Task :app:javaPreCompileDebug UP-TO-DATE
 > Task :app:processDebugGoogleServices UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
 > Task :app:generateDebugBuildConfig UP-TO-DATE
 > Task :app:kspDebugKotlin SKIPPED
 > Task :app:packageDebugResources UP-TO-DATE
@@ -59,21 +39,54 @@ Calculating task graph as no cached configuration is available for tasks: :app:c
 > Task :app:processDebugMainManifest UP-TO-DATE
 > Task :app:processDebugManifest UP-TO-DATE
 > Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
 > Task :app:processDebugResources UP-TO-DATE
-> Task :app:compileDebugKotlin
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/SanctuaryWorldRenderer.kt:522:7 Incompatible types 'WeatherState' and 'WorldWeather'.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/SanctuaryWorldRenderer.kt:523:7 Incompatible types 'WeatherState' and 'WorldWeather'.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/SanctuaryWorldRenderer.kt:524:7 Incompatible types 'WeatherState' and 'WorldWeather'.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/SanctuaryWorldRenderer.kt:525:7 Incompatible types 'WeatherState' and 'WorldWeather'.
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/SanctuaryWorldRenderer.kt:529:24 Operator '==' cannot be applied to 'WeatherState' and 'WorldWeather'.
+> Task :app:bundleDebugClassesToCompileJar UP-TO-DATE
+> Task :app:kspDebugUnitTestKotlin SKIPPED
 
-> Task :app:compileDebugKotlin FAILED
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_23-1793720658237.json
+> Task :app:compileDebugUnitTestKotlin FAILED
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:54:30 Unresolved reference 'WeatherState'.
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:55:30 Unresolved reference 'WeatherState'.
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:56:30 Unresolved reference 'WeatherState'.
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:57:30 Unresolved reference 'WeatherState'.
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:58:30 Unresolved reference 'WeatherState'.
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:59:30 Unresolved reference 'WeatherState'.
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:60:17 Cannot infer type for this parameter. Specify it explicitly.
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:108:17 Unresolved reference 'toArgb'.
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:109:21 None of the following candidates is applicable:
+fun times(other: Byte): Float
+fun times(other: Short): Float
+fun times(other: Int): Float
+fun times(other: Long): Float
+fun times(other: Float): Float
+fun times(other: Double): Double
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:109:35 'infix' modifier is required on 'FirNamedFunctionSymbol java/math/BigInteger.and'.
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:109:39 Argument type mismatch: actual type is 'Int', but 'BigInteger!' was expected.
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:109:54 None of the following candidates is applicable:
+fun times(other: Byte): Float
+fun times(other: Short): Float
+fun times(other: Int): Float
+fun times(other: Long): Float
+fun times(other: Float): Float
+fun times(other: Double): Double
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:109:67 'infix' modifier is required on 'FirNamedFunctionSymbol java/math/BigInteger.and'.
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:109:71 Argument type mismatch: actual type is 'Int', but 'BigInteger!' was expected.
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormContractTest.kt:109:86 None of the following candidates is applicable:
+fun times(other: Byte): Float
+fun times(other: Short): Float
+fun times(other: Int): Float
+fun times(other: Long): Float
+fun times(other: Float): Float
+fun times(other: Double): Double
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormRenderTest.kt:40:2 Unresolved reference 'GraphicsMode'.
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormRenderTest.kt:40:15 Unresolved reference 'GraphicsMode'.
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_23-1793721085955.json
 
 FAILURE: Build failed with an exception.
 
 * What went wrong:
-Execution failed for task ':app:compileDebugKotlin'.
+Execution failed for task ':app:compileDebugUnitTestKotlin'.
 > A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
    > Compilation error. See log for more details
 
@@ -83,6 +96,6 @@ Execution failed for task ':app:compileDebugKotlin'.
 > Run with --scan to get full insights from a Build Scan (powered by Develocity).
 > Get more help at https://help.gradle.org.
 
-BUILD FAILED in 37s
-19 actionable tasks: 1 executed, 18 up-to-date
+BUILD FAILED in 21s
+22 actionable tasks: 1 executed, 21 up-to-date
 Configuration cache entry stored.
