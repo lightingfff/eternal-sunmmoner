@@ -163,7 +163,7 @@
         190,
         166
       ],
-      "sha256": "1faf98862a3e864c5278700dca02441c981438cdefb4e73edaa9187b77e51012"
+      "sha256": "18794a36f4270e71ecdcabe733742fb1092c9264ed072f863fc02ec54c561084"
     },
     "smithy_verge": {
       "file": "smithy_verge.png",
@@ -195,7 +195,7 @@
         260,
         224
       ],
-      "sha256": "271a44c3f07e089bcba8446c3ad06f61db8d4067d8274aacbdd0ef57ef072425"
+      "sha256": "d2efd9d1f521f4fa945379f01fdd8c3e75d70b13945410281f0a9f5242cac26a"
     },
     "hero_registry": {
       "file": "hero_registry.png",
@@ -203,7 +203,7 @@
         188,
         166
       ],
-      "sha256": "d9ed2e4a69b66d3217fe73500c9edefb55b7d132681274444ca88d253f368c8f"
+      "sha256": "5ce2f7a6b0374c53723a94c64b973ef12e70b0332d92488c8859a2820abbe66e"
     },
     "hero_quarters": {
       "file": "hero_quarters.png",
@@ -227,7 +227,7 @@
         188,
         168
       ],
-      "sha256": "bfb4cbd089052f505c432713a824968578dab362ecd0201348b12c08ec05abab"
+      "sha256": "1785d2ec21b2cb37aa4a7be051606c337b484613b687d5f095dd9976443d8942"
     }
   },
   "sample": {

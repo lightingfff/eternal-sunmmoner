@@ -72,6 +72,7 @@ camera 0.72 & anchor, alpha foot row, door trigger P20 armory, manifest/CRC, nea
 | `docs/quality-loop/p25-architecture-volume/*` | Director / QA | 1 (rubric, ROI, rounds, report) |
 | `tools/mapforge_p23_architecture.py` | Environment Artist (lead) | 2 |
 | `app/src/main/assets/premium_slice/{hero_quarters,restaurant,summoning_hall}.png` | generator (deterministic) | 3, sau khi generator tồn tại |
+| `app/src/main/assets/premium_slice/{armory,hero_registry,synthesis_lab,tower_gate}.png` | generator (deterministic) | **ROUND 2 / Phase C**, chỉ sau khi 3 pilot PASS |
 | `app/src/main/assets/premium_slice/manifest.json` | generator `stamp()` | 3 |
 | `tools/p25_validate_faces.py` (mới) | QA (validator, không sửa generator) | 4 |
 | `.github/workflows/lyra-render-evidence.yml` | Director (thêm snapshot P25 + path validator) | 5 |
@@ -80,7 +81,9 @@ camera 0.72 & anchor, alpha foot row, door trigger P20 armory, manifest/CRC, nea
 
 ## Files MUST NOT change
 
-`WorldMapModels.kt` (`ObliqueCamera`, `SanctuaryLight`, `WorldObstacle`, `SanctuaryHouseEntrances`), `ObliqueSpriteGeometry.kt`, `SanctuaryEnvironmentShadows.kt`, `PixelSpriteRenderer.kt` (trừ khi có quyết định owner-level), mọi gameplay/combat/AI/ViewModel/save/`model`/`data`, `AGENTS.md`, `.agents/skills/**`, `.codex/**`, `docs/quality-loop/p24-sanctuary-hdr/**` (tài liệu lịch sử), `premium_slice/{armory,hero_registry,synthesis_lab,tower_gate}.png` **cho đến khi 3 pilot PASS** (Phase C), `sanctuary_p03/*.png`, `tools/validate_assets.py`, 29 file PR #28, PR #30.
+`WorldMapModels.kt` (`ObliqueCamera`, `SanctuaryLight`, `WorldObstacle`, `SanctuaryHouseEntrances`), `ObliqueSpriteGeometry.kt`, `SanctuaryEnvironmentShadows.kt`, `PixelSpriteRenderer.kt` (trừ khi có quyết định owner-level), `HdrLightResponse.kt` (chỉ mở nếu B5 engine ROI chứng minh grade P24 triệt tiêu mặt phẳng — tới ROUND 2 chưa cần), mọi gameplay/combat/AI/ViewModel/save/`model`/`data`, `AGENTS.md`, `.agents/skills/**`, `.codex/**`, `docs/quality-loop/p24-sanctuary-hdr/**` (tài liệu lịch sử), `sanctuary_p03/*.png` (background buildings, KHÔNG nằm trong 7 facility), `tools/validate_assets.py`, `docs/visual-evidence/p25/engine-render-before/**` (baseline bất biến), `docs/visual-evidence/p25/authored-before/**` (baseline bất biến), 29 file PR #28, PR #30.
+
+**Cập nhật quyền Phase C (sau ROUND 1)**: 3 pilot PASS B5 (17/17 authored ROI + engine-projected ROI) và B6 (3/4 visual coherence trên ảnh engine thật z0.88/z1.00) → `premium_slice/{armory,hero_registry,synthesis_lab,tower_gate}.png` ĐƯỢC PHÉP sinh lại trong ROUND 2, cùng grammar, cùng ROI/threshold, không nới rubric. Xem `ROUND_2.md`.
 
 ## Song song / nối tiếp
 

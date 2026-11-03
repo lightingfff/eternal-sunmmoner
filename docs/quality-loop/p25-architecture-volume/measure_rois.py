@@ -37,13 +37,21 @@ PROP_TO_ASSET = {
     "building_hero_quarters": "hero_quarters",
     "building_restaurant": "restaurant",
     "building_summon_hall": "summoning_hall",
+    "building_armory": "armory",
+    "building_hero_registry": "hero_registry",
+    "building_synthesis_lab": "synthesis_lab",
+    "monument_tower_gate": "tower_gate",
 }
-FOOT_OFFSET = {"hero_quarters": 6.0, "restaurant": 6.0, "summoning_hall": 6.0}
+# PixelSpriteRenderer draws ALL seven facilities at footY = cy + 6f * s, 2f * s scale.
+FOOT_OFFSET = {k: 6.0 for k in PROP_TO_ASSET.values()}
 # Engine frames whose ROI projection is meaningful and unoccluded enough to report.
 ENGINE_FRAMES = [
     "service_cluster_z088.png", "service_cluster_z100.png",
     "quarters_door_actor_z148.png", "restaurant_door_actor_z148.png",
-    "summoning_hall_whole_z148.png", "sanctuary_overview_z036.png",
+    "armory_full_z148.png", "armory_door_trigger_actor_z148.png",
+    "registry_close_z148.png", "synthesis_cottage_z148.png",
+    "summoning_hall_whole_z148.png", "tower_gate_whole_z148.png",
+    "sanctuary_overview_z036.png",
 ]
 P24_KEY_FRAMES = [
     "sanctuary_overview_z036.png", "service_cluster_z088.png", "tower_gate_whole_z148.png",
@@ -184,7 +192,7 @@ def main() -> int:
             if not key:
                 continue
             for face, fd in spec["assets"][key]["faces"].items():
-                if not fd.get("measure") or not fd.get("poly") or face == "rune_stage":
+                if not fd.get("measure") or not fd.get("poly") or fd.get("protected"):
                     continue
                 sb, _ = project_face(be / f, ba / f"{key}.png", fr, prop, key, fd["poly"], spec)
                 sa, meta = project_face(ae / f, ca / f"{key}.png", fr, prop, key, fd["poly"], spec)

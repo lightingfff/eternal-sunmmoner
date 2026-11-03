@@ -1,10 +1,19 @@
 {
-  "_comment": "P25 precommitted, deterministic, auditable ROI + face-value grammar. Coordinates are authored sprite PNG pixels (origin top-left), traced from tools/mapforge_p23_architecture.py geometry (house_mass / temple / gate), NOT screen-space magic boxes. One source of truth read by tools/p25_face_grammar.py, measure_rois.py and tools/p25_validate_faces.py.",
-  "_rules": "faces are graded in priority order (first match wins). Pixels are graded once. protect rects are byte-identical before/after. is_emissive (warm window/lantern >= r130 & r>b+40, or cyan/teal >= b110 & b>r+30) is never graded. dark_floor skips existing deep shadow/outline/recess pixels unless face.allow_dark. bright_ceiling skips highlights. Grade is baked OFFLINE into the PNG at generation time: zero runtime draw calls, zero per-frame bitmap allocation, zero alpha/size/pivot change.",
+  "_comment": "P25 precommitted, deterministic, auditable ROI + face-value grammar. Coordinates are authored sprite PNG pixels (origin top-left), traced from tools/mapforge_p23_architecture.py geometry (house_mass / temple / gate), NOT screen-space magic boxes. One source of truth read by tools/p25_face_grammar.py, measure_rois.py and tools/p25_validate_faces.py. Phase C extends the same grammar to armory / hero_registry / synthesis_lab / tower_gate.",
+  "_rules": "faces are graded in priority order (first match wins). Pixels are graded once. protect rects are byte-identical before/after. is_emissive (warm window/lantern >= r130 & r>b+40, or cyan/teal >= b110 & b>r+30) is never graded. dark_floor skips existing deep shadow/outline/recess pixels unless face.allow_dark. bright_ceiling skips highlights. Grade is baked OFFLINE into the PNG at generation time: zero runtime draw calls, zero per-frame bitmap allocation, zero alpha/size/pivot change. Protected measure-only faces (door_reveal on armory, portal_aperture, rune_stage) are NOT graded.",
   "grade": {
     "dark_floor": 40,
     "bright_ceiling": 150,
-    "priority": ["soffit_eave", "door_reveal", "roof_shaded_return", "roof_key_pitch", "side_wall", "plinth_foundation", "front_wall", "rune_stage"]
+    "priority": [
+      "soffit_eave",
+      "door_reveal",
+      "roof_shaded_return",
+      "roof_key_pitch",
+      "side_wall",
+      "plinth_foundation",
+      "front_wall",
+      "rune_stage"
+    ]
   },
   "thresholds": {
     "front_minus_side_min": 12.0,
@@ -17,48 +26,1507 @@
   },
   "assets": {
     "hero_quarters": {
-      "canvas": [200, 168],
+      "canvas": [
+        200,
+        168
+      ],
       "source": "build_hero_quarters: x0=18 xm=124 x1=184 eave=96 ridge_y=30 jetty=122 base=167 overhang=8; eave_l=(18,90) eave_m=(130,90) ridge_l=(48,30) ridge_m=(120,30) hip_tip=(192,75)",
-      "protect": [[84, 124, 118, 167]],
+      "protect": [
+        [
+          84,
+          124,
+          118,
+          167
+        ]
+      ],
       "protect_note": "door leaf + both stone jambs + hood: preserve P20/P21 trigger contract (MapForgeP23ContractTest dark leaf / lighter jamb) byte-identically",
       "faces": {
-        "roof_key_pitch":     {"poly": [[24, 86], [126, 86], [116, 36], [52, 36]], "mean": 66, "gain": 1.30, "hue": [1.04, 1.00, 0.96], "measure": true},
-        "roof_shaded_return": {"poly": [[132, 86], [186, 76], [124, 36], [122, 62]], "mean": 32, "gain": 1.20, "hue": [0.93, 0.98, 1.09], "measure": true},
-        "front_wall":         {"poly": [[22, 100], [120, 100], [120, 164], [22, 164]], "mean": 78, "gain": 1.18, "hue": [1.05, 1.00, 0.95], "measure": true},
-        "side_wall":          {"poly": [[128, 98], [180, 84], [180, 144], [128, 162]], "mean": 40, "gain": 1.18, "hue": [0.93, 0.98, 1.09], "measure": true},
-        "soffit_eave":        {"poly": [[22, 95], [126, 95], [126, 99], [22, 99]], "mean": 20, "gain": 1.10, "hue": [0.95, 0.97, 1.06], "allow_dark": true, "measure": true},
-        "door_reveal":        {"poly": [[90, 136], [110, 136], [110, 164], [90, 164]], "mean": 20, "gain": 1.00, "hue": [1.00, 1.00, 1.00], "allow_dark": true, "measure": true},
-        "plinth_foundation":  {"poly": [[22, 160], [120, 160], [120, 167], [22, 167]], "mean": 56, "gain": 1.10, "hue": [0.98, 1.04, 0.98], "measure": true}
+        "roof_key_pitch": {
+          "poly": [
+            [
+              24,
+              86
+            ],
+            [
+              126,
+              86
+            ],
+            [
+              116,
+              36
+            ],
+            [
+              52,
+              36
+            ]
+          ],
+          "mean": 66,
+          "gain": 1.3,
+          "hue": [
+            1.04,
+            1.0,
+            0.96
+          ],
+          "measure": true
+        },
+        "roof_shaded_return": {
+          "poly": [
+            [
+              132,
+              86
+            ],
+            [
+              186,
+              76
+            ],
+            [
+              124,
+              36
+            ],
+            [
+              122,
+              62
+            ]
+          ],
+          "mean": 32,
+          "gain": 1.2,
+          "hue": [
+            0.93,
+            0.98,
+            1.09
+          ],
+          "measure": true
+        },
+        "front_wall": {
+          "poly": [
+            [
+              22,
+              100
+            ],
+            [
+              120,
+              100
+            ],
+            [
+              120,
+              164
+            ],
+            [
+              22,
+              164
+            ]
+          ],
+          "mean": 78,
+          "gain": 1.18,
+          "hue": [
+            1.05,
+            1.0,
+            0.95
+          ],
+          "measure": true
+        },
+        "side_wall": {
+          "poly": [
+            [
+              128,
+              98
+            ],
+            [
+              180,
+              84
+            ],
+            [
+              180,
+              144
+            ],
+            [
+              128,
+              162
+            ]
+          ],
+          "mean": 40,
+          "gain": 1.18,
+          "hue": [
+            0.93,
+            0.98,
+            1.09
+          ],
+          "measure": true
+        },
+        "soffit_eave": {
+          "poly": [
+            [
+              22,
+              95
+            ],
+            [
+              126,
+              95
+            ],
+            [
+              126,
+              99
+            ],
+            [
+              22,
+              99
+            ]
+          ],
+          "mean": 20,
+          "gain": 1.1,
+          "hue": [
+            0.95,
+            0.97,
+            1.06
+          ],
+          "allow_dark": true,
+          "measure": true
+        },
+        "door_reveal": {
+          "poly": [
+            [
+              90,
+              136
+            ],
+            [
+              110,
+              136
+            ],
+            [
+              110,
+              164
+            ],
+            [
+              90,
+              164
+            ]
+          ],
+          "mean": 20,
+          "gain": 1.0,
+          "hue": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "allow_dark": true,
+          "measure": true
+        },
+        "plinth_foundation": {
+          "poly": [
+            [
+              22,
+              160
+            ],
+            [
+              120,
+              160
+            ],
+            [
+              120,
+              167
+            ],
+            [
+              22,
+              167
+            ]
+          ],
+          "mean": 56,
+          "gain": 1.1,
+          "hue": [
+            0.98,
+            1.04,
+            0.98
+          ],
+          "measure": true
+        }
       }
     },
     "restaurant": {
-      "canvas": [206, 172],
+      "canvas": [
+        206,
+        172
+      ],
       "source": "build_restaurant: x0=16 xm=128 x1=190 eave=98 ridge_y=30 jetty=124 base=171 overhang=8; eave_l=(16,92) eave_m=(134,92) ridge_l=(46,30) ridge_m=(124,30) hip_tip=(198,76)",
-      "protect": [[86, 128, 120, 171]],
+      "protect": [
+        [
+          86,
+          128,
+          120,
+          171
+        ]
+      ],
       "protect_note": "door leaf + jambs + awning posts: preserve P20/P21 door trigger contract",
       "faces": {
-        "roof_key_pitch":     {"poly": [[22, 88], [130, 88], [120, 36], [50, 36]], "mean": 56, "gain": 1.30, "hue": [1.02, 1.00, 0.98], "measure": true, "note": "slate roof is a DARKER value family than the lit plaster front"},
-        "roof_shaded_return": {"poly": [[136, 88], [192, 78], [126, 36], [124, 62]], "mean": 34, "gain": 1.20, "hue": [0.93, 0.98, 1.09], "measure": true},
-        "front_wall":         {"poly": [[20, 102], [124, 102], [124, 168], [20, 168]], "mean": 88, "gain": 1.18, "hue": [1.05, 1.00, 0.95], "measure": true},
-        "side_wall":          {"poly": [[132, 100], [186, 84], [186, 148], [132, 166]], "mean": 42, "gain": 1.18, "hue": [0.93, 0.98, 1.09], "measure": true},
-        "soffit_eave":        {"poly": [[20, 97], [130, 97], [130, 101], [20, 101]], "mean": 20, "gain": 1.10, "hue": [0.95, 0.97, 1.06], "allow_dark": true, "measure": true},
-        "door_reveal":        {"poly": [[93, 140], [113, 140], [113, 168], [93, 168]], "mean": 20, "gain": 1.00, "hue": [1.00, 1.00, 1.00], "allow_dark": true, "measure": true},
-        "plinth_foundation":  {"poly": [[20, 164], [124, 164], [124, 171], [20, 171]], "mean": 58, "gain": 1.10, "hue": [0.98, 1.04, 0.98], "measure": true}
+        "roof_key_pitch": {
+          "poly": [
+            [
+              22,
+              88
+            ],
+            [
+              130,
+              88
+            ],
+            [
+              120,
+              36
+            ],
+            [
+              50,
+              36
+            ]
+          ],
+          "mean": 56,
+          "gain": 1.3,
+          "hue": [
+            1.02,
+            1.0,
+            0.98
+          ],
+          "measure": true,
+          "note": "slate roof is a DARKER value family than the lit plaster front"
+        },
+        "roof_shaded_return": {
+          "poly": [
+            [
+              136,
+              88
+            ],
+            [
+              192,
+              78
+            ],
+            [
+              126,
+              36
+            ],
+            [
+              124,
+              62
+            ]
+          ],
+          "mean": 34,
+          "gain": 1.2,
+          "hue": [
+            0.93,
+            0.98,
+            1.09
+          ],
+          "measure": true
+        },
+        "front_wall": {
+          "poly": [
+            [
+              20,
+              102
+            ],
+            [
+              124,
+              102
+            ],
+            [
+              124,
+              168
+            ],
+            [
+              20,
+              168
+            ]
+          ],
+          "mean": 88,
+          "gain": 1.18,
+          "hue": [
+            1.05,
+            1.0,
+            0.95
+          ],
+          "measure": true
+        },
+        "side_wall": {
+          "poly": [
+            [
+              132,
+              100
+            ],
+            [
+              186,
+              84
+            ],
+            [
+              186,
+              148
+            ],
+            [
+              132,
+              166
+            ]
+          ],
+          "mean": 42,
+          "gain": 1.18,
+          "hue": [
+            0.93,
+            0.98,
+            1.09
+          ],
+          "measure": true
+        },
+        "soffit_eave": {
+          "poly": [
+            [
+              20,
+              97
+            ],
+            [
+              130,
+              97
+            ],
+            [
+              130,
+              101
+            ],
+            [
+              20,
+              101
+            ]
+          ],
+          "mean": 20,
+          "gain": 1.1,
+          "hue": [
+            0.95,
+            0.97,
+            1.06
+          ],
+          "allow_dark": true,
+          "measure": true
+        },
+        "door_reveal": {
+          "poly": [
+            [
+              93,
+              140
+            ],
+            [
+              113,
+              140
+            ],
+            [
+              113,
+              168
+            ],
+            [
+              93,
+              168
+            ]
+          ],
+          "mean": 20,
+          "gain": 1.0,
+          "hue": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "allow_dark": true,
+          "measure": true
+        },
+        "plinth_foundation": {
+          "poly": [
+            [
+              20,
+              164
+            ],
+            [
+              124,
+              164
+            ],
+            [
+              124,
+              171
+            ],
+            [
+              20,
+              171
+            ]
+          ],
+          "mean": 58,
+          "gain": 1.1,
+          "hue": [
+            0.98,
+            1.04,
+            0.98
+          ],
+          "measure": true
+        }
       }
     },
     "summoning_hall": {
-      "canvas": [268, 206],
+      "canvas": [
+        268,
+        206
+      ],
       "source": "build_summoning_hall: PL=30 PR=206 RR=236 pediment 30..66 entablature 66..83 columns 90..145; return wall quad (206,84)-(236,68)-(236,145)-(206,161). ZONE-ONLY: no door trigger, no door threshold applied. rune_stage is a measure-only ROI.",
-      "protect": [[100, 92, 158, 205], [70, 158, 200, 205]],
+      "protect": [
+        [
+          100,
+          92,
+          158,
+          205
+        ],
+        [
+          70,
+          158,
+          200,
+          205
+        ]
+      ],
       "protect_note": "central dark portal void + cyan glow + rune ring: the P24 dark aperture must never be washed; this is a deliberate negative-space opening, not an alpha defect",
       "faces": {
-        "roof_key_pitch":     {"poly": [[44, 40], [192, 40], [178, 62], [58, 62]], "mean": 66, "gain": 1.25, "hue": [1.03, 1.00, 0.97], "measure": true, "note": "pediment front plane, deliberately darker than the sunlit colonnade"},
-        "roof_shaded_return": {"poly": [[208, 66], [232, 60], [232, 78], [208, 84]], "mean": 44, "gain": 1.20, "hue": [0.93, 0.98, 1.09], "measure": true, "note": "pediment right hip return"},
-        "front_wall":         {"poly": [[34, 88], [200, 88], [200, 144], [34, 144]], "mean": 92, "gain": 1.18, "hue": [1.04, 1.00, 0.96], "measure": true, "note": "colonnade / cella"},
-        "side_wall":          {"poly": [[210, 86], [234, 70], [234, 142], [210, 158]], "mean": 52, "gain": 1.18, "hue": [0.93, 0.98, 1.09], "measure": true},
-        "soffit_eave":        {"poly": [[32, 80], [204, 80], [204, 84], [32, 84]], "mean": 24, "gain": 1.10, "hue": [0.95, 0.97, 1.06], "allow_dark": true, "measure": true, "note": "entablature underside band"},
-        "plinth_foundation":  {"poly": [[32, 146], [232, 146], [232, 162], [32, 162]], "mean": 66, "gain": 1.10, "hue": [0.98, 1.04, 0.98], "measure": true},
-        "rune_stage":         {"poly": [[110, 168], [152, 168], [152, 200], [110, 200]], "mean": 0, "gain": 1.0, "hue": [1.0, 1.0, 1.0], "measure": true, "protected": true, "note": "measure-only, NOT graded: cyan emissive stage"}
+        "roof_key_pitch": {
+          "poly": [
+            [
+              44,
+              40
+            ],
+            [
+              192,
+              40
+            ],
+            [
+              178,
+              62
+            ],
+            [
+              58,
+              62
+            ]
+          ],
+          "mean": 66,
+          "gain": 1.25,
+          "hue": [
+            1.03,
+            1.0,
+            0.97
+          ],
+          "measure": true,
+          "note": "pediment front plane, deliberately darker than the sunlit colonnade"
+        },
+        "roof_shaded_return": {
+          "poly": [
+            [
+              208,
+              66
+            ],
+            [
+              232,
+              60
+            ],
+            [
+              232,
+              78
+            ],
+            [
+              208,
+              84
+            ]
+          ],
+          "mean": 44,
+          "gain": 1.2,
+          "hue": [
+            0.93,
+            0.98,
+            1.09
+          ],
+          "measure": true,
+          "note": "pediment right hip return"
+        },
+        "front_wall": {
+          "poly": [
+            [
+              34,
+              88
+            ],
+            [
+              200,
+              88
+            ],
+            [
+              200,
+              144
+            ],
+            [
+              34,
+              144
+            ]
+          ],
+          "mean": 92,
+          "gain": 1.18,
+          "hue": [
+            1.04,
+            1.0,
+            0.96
+          ],
+          "measure": true,
+          "note": "colonnade / cella"
+        },
+        "side_wall": {
+          "poly": [
+            [
+              210,
+              86
+            ],
+            [
+              234,
+              70
+            ],
+            [
+              234,
+              142
+            ],
+            [
+              210,
+              158
+            ]
+          ],
+          "mean": 52,
+          "gain": 1.18,
+          "hue": [
+            0.93,
+            0.98,
+            1.09
+          ],
+          "measure": true
+        },
+        "soffit_eave": {
+          "poly": [
+            [
+              32,
+              80
+            ],
+            [
+              204,
+              80
+            ],
+            [
+              204,
+              84
+            ],
+            [
+              32,
+              84
+            ]
+          ],
+          "mean": 24,
+          "gain": 1.1,
+          "hue": [
+            0.95,
+            0.97,
+            1.06
+          ],
+          "allow_dark": true,
+          "measure": true,
+          "note": "entablature underside band"
+        },
+        "plinth_foundation": {
+          "poly": [
+            [
+              32,
+              146
+            ],
+            [
+              232,
+              146
+            ],
+            [
+              232,
+              162
+            ],
+            [
+              32,
+              162
+            ]
+          ],
+          "mean": 66,
+          "gain": 1.1,
+          "hue": [
+            0.98,
+            1.04,
+            0.98
+          ],
+          "measure": true
+        },
+        "rune_stage": {
+          "poly": [
+            [
+              110,
+              168
+            ],
+            [
+              152,
+              168
+            ],
+            [
+              152,
+              200
+            ],
+            [
+              110,
+              200
+            ]
+          ],
+          "mean": 0,
+          "gain": 1.0,
+          "hue": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "measure": true,
+          "protected": true,
+          "note": "measure-only, NOT graded: cyan emissive stage"
+        }
+      }
+    },
+    "armory": {
+      "canvas": [
+        190,
+        166
+      ],
+      "source": "build_armory (P20/P21 trigger correction PRESERVED): x0=20 xm=116 x1=176 eave=96 ridge_y=26 rise_r=16 drop_r=18 jetty=118 base=165 overhang=8; eave_l=(20,90) eave_m=(122,90) ridge_l=(50,26) ridge_m=(112,26) hip_tip=(184,74). Door centre x=95, sill H-3=163.",
+      "protect": [
+        [
+          76,
+          110,
+          116,
+          165
+        ]
+      ],
+      "protect_note": "door leaf + both stone jambs + lintel: P20/P21 trigger (993,655) contract must stay byte-identical",
+      "faces": {
+        "roof_key_pitch": {
+          "poly": [
+            [
+              24,
+              86
+            ],
+            [
+              118,
+              86
+            ],
+            [
+              108,
+              30
+            ],
+            [
+              54,
+              30
+            ]
+          ],
+          "mean": 80,
+          "gain": 1.45,
+          "hue": [
+            1.05,
+            1.0,
+            0.95
+          ],
+          "measure": true,
+          "note": "warm shingle smithy roof; raised 62->80 because ~72% of this ROI is protected dark shingle outline, so the measured mean only moves ~0.28 per target unit"
+        },
+        "roof_shaded_return": {
+          "poly": [
+            [
+              124,
+              86
+            ],
+            [
+              180,
+              75
+            ],
+            [
+              114,
+              30
+            ],
+            [
+              112,
+              56
+            ]
+          ],
+          "mean": 18,
+          "gain": 1.25,
+          "hue": [
+            0.93,
+            0.98,
+            1.09
+          ],
+          "measure": true,
+          "note": "lowered 24->18 so the key-lit shingle pitch clears the precommitted >=10 separation despite protected dark shingle outlines"
+        },
+        "front_wall": {
+          "poly": [
+            [
+              22,
+              100
+            ],
+            [
+              112,
+              100
+            ],
+            [
+              112,
+              163
+            ],
+            [
+              22,
+              163
+            ]
+          ],
+          "mean": 84,
+          "gain": 1.18,
+          "hue": [
+            1.06,
+            1.0,
+            0.94
+          ],
+          "measure": true
+        },
+        "side_wall": {
+          "poly": [
+            [
+              120,
+              98
+            ],
+            [
+              172,
+              82
+            ],
+            [
+              172,
+              145
+            ],
+            [
+              120,
+              161
+            ]
+          ],
+          "mean": 40,
+          "gain": 1.18,
+          "hue": [
+            0.93,
+            0.98,
+            1.09
+          ],
+          "measure": true
+        },
+        "soffit_eave": {
+          "poly": [
+            [
+              22,
+              95
+            ],
+            [
+              118,
+              95
+            ],
+            [
+              118,
+              99
+            ],
+            [
+              22,
+              99
+            ]
+          ],
+          "mean": 20,
+          "gain": 1.1,
+          "hue": [
+            0.95,
+            0.97,
+            1.06
+          ],
+          "allow_dark": true,
+          "measure": true
+        },
+        "door_reveal": {
+          "poly": [
+            [
+              86,
+              136
+            ],
+            [
+              106,
+              136
+            ],
+            [
+              106,
+              162
+            ],
+            [
+              86,
+              162
+            ]
+          ],
+          "mean": 20,
+          "gain": 1.0,
+          "hue": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "allow_dark": true,
+          "measure": true,
+          "protected": true,
+          "note": "measure-only: inside protect rect"
+        },
+        "plinth_foundation": {
+          "poly": [
+            [
+              22,
+              160
+            ],
+            [
+              112,
+              160
+            ],
+            [
+              112,
+              165
+            ],
+            [
+              22,
+              165
+            ]
+          ],
+          "mean": 54,
+          "gain": 1.1,
+          "hue": [
+            0.98,
+            1.04,
+            0.98
+          ],
+          "measure": true
+        }
+      }
+    },
+    "hero_registry": {
+      "canvas": [
+        188,
+        166
+      ],
+      "source": "build_hero_registry (zone-only arcaded loggia, NO door): x0=12 xm=116 x1=176 eave=94 ridge_y=28 rise_r=15 jetty=118 base=165 overhang=8; eave_l=(12,88) eave_m=(122,88) hip_tip=(184,73). Bell turret at x=78 is a 0.36 silhouette marker.",
+      "protect": [
+        [
+          22,
+          124,
+          42,
+          160
+        ],
+        [
+          54,
+          124,
+          74,
+          160
+        ],
+        [
+          86,
+          124,
+          106,
+          160
+        ],
+        [
+          64,
+          1,
+          92,
+          33
+        ]
+      ],
+      "protect_note": "three loggia arch openings (deliberate negative space, NOT alpha defects) + bell turret; no door threshold applies",
+      "faces": {
+        "roof_key_pitch": {
+          "poly": [
+            [
+              16,
+              84
+            ],
+            [
+              118,
+              84
+            ],
+            [
+              108,
+              32
+            ],
+            [
+              46,
+              32
+            ]
+          ],
+          "mean": 56,
+          "gain": 1.3,
+          "hue": [
+            1.02,
+            1.0,
+            0.98
+          ],
+          "measure": true,
+          "note": "cool civic slate"
+        },
+        "roof_shaded_return": {
+          "poly": [
+            [
+              124,
+              84
+            ],
+            [
+              180,
+              73
+            ],
+            [
+              114,
+              32
+            ],
+            [
+              112,
+              56
+            ]
+          ],
+          "mean": 30,
+          "gain": 1.2,
+          "hue": [
+            0.93,
+            0.98,
+            1.09
+          ],
+          "measure": true
+        },
+        "front_wall": {
+          "poly": [
+            [
+              14,
+              98
+            ],
+            [
+              112,
+              98
+            ],
+            [
+              112,
+              163
+            ],
+            [
+              14,
+              163
+            ]
+          ],
+          "mean": 88,
+          "gain": 1.18,
+          "hue": [
+            1.04,
+            1.0,
+            0.96
+          ],
+          "measure": true,
+          "note": "brightest slate-house front = civic archive identity"
+        },
+        "side_wall": {
+          "poly": [
+            [
+              120,
+              96
+            ],
+            [
+              172,
+              80
+            ],
+            [
+              172,
+              145
+            ],
+            [
+              120,
+              161
+            ]
+          ],
+          "mean": 42,
+          "gain": 1.18,
+          "hue": [
+            0.93,
+            0.98,
+            1.09
+          ],
+          "measure": true
+        },
+        "soffit_eave": {
+          "poly": [
+            [
+              14,
+              93
+            ],
+            [
+              118,
+              93
+            ],
+            [
+              118,
+              97
+            ],
+            [
+              14,
+              97
+            ]
+          ],
+          "mean": 20,
+          "gain": 1.1,
+          "hue": [
+            0.95,
+            0.97,
+            1.06
+          ],
+          "allow_dark": true,
+          "measure": true
+        },
+        "plinth_foundation": {
+          "poly": [
+            [
+              14,
+              160
+            ],
+            [
+              112,
+              160
+            ],
+            [
+              112,
+              165
+            ],
+            [
+              14,
+              165
+            ]
+          ],
+          "mean": 58,
+          "gain": 1.1,
+          "hue": [
+            0.98,
+            1.04,
+            0.98
+          ],
+          "measure": true
+        }
+      }
+    },
+    "synthesis_lab": {
+      "canvas": [
+        188,
+        168
+      ],
+      "source": "build_synthesis_lab (zone-only workshop bay, NO door): x0=12 xm=112 x1=174 eave=96 ridge_y=28 rise_r=16 jetty=116 base=167 overhang=8; eave_l=(12,90) eave_m=(118,90) hip_tip=(182,74). Copper condenser on right return.",
+      "protect": [
+        [
+          20,
+          118,
+          100,
+          166
+        ],
+        [
+          116,
+          84,
+          144,
+          124
+        ]
+      ],
+      "protect_note": "open workshop bay (deliberate negative space) + copper/verdigris condenser; no door threshold applies",
+      "faces": {
+        "roof_key_pitch": {
+          "poly": [
+            [
+              16,
+              86
+            ],
+            [
+              114,
+              86
+            ],
+            [
+              104,
+              32
+            ],
+            [
+              46,
+              32
+            ]
+          ],
+          "mean": 54,
+          "gain": 1.35,
+          "hue": [
+            1.0,
+            1.02,
+            0.98
+          ],
+          "measure": true,
+          "note": "verdigris-tinted slate"
+        },
+        "roof_shaded_return": {
+          "poly": [
+            [
+              120,
+              86
+            ],
+            [
+              178,
+              74
+            ],
+            [
+              110,
+              32
+            ],
+            [
+              108,
+              56
+            ]
+          ],
+          "mean": 28,
+          "gain": 1.2,
+          "hue": [
+            0.93,
+            0.98,
+            1.09
+          ],
+          "measure": true
+        },
+        "front_wall": {
+          "poly": [
+            [
+              14,
+              100
+            ],
+            [
+              108,
+              100
+            ],
+            [
+              108,
+              165
+            ],
+            [
+              14,
+              165
+            ]
+          ],
+          "mean": 82,
+          "gain": 1.18,
+          "hue": [
+            0.97,
+            1.05,
+            0.98
+          ],
+          "measure": true,
+          "note": "darker alchemical workshop identity"
+        },
+        "side_wall": {
+          "poly": [
+            [
+              116,
+              98
+            ],
+            [
+              170,
+              80
+            ],
+            [
+              170,
+              146
+            ],
+            [
+              116,
+              163
+            ]
+          ],
+          "mean": 40,
+          "gain": 1.18,
+          "hue": [
+            0.93,
+            0.98,
+            1.09
+          ],
+          "measure": true
+        },
+        "soffit_eave": {
+          "poly": [
+            [
+              14,
+              95
+            ],
+            [
+              114,
+              95
+            ],
+            [
+              114,
+              99
+            ],
+            [
+              14,
+              99
+            ]
+          ],
+          "mean": 20,
+          "gain": 1.1,
+          "hue": [
+            0.95,
+            0.97,
+            1.06
+          ],
+          "allow_dark": true,
+          "measure": true
+        },
+        "plinth_foundation": {
+          "poly": [
+            [
+              14,
+              162
+            ],
+            [
+              108,
+              162
+            ],
+            [
+              108,
+              167
+            ],
+            [
+              14,
+              167
+            ]
+          ],
+          "mean": 56,
+          "gain": 1.1,
+          "hue": [
+            0.98,
+            1.04,
+            0.98
+          ],
+          "measure": true
+        }
+      }
+    },
+    "tower_gate": {
+      "canvas": [
+        260,
+        224
+      ],
+      "source": "build_tower_gate (fortress, NOT house_mass): twin battered towers x24..94 / x164..232, curtain wall x96..164 y62..200, crenellated parapet y44..62, stepped basalt dais y186..223, DARK rift aperture at sprite (130,120) +/- (16,27). P24 already gave this gate its contrast gain; Phase C grammar here is deliberately conservative.",
+      "protect": [
+        [
+          106,
+          88,
+          154,
+          202
+        ]
+      ],
+      "protect_note": "dark portal void + animated rift oval + cold threshold spill: P24 dark aperture must NEVER be washed or glow",
+      "faces": {
+        "roof_key_pitch": {
+          "poly": [
+            [
+              28,
+              30
+            ],
+            [
+              90,
+              30
+            ],
+            [
+              90,
+              58
+            ],
+            [
+              28,
+              58
+            ]
+          ],
+          "mean": 56,
+          "gain": 1.2,
+          "hue": [
+            1.03,
+            1.0,
+            0.97
+          ],
+          "measure": true,
+          "note": "left tower key-lit battlement/upper face"
+        },
+        "roof_shaded_return": {
+          "poly": [
+            [
+              232,
+              28
+            ],
+            [
+              238,
+              24
+            ],
+            [
+              238,
+              180
+            ],
+            [
+              232,
+              186
+            ]
+          ],
+          "mean": 30,
+          "gain": 1.15,
+          "hue": [
+            0.93,
+            0.98,
+            1.09
+          ],
+          "measure": true,
+          "note": "right tower foreshortened return"
+        },
+        "front_wall": {
+          "poly": [
+            [
+              28,
+              32
+            ],
+            [
+              92,
+              32
+            ],
+            [
+              92,
+              190
+            ],
+            [
+              28,
+              190
+            ]
+          ],
+          "mean": 78,
+          "gain": 1.12,
+          "hue": [
+            1.04,
+            1.0,
+            0.96
+          ],
+          "measure": true,
+          "note": "left tower frontal face"
+        },
+        "side_wall": {
+          "poly": [
+            [
+              166,
+              32
+            ],
+            [
+              230,
+              32
+            ],
+            [
+              230,
+              190
+            ],
+            [
+              166,
+              190
+            ]
+          ],
+          "mean": 44,
+          "gain": 1.12,
+          "hue": [
+            0.93,
+            0.98,
+            1.09
+          ],
+          "measure": true,
+          "note": "right tower frontal face, shaded"
+        },
+        "soffit_eave": {
+          "poly": [
+            [
+              26,
+              60
+            ],
+            [
+              234,
+              60
+            ],
+            [
+              234,
+              64
+            ],
+            [
+              26,
+              64
+            ]
+          ],
+          "mean": 22,
+          "gain": 1.1,
+          "hue": [
+            0.95,
+            0.97,
+            1.06
+          ],
+          "allow_dark": true,
+          "measure": true,
+          "note": "machicolation / parapet underside band; sky cleft x94..164 is transparent and skipped"
+        },
+        "plinth_foundation": {
+          "poly": [
+            [
+              30,
+              192
+            ],
+            [
+              230,
+              192
+            ],
+            [
+              230,
+              222
+            ],
+            [
+              30,
+              222
+            ]
+          ],
+          "mean": 38,
+          "gain": 1.05,
+          "hue": [
+            0.98,
+            1.02,
+            1.0
+          ],
+          "measure": true
+        },
+        "portal_aperture": {
+          "poly": [
+            [
+              114,
+              94
+            ],
+            [
+              146,
+              94
+            ],
+            [
+              146,
+              196
+            ],
+            [
+              114,
+              196
+            ]
+          ],
+          "mean": 0,
+          "gain": 1.0,
+          "hue": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "measure": true,
+          "protected": true,
+          "note": "measure-only, inside protect rect: dark void must stay dark"
+        }
       }
     }
   }

@@ -1,0 +1,111 @@
+P25 ROI / full-frame measurement (deterministic, nearest-neighbour)
+engine frames: 32 | authored assets: 3
+
+[hero_quarters] authored PNG ROI  PASS
+  PASS front_minus_side         before=  -1.57 after=  19.77 min=12.0
+  PASS roof_key_minus_return    before=   5.14 after=  11.13 min=10.0
+  PASS roof_front_abs           before=  11.08 after=  13.86 min=10.0
+  PASS front_minus_soffit       before=  26.95 after=  41.01 min=18.0
+  PASS roof_key_spread          before=  32.80 after=  43.80 min=14.0
+  PASS door_below_front         before=  21.53 after=  27.12 min=20.0
+  face means before -> after: roof_key_pitch=44.11->46.92, roof_shaded_return=38.97->35.79, front_wall=55.19->60.78, side_wall=56.76->41.01, soffit_eave=28.24->19.77, door_reveal=33.66->33.66, plinth_foundation=61.45->54.5
+
+[restaurant] authored PNG ROI  PASS
+  PASS front_minus_side         before=   0.14 after=  23.51 min=12.0
+  PASS roof_key_minus_return    before=   0.94 after=  23.74 min=10.0
+  PASS roof_front_abs           before=   2.20 after=  15.67 min=10.0
+  PASS front_minus_soffit       before=  35.24 after=  53.21 min=18.0
+  PASS roof_key_spread          before=  12.90 after=  16.60 min=14.0
+  PASS door_below_front         before=  29.56 after=  39.06 min=20.0
+  face means before -> after: roof_key_pitch=65.93->57.56, roof_shaded_return=64.99->33.82, front_wall=63.73->73.23, side_wall=63.59->49.72, soffit_eave=28.49->20.02, door_reveal=34.17->34.17, plinth_foundation=64.98->58.38
+
+[summoning_hall] authored PNG ROI  PASS
+  PASS front_minus_side         before=  12.14 after=  33.16 min=12.0
+  PASS roof_key_minus_return    before=  -7.98 after=  22.12 min=10.0
+  PASS roof_front_abs           before=  15.15 after=  18.16 min=10.0
+  PASS front_minus_soffit       before=   0.31 after=  60.02 min=18.0
+  PASS roof_key_spread          before=  26.30 after=  32.60 min=14.0
+  face means before -> after: roof_key_pitch=64.86->66.08, roof_shaded_return=72.84->43.96, front_wall=80.01->84.24, side_wall=67.87->51.08, soffit_eave=79.7->24.22, plinth_foundation=86.29->73.67, rune_stage=103.4->103.4
+
+[full frame, 3 P24 key cameras]
+  sanctuary_overview_z036.png          mean  70.60-> 70.52 (Δ -0.11%)  spread  57.6-> 57.6 (Δ +0.0)
+  service_cluster_z088.png             mean  62.76-> 62.59 (Δ -0.27%)  spread  53.1-> 54.1 (Δ +1.0)
+  tower_gate_whole_z148.png            mean  59.35-> 59.35 (Δ +0.00%)  spread  56.6-> 56.6 (Δ +0.0)
+  max |Δmean| all frames = 1.09%  no-flood gate (<8.0%) = PASS
+  P24 full-frame p90-p10 gain >=+3 count = 0/3 (disclosed, NOT relabelled)
+
+[engine-projected ROI corroboration]
+  service_cluster_z088.png
+    hero_quarters:roof_key_pitch           mean  49.30-> 51.96 spread  28.8-> 39.1 n=8188
+    hero_quarters:roof_shaded_return       mean  36.43-> 33.68 spread  19.6-> 11.7 n=3073
+    hero_quarters:front_wall               mean  51.04-> 54.48 spread  46.3-> 56.7 n=12420
+    hero_quarters:side_wall                mean  47.47-> 35.70 spread  20.1-> 17.0 n=6472
+    hero_quarters:soffit_eave              mean  29.22-> 21.08 spread   7.3->  7.2 n=882
+    hero_quarters:door_reveal              mean  36.18-> 36.18 spread  30.5-> 30.5 n=1092
+    hero_quarters:plinth_foundation        mean  54.49-> 52.08 spread  64.4-> 64.2 n=1380
+    restaurant:roof_key_pitch              mean  70.72-> 62.78 spread  20.0-> 24.7 n=9160
+    restaurant:roof_shaded_return          mean  59.31-> 32.25 spread  13.9-> 14.7 n=3341
+    restaurant:front_wall                  mean  61.03-> 70.34 spread  58.9-> 76.6 n=13524
+    restaurant:side_wall                   mean  52.93-> 42.41 spread  38.6-> 39.4 n=6949
+    restaurant:soffit_eave                 mean  30.29-> 22.17 spread   8.9->  8.5 n=930
+    restaurant:door_reveal                 mean  36.56-> 36.56 spread  30.6-> 30.6 n=1092
+    restaurant:plinth_foundation           mean  48.88-> 46.28 spread  55.3-> 51.7 n=1470
+  service_cluster_z100.png
+    hero_quarters:roof_key_pitch           mean  50.35-> 53.08 spread  27.4-> 37.9 n=10646
+    hero_quarters:roof_shaded_return       mean  36.10-> 33.43 spread  18.9-> 11.7 n=3956
+    hero_quarters:front_wall               mean  50.49-> 53.74 spread  46.0-> 56.3 n=16171
+    hero_quarters:side_wall                mean  46.09-> 34.78 spread  20.2-> 16.8 n=8239
+    hero_quarters:soffit_eave              mean  29.77-> 21.69 spread   8.4->  8.4 n=1169
+    hero_quarters:door_reveal              mean  37.54-> 37.54 spread  31.0-> 31.0 n=1440
+    hero_quarters:plinth_foundation        mean  53.77-> 51.50 spread  61.0-> 60.7 n=1727
+    restaurant:roof_key_pitch              mean  71.25-> 63.30 spread  21.7-> 25.7 n=11856
+    restaurant:roof_shaded_return          mean  58.55-> 31.99 spread  14.6-> 14.7 n=4321
+    restaurant:front_wall                  mean  60.26-> 69.15 spread  59.1-> 76.5 n=17702
+    restaurant:side_wall                   mean  51.44-> 41.24 spread  37.6-> 38.4 n=9034
+    restaurant:soffit_eave                 mean  30.70-> 22.65 spread   9.9->  9.4 n=1056
+    restaurant:door_reveal                 mean  37.28-> 37.28 spread  30.5-> 30.5 n=1440
+    restaurant:plinth_foundation           mean  47.48-> 44.69 spread  52.8-> 51.7 n=1837
+  quarters_door_actor_z148.png
+    hero_quarters:roof_key_pitch           mean  51.69-> 54.41 spread  28.5-> 39.6 n=23410
+    hero_quarters:roof_shaded_return       mean  35.57-> 32.90 spread  18.7-> 11.8 n=8672
+    hero_quarters:front_wall               mean  51.35-> 54.67 spread  47.8-> 57.2 n=35264
+    hero_quarters:side_wall                mean  44.35-> 33.77 spread  19.9-> 15.9 n=18214
+    hero_quarters:soffit_eave              mean  29.85-> 21.84 spread  10.0->  9.4 n=2470
+    hero_quarters:door_reveal              mean  45.31-> 45.31 spread  53.3-> 53.3 n=3216
+    hero_quarters:plinth_foundation        mean  52.39-> 50.14 spread  57.3-> 55.2 n=3944
+  restaurant_door_actor_z148.png
+    restaurant:roof_key_pitch              mean  72.43-> 64.60 spread  23.5-> 28.3 n=25913
+    restaurant:roof_shaded_return          mean  57.36-> 31.63 spread  14.1-> 14.8 n=9464
+    restaurant:front_wall                  mean  60.92-> 69.71 spread  61.8-> 79.3 n=38779
+    restaurant:side_wall                   mean  48.37-> 39.00 spread  33.4-> 33.4 n=19700
+    restaurant:soffit_eave                 mean  30.68-> 22.69 spread  11.1-> 11.1 n=2349
+    restaurant:door_reveal                 mean  45.29-> 45.29 spread  53.3-> 53.3 n=3216
+    restaurant:plinth_foundation           mean  48.83-> 46.16 spread  53.9-> 53.9 n=4199
+  summoning_hall_whole_z148.png
+    summoning_hall:roof_key_pitch          mean  75.65-> 76.74 spread  40.1-> 45.8 n=23981
+    summoning_hall:roof_shaded_return      mean  57.64-> 36.91 spread   9.0->  8.9 n=4428
+    summoning_hall:front_wall              mean  79.73-> 83.42 spread  44.2-> 49.9 n=95049
+    summoning_hall:side_wall               mean  49.47-> 38.68 spread  13.9-> 16.4 n=17506
+    summoning_hall:soffit_eave             mean  85.28-> 35.50 spread  31.8-> 35.7 n=7150
+    summoning_hall:plinth_foundation       mean  76.21-> 66.01 spread  54.4-> 56.8 n=32640
+  sanctuary_overview_z036.png
+    summoning_hall:roof_key_pitch          mean  70.14-> 71.32 spread  33.1-> 39.2 n=1410
+    summoning_hall:roof_shaded_return      mean  64.82-> 40.41 spread   8.9->  9.6 n=266
+    summoning_hall:front_wall              mean  79.79-> 83.72 spread  40.6-> 48.4 n=5676
+    summoning_hall:side_wall               mean  58.07-> 44.61 spread  15.9-> 18.8 n=1064
+    summoning_hall:soffit_eave             mean  80.58-> 27.80 spread  28.8-> 30.7 n=399
+    summoning_hall:plinth_foundation       mean  81.52-> 70.10 spread  50.4-> 54.8 n=2015
+    hero_quarters:roof_key_pitch           mean  45.01-> 48.43 spread  21.0-> 32.1 n=1389
+    hero_quarters:roof_shaded_return       mean  39.12-> 36.28 spread  22.8-> 12.4 n=512
+    hero_quarters:front_wall               mean  54.19-> 57.74 spread  51.2-> 55.9 n=2072
+    hero_quarters:side_wall                mean  56.93-> 42.01 spread  28.8-> 37.2 n=1038
+    hero_quarters:soffit_eave              mean  27.87-> 19.51 spread   0.0->  0.0 n=118
+    hero_quarters:door_reveal              mean  38.91-> 38.91 spread  35.9-> 35.9 n=176
+    hero_quarters:plinth_foundation        mean  63.14-> 60.70 spread  75.0-> 74.6 n=224
+    restaurant:roof_key_pitch              mean  66.08-> 57.80 spread  12.9-> 16.6 n=1550
+    restaurant:roof_shaded_return          mean  65.21-> 34.54 spread  12.9-> 15.7 n=562
+    restaurant:front_wall                  mean  63.50-> 73.20 spread  62.0-> 81.4 n=2280
+    restaurant:side_wall                   mean  62.98-> 48.96 spread  47.5-> 50.4 n=1156
+    restaurant:soffit_eave                 mean  28.61-> 20.18 spread   0.0->  0.0 n=126
+    restaurant:door_reveal                 mean  38.78-> 38.78 spread  35.1-> 35.1 n=176
+    restaurant:plinth_foundation           mean  54.20-> 51.60 spread  65.9-> 57.6 n=240
