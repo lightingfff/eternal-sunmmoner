@@ -1192,8 +1192,8 @@ object SanctuaryWorldRenderer {
       val px = sx(SanctuaryIslandGeometry.PLAZA_CENTER_X)
       val py = sy(SanctuaryIslandGeometry.PLAZA_CENTER_Y, 0f)
       drawHdrStamp(
-        Offset(px, py), 96f*zoom, 96f*zoom*ObliqueCamera.OBLIQUE_Y_SCALE,
-        HdrLightResponse.Tint.MOON, (.105f*exposure).coerceAtMost(.22f),
+        Offset(px, py), 120f*zoom, 120f*zoom*ObliqueCamera.OBLIQUE_Y_SCALE,
+        HdrLightResponse.Tint.MOON, (.160f*exposure).coerceAtMost(.30f),
       )
       // Tower Gate is the strongest cold source; its pool reaches the monolith stairs.
       // The emissive core/rift halo itself is drawn by drawProp AFTER the monument sprite.

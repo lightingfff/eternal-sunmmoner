@@ -199,11 +199,14 @@ object HdrLightResponse {
     PropKind.FACILITY_ARMORY -> LightSpec(
       Tint.EMBER, Material.METAL, 78f, .130f, 0f, .00f, 24f, .12f, 78f, false,
     )
+    // Warm windows: the halo sits at window height on the facade (wall spill), and
+    // the ground pool reaches the paving in front. This is what makes emission read
+    // as light ON stone instead of a bright rectangle floating on a flat wall.
     PropKind.FACILITY_HERO_QUARTERS, PropKind.FACILITY_RESTAURANT,
     PropKind.FACILITY_HERO_REGISTRY, PropKind.FACILITY_SYNTHESIS_LAB,
     PropKind.MEDIEVAL_TOWNHOUSE_A, PropKind.MEDIEVAL_TOWNHOUSE_B,
     PropKind.SANCTUARY_COTTAGE_BROWN, PropKind.SANCTUARY_COTTAGE_SLATE -> LightSpec(
-      Tint.GOLD, Material.WOOD, 54f, .115f, 0f, .00f, 18f, .10f, 62f, false,
+      Tint.GOLD, Material.WOOD, 62f, .150f, 0f, .00f, 40f, .17f, 62f, false,
     )
     PropKind.FORGE_ANVIL_STATION, PropKind.ALCHEMICAL_CRUCIBLE,
     PropKind.TAVERN_HEARTH_FIREPLACE -> LightSpec(
@@ -402,18 +405,30 @@ object HdrLightResponse {
     // Direction is vertically biased so ROOF -> FRONT -> FOUNDATION separate, with a
     // residual NW->SE tilt for the left/right plane.
     val brush = Brush.linearGradient(
-      0f to roof.copy(alpha = (key * .62f * exposure).coerceAtMost(.16f)),
-      .30f to keyCol.copy(alpha = (key * .40f * exposure).coerceAtMost(.11f)),
+      0f to roof.copy(alpha = (key * .80f * exposure).coerceAtMost(.20f)),
+      .30f to keyCol.copy(alpha = (key * .52f * exposure).coerceAtMost(.14f)),
       .44f to Color.Transparent,
-      1f to Color(0xff0a1220.toInt()).copy(alpha = (key * 2.15f * exposure).coerceAtMost(.36f)),
+      1f to Color(0xff0a1220.toInt()).copy(alpha = (key * 2.60f * exposure).coerceAtMost(.42f)),
       start = Offset(-bmp.width * .30f, bounds.visibleHeight.toFloat()),
       end = Offset(bmp.width * .30f, 0f),
     )
+    // A second, purely horizontal pass on the SAME cached silhouette gives a real
+    // front/side plane break (right third reads as the shaded return wall). Two
+    // drawPath calls per building, still no per-frame bitmap and no fullscreen pass.
+    val sideBrush = Brush.linearGradient(
+      0f to Color.Transparent,
+      .48f to Color.Transparent,
+      1f to Color(0xff0a1220.toInt()).copy(alpha = (key * 1.55f * exposure).coerceAtMost(.28f)),
+      start = Offset(-bmp.width / 2f, 0f),
+      end = Offset(bmp.width / 2f, 0f),
+    )
+    val shape = SanctuaryEnvironmentShadows.silhouette(bmp)
     withTransform({
       translate(cx, baseY)
       scale(ps, -ps, Offset.Zero)
     }) {
-      drawPath(SanctuaryEnvironmentShadows.silhouette(bmp), brush)
+      drawPath(shape, brush)
+      drawPath(shape, sideBrush)
     }
   }
 }
