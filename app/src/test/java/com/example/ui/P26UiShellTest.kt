@@ -164,7 +164,7 @@ class P26UiShellTest {
     assertTrue("FantasySkin.Panel must keep dark glass base", FantasySkin.Panel.red > 0.05f)
     assertTrue("FantasySkin.Gold accent keeps warm gold", FantasySkin.Gold.red > 0.6f)
     // The shared glass used by FantasyPanel must be translucent too.
-    val glass = com.example.ui.components.FantasyManagement.PanelGlass
+    val glass = com.example.ui.components.PanelGlass
     assertTrue("FantasyPanel glass must be translucent", glass.alpha < 1f)
   }
 }
