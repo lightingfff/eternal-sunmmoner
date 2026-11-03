@@ -4,78 +4,78 @@
     "E1": {
       "pass": true,
       "detail": {
-        "morning_minus_noon_abs": 12.77200792968749,
-        "noon_minus_evening_abs": 39.83311767795138,
-        "evening_minus_night_abs": 17.29780199652778,
-        "noon_minus_night_abs": 57.13091967447916
+        "morning_minus_noon_abs": 12.484755755208326,
+        "noon_minus_evening_abs": 39.559132825520834,
+        "evening_minus_night_abs": 11.700072543402776,
+        "noon_minus_night_abs": 51.25920536892361
       }
     },
     "E2": {
       "pass": true,
       "detail": {
         "noon_sky_ge_morning_sky": true,
-        "noon_whole_minus_night_whole": 33.3106926812066
+        "noon_whole_minus_night_whole": 26.809790681423607
       }
     },
     "E3": {
       "pass": true,
       "detail": {
-        "cloudy_minus_clear": -11.935681219618047,
-        "rain_minus_clear": -22.745607717013883
+        "cloudy_minus_clear": -11.30439868489583,
+        "rain_minus_clear": -23.23970532552083
       }
     },
     "E4": {
-      "pass": false,
+      "pass": true,
       "detail": {
         "p26_gate_night_rain_z148.png": {
-          "before": 57.3,
-          "after": 48.5,
-          "delta_pct": -15.28
+          "before": 56.0,
+          "after": 55.0,
+          "delta_pct": -1.82
         },
         "p26_gate_night_z148.png": {
-          "before": 58.8,
-          "after": 51.2,
-          "delta_pct": -12.93
+          "before": 57.3,
+          "after": 54.8,
+          "delta_pct": -4.36
         },
         "p26_gate_noon_z148.png": {
-          "before": 71.2,
-          "after": 75.2,
-          "delta_pct": 5.53
+          "before": 67.8,
+          "after": 68.0,
+          "delta_pct": 0.36
         },
         "p26_overview_night_z036.png": {
-          "before": 59.0,
-          "after": 48.4,
-          "delta_pct": -17.99
+          "before": 59.1,
+          "after": 55.8,
+          "delta_pct": -5.54
         },
         "p26_sky_evening_z088.png": {
-          "before": 68.4,
-          "after": 68.1,
-          "delta_pct": -0.41
+          "before": 69.5,
+          "after": 67.9,
+          "delta_pct": -2.32
         },
         "p26_sky_morning_z088.png": {
-          "before": 73.0,
-          "after": 77.9,
-          "delta_pct": 6.8
+          "before": 74.0,
+          "after": 77.0,
+          "delta_pct": 4.1
         },
         "p26_sky_night_z088.png": {
-          "before": 65.2,
-          "after": 58.2,
-          "delta_pct": -10.78
+          "before": 66.3,
+          "after": 64.0,
+          "delta_pct": -3.57
         },
         "p26_sky_noon_cloudy_z088.png": {
-          "before": 78.9,
-          "after": 77.5,
-          "delta_pct": -1.81
+          "before": 79.8,
+          "after": 77.0,
+          "delta_pct": -3.61
         },
         "p26_sky_noon_rain_z088.png": {
-          "before": 71.6,
-          "after": 79.0,
-          "delta_pct": 10.34
+          "before": 72.5,
+          "after": 76.4,
+          "delta_pct": 5.44
         },
         "p26_sky_noon_z088.png": {
-          "before": 78.9,
-          "after": 83.6,
-          "delta_pct": 5.88
+          "before": 79.8,
+          "after": 81.7,
+          "delta_pct": 2.31
         }
       }
     },
@@ -90,82 +90,92 @@
       "pass": false,
       "detail": {
         "p26_gate_night_z148.png": {
-          "rift_after": 42.8,
+          "rift_after": 48.4,
           "rift_before": 50.3,
-          "delta": -7.47
+          "delta": -1.91
         },
         "p26_gate_noon_z148.png": {
           "rift_after": 54.5,
           "rift_before": 57.7,
-          "delta": -3.18
+          "delta": -3.2
         },
         "p26_gate_night_rain_z148.png": {
-          "rift_after": 42.8,
+          "rift_after": 50.0,
           "rift_before": 49.7,
-          "delta": -6.9
+          "delta": 0.35
         },
         "rift_roi_mean_le": 40.0,
-        "night_rift_mean": 42.8
+        "night_rift_mean": 48.4
       }
     },
     "G2": {
       "pass": false,
       "detail": {
-        "halo_night": 50.2,
+        "halo_night": 55.7,
         "halo_noon": 66.1
       }
     }
   },
   "frames": {
     "p26_sky_morning_z088.png": {
-      "sky": 93.47,
-      "world": 77.94,
-      "whole": 81.82
+      "sky": 92.66,
+      "world": 76.62,
+      "world42": 77.0,
+      "whole": 80.63
     },
     "p26_sky_noon_z088.png": {
-      "sky": 106.25,
-      "world": 83.58,
-      "whole": 89.24
+      "sky": 105.15,
+      "world": 81.57,
+      "world42": 81.69,
+      "whole": 87.46
     },
     "p26_sky_evening_z088.png": {
-      "sky": 66.41,
-      "world": 68.12,
-      "whole": 67.69
+      "sky": 65.59,
+      "world": 67.06,
+      "world42": 67.9,
+      "whole": 66.69
     },
     "p26_sky_night_z088.png": {
-      "sky": 49.12,
-      "world": 58.21,
-      "whole": 55.93
+      "sky": 53.89,
+      "world": 62.91,
+      "world42": 63.97,
+      "whole": 60.65
     },
     "p26_sky_noon_cloudy_z088.png": {
-      "sky": 94.31,
-      "world": 77.5,
-      "whole": 81.71
+      "sky": 93.85,
+      "world": 76.65,
+      "world42": 76.96,
+      "whole": 80.95
     },
     "p26_sky_noon_rain_z088.png": {
-      "sky": 83.5,
-      "world": 79.04,
-      "whole": 80.16
+      "sky": 81.91,
+      "world": 75.91,
+      "world42": 76.41,
+      "whole": 77.41
     },
     "p26_gate_night_z148.png": {
-      "sky": 44.47,
-      "world": 51.2,
-      "whole": 49.52
+      "sky": 48.66,
+      "world": 56.48,
+      "world42": 54.76,
+      "whole": 54.52
     },
     "p26_gate_noon_z148.png": {
-      "sky": 151.11,
-      "world": 75.17,
-      "whole": 94.16
+      "sky": 150.26,
+      "world": 74.84,
+      "world42": 68.02,
+      "whole": 93.69
     },
     "p26_gate_night_rain_z148.png": {
-      "sky": 38.49,
-      "world": 48.51,
-      "whole": 46.0
+      "sky": 45.43,
+      "world": 55.97,
+      "world42": 54.96,
+      "whole": 53.34
     },
     "p26_overview_night_z036.png": {
-      "sky": 40.72,
-      "world": 48.37,
-      "whole": 46.46
+      "sky": 47.82,
+      "world": 55.9,
+      "world42": 55.83,
+      "whole": 53.88
     }
   }
 }

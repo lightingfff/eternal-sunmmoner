@@ -660,7 +660,7 @@ object PixelSpriteRenderer {
         // P26: the aperture stays a real void at every hour (P24 protection) — a dark
         // fill inside the portal oval, drawn before the energy rings.
         drawOval(
-          color = Color(0xFF05080F).copy(alpha = 0.72f),
+          color = Color(0xFF05080F).copy(alpha = 0.85f),
           topLeft = Offset(riftCenter.x - 32f * s, riftCenter.y - 54f * s),
           size = Size(64f * s, 108f * s),
           style = Fill,
@@ -684,6 +684,18 @@ object PixelSpriteRenderer {
             size = Size(104f * s, 144f * s),
             style = Stroke(width = 3.2f * s),
           )
+          // P26: a wider second ring reads as the portal's light in the night sky —
+          // localized to the gate, bounded alpha, BALANCED-only.
+          if (com.example.game.world.WorldEnvironment.lighting.localLightIntensity > 0.55f) {
+            val wideAlpha = (0.12f * com.example.game.world.WorldEnvironment.lighting.localLightIntensity * pulse)
+              .coerceAtMost(0.12f)
+            drawOval(
+              color = portalCoreCol.copy(alpha = wideAlpha),
+              topLeft = Offset(riftCenter.x - 66f * s, riftCenter.y - 90f * s),
+              size = Size(132f * s, 180f * s),
+              style = Stroke(width = 2.6f * s),
+            )
+          }
         }
         if (highestClearedFloor >= 1) {
           drawOval(
