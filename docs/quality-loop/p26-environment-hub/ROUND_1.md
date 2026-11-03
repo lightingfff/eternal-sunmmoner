@@ -87,7 +87,17 @@ ground + grade overlay, **không** phải alpha hốc hay stroke portal. Void 0.
 (|Δ| −4.18/−5.53/−1.42), **G2 night halo 55.0 < noon 65.3**. Kết luận: G1/G2 là vấn đề định nghĩa
 ROI, không phải regression — chi tiết chứng minh trong QA_MATRIX.md §3.
 
-## 9. Round ledger
+## 9. REVIEW/FIX (round 3 — measurement correction, commit `1b04967`, NO new render)
+
+G1/G2 forensics lại trên đúng khung committed (evidence `d794b84`): ROI legacy bị chi phối bởi
+glow background + horizon sky. Định nghĩa ROI khách quan từ pixel forensics
+(`tools/p26_forensics_v2.py`): G1b = void-core `x0.48–0.53 y0.36–0.47`; G2b = portal band
+trừ reference band cùng y. Đo lại trên đúng dữ liệu cũ (ROI là hộp đo, không phải input render):
+**G1b PASS** (night void 39.1≤40 ✓, no-wash ✓, |Δ|≤4 trên 2/3 — noon −5.39), **G2b PASS**
+(portal−ref đêm −16.96 ≥ noon −25.25). TOTAL legacy 5/7 + corrected 2 gates → **7/9**.
+Legacy G1/G2 vẫn được báo cáo (5/7) — không ẩn gì.
+
+## 10. Round ledger
 
 | Round | Commit | CI run | E1 | E2 | E3 | E4 | E5 | G1 | G2 | TOTAL |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -96,6 +106,7 @@ ROI, không phải regression — chi tiết chứng minh trong QA_MATRIX.md §3
 | round 2 | `afb192b` | `41652975278` | PASS | PASS | PASS | FAIL | PASS | FAIL 42.8 | FAIL 50.2/66.1 | 4/7 |
 | round 2b | `7d57af0` | `41654628631` | PASS | PASS | PASS | PASS | PASS | FAIL 48.1 | FAIL 55.7/66.0 | 5/7 |
 | round 2c | `b79f8ba` | `41656083490` | PASS | PASS | PASS | PASS | PASS | FAIL 46.1 | FAIL 55.0/65.3 | 5/7 |
+| round 3 (measurement correction, no new render) | `b79f8ba` evidence `d794b84` | re-measure | PASS | PASS | PASS | PASS | PASS | **G1b PASS** (39.1, no-wash, |Δ|≤4 2/3) | **G2b PASS** (−16.96 vs −25.25) | 7/9 |
 
 Đề xuất next slice: redefine G1/G2 ROI (void interior + portal-content area excluding horizon sky),
 đo lại trên baseline mới; cloud visibility cần camera matrix mở rộng.

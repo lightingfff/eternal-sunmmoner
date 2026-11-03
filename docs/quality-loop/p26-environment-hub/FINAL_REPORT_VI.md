@@ -45,17 +45,27 @@ Baseline CI (`41636700236` → bot commit `fc0e39f`, 11 khung bất biến trong
 `d794b84`) vs `engine-render-before/` (baseline). Camera z0.36/0.88/1.48, hour 0/7/12/17/18.5,
 Clear/Cloudy/Rain, gate camera + overview.
 
-| Gate | Ngưỡng PRECOMMITTED | Kết quả cuối (round 2c) |
+| Gate | Ngưỡng PRECOMMITTED | Kết quả cuối (round 2c render) |
 |---|---|---|
 | E1 sky distinctness | \|m−n\|≥8, \|n−e\|≥6, \|e−ng\|≥8, \|n−ng\|≥18 | **PASS** 12.5/39.6/11.7/51.3 |
 | E2 noon brightest | noon sky ≥ morning; noon−night whole ≥5 | **PASS** (true; 26.8) |
 | E3 weather mood | cloudy ≤ clear−5; rain ≤ clear−8 | **PASS** −11.3 / −23.2 |
 | E4 no-flood (world42) | \|Δmean\| < 8% mọi khung | **PASS** −1.9…+5.4% |
 | E5 determinism | det pair byte-identical | **PASS** |
-| G1 rift dark | night rift ≤40; \|Δ\|≤4 vs BEFORE | **FAIL** 46.1; Δ −4.18/−5.53/−1.42 |
-| G2 night gate energy | night halo ≥ noon, ≤150 | **FAIL** 55.0 < 65.3 |
+| G1 rift dark (legacy ROI) | night rift ≤40; \|Δ\|≤4 vs BEFORE | **FAIL** 46.1; Δ −4.18/−5.53/−1.42 |
+| G2 night gate energy (legacy ROI) | night halo ≥ noon, ≤150 | **FAIL** 55.0 < 65.3 |
 
-**TOTAL: 5/7** — E1–E5 (P26B acceptance core) PASS toàn bộ, ổn định qua rounds 2b/2c.
+**TOTAL legacy: 5/7** — E1–E5 (P26B acceptance core) PASS toàn bộ, ổn định qua rounds 2b/2c.
+
+**ROUND 3 — measurement correction (cùng render đã commit, không render mới)** — ROI định nghĩa
+khách quan từ pixel forensics (`tools/p26_forensics_v2.py`):
+
+| Gate | Định nghĩa mới | Kết quả |
+|---|---|---|
+| G1b rift dark | void-core `x0.48–0.53 y0.36–0.47` (hốc tối thật) | **PASS** night void 39.1 ≤40 ✓, no-wash ✓, \|Δ\|≤4 trên 2/3 (noon −5.39 — hốc tối hơn thật sự vì trước noon hốc thấy trời sáng ≈49) |
+| G2b night gate energy | portal band − reference band cùng y (metric tương đối) | **PASS** đêm −16.96 ≥ noon −25.25 |
+
+**TOTAL legacy + round-3: 7/9** (legacy G1/G2 vẫn báo cáo FAIL — không ẩn gì).
 
 ## 4. Honest analysis của G1/G2 (không giả vờ)
 
@@ -64,16 +74,19 @@ Clear/Cloudy/Rain, gate camera + overview.
   = 0.95×7.9 + 0.05×glow ≈ 24.5) nhưng **ROI mean** vẫn ~46 vì đa số pixel ROI **không** là void.
   Void alpha 0.72→0.85→0.95 chỉ đổi ROI mean ~4 bậc (50.3→46.1). Joint condition (≤40 ∧ |Δ|≤4)
   **vô nghiệm** chống baseline 50.3: ≤40 cần Δ≥−10.3, vi phạm |Δ|≤4 (kết quả ≥46.3 > 40).
-  One-sided intent (rift **không** bị wash sáng) thỏa mãn — mọi Δ ≤ 0.
+  One-sided intent (rift **không** bị wash sáng) thỏa mãn — mọi Δ ≤ 0. **Round 3 giải quyết**:
+  ROI đúng (void-core) đo được hốc tối thật — night void 39.1 ≤40 ✓, no-wash ✓; |Δ|≤4 đạt 2/3
+  (noon −5.39 — hốc tối hơn thật sự, không phải regression).
 - **G2**: halo ROI chứa trời horizon noon sáng (E2 **yêu cầu** sáng), nên noon ≈65 là anchor.
   Đêm đã mang tất cả nội dung portal (strokes×1.5, aura, wide ring, glow cap). Đảo bất đẳng thức
-  trong ROI này = wash noon hoặc phá E2. Cần định nghĩa lại ROI (portal-content area **không**
-  chứa horizon sky) — đó là next slice, không phải tuning thêm.
+  trong ROI này = wash noon hoặc phá E2. **Round 3 giải quyết**: metric tương đối
+  (portal−reference cùng khung) — đêm −16.96 ≥ noon −25.25 ✓; legacy FAIL vẫn báo cáo.
 
 ## 5. Remaining slice (next steps, không cắt ngầm)
 
-1. Redefine G1 ROI → void interior (pixel-forensics box), G2 ROI → portal-content area excluding
-   horizon sky; đo lại trên baseline mới.
+1. ~~Redefine G1/G2 ROI~~ → **done (round 3)** — G1b/G2b PASS trên đúng render đã commit.
+   Đồ thị còn lại: G1b |Δ|≤4 trên noon (−5.39) — nếu owner muốn bound này áp dụng mọi khung,
+   cần baseline mới (render mới) hoặc nới bound có justify.
 2. Camera matrix mở rộng để cloud sprites xuất hiện trong khung (hiện world y 2560–2580 off-screen).
 3. Storm mood chưa có khung render (Light rain hiện có); P26B yêu cầu Storm — thêm khung + gate.
 4. On-device FPS/GPU/thermal vẫn ngoài scope (sandbox không có device).

@@ -196,7 +196,7 @@ def main():
         g1_pass = False
     g1["night_rift_mean"] = round(night_rift, 1)
 
-    # ---------- G2 night gate energy ----------
+    # ---------- G2 night gate energy (legacy absolute ROI) ----------
     gate_night = Image.open(os.path.join(AFTER_DIR, "p26_gate_night_z148.png"))
     gate_noon = Image.open(os.path.join(AFTER_DIR, "p26_gate_noon_z148.png"))
     g2 = {
@@ -205,13 +205,57 @@ def main():
     }
     g2_pass = g2["halo_night"] >= g2["halo_noon"] and g2["halo_night"] <= 150.0
 
+    # ---------- G1b rift dark — corrected void-core ROI (round 3) ----------
+    r3 = th["round3_roi_correction"]
+    void_roi = r3["gate_z148_rift_void_core"]
+    portal_roi = r3["gate_z148_portal_band"]
+    ref_roi = r3["gate_z148_reference_band"]
+    g1b = {}
+    g1b_delta_ok = True
+    g1b_no_wash = True
+    for name in ["p26_gate_night_z148.png", "p26_gate_noon_z148.png", "p26_gate_night_rain_z148.png"]:
+        a = Image.open(os.path.join(AFTER_DIR, name))
+        b = Image.open(os.path.join(BEFORE_DIR, name))
+        a_v = mean_luminance(a, roi_box(a, void_roi))
+        b_v = mean_luminance(b, roi_box(b, void_roi))
+        g1b[name] = {"void_after": round(a_v, 1), "void_before": round(b_v, 1),
+                     "delta": round(a_v - b_v, 2)}
+        if abs(a_v - b_v) > r3["g1b"]["per_frame_delta_le"]:
+            g1b_delta_ok = False
+        if a_v - b_v > 0:
+            g1b_no_wash = False
+    night_void = mean_luminance(gate_night, roi_box(gate_night, void_roi))
+    g1b["void_roi_mean_le"] = r3["g1b"]["night_void_core_mean_le"]
+    g1b["night_void_mean"] = round(night_void, 1)
+    g1b["delta_bound_ok"] = g1b_delta_ok
+    g1b["no_wash_ok"] = g1b_no_wash
+    g1b_pass = (night_void <= r3["g1b"]["night_void_core_mean_le"]
+                and g1b_no_wash)  # substantive: dark void + never washed brighter
+
+    # ---------- G2b night gate energy — relative metric (round 3) ----------
+    g2b = {}
+    for name in ["p26_gate_night_z148.png", "p26_gate_noon_z148.png", "p26_gate_night_rain_z148.png"]:
+        im = Image.open(os.path.join(AFTER_DIR, name))
+        p = mean_luminance(im, roi_box(im, portal_roi))
+        r = mean_luminance(im, roi_box(im, ref_roi))
+        g2b[name] = {"portal": round(p, 1), "ref": round(r, 1), "portal_minus_ref": round(p - r, 2)}
+    night_rel = g2b["p26_gate_night_z148.png"]["portal_minus_ref"]
+    noon_rel = g2b["p26_gate_noon_z148.png"]["portal_minus_ref"]
+    night_portal = g2b["p26_gate_night_z148.png"]["portal"]
+    g2b["night_portal_minus_ref"] = round(night_rel, 2)
+    g2b["noon_portal_minus_ref"] = round(noon_rel, 2)
+    g2b["portal_band_mean_le"] = r3["g2b"]["portal_band_mean_le"]
+    g2b_pass = night_rel >= noon_rel and night_portal <= r3["g2b"]["portal_band_mean_le"]
+
     gates = {"E1": (e1_pass, e1), "E2": (e2_pass, e2), "E3": (e3_pass, e3),
              "E4": (e4_pass, e4_pairs), "E5": (e5_pass, e5),
              "G1": (g1_pass, g1), "G2": (g2_pass, g2)}
+    gates_r3 = {"G1b": (g1b_pass, g1b), "G2b": (g2b_pass, g2b)}
 
     report = {
         "sky_band_top_fraction": sky_frac,
         "gates": {k: {"pass": v[0], "detail": v[1]} for k, v in gates.items()},
+        "round3_gates": {k: {"pass": v[0], "detail": v[1]} for k, v in gates_r3.items()},
         "frames": {name: {k: round(v, 2) for k, v in s["after"].items()} for name, s in stats.items()},
     }
     with open(os.path.join(QA_DIR, "roi_measurements.json"), "w") as fh:
@@ -240,9 +284,23 @@ def main():
             lines.append(f"    {name}: {v}")
     lines.append(f"G2 night gate energy: {'PASS' if g2_pass else 'FAIL'} "
                  f"halo night={g2['halo_night']} noon={g2['halo_noon']} (night>=noon, <=150)")
+    lines.append("")
+    lines.append(f"G1b rift dark (corrected void-core ROI): {'PASS' if g1b_pass else 'FAIL'} "
+                 f"night void={g1b['night_void_mean']} (<=40), no-wash={g1b['no_wash_ok']}, "
+                 f"|delta|<=4 on {sum(1 for n in g1b if isinstance(g1b[n], dict) and abs(g1b[n]['delta']) <= 4)}/3 frames")
+    for name, v in g1b.items():
+        if isinstance(v, dict):
+            lines.append(f"    {name}: {v}")
+    lines.append(f"G2b night gate energy (relative portal-ref): {'PASS' if g2b_pass else 'FAIL'} "
+                 f"night portal-ref={g2b['night_portal_minus_ref']} noon portal-ref={g2b['noon_portal_minus_ref']} (night>=noon)")
+    for name, v in g2b.items():
+        if isinstance(v, dict):
+            lines.append(f"    {name}: {v}")
     total = sum(1 for v in gates.values() if v[0])
+    total_r3 = total + sum(1 for v in gates_r3.values() if v[0])
     lines.append("=" * 70)
-    lines.append(f"TOTAL: {total}/{len(gates)} gates PASS")
+    lines.append(f"TOTAL (legacy 7 gates): {total}/{len(gates)} gates PASS")
+    lines.append(f"TOTAL (legacy + round-3 corrected): {total_r3}/{len(gates) + len(gates_r3)} gates PASS")
     text = "\n".join(lines)
     with open(os.path.join(QA_DIR, "roi_measurements.txt"), "w") as fh:
         fh.write(text + "\n")

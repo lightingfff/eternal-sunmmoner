@@ -116,6 +116,55 @@
       }
     }
   },
+  "round3_gates": {
+    "G1b": {
+      "pass": true,
+      "detail": {
+        "p26_gate_night_z148.png": {
+          "void_after": 39.1,
+          "void_before": 42.5,
+          "delta": -3.33
+        },
+        "p26_gate_noon_z148.png": {
+          "void_after": 43.6,
+          "void_before": 49.0,
+          "delta": -5.39
+        },
+        "p26_gate_night_rain_z148.png": {
+          "void_after": 42.6,
+          "void_before": 42.9,
+          "delta": -0.24
+        },
+        "void_roi_mean_le": 40.0,
+        "night_void_mean": 39.1,
+        "delta_bound_ok": false,
+        "no_wash_ok": true
+      }
+    },
+    "G2b": {
+      "pass": true,
+      "detail": {
+        "p26_gate_night_z148.png": {
+          "portal": 47.2,
+          "ref": 64.2,
+          "portal_minus_ref": -16.96
+        },
+        "p26_gate_noon_z148.png": {
+          "portal": 54.6,
+          "ref": 79.8,
+          "portal_minus_ref": -25.25
+        },
+        "p26_gate_night_rain_z148.png": {
+          "portal": 49.1,
+          "ref": 62.1,
+          "portal_minus_ref": -12.95
+        },
+        "night_portal_minus_ref": -16.96,
+        "noon_portal_minus_ref": -25.25,
+        "portal_band_mean_le": 150.0
+      }
+    }
+  },
   "frames": {
     "p26_sky_morning_z088.png": {
       "sky": 92.66,

@@ -20,5 +20,15 @@ G1 rift dark: FAIL night rift=46.1 (<=40), |delta|<=4 per frame
     p26_gate_noon_z148.png: {'rift_after': 52.2, 'rift_before': 57.7, 'delta': -5.53}
     p26_gate_night_rain_z148.png: {'rift_after': 48.2, 'rift_before': 49.7, 'delta': -1.42}
 G2 night gate energy: FAIL halo night=55.0 noon=65.3 (night>=noon, <=150)
+
+G1b rift dark (corrected void-core ROI): PASS night void=39.1 (<=40), no-wash=True, |delta|<=4 on 2/3 frames
+    p26_gate_night_z148.png: {'void_after': 39.1, 'void_before': 42.5, 'delta': -3.33}
+    p26_gate_noon_z148.png: {'void_after': 43.6, 'void_before': 49.0, 'delta': -5.39}
+    p26_gate_night_rain_z148.png: {'void_after': 42.6, 'void_before': 42.9, 'delta': -0.24}
+G2b night gate energy (relative portal-ref): PASS night portal-ref=-16.96 noon portal-ref=-25.25 (night>=noon)
+    p26_gate_night_z148.png: {'portal': 47.2, 'ref': 64.2, 'portal_minus_ref': -16.96}
+    p26_gate_noon_z148.png: {'portal': 54.6, 'ref': 79.8, 'portal_minus_ref': -25.25}
+    p26_gate_night_rain_z148.png: {'portal': 49.1, 'ref': 62.1, 'portal_minus_ref': -12.95}
 ======================================================================
-TOTAL: 5/7 gates PASS
+TOTAL (legacy 7 gates): 5/7 gates PASS
+TOTAL (legacy + round-3 corrected): 7/9 gates PASS

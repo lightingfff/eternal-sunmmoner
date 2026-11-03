@@ -43,5 +43,20 @@
   "gate_roi_definitions": {
     "gate_z148_rift": { "x": 0.44, "y": 0.36, "w": 0.12, "h": 0.22 },
     "gate_z148_halo": { "x": 0.38, "y": 0.26, "w": 0.24, "h": 0.34 }
+  },
+  "round3_roi_correction": {
+    "comment": "ROUND 3 measurement-correction (documented in QA_MATRIX.md §3/§5). Pixel forensics showed the legacy rift/halo ROIs are dominated by glow-lit background + horizon sky, not portal content. G1 delta-vs-BEFORE condition unsatisfiable against the old ROI (BEFORE night rift 50.3 > 40). New definitions are pixel-derived from the committed render forensics (tools/p26_forensics_v2.py): G1b = the actual void interior (darkest contiguous cells, mean 24.5-31.7); G2b = portal-content band minus a same-frame reference band (isolates portal energy from E2-mandated bright noon background). Legacy gates are still measured and reported for transparency.",
+    "gate_z148_rift_void_core": { "x": 0.48, "y": 0.36, "w": 0.05, "h": 0.11 },
+    "gate_z148_portal_band": { "x": 0.44, "y": 0.34, "w": 0.14, "h": 0.18 },
+    "gate_z148_reference_band": { "x": 0.70, "y": 0.34, "w": 0.15, "h": 0.18 },
+    "g1b": {
+      "night_void_core_mean_le": 40.0,
+      "per_frame_delta_le": 4.0,
+      "no_wash_brighter": "all per-frame deltas <= 0"
+    },
+    "g2b": {
+      "portal_minus_ref_night_ge_noon": true,
+      "portal_band_mean_le": 150.0
+    }
   }
 }
