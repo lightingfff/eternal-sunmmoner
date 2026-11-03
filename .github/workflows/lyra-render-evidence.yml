@@ -24,11 +24,23 @@ on:
       - 'app/src/test/java/com/example/MapForgeP23RenderTest.kt'
       - 'app/src/test/java/com/example/MapForgeP23ContractTest.kt'
       - 'app/src/test/java/com/example/HdrLightingRenderTest.kt'
+      - 'app/src/test/java/com/example/P26SkyRenderTest.kt'
+      - 'app/src/test/java/com/example/P26SkyContractTest.kt'
+      - 'app/src/test/java/com/example/ui/P26UiShellTest.kt'
+      - 'app/src/main/java/com/example/game/world/WorldEnvironment.kt'
+      - 'app/src/main/java/com/example/game/pixel/SanctuaryWorldRenderer.kt'
+      - 'app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt'
+      - 'app/src/main/java/com/example/game/pixel/LivingWorldRenderer.kt'
+      - 'app/src/main/java/com/example/ui/components/FantasyManagement.kt'
+      - 'app/src/main/java/com/example/ui/components/FantasySkin.kt'
       - 'tools/mapforge_p23_architecture.py'
       - 'tools/p25_face_grammar.py'
       - 'tools/p25_validate_faces.py'
+      - 'tools/p26_measure_sky.py'
       - 'docs/quality-loop/p25-architecture-volume/**'
+      - 'docs/quality-loop/p26-environment-hub/**'
       - 'docs/visual-evidence/p25/**'
+      - 'docs/visual-evidence/p26/**'
       - '.github/workflows/lyra-render-evidence.yml'
 
 permissions:
@@ -130,6 +142,10 @@ jobs:
       - name: Render P24 HDR light-response matrix (real draw code, Robolectric native graphics)
         run: gradle :app:testDebugUnitTest --tests "com.example.HdrLightingRenderTest" --stacktrace
 
+      # P26: sky / day-night / weather matrix through the real draw path, locked cameras.
+      - name: Render P26 sky and time-of-day matrix (real draw code, Robolectric native graphics)
+        run: gradle :app:testDebugUnitTest --tests "com.example.P26SkyRenderTest" --stacktrace
+
       - name: Verify Sanctuary environment art, manifest, layout, and performance regressions
         run: >-
           gradle :app:testDebugUnitTest
@@ -180,12 +196,25 @@ jobs:
             cp -f docs/visual-evidence/p23/engine-render/*.png docs/visual-evidence/p25/engine-render-before/ || true
             cp -f docs/visual-evidence/p23/camera_props.json docs/visual-evidence/p25/ || true
           fi
+          # P26: the sky/day-night matrix is the ticket's evidence. The BEFORE guard is
+          # created from the first committed run (renderer still unmodified), exactly like
+          # P25's immutable baseline; later runs only refresh the AFTER frames.
+          mkdir -p docs/visual-evidence/p26/engine-render
+          cp -f app/build/visual_screenshots/p26/*.png docs/visual-evidence/p26/engine-render/ || true
+          cp -f app/build/visual_screenshots/p26/camera_props.json docs/visual-evidence/p26/ || true
+          mkdir -p docs/visual-evidence/p26/ui
+          cp -f app/build/visual_screenshots/p26/ui/*.png docs/visual-evidence/p26/ui/ || true
+          if [ ! -d docs/visual-evidence/p26/engine-render-before ]; then
+            mkdir -p docs/visual-evidence/p26/engine-render-before
+            cp -f docs/visual-evidence/p26/engine-render/*.png docs/visual-evidence/p26/engine-render-before/ || true
+            cp -f docs/visual-evidence/p26/camera_props.json docs/visual-evidence/p26/camera_props_before.json || true
+          fi
           mkdir -p docs/visual-evidence/p23/engine-render
           cp -f app/build/visual_screenshots/p23/*.png docs/visual-evidence/p23/engine-render/ || true
           cp -f app/build/visual_screenshots/p23/camera_props.json docs/visual-evidence/p23/ || true
           git config user.name "eternal-render-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add docs/visual-evidence/p17c/engine-render docs/visual-evidence/p18/engine-render docs/visual-evidence/p19/engine-render docs/visual-evidence/p20/engine-render docs/visual-evidence/p21/engine-render docs/visual-evidence/p22/engine-render docs/visual-evidence/p22/camera_props.json docs/visual-evidence/p23/engine-render-before docs/visual-evidence/p23/engine-render docs/visual-evidence/p23/camera_props.json docs/visual-evidence/p24/engine-render-before docs/visual-evidence/p25/engine-render-before docs/visual-evidence/p25/camera_props.json
+          git add docs/visual-evidence/p17c/engine-render docs/visual-evidence/p18/engine-render docs/visual-evidence/p19/engine-render docs/visual-evidence/p20/engine-render docs/visual-evidence/p21/engine-render docs/visual-evidence/p22/engine-render docs/visual-evidence/p22/camera_props.json docs/visual-evidence/p23/engine-render-before docs/visual-evidence/p23/engine-render docs/visual-evidence/p23/camera_props.json docs/visual-evidence/p24/engine-render-before docs/visual-evidence/p25/engine-render-before docs/visual-evidence/p25/camera_props.json docs/visual-evidence/p26/engine-render docs/visual-evidence/p26/engine-render-before docs/visual-evidence/p26/ui docs/visual-evidence/p26/camera_props.json docs/visual-evidence/p26/camera_props_before.json
           if git diff --cached --quiet; then echo "no render changes"; exit 0; fi
           git commit -m "P17-C: engine render evidence (automated, Robolectric native graphics)"
           # The branch can move while the render job runs (another commit lands, the agent pushes
@@ -251,6 +280,9 @@ jobs:
             app/build/visual_screenshots/p22/camera_props.json
             app/build/visual_screenshots/p23/*.png
             app/build/visual_screenshots/p23/camera_props.json
+            app/build/visual_screenshots/p26/*.png
+            app/build/visual_screenshots/p26/camera_props.json
+            app/build/visual_screenshots/p26/ui/*.png
             app/build/reports/tests/testDebugUnitTest/**
           if-no-files-found: warn
           retention-days: 30

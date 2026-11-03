@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import kotlin.math.*
 
-enum class WorldWeather { CLEAR, RAIN, FOG }
+enum class WorldWeather { CLEAR, CLOUDY, RAIN, FOG }
 class WorldClock(val originMillis: Long, val dayDurationMillis: Long = DEFAULT_DAY_MILLIS) {
   init { require(dayDurationMillis > 0) }
   fun hour(nowMillis: Long): Float = Math.floorMod(nowMillis - originMillis, dayDurationMillis).toFloat() / dayDurationMillis * 24f
