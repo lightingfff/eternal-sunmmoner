@@ -1,0 +1,216 @@
+Picked up JAVA_TOOL_OPTIONS:  -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts=localhost|127.*
+Calculating task graph as no cached configuration is available for tasks: :app:testDebugUnitTest --tests com.example.LostCourier* --tests com.example.Mission01BPlaythroughTest --tests com.example.HeroAgencyTest --tests com.example.TowerOffFieldMasterTest --tests com.example.ui.HeroAgencyAlertUiTest --tests com.example.RescueJourney* --tests com.example.RescueFieldActionsTest --tests com.example.RescueEnemyTargetingTest --tests com.example.RescueTacticalCommandsTest --tests com.example.CourierChoiceInteractionTest --tests com.example.data.LostCourier* --tests com.example.ui.Rescue* --tests com.example.performance.ScenePerformanceTest --tests com.example.performance.SceneFrameLoopLifecycleRobolectricTest --tests com.example.SanctuaryMaterialTest.manifestAssetsDecodeAndMatchRuntimeAtlas --tests com.example.SanctuaryEnvironmentArtTest --tests com.example.ui.LayoutResponsivenessRobolectricTest --tests com.example.LivingWorldTest --tests com.example.MapForgeTerrainRenderTest
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:kspDebugKotlin SKIPPED
+> Task :app:processDebugGoogleServices UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:generateDebugRFile UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:processDebugUnitTestManifest UP-TO-DATE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:packageDebugUnitTestForUnitTest UP-TO-DATE
+> Task :app:bundleDebugClassesToCompileJar UP-TO-DATE
+> Task :app:kspDebugUnitTestKotlin SKIPPED
+> Task :app:generateDebugUnitTestConfig UP-TO-DATE
+> Task :app:bundleDebugClassesToRuntimeJar UP-TO-DATE
+> Task :app:compileDebugUnitTestKotlin UP-TO-DATE
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processDebugUnitTestJavaRes UP-TO-DATE
+
+> Task :app:testDebugUnitTest
+Picked up JAVA_TOOL_OPTIONS:  -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts=localhost|127.*
+
+CourierChoiceInteractionTest > choiceCommitsOnceAndSuppliesRequireContinuousLivingHeroPresence PASSED
+
+HeroAgencyTest > fearProducesContextualRequestAndRegroupHelpsDifferentlyWithoutSpam PASSED
+
+HeroAgencyTest > fearRequestCanBeDismissedWithoutChangingHeroStateOrOrder PASSED
+
+LivingWorldTest > originAndDurationSurviveReload PASSED
+
+LivingWorldTest > captureLivingSanctuaryRuntimeStates PASSED
+
+LivingWorldTest > clockProgressesIndependentlyOfFramesAndWraps PASSED
+
+LivingWorldTest > weatherTransitionsAreSmoothAndFrameIndependent PASSED
+
+LivingWorldTest > lightingIsContinuousReadableAndSharesShadowDirection PASSED
+
+LostCourierEncounterTest > escortWaitsForARealHeroAndRequiresTheGateAfterCombat PASSED
+
+LostCourierEncounterTest > fearReducesRealStatsAndReassuranceRecoversWithoutRepeatingTheEvent PASSED
+
+LostCourierEncounterTest > authoredEscortRouteHasCollisionClearanceWithoutChangingNavigation PASSED
+
+LostCourierEncounterTest > encounterIsOptInAndPreservesTheExistingFloorMap PASSED
+
+LostCourierEncounterTest > scoutHasACounterWindowAndInterceptionPreventsRealReinforcements PASSED
+
+LostCourierStarterPartyTest > missedSupplyPickupRescuesWithoutGrantingSupportRewards PASSED
+
+LostCourierStarterPartyTest > newGuestCanRecoverSuppliesAndPersistADifferentOutcome PASSED
+
+LostCourierStarterPartyTest > newGuestCanRescueCourierWithTaughtOrders PASSED
+
+LostCourierVisualTest > fullTowerLandscapeKeepsMissionAndControlsApart PASSED
+
+LostCourierVisualTest > fullTowerPortraitKeepsMissionAndControlsApart PASSED
+
+LostCourierVisualTest > courierHudOrdersDriveTheRealEncounterAndRemainTouchable PASSED
+
+LostCourierVisualTest > actualTowerScreenShowsJourneyWaypointAtGameplayZoom PASSED
+
+LostCourierVisualTest > captureARealEscortScoutFearTelegraphAndRescuePlaythrough PASSED
+
+MapForgeTerrainRenderTest > captureTerrainSliceThroughTheRealRenderer PASSED
+
+Mission01BPlaythroughTest > silenceSignalThenSupportCourierCompletesWholeJourneyAndRestoresStory PASSED
+
+Mission01BPlaythroughTest > retreatDuringJourneyPersistsFailureAndRetryStartsFresh PASSED
+
+Mission01BPlaythroughTest > retreatFromDistantSignalFollowsTheReturnRouteAndFreshRetryIsClean PASSED
+
+Mission01BPlaythroughTest > decoySignalThenCollectSuppliesCompletesDifferentPersistedStory PASSED
+
+Mission01BPlaythroughTest > missedPickupStillRescuesWithoutInventingSupportReward PASSED
+
+RescueEnemyTargetingTest > rangedThreatensCourierRatherThanCommandSigil PASSED
+
+RescueEnemyTargetingTest > meleeThreatensCourierRatherThanCommandSigil PASSED
+
+RescueFieldActionsTest > sevenDifferentFieldTasksHaveFourteenOrderedSpatialStepsAndNoTimers PASSED
+
+RescueFieldActionsTest > fieldWorkNeedsActualPresenceAndExplicitActionAtEachDistinctPoint PASSED
+
+RescueFieldActionsTest > authoredFieldTargetsHaveClearPhysicalFootprintsInTheActualMap PASSED
+
+RescueJourneyMapTest > additiveDistrictPreservesOldGeometryAndHasWalkableCourierCorridor PASSED
+
+RescueJourneyMapTest > routeChoicesRemainAfterDiscoveryChurnAndDoNotReplaceEscortFlags PASSED
+
+RescueTacticalCommandsTest > urgentMovementCancelsPendingContactWithoutDeliveringStaleDamage PASSED
+
+RescueTacticalCommandsTest > regroupUsesCourierOnEscortAndSigilOnOrdinaryFloors PASSED
+
+RescueTacticalCommandsTest > retreatReturnsToExtractionEvenAfterCommandSigilMovesAway PASSED
+
+RescueTacticalCommandsTest > moveOrderEvadesCaptainTelegraphDuringHeroWindup PASSED
+
+SanctuaryEnvironmentArtTest > characterBehindCanopy PASSED
+
+SanctuaryEnvironmentArtTest > obliqueProjectionAndAnchorsRemainConsistent PASSED
+
+SanctuaryEnvironmentArtTest > environmentDetailsAtMultipleZooms PASSED
+
+SanctuaryEnvironmentArtTest > terrainCloseupsInRuntimeRenderer PASSED
+
+SanctuaryMaterialTest > manifestAssetsDecodeAndMatchRuntimeAtlas PASSED
+
+TowerOffFieldMasterTest > zeroLivingHeroesEndsBattleWithoutAttemptingToTargetMaster PASSED
+
+TowerOffFieldMasterTest > hostileProjectilePassesThroughSigilAndZeroLegacyMasterHpIsNotDefeat PASSED
+
+TowerOffFieldMasterTest > genericRaiderAttacksHeroWhenCommandSigilIsCloser PASSED
+
+LostCourierBranchPolicyTest > missedSuppliesSaveIsARescueWithoutCompletingEitherRewardBranch PASSED
+
+LostCourierBranchPolicyTest > failureAndOrdinaryExpeditionsCannotGrantBranchRewardsOrEraseSuccess PASSED
+
+LostCourierBranchPolicyTest > eachSuccessHasItsOwnPermanentConsequenceAndOneTimeReward PASSED
+
+LostCourierBranchPolicyTest > oldRescueSavesDoNotReceiveSupportRewardAgainAfterAnotherBranch PASSED
+
+LostCourierPersistenceRobolectricTest > full old bond retains new memory and permanent flags survive transient churn PASSED
+
+LostCourierPersistenceRobolectricTest > failed atomic write does not claim rescue or alter valid saves and retry succeeds PASSED
+
+LostCourierPersistenceRobolectricTest > failed escort is saved and a later rescue remains available PASSED
+
+LostCourierPersistenceRobolectricTest > missed supplies survive restart without support reward until actual support completion PASSED
+
+LostCourierPersistenceRobolectricTest > rescue unlock and one hero memory survive restart and stale-profile replay PASSED
+
+LostCourierPersistenceRobolectricTest > saved courier service allows crafting with exactly ninety gold PASSED
+
+LostCourierPersistenceRobolectricTest > both rescue choices survive restart and stale replays cannot repeat branch bonuses PASSED
+
+SceneFrameLoopLifecycleRobolectricTest > stoppedLifecycleAndBlockingModalCancelFramesAndResumeWithoutTimeJump PASSED
+
+ScenePerformanceTest > disabledProbeDoesNoSamplingAndEnablingStartsFresh PASSED
+
+ScenePerformanceTest > samplesAtMostOncePerSecondAndReportsMeasuredCounters PASSED
+
+ScenePerformanceTest > worksAtHighRefreshAndResetsPauseTime PASSED
+
+ScenePerformanceTest > boundedSamplesReportTailAndJankWithoutRetainingPause PASSED
+
+ScenePerformanceTest > balancedHalvesRenderWorkWithoutChangingLogicalTime PASSED
+
+ScenePerformanceTest > fixedSimulationRetainsFractionalFramesAndResetClearsThem PASSED
+
+HeroAgencyAlertUiTest > regroupRespondsToRealFearAndRetreatOpensConfirmationOnly PASSED
+
+HeroAgencyAlertUiTest > confirmedRetreatWalksToExtractionBeforeSettlement PASSED
+
+LayoutResponsivenessRobolectricTest > narrow portrait 360x640 sanctuary lobby has slim HUD and non-overlapping controls PASSED
+
+LayoutResponsivenessRobolectricTest > narrow portrait 360x640 floor selection squad prep and facility modals fit cleanly PASSED
+
+LayoutResponsivenessRobolectricTest > widescreen landscape 800x360 sanctuary and tower battle HUDs stay compact and collision-free PASSED
+
+LayoutResponsivenessRobolectricTest > summoning requires explicit spend confirmation and supports cancellation PASSED
+
+LayoutResponsivenessRobolectricTest > login gate renders one-tap guest button google sign-in and settings cleanly PASSED
+
+LayoutResponsivenessRobolectricTest > management navigation opens roster team summon and hero details PASSED
+
+LayoutResponsivenessRobolectricTest > render widescreen oblique 3_4 sanctuary restaurant and floor01 screenshots PASSED
+
+LayoutResponsivenessRobolectricTest > render high resolution 4_3 full sanctuary island overview screenshot PASSED
+
+LayoutResponsivenessRobolectricTest > pixel tile and monumental structure atlases generate crisp pixel art sprites PASSED
+
+LayoutResponsivenessRobolectricTest > narrow portrait 360x640 tower battle HUD and 8 tactical orders never overlap joystick PASSED
+
+LayoutResponsivenessRobolectricTest > saved expedition rewards use readable fantasy summary PASSED
+
+LayoutResponsivenessRobolectricTest > playable restaurant interior entry exit and settings account modal render cleanly PASSED
+
+RescueChoiceHudTest > suppliesChoiceDisappearsAfterCommitAndProvidesActionableWaypoint PASSED
+
+RescueChoiceHudTest > compactHudKeepsBothChoiceActionsVisible PASSED
+
+RescueJourneyHudTest > investigationRequiresArrivalAndClearedThreatsBeforeItCanAdvance PASSED
+
+RescueJourneyHudTest > signalDecisionHasVisibleConsequencesAndInvokesTheChosenAction PASSED
+
+RescueJourneyHudTest > fieldWorkRequiresArrivalAndAllowsExplicitMovementAndInteraction PASSED
+
+RescueRetryFlowTest > retryWaitsForSavedOutcomeAndPreparationPreservesInjuriesAndRewards PASSED
+
+RescueRetryFlowTest > failedSaveCannotPrepareRetryUntilSaveRetrySucceeds PASSED
+
+BUILD SUCCESSFUL in 31s
+31 actionable tasks: 1 executed, 30 up-to-date
+Configuration cache entry stored.

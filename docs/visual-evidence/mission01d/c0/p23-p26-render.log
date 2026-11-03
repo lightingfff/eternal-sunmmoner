@@ -1,0 +1,86 @@
+Picked up JAVA_TOOL_OPTIONS:  -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts=localhost|127.*
+Calculating task graph as no cached configuration is available for tasks: :app:testDebugUnitTest --tests com.example.MapForgeP23ContractTest --tests com.example.MapForgeP23RenderTest --tests com.example.HdrLightingRenderTest --tests com.example.P26SkyContractTest --tests com.example.P26SkyRenderTest --tests com.example.ui.P26UiShellTest
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:processDebugGoogleServices UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:kspDebugKotlin SKIPPED
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:generateDebugRFile UP-TO-DATE
+> Task :app:processDebugUnitTestManifest UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:packageDebugUnitTestForUnitTest UP-TO-DATE
+> Task :app:generateDebugUnitTestConfig UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:bundleDebugClassesToRuntimeJar UP-TO-DATE
+> Task :app:bundleDebugClassesToCompileJar UP-TO-DATE
+> Task :app:kspDebugUnitTestKotlin SKIPPED
+> Task :app:compileDebugUnitTestKotlin UP-TO-DATE
+> Task :app:processDebugUnitTestJavaRes UP-TO-DATE
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+
+> Task :app:testDebugUnitTest
+Picked up JAVA_TOOL_OPTIONS:  -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts=localhost|127.*
+
+HdrLightingRenderTest > cachedMasksAreReusedAndExposureIsBounded PASSED
+
+HdrLightingRenderTest > hdrTiersAndWeatherThroughTheRealRenderer PASSED
+
+MapForgeP23ContractTest > propsReachTheGroundRowAndLanternFramesAreLocked PASSED
+
+MapForgeP23ContractTest > enterableDoorsSitOnTheirWorldTriggers PASSED
+
+MapForgeP23ContractTest > reAuthoredPropsCastApprovedSilhouetteShadows PASSED
+
+MapForgeP23ContractTest > manifestsPinTheNewPngsAndFallbacksStillExist PASSED
+
+MapForgeP23ContractTest > everyAuthoredBuildingHasNoInteriorAlphaHole PASSED
+
+MapForgeP23ContractTest > worldGeometryEntrancesAndCameraAreUntouched PASSED
+
+MapForgeP23ContractTest > roofSilhouetteIsContinuousAcrossEveryBuilding PASSED
+
+MapForgeP23RenderTest > captureArchitectureAndPropsThroughTheRealRenderer PASSED
+
+P26SkyContractTest > skyColorsAreCachedNotReallocated PASSED
+
+P26SkyContractTest > localLightsMatterMoreAtNight PASSED
+
+P26SkyContractTest > skyStatesAreDistinctInLuminance PASSED
+
+P26SkyContractTest > weatherChangesSkyMood PASSED
+
+P26SkyContractTest > celestialDiscSwitchesSunAndMoon PASSED
+
+P26SkyContractTest > livingWorldInvariantsArePreserved PASSED
+
+P26SkyRenderTest > skyMatrixThroughTheRealRenderer PASSED
+
+P26UiShellTest > widescreen lobby captures premium shell and compact hud PASSED
+
+P26UiShellTest > panel skin is translucent with gold border PASSED
+
+P26UiShellTest > narrow portrait lobby captures premium shell with nav tabs PASSED
+
+BUILD SUCCESSFUL in 24s
+31 actionable tasks: 1 executed, 30 up-to-date
+Configuration cache entry stored.
