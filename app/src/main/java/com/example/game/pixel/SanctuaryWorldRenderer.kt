@@ -60,6 +60,39 @@ object SanctuaryWorldRenderer {
     CloudAnchor(700f, 180f, 0.70f, 0.55f, 2),
   )
 
+  // Authored cloud contours. Unlike per-frame Path()s, these are built ONCE and reused
+  // under a transform. Stepped edges echo the Sanctuary's pixel-art silhouettes.
+  private val cumulusBody = Path().apply {
+    moveTo(-98f, 14f); lineTo(-98f, -2f); lineTo(-80f, -2f)
+    lineTo(-80f, -15f); lineTo(-61f, -15f); lineTo(-61f, -24f)
+    lineTo(-45f, -24f); lineTo(-45f, -33f); lineTo(-17f, -33f)
+    lineTo(-17f, -43f); lineTo(22f, -43f); lineTo(22f, -35f)
+    lineTo(49f, -35f); lineTo(49f, -23f); lineTo(71f, -23f)
+    lineTo(71f, -12f); lineTo(90f, -12f); lineTo(90f, 2f)
+    lineTo(100f, 2f); lineTo(100f, 15f); lineTo(79f, 15f)
+    lineTo(79f, 27f); lineTo(-75f, 27f); lineTo(-75f, 17f)
+    lineTo(-98f, 17f); close()
+  }
+  private val cumulusUnder = Path().apply {
+    moveTo(-92f, 7f); lineTo(-66f, 7f); lineTo(-66f, 13f)
+    lineTo(78f, 13f); lineTo(78f, 23f); lineTo(61f, 23f)
+    lineTo(61f, 27f); lineTo(-75f, 27f); lineTo(-75f, 17f)
+    lineTo(-92f, 17f); close()
+  }
+  private val cumulusRim = Path().apply {
+    moveTo(-45f, -33f); lineTo(-17f, -33f); lineTo(-17f, -43f)
+    lineTo(22f, -43f); lineTo(22f, -35f); lineTo(49f, -35f)
+    lineTo(49f, -29f); lineTo(16f, -29f); lineTo(16f, -35f)
+    lineTo(-10f, -35f); lineTo(-10f, -26f); lineTo(-45f, -26f); close()
+  }
+  private val skyWisp = Path().apply {
+    moveTo(-91f, 6f); lineTo(-65f, -2f); lineTo(-49f, -2f)
+    lineTo(-41f, -11f); lineTo(-14f, -11f); lineTo(-6f, -20f)
+    lineTo(15f, -16f); lineTo(23f, -7f); lineTo(59f, -7f)
+    lineTo(84f, 2f); lineTo(98f, 5f); lineTo(68f, 11f)
+    lineTo(-75f, 11f); close()
+  }
+
   fun DrawScope.drawSanctuaryFloatingWorld(
     camX: Float,
     camY: Float,
@@ -592,29 +625,49 @@ object SanctuaryWorldRenderer {
       }
 
       drawCloudPuff(screenX, screenY, s, cloudCol, alphaScale * layerAlpha,
-        storm = weatherType == com.example.game.world.WorldWeather.STORM)
+        depth = depth, storm = weatherType == com.example.game.world.WorldWeather.STORM)
     }
   }
 
-  /** Three-tone cumulus (body, underside, rim). No per-frame Brush/Path/Bitmap. */
+  /** Far = soft bank, middle = stepped three-tone cumulus, near = narrow wind wisp.
+   * All Paths are immutable object-level art; this hot loop allocates no Brush/Path/Bitmap. */
   private fun DrawScope.drawCloudPuff(
     cx: Float,
     cy: Float,
     s: Float,
     color: Color,
     alphaScale: Float,
+    depth: Int,
     storm: Boolean,
   ) {
     val a = alphaScale
     val underside = if (storm) Color(0xFF233449) else lerp(color, Color(0xFF64748B), 0.42f)
     val rim = if (storm) Color(0xFF9FB6C9) else lerp(color, Color.White, 0.30f)
-    drawOval(color.copy(alpha = 0.70f * a), Offset(cx - 95f * s, cy - 16f * s), Size(190f * s, 44f * s))
-    drawOval(color.copy(alpha = 0.58f * a), Offset(cx - 80f * s, cy - 30f * s), Size(100f * s, 40f * s))
-    drawOval(color.copy(alpha = 0.52f * a), Offset(cx - 38f * s, cy - 46f * s), Size(95f * s, 52f * s))
-    drawOval(color.copy(alpha = 0.58f * a), Offset(cx + 22f * s, cy - 28f * s), Size(75f * s, 40f * s))
-    drawOval(underside.copy(alpha = 0.40f * a), Offset(cx - 70f * s, cy - 6f * s), Size(150f * s, 30f * s))
-    drawOval(rim.copy(alpha = 0.32f * a), Offset(cx - 62f * s, cy - 34f * s), Size(65f * s, 28f * s))
-    drawOval(rim.copy(alpha = 0.26f * a), Offset(cx + 8f * s, cy - 20f * s), Size(50f * s, 24f * s))
+    when (depth) {
+      0 -> {
+        // A low-contrast, elongated bank behind the crisper cumulus, not stacked bubbles.
+        drawOval(color.copy(alpha = 0.65f * a), Offset(cx - 100f * s, cy - 9f * s), Size(200f * s, 29f * s))
+        drawOval(color.copy(alpha = 0.43f * a), Offset(cx - 67f * s, cy - 23f * s), Size(82f * s, 32f * s))
+        drawOval(color.copy(alpha = 0.38f * a), Offset(cx + 7f * s, cy - 18f * s), Size(77f * s, 26f * s))
+        drawOval(underside.copy(alpha = 0.18f * a), Offset(cx - 65f * s, cy + 7f * s), Size(126f * s, 11f * s))
+      }
+      1 -> withTransform({
+        translate(cx, cy)
+        scale(s, s, Offset.Zero)
+      }) {
+        drawPath(cumulusBody, color.copy(alpha = 0.85f * a))
+        drawPath(cumulusUnder, underside.copy(alpha = 0.35f * a))
+        drawPath(cumulusRim, rim.copy(alpha = 0.42f * a))
+      }
+      else -> withTransform({
+        translate(cx, cy)
+        scale(s, s, Offset.Zero)
+      }) {
+        drawPath(skyWisp, color.copy(alpha = 0.59f * a))
+        drawRect(underside.copy(alpha = 0.25f * a), Offset(-65f, 6f), Size(125f, 5f))
+        drawRect(rim.copy(alpha = 0.26f * a), Offset(-19f, -13f), Size(30f, 5f))
+      }
+    }
   }
 
   private fun DrawScope.drawFloatingIslandCliffUnderside(

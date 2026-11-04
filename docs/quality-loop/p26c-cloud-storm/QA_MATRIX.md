@@ -10,7 +10,8 @@ Ngưỡng C1/C3/C4/E1–E5 vẫn là `thresholds.json` đã chốt trước vòn
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | Baseline | `f0dc0de` | P26B | Mây không thấy tại service z0.88 | — | Chưa có STORM | — | P26B | — | — | — | Ảnh BEFORE tồn tại |
 | Round 1 | `c255395` (ảnh `c466d65`) | [Render success](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41686884922), [APK success](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41686885163) | **FAIL / FAIL** | PASS | **FAIL** | PASS / culling đã đọc code | PASS/PASS | **FAIL** | PASS trên 7 cặp | PASS | **6/9 cổng tự động**, visual FAIL |
-| Round 2 | chờ SHA mới | chờ CI | CHỜ ĐO | CHỜ ĐO | CHỜ ĐO | CHỜ ĐO | CHỜ ĐO | CHỜ ĐO | CHỜ ĐO | CHỜ ĐO | KHÔNG CHẤM TRƯỚC |
+| Round 2 | `8b26848` (ảnh `b6ece51`) | [Render success](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41769520424), [APK success](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41769520387) | PASS 14.12/12.77% / **WARN oval 2/4** | PASS −7.95 | PASS −10.56 vs rain | PASS / code cull | PASS/PASS | PASS | PASS trên 7 cặp | PASS | **9/9 auto, visual WARN** |
+| Round 3 (tinh silhouette) | chờ SHA mới | chờ CI | CHỜ ĐO | CHỜ ĐO | CHỜ ĐO | CHỜ ĐO | CHỜ ĐO | CHỜ ĐO | CHỜ ĐO | CHỜ ĐO | CHẶN nếu FAIL |
 
 ## Root cause Round 1 (đo sau khi toàn bộ CI xanh)
 
@@ -34,13 +35,15 @@ Ngưỡng C1/C3/C4/E1–E5 vẫn là `thresholds.json` đã chốt trước vòn
   đã hiệu chỉnh; PR này không đổi/giấu ngưỡng legacy. Chưa chạy lại ROI gate P26B
   trên ảnh vòng 2; không tuyên bố chúng PASS.
 
-## Targeted Round 2 (đợi ảnh mới rồi mới chấm)
+## Round 2 đã đo, Round 3 là vòng tinh chỉnh cuối
 
-1. Di chuyển các neo mây vào **khe trời thật** ở trái/trên bức tường service;
-   tăng độ tương phản thể tích và giữ ba lớp, 8 neo; không giảm VFX.
-2. Điều chỉnh `skyBrightness` **chỉ với STORM**, không phủ tối toàn cảnh; phân biệt
-   cache STORM/RAIN dù lượng mưa khi chuyển tiếp cùng bucket.
-3. Tool C1 so pixel thay đổi với nguồn BEFORE có kiểm SHA/camera; E4 so trực tiếp,
-   gate không có baseline thì ghi NOT AVAILABLE. Ghi lại số đo/ảnh/CI trên SHA mới.
+1. Round 2 đã đưa neo vào **khe trời thật** của service và làm STORM tối riêng
+   sky bands: [chi tiết/số đo](ROUND_2.md). 9/9 auto PASS nhưng các mây oval
+   chồng nhau vẫn quá giống bong bóng; C2 chỉ 2/4 theo kiểm ảnh thật.
+2. Round 3 đang tinh silhouette ba lớp bằng hình dạng **khác nhau** (far bank mềm,
+   middle cumulus biên bậc thang, near wind wisp), Path khai báo cấp object;
+   giữ 8 neo và ngưỡng C1/C4. Chỉ chấm lại sau khi CI và ảnh mới tồn tại.
+3. Nếu một ngưỡng FAIL ở vòng cuối, báo BLOCKED và số đo thật; không đổi ngưỡng
+   `thresholds.json` để giấu thất bại.
 
 **Hardware**: FPS/GPU/thermal trên điện thoại = NOT TESTED. Không suy từ Robolectric.

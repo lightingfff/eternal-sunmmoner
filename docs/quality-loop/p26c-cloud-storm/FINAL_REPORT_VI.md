@@ -2,8 +2,9 @@
 
 **Nhánh** `arena/06fa6c23-eternal-sunmmoner` · **P26B baseline** `f0dc0de` ·
 **PR** [#33](https://github.com/lightingfff/eternal-sunmmoner/pull/33) OPEN, không tự merge.
-**Trạng thái trước Round 2**: CI đã xanh trên SHA `c255395`, nhưng **visual FAIL**;
-không kết luận P26C hoàn thành chỉ nhờ Gradle thành công.
+**Trạng thái trước Round 3**: Round 1 CI xanh nhưng visual FAIL; Round 2 CI xanh,
+9/9 cổng tự động PASS trên SHA `8b26848`, song hình khối mây vẫn giống các oval
+chồng nhau (**C2 visual 2/4**). Đang tinh chỉnh silhouette cuối; chưa gọi DONE.
 
 ## Phần đã có mã chạy thật
 
@@ -36,15 +37,21 @@ Chi tiết `QA_MATRIX.md`, `ROUND_1.md`, ngưỡng không đổi `thresholds.jso
 Bookmark zoom 1.48 tại khu service bị công trình che hết trời: không được gán PASS
 cho độ hiện mây; Round 2 bổ sung camera gate gameplay z1.48 có vùng trời thật.
 
-## Round 2 — thay đổi và kiểm thử chờ ảnh mới
+## Round 2 đã đo — Round 3 đang kiểm tra
 
-- Đưa neo mây vào khe trời *đang lộ trong camera gameplay*, chỉnh body/shade/rim
-  để mây đọc được khi trời nắng và giông, **không giảm số neo/VFX**.
-- STORM tối hơn ở **sky bands** (không phủ màn hình tối), khóa cache sky bands theo
-  weatherType để RAIN/STORM không dùng nhầm màu khi chuyển trạng thái.
-- `tools/p26c_measure_clouds.py` dùng đúng ảnh BEFORE; E4 không tự so với chính nó;
-  CI sẽ chạy cổng pixel sau các bài test/render/build.
-- **Chờ** CI và ảnh trên SHA mới: chưa thể gọi DONE / READY sau sửa mã.
+- [Render CI 41769520424](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41769520424),
+  [APK CI 41769520387](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41769520387)
+  **success** trên SHA `8b26848`; ảnh mới ở commit bot `b6ece51`.
+- C1 changed-sky ratio CLEAR z0.88: **14.116% sáng / 12.771% trưa** (min 5%).
+  C4 STORM−RAIN **−10.56** (max −2). E1–E5 PASS theo phạm vi cặp matched.
+  `tools/p26c_measure_clouds.py` so đúng BEFORE; **9/9 cổng tự động PASS**.
+- [ROUND_2.md](ROUND_2.md) và ảnh engine cho thấy cloud far/middle/near đều
+  giống các oval chồng nhau. C2 **visual 2/4** chưa đạt ngưỡng 3/4.
+- Round 3 giữ 8 neo nhưng làm silhouette far/mid/near khác nhau bằng các Path
+  **tạo một lần**; vẫn phải chạy CI và kiểm ảnh thật. Không hạ ngưỡng C1/C4;
+  nếu thất bại ở vòng cuối thì báo BLOCKED, không tô hồng.
+- Việc kiểm CI trên **SHA cuối cùng** (sau bot commit ảnh) vẫn chờ manual dispatch;
+  không dùng kết quả trên SHA nguồn trước đó thay cho SHA cuối.
 
 ## Ràng buộc và nợ kỹ thuật
 
