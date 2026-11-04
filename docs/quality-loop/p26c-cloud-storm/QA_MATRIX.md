@@ -11,7 +11,7 @@ Ngưỡng C1/C3/C4/E1–E5 vẫn là `thresholds.json` đã chốt trước vòn
 | Baseline | `f0dc0de` | P26B | Mây không thấy tại service z0.88 | — | Chưa có STORM | — | P26B | — | — | — | Ảnh BEFORE tồn tại |
 | Round 1 | `c255395` (ảnh `c466d65`) | [Render success](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41686884922), [APK success](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41686885163) | **FAIL / FAIL** | PASS | **FAIL** | PASS / culling đã đọc code | PASS/PASS | **FAIL** | PASS trên 7 cặp | PASS | **6/9 cổng tự động**, visual FAIL |
 | Round 2 | `8b26848` (ảnh `b6ece51`) | [Render success](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41769520424), [APK success](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41769520387) | PASS 14.12/12.77% / **WARN oval 2/4** | PASS −7.95 | PASS −10.56 vs rain | PASS / code cull | PASS/PASS | PASS | PASS trên 7 cặp | PASS | **9/9 auto, visual WARN** |
-| Round 3 (tinh silhouette) | chờ SHA mới | chờ CI | CHỜ ĐO | CHỜ ĐO | CHỜ ĐO | CHỜ ĐO | CHỜ ĐO | CHỜ ĐO | CHỜ ĐO | CHỜ ĐO | CHẶN nếu FAIL |
+| Round 3 (silhouette cuối) | `d89c73a` (ảnh `6d67edc`) | [Render success](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41770644293), [APK success](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41770644177) | PASS 10.17/9.57% / **3/4 tự chấm** | PASS −8.68 | PASS −8.94 vs rain | PASS / code cull ±300px | PASS/PASS | PASS | PASS 7 cặp | PASS | **9/9 auto + C2 3/4, owner review** |
 
 ## Root cause Round 1 (đo sau khi toàn bộ CI xanh)
 
@@ -32,18 +32,25 @@ Ngưỡng C1/C3/C4/E1–E5 vẫn là `thresholds.json` đã chốt trước vòn
   self-comparison để tuyên bố STORM PASS; STORM không có baseline P26B.
 - **C3/C5/E1/E2/E5 PASS** chỉ phản ánh cổng tương ứng; CI xanh không đồng nghĩa ảnh đẹp.
 - Legacy G1/G2 của P26B vẫn **FAIL** theo metric gốc, G1b/G2b từng PASS theo metric
-  đã hiệu chỉnh; PR này không đổi/giấu ngưỡng legacy. Chưa chạy lại ROI gate P26B
-  trên ảnh vòng 2; không tuyên bố chúng PASS.
+  đã hiệu chỉnh; PR này không đổi/giấu ngưỡng legacy. Round 3 so đúng ROI void core
+  trên P26B→P26C: noon 43.60→43.60, night CLEAR 39.15→39.15,
+  night RAIN 42.75→42.62. STORM night core 44.54 >40 nếu áp G1 tuyệt đối,
+  không có STORM P26B để nói có/không hồi quy. Không tuyên bố gate G1/G2 PASS.
 
-## Round 2 đã đo, Round 3 là vòng tinh chỉnh cuối
+## Round 3 — vòng cuối đã đối chiếu bằng PNG engine
 
-1. Round 2 đã đưa neo vào **khe trời thật** của service và làm STORM tối riêng
-   sky bands: [chi tiết/số đo](ROUND_2.md). 9/9 auto PASS nhưng các mây oval
-   chồng nhau vẫn quá giống bong bóng; C2 chỉ 2/4 theo kiểm ảnh thật.
-2. Round 3 đang tinh silhouette ba lớp bằng hình dạng **khác nhau** (far bank mềm,
-   middle cumulus biên bậc thang, near wind wisp), Path khai báo cấp object;
-   giữ 8 neo và ngưỡng C1/C4. Chỉ chấm lại sau khi CI và ảnh mới tồn tại.
-3. Nếu một ngưỡng FAIL ở vòng cuối, báo BLOCKED và số đo thật; không đổi ngưỡng
-   `thresholds.json` để giấu thất bại.
+1. Round 2 đưa neo vào **khe trời thật** của service và làm STORM tối riêng sky
+   bands: [chi tiết/số đo](ROUND_2.md). 9/9 auto PASS nhưng các oval chồng nhau
+   còn giống bong bóng; C2 chỉ 2/4 theo kiểm ảnh thật.
+2. Round 3 thay hình ba lớp (far bank, middle stepped cumulus, near wisp), 4 Path
+   khai báo cấp object; giữ 8 neo và ngưỡng C1/C4. CI + [ảnh engine](../../visual-evidence/p26c/engine-render/)
+   đã tồn tại; [ROUND_3.md](ROUND_3.md) và `roi_measurements.{json,txt}` ghi
+   9/9 auto PASS, C2 **3/4 theo tự chấm**. Far bank còn chút oval; không gán
+   mức mỹ thuật hoàn hảo hoặc lấy 9/9 thay bằng chứng thị giác.
+3. G1/G2 legacy không đổi thành PASS; night STORM void core 44.54 >40 nếu áp
+   ngưỡng tuyệt đối. Không có BEFORE STORM. Gate art/halo thuộc review riêng;
+   không lén sửa gate hoặc tuyên bố full-game DONE.
+4. PR #33 giữ OPEN cho owner; không thêm vòng tinh chỉnh thứ 4. Verify cuối trên
+   đúng SHA báo cáo/bot bằng workflow dispatch, không đẩy bot evidence mới.
 
 **Hardware**: FPS/GPU/thermal trên điện thoại = NOT TESTED. Không suy từ Robolectric.

@@ -1,10 +1,12 @@
-# P26C — báo cáo tích hợp PR #33 (đang QA, chưa merge)
+# P26C — báo cáo tích hợp PR #33 (vòng QA 3/3 đã đo, chờ owner review)
 
 **Nhánh** `arena/06fa6c23-eternal-sunmmoner` · **P26B baseline** `f0dc0de` ·
 **PR** [#33](https://github.com/lightingfff/eternal-sunmmoner/pull/33) OPEN, không tự merge.
-**Trạng thái trước Round 3**: Round 1 CI xanh nhưng visual FAIL; Round 2 CI xanh,
-9/9 cổng tự động PASS trên SHA `8b26848`, song hình khối mây vẫn giống các oval
-chồng nhau (**C2 visual 2/4**). Đang tinh chỉnh silhouette cuối; chưa gọi DONE.
+**Kết luận phạm vi P26C**: Round 1 visual FAIL; Round 2 9/9 automated PASS
+nhưng C2 visual 2/4; Round 3 trên code `d89c73a` + ảnh bot `6d67edc` **9/9
+cổng tự động PASS, C2 3/4 theo tự đánh giá trực tiếp trên PNG 1280×720**.
+Chuyển PR cho owner review; **không** coi G1/G2 gate legacy, P27 UI hoặc hiệu năng
+thiết bị đã hoàn tất. Không còn vòng tinh chỉnh thứ 4.
 
 ## Phần đã có mã chạy thật
 
@@ -37,21 +39,34 @@ Chi tiết `QA_MATRIX.md`, `ROUND_1.md`, ngưỡng không đổi `thresholds.jso
 Bookmark zoom 1.48 tại khu service bị công trình che hết trời: không được gán PASS
 cho độ hiện mây; Round 2 bổ sung camera gate gameplay z1.48 có vùng trời thật.
 
-## Round 2 đã đo — Round 3 đang kiểm tra
+## Round 2 → Round 3: đối chiếu engine thật theo cùng camera
 
-- [Render CI 41769520424](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41769520424),
-  [APK CI 41769520387](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41769520387)
-  **success** trên SHA `8b26848`; ảnh mới ở commit bot `b6ece51`.
-- C1 changed-sky ratio CLEAR z0.88: **14.116% sáng / 12.771% trưa** (min 5%).
-  C4 STORM−RAIN **−10.56** (max −2). E1–E5 PASS theo phạm vi cặp matched.
-  `tools/p26c_measure_clouds.py` so đúng BEFORE; **9/9 cổng tự động PASS**.
-- [ROUND_2.md](ROUND_2.md) và ảnh engine cho thấy cloud far/middle/near đều
-  giống các oval chồng nhau. C2 **visual 2/4** chưa đạt ngưỡng 3/4.
-- Round 3 giữ 8 neo nhưng làm silhouette far/mid/near khác nhau bằng các Path
-  **tạo một lần**; vẫn phải chạy CI và kiểm ảnh thật. Không hạ ngưỡng C1/C4;
-  nếu thất bại ở vòng cuối thì báo BLOCKED, không tô hồng.
-- Việc kiểm CI trên **SHA cuối cùng** (sau bot commit ảnh) vẫn chờ manual dispatch;
-  không dùng kết quả trên SHA nguồn trước đó thay cho SHA cuối.
+- Round 2 [render 41769520424](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41769520424)
+  + [APK 41769520387](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41769520387)
+  success trên SHA `8b26848`, ảnh bot `b6ece51`: C1 **14.116% / 12.771%**,
+  C4 storm−rain **−10.56**, 9/9 automated PASS nhưng C2 mây oval **2/4**.
+  [ROUND_2.md](ROUND_2.md) ghi rõ lỗi hình thật, không dùng CI để tự nhận đẹp.
+- Round 3 [render CI 41770644293](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41770644293)
+  + [APK CI 41770644177](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41770644177)
+  **SUCCESS trên source `d89c73a`**, qua compile → P26C tests/render → P17–P26
+  regressions → assembleDebug → pixel gate. Commit bot `6d67edc` lưu
+  [18 ảnh engine 1280×720](../../visual-evidence/p26c/engine-render/) và
+  [camera props](../../visual-evidence/p26c/camera_props.json).
+- [ROUND_3.md](ROUND_3.md) / [số đo JSON](roi_measurements.json): C1 CLEAR
+  **10.170% / 9.573%** so BEFORE P26B; C3 **−8.68**; C4 storm−rain **−8.94**;
+  E1–E5 PASS; E4 world max abs **0.005%** trên 7 cặp matched, không có BEFORE
+  STORM. **9/9 cổng số PASS**; tự đánh giá C2 **3/4**: far bank, stepped cumulus,
+  near wisp nhận dạng riêng. Vẫn còn far bank hơi oval, service sky wedge hẹp;
+  gate z1.48 có sky là bookmark hợp lệ, service z1.48 không thấy trời là đối chứng.
+- Same camera/timeSec=0 render 2 lần byte-identical; ô trời t0→t4/t8 có
+  **19.95% / 32.20%** pixel đổi >8 (bằng chứng motion ảnh, không phải FPS).
+- Gate void core BEFORE P26B→AFTER P26C: noon **43.60→43.60**, night CLEAR
+  **39.15→39.15**, night RAIN **42.75→42.62**. Night STORM core **44.54**
+  >40 nếu áp G1 tuyệt đối; P26B không có STORM để nói hồi quy. G1/G2 legacy
+  vẫn FAIL; không tuyên bố gate contract PASS hoặc đổi ROI sau khi biết kết quả.
+- **CI trên SHA cuối cùng sau commit tài liệu** sẽ xác minh bằng dispatch riêng;
+  các run phía trên là source `d89c73a`, không được gán cho SHA bot/cuối khi
+  chưa chạy. Kết quả chính xác/URL run cuối được ghi lúc bàn giao.
 
 ## Ràng buộc và nợ kỹ thuật
 
