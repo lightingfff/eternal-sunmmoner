@@ -5,29 +5,48 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import kotlin.math.*
 
-enum class WorldWeather { CLEAR, CLOUDY, RAIN, FOG }
+enum class WorldWeather { CLEAR, CLOUDY, RAIN, STORM, FOG }
 class WorldClock(val originMillis: Long, val dayDurationMillis: Long = DEFAULT_DAY_MILLIS) {
   init { require(dayDurationMillis > 0) }
   fun hour(nowMillis: Long): Float = Math.floorMod(nowMillis - originMillis, dayDurationMillis).toFloat() / dayDurationMillis * 24f
   companion object { const val DEFAULT_DAY_MILLIS = 24L * 60 * 1000 }
 }
-data class WeatherState(val rain: Float = 0f, val fog: Float = 0f, val cloud: Float = 0f) {
+data class WeatherState(
+  val rain: Float = 0f,
+  val fog: Float = 0f,
+  val cloud: Float = 0f,
+  val weatherType: WorldWeather = WorldWeather.CLEAR,
+) {
   companion object {
-    fun blend(a: WorldWeather,b: WorldWeather,t: Float): WeatherState {
-      val k=t.coerceIn(0f,1f).let { it*it*(3-2*it) }
-      fun cloudOf(w: WorldWeather): Float = when(w) { WorldWeather.CLEAR -> 0f; WorldWeather.CLOUDY, WorldWeather.RAIN -> 1f; WorldWeather.FOG -> .5f }
+    fun blend(a: WorldWeather, b: WorldWeather, t: Float): WeatherState {
+      val k = t.coerceIn(0f, 1f).let { it * it * (3 - 2 * it) }
+      fun cloudOf(w: WorldWeather): Float = when (w) {
+        WorldWeather.CLEAR -> 0f
+        WorldWeather.CLOUDY, WorldWeather.RAIN, WorldWeather.STORM -> 1f
+        WorldWeather.FOG -> 0.5f
+      }
+      fun rainOf(w: WorldWeather): Float = when (w) {
+        WorldWeather.RAIN -> 1f
+        WorldWeather.STORM -> 0.7f // giông có mưa nhưng không liệt tục như mưa thường
+        else -> 0f
+      }
+      // weatherType theo trạng thái đích (b) khi vượt nửa chu kỳ chuyển đổi
+      val type = if (k >= 0.5f) b else a
       return WeatherState(
-        (if(a==WorldWeather.RAIN) 1f-k else 0f)+(if(b==WorldWeather.RAIN) k else 0f),
-        (if(a==WorldWeather.FOG) 1f-k else 0f)+(if(b==WorldWeather.FOG) k else 0f),
-        (cloudOf(a)*(1f-k))+(cloudOf(b)*k),
+        (rainOf(a) * (1f - k)) + (rainOf(b) * k),
+        (if (a == WorldWeather.FOG) 1f - k else 0f) + (if (b == WorldWeather.FOG) k else 0f),
+        (cloudOf(a) * (1f - k)) + (cloudOf(b) * k),
+        type,
       )
     }
+
     fun at(elapsedMillis: Long): WeatherState {
-      val slot=Math.floorDiv(elapsedMillis,240000L)
-      // P26: cloudy days join the rotation so the world reads as alive, not always clear.
-      val schedule=arrayOf(WorldWeather.CLEAR,WorldWeather.CLOUDY,WorldWeather.RAIN,WorldWeather.CLEAR,WorldWeather.FOG)
-      val a=schedule[Math.floorMod(slot-1,5L).toInt()]; val b=schedule[Math.floorMod(slot,5L).toInt()]
-      return blend(a,b,Math.floorMod(elapsedMillis,240000L)/30000f)
+      val slot = Math.floorDiv(elapsedMillis, 240000L)
+      // P26C: thêm STORM vào chu kỳ thời tiết để world đọc được trạng thái giông bão.
+      val schedule = arrayOf(WorldWeather.CLEAR, WorldWeather.CLOUDY, WorldWeather.RAIN, WorldWeather.STORM, WorldWeather.CLEAR, WorldWeather.FOG)
+      val a = schedule[Math.floorMod(slot - 1, 6L).toInt()]
+      val b = schedule[Math.floorMod(slot, 6L).toInt()]
+      return blend(a, b, Math.floorMod(elapsedMillis, 240000L) / 30000f)
     }
   }
 }
@@ -67,15 +86,18 @@ data class WorldLighting(
 ) {
   /** Weather multipliers: mood must change with weather, not just particle counts. */
   fun withWeather(state: WeatherState): WorldLighting = copy(
-    ambientIntensity = ambientIntensity * (1f - 0.08f * state.cloud - 0.10f * state.rain - 0.02f * state.fog),
-    shadowStrength = shadowStrength * (1f - 0.20f * state.rain - 0.15f * state.fog),
-    sunIntensity = sunIntensity * (1f - 0.45f * state.cloud - 0.65f * state.rain),
-    cloudDensity = cloudDensity * (1f + 0.50f * state.cloud + 0.60f * state.rain + 0.10f * state.fog),
-    cloudBrightness = cloudBrightness * (1f - 0.05f * state.cloud - 0.20f * state.rain),
-    rayAlpha = rayAlpha * (1f - 0.55f * state.cloud - 0.80f * state.rain),
-    skyBrightness = skyBrightness * (1f - 0.15f * state.cloud - 0.22f * state.rain - 0.05f * state.fog),
-    hazeDensity = hazeDensity * (1f + 1.00f * state.fog + 0.50f * state.rain),
-    localLightIntensity = localLightIntensity * (1f + 0.15f * state.rain + 0.05f * state.fog),
+    ambientIntensity = ambientIntensity * (1f - 0.08f * state.cloud - 0.10f * state.rain - 0.02f * state.fog - (if (state.weatherType == WorldWeather.STORM) 0.10f else 0f)),
+    shadowStrength = shadowStrength * (1f - 0.20f * state.rain - 0.15f * state.fog - (if (state.weatherType == WorldWeather.STORM) 0.15f else 0f)),
+    sunIntensity = sunIntensity * (1f - 0.45f * state.cloud - 0.65f * state.rain - (if (state.weatherType == WorldWeather.STORM) 0.25f else 0f)),
+    cloudDensity = cloudDensity * (1f + 0.50f * state.cloud + 0.60f * state.rain + 0.10f * state.fog + (if (state.weatherType == WorldWeather.STORM) 0.30f else 0f)),
+    cloudBrightness = cloudBrightness * (1f - 0.05f * state.cloud - 0.20f * state.rain - (if (state.weatherType == WorldWeather.STORM) 0.15f else 0f)),
+    rayAlpha = rayAlpha * (1f - 0.55f * state.cloud - 0.80f * state.rain - (if (state.weatherType == WorldWeather.STORM) 0.40f else 0f)),
+    // Darken the storm SKY itself, not the whole world with a fake fullscreen overlay.
+    // RAIN's denser precipitation dims the scene; STORM must still read darker in the sky.
+    skyBrightness = skyBrightness * (1f - 0.15f * state.cloud - 0.22f * state.rain - 0.05f * state.fog - (if (state.weatherType == WorldWeather.STORM) 0.30f else 0f)).coerceAtLeast(0f),
+    hazeDensity = hazeDensity * (1f + 1.00f * state.fog + 0.50f * state.rain + (if (state.weatherType == WorldWeather.STORM) 0.80f else 0f)),
+    localLightIntensity = localLightIntensity * (1f + 0.15f * state.rain + 0.05f * state.fog + (if (state.weatherType == WorldWeather.STORM) 0.20f else 0f)),
+    cloudColor = if (state.weatherType == WorldWeather.STORM) Color(0xff4A5568) else cloudColor,
   )
   companion object {
     // Anchor hours: deep night -> dawn -> morning -> noon -> evening -> night -> deep night

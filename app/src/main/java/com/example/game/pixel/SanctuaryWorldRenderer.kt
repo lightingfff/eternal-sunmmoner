@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
@@ -40,6 +41,57 @@ object SanctuaryWorldRenderer {
    * 40 px tall at the 0.88 default camera), so the sharp art seen up close is untouched.
    */
   private const val GRASS_BLOCK_MIN_TILE_SCREEN_PX = 25
+
+  // P26C: screen-space anchors, kept at object level (no per-frame list allocation).
+  // Gameplay camera (960, 860, 0.88) shows sky only above/left of the fortress wall;
+  // anchors MUST intersect that real visible wedge, not just the centre of the framebuffer.
+  private data class CloudAnchor(val x: Float, val y: Float, val scale: Float, val parallax: Float, val depth: Int)
+  private val cloudSpecs = listOf(
+    // Far bank: small, slow shapes behind the fortress silhouette.
+    CloudAnchor(-565f, 36f, 0.95f, 0.12f, 0),
+    CloudAnchor(-355f, 20f, 1.00f, 0.18f, 0),
+    CloudAnchor(760f, 70f, 0.95f, 0.10f, 0),
+    // Middle cumulus: readable volume inside the open sky at gameplay zoom.
+    CloudAnchor(-495f, 87f, 1.15f, 0.42f, 1),
+    CloudAnchor(-345f, 65f, 0.93f, 0.48f, 1),
+    CloudAnchor(540f, 115f, 1.08f, 0.38f, 1),
+    // Foreground wisps: smaller/faster, masked naturally by walls and buildings.
+    CloudAnchor(-495f, 140f, 0.80f, 0.60f, 2),
+    CloudAnchor(700f, 180f, 0.70f, 0.55f, 2),
+  )
+
+  // Authored cloud contours. Unlike per-frame Path()s, these are built ONCE and reused
+  // under a transform. Stepped edges echo the Sanctuary's pixel-art silhouettes.
+  private val cumulusBody = Path().apply {
+    moveTo(-98f, 14f); lineTo(-98f, -2f); lineTo(-80f, -2f)
+    lineTo(-80f, -15f); lineTo(-61f, -15f); lineTo(-61f, -24f)
+    lineTo(-45f, -24f); lineTo(-45f, -33f); lineTo(-17f, -33f)
+    lineTo(-17f, -43f); lineTo(22f, -43f); lineTo(22f, -35f)
+    lineTo(49f, -35f); lineTo(49f, -23f); lineTo(71f, -23f)
+    lineTo(71f, -12f); lineTo(90f, -12f); lineTo(90f, 2f)
+    lineTo(100f, 2f); lineTo(100f, 15f); lineTo(79f, 15f)
+    lineTo(79f, 27f); lineTo(-75f, 27f); lineTo(-75f, 17f)
+    lineTo(-98f, 17f); close()
+  }
+  private val cumulusUnder = Path().apply {
+    moveTo(-92f, 7f); lineTo(-66f, 7f); lineTo(-66f, 13f)
+    lineTo(78f, 13f); lineTo(78f, 23f); lineTo(61f, 23f)
+    lineTo(61f, 27f); lineTo(-75f, 27f); lineTo(-75f, 17f)
+    lineTo(-92f, 17f); close()
+  }
+  private val cumulusRim = Path().apply {
+    moveTo(-45f, -33f); lineTo(-17f, -33f); lineTo(-17f, -43f)
+    lineTo(22f, -43f); lineTo(22f, -35f); lineTo(49f, -35f)
+    lineTo(49f, -29f); lineTo(16f, -29f); lineTo(16f, -35f)
+    lineTo(-10f, -35f); lineTo(-10f, -26f); lineTo(-45f, -26f); close()
+  }
+  private val skyWisp = Path().apply {
+    moveTo(-91f, 6f); lineTo(-65f, -2f); lineTo(-49f, -2f)
+    lineTo(-41f, -11f); lineTo(-14f, -11f); lineTo(-6f, -20f)
+    lineTo(15f, -16f); lineTo(23f, -7f); lineTo(59f, -7f)
+    lineTo(84f, 2f); lineTo(98f, 5f); lineTo(68f, 11f)
+    lineTo(-75f, 11f); close()
+  }
 
   fun DrawScope.drawSanctuaryFloatingWorld(
     camX: Float,
@@ -421,7 +473,16 @@ object SanctuaryWorldRenderer {
     val rb = ((weather.rain * 3f).roundToInt().coerceIn(0, 3)).toLong()
     val cb = ((weather.cloud * 3f).roundToInt().coerceIn(0, 3)).toLong()
     val fb = ((weather.fog * 3f).roundToInt().coerceIn(0, 3)).toLong()
-    val key = hb * 64L + rb * 16L + cb * 4L + fb
+    // STORM and RAIN can quantise to the same rain/cloud buckets during a transition.
+    // Keep their different sky brightness out of one another's cache entries.
+    val weatherKey = when (weather.weatherType) {
+      com.example.game.world.WorldWeather.CLEAR -> 0L
+      com.example.game.world.WorldWeather.CLOUDY -> 1L
+      com.example.game.world.WorldWeather.RAIN -> 2L
+      com.example.game.world.WorldWeather.STORM -> 3L
+      com.example.game.world.WorldWeather.FOG -> 4L
+    }
+    val key = (hb * 64L + rb * 16L + cb * 4L + fb) * 8L + weatherKey
     val cached = skyBandCache[key]
     if (cached != null) return cached
     val lighting = com.example.game.world.WorldLighting.at(hour).withWeather(weather)
@@ -511,31 +572,100 @@ object SanctuaryWorldRenderer {
     zoom: Float,
     timeSec: Float,
   ) {
-    val cloudSpecs = listOf(
-      Triple(-120f, 260f, 1.25f),
-      Triple(160f, 1650f, 1.35f),
-      Triple(2980f, 420f, 1.20f),
-      Triple(3080f, 1520f, 1.45f),
-      Triple(420f, 2580f, 1.30f),
-      Triple(2780f, 2560f, 1.35f),
-    )
-    // P26: cloud colour and character answer the time of day and weather (white noon
-    // clouds, warm sunset bands, thin dark night cloud, denser cover when it rains).
     val lighting = com.example.game.world.WorldEnvironment.lighting
-    val cloudCol = lighting.cloudColor
-    val alphaScale = (lighting.cloudDensity * lighting.cloudBrightness).coerceIn(0f, 1f)
+    val weather = com.example.game.world.WorldEnvironment.weather
+    val baseCloudCol = lighting.cloudColor
+
+    // P26C: mây nằm trong layer bầu trời (screen-space, vùng trên cùng của khung), có parallax nhẹ
+    // theo camera world. Không đặt mây ở world Y cố định ngoài vùng nhìn rồi chụp camera riêng.
+    // Cloud cover theo thời tiết: CLEAR < CLOUDY < RAIN < STORM.
+    val weatherType = weather.weatherType
+    val cloudCover = when (weatherType) {
+      com.example.game.world.WorldWeather.CLEAR -> 0.30f
+      com.example.game.world.WorldWeather.CLOUDY -> 0.70f
+      com.example.game.world.WorldWeather.RAIN -> 0.85f
+      com.example.game.world.WorldWeather.STORM -> 1.00f
+      else -> 0.30f
+    }
+    // STORM: mây tối hơn (màu xám-than), các thời tiết khác giữ cloudColor từ lighting model.
+    val cloudCol = if (weatherType == com.example.game.world.WorldWeather.STORM) {
+      Color(0xff4A5568)
+    } else {
+      baseCloudCol
+    }
+    // The original CLEAR value (~0.135) disappeared against the sky after compositing.
+    // Keep the sparse CLEAR bank legible; weather still increases density/opacity.
+    val alphaScale = (0.28f + lighting.cloudDensity * lighting.cloudBrightness * cloudCover * 0.95f).coerceIn(0f, 1f)
+
     val halfW = size.width / 2f
-    val halfH = size.height / 2f
-    cloudSpecs.forEachIndexed { idx, (wx, wy, cScale) ->
-      val drift = sin(timeSec * 0.22f + idx * 1.4f) * 28f
-      val cx = ObliqueCamera.worldToScreenX(wx + drift, camX, zoom, halfW)
-      val cy = ObliqueCamera.worldToScreenY(wy, camY, zoom, halfH)
-      val s = zoom * cScale
-      if (cx in -320f..(size.width + 320f) && cy in -220f..(size.height + 220f)) {
-        drawOval(cloudCol.copy(alpha = 0.45f * alphaScale), Offset(cx - 120f * s, cy - 18f * s), Size(240f * s, 54f * s))
-        drawOval(cloudCol.copy(alpha = 0.38f * alphaScale), Offset(cx - 108f * s, cy - 34f * s), Size(110f * s, 52f * s))
-        drawOval(cloudCol.copy(alpha = 0.32f * alphaScale), Offset(cx - 46f * s, cy - 52f * s), Size(118f * s, 64f * s))
-        drawOval(cloudCol.copy(alpha = 0.38f * alphaScale), Offset(cx + 28f * s, cy - 32f * s), Size(92f * s, 48f * s))
+    // Parallax nhẹ: mây di chuyển theo camera nhưng chậm hơn đảo (0.15f hệ số).
+    val parallaxX = camX * 0.15f
+
+    // cloudSpecs là hằng số cấp object-level (đ khai báo một lần, không cấp phát mỗi frame).
+    cloudSpecs.forEachIndexed { idx, anchor ->
+      val cx = anchor.x
+      val cy = anchor.y
+      val scale = anchor.scale
+      val parallax = anchor.parallax
+      val depth = anchor.depth
+      // Drift deterministic: sin(timeSec) với chu kỳ khác nhau theo layer, không giật khi zoom/quay lại.
+      val drift = sin(timeSec * (0.12f + depth * 0.06f) + idx * 2.1f) * (35f + depth * 12f)
+      // Parallax X: camera di chuyển làm mây dịch nhẹ ngược hướng.
+      val screenX = halfW + cx - parallaxX * parallax + drift
+      val screenY = cy
+      val s = zoom * scale
+
+      // Cull: không vẽ mây hoàn toàn ngoài màn hình (dành margin để mây vào khung mượt).
+      if (screenX !in -300f..(size.width + 300f) || screenY !in -120f..(size.height * 0.72f)) return@forEachIndexed
+
+      val layerAlpha = when (depth) {
+        0 -> 0.68f // far bank
+        1 -> 0.92f // middle volume
+        else -> 0.70f // foreground wisps
+      }
+
+      drawCloudPuff(screenX, screenY, s, cloudCol, alphaScale * layerAlpha,
+        depth = depth, storm = weatherType == com.example.game.world.WorldWeather.STORM)
+    }
+  }
+
+  /** Far = soft bank, middle = stepped three-tone cumulus, near = narrow wind wisp.
+   * All Paths are immutable object-level art; this hot loop allocates no Brush/Path/Bitmap. */
+  private fun DrawScope.drawCloudPuff(
+    cx: Float,
+    cy: Float,
+    s: Float,
+    color: Color,
+    alphaScale: Float,
+    depth: Int,
+    storm: Boolean,
+  ) {
+    val a = alphaScale
+    val underside = if (storm) Color(0xFF233449) else lerp(color, Color(0xFF64748B), 0.42f)
+    val rim = if (storm) Color(0xFF9FB6C9) else lerp(color, Color.White, 0.30f)
+    when (depth) {
+      0 -> {
+        // A low-contrast, elongated bank behind the crisper cumulus, not stacked bubbles.
+        drawOval(color.copy(alpha = 0.65f * a), Offset(cx - 100f * s, cy - 9f * s), Size(200f * s, 29f * s))
+        drawOval(color.copy(alpha = 0.43f * a), Offset(cx - 67f * s, cy - 23f * s), Size(82f * s, 32f * s))
+        drawOval(color.copy(alpha = 0.38f * a), Offset(cx + 7f * s, cy - 18f * s), Size(77f * s, 26f * s))
+        drawOval(underside.copy(alpha = 0.18f * a), Offset(cx - 65f * s, cy + 7f * s), Size(126f * s, 11f * s))
+      }
+      1 -> withTransform({
+        translate(cx, cy)
+        scale(s, s, Offset.Zero)
+      }) {
+        drawPath(cumulusBody, color.copy(alpha = 0.85f * a))
+        drawPath(cumulusUnder, underside.copy(alpha = 0.35f * a))
+        drawPath(cumulusRim, rim.copy(alpha = 0.42f * a))
+      }
+      else -> withTransform({
+        translate(cx, cy)
+        scale(s, s, Offset.Zero)
+      }) {
+        drawPath(skyWisp, color.copy(alpha = 0.59f * a))
+        drawRect(underside.copy(alpha = 0.25f * a), Offset(-65f, 6f), Size(125f, 5f))
+        drawRect(rim.copy(alpha = 0.26f * a), Offset(-19f, -13f), Size(30f, 5f))
       }
     }
   }

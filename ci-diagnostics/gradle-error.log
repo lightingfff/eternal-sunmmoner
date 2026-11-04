@@ -2,40 +2,40 @@
 Calculating task graph as no cached configuration is available for tasks: :app:compileDebugKotlin
 > Task :app:preBuild UP-TO-DATE
 > Task :app:preDebugBuild UP-TO-DATE
-> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:processDebugGoogleServices UP-TO-DATE
 > Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
 > Task :app:generateDebugResources UP-TO-DATE
 > Task :app:kspDebugKotlin SKIPPED
-> Task :app:processDebugGoogleServices UP-TO-DATE
 > Task :app:packageDebugResources UP-TO-DATE
 > Task :app:parseDebugLocalResources UP-TO-DATE
 > Task :app:generateDebugRFile UP-TO-DATE
 > Task :app:compileDebugKotlin UP-TO-DATE
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_21-1793712900970.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_23-1793722671945.json
 
-BUILD SUCCESSFUL in 2s
+BUILD SUCCESSFUL in 4s
 8 actionable tasks: 8 up-to-date
 Configuration cache entry stored.
 ### :app:compileDebugUnitTestKotlin
 Calculating task graph as no cached configuration is available for tasks: :app:compileDebugUnitTestKotlin
 > Task :app:preBuild UP-TO-DATE
-> Task :app:preDebugUnitTestBuild UP-TO-DATE
 > Task :app:preDebugBuild UP-TO-DATE
-> Task :app:generateDebugBuildConfig UP-TO-DATE
-> Task :app:kspDebugKotlin SKIPPED
 > Task :app:processDebugGoogleServices UP-TO-DATE
-> Task :app:javaPreCompileDebug UP-TO-DATE
-> Task :app:mapDebugSourceSetPaths UP-TO-DATE
 > Task :app:generateDebugResources UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:kspDebugKotlin SKIPPED
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
 > Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
 > Task :app:processDebugNavigationResources UP-TO-DATE
-> Task :app:packageDebugResources UP-TO-DATE
-> Task :app:compileDebugNavigationResources UP-TO-DATE
-> Task :app:checkDebugAarMetadata UP-TO-DATE
 > Task :app:extractDeepLinksDebug UP-TO-DATE
 > Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
 > Task :app:generateDebugRFile UP-TO-DATE
 > Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
 > Task :app:processDebugMainManifest UP-TO-DATE
 > Task :app:processDebugManifest UP-TO-DATE
 > Task :app:processDebugManifestForPackage UP-TO-DATE
@@ -46,8 +46,9 @@ Calculating task graph as no cached configuration is available for tasks: :app:c
 > Task :app:kspDebugUnitTestKotlin SKIPPED
 
 > Task :app:compileDebugUnitTestKotlin FAILED
-e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/ui/P26UiShellTest.kt:167:43 Unresolved reference 'FantasyManagement'.
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_21-1793712903666.json
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormRenderTest.kt:40:2 Unresolved reference 'GraphicsMode'.
+e: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/test/java/com/example/P26CCloudStormRenderTest.kt:40:15 Unresolved reference 'GraphicsMode'.
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_23-1793722676551.json
 
 FAILURE: Build failed with an exception.
 
@@ -62,6 +63,6 @@ Execution failed for task ':app:compileDebugUnitTestKotlin'.
 > Run with --scan to get full insights from a Build Scan (powered by Develocity).
 > Get more help at https://help.gradle.org.
 
-BUILD FAILED in 14s
+BUILD FAILED in 21s
 22 actionable tasks: 1 executed, 21 up-to-date
 Configuration cache entry stored.

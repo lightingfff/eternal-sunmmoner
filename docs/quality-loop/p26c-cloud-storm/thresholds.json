@@ -1,0 +1,65 @@
+{
+  "comment": "P26C precommitted thresholds — measured on 1280x720 PNGs, mean luminance Rec.709 (0..255). Sky band = top 25% of frame. All thresholds fixed BEFORE the candidate render and not softened afterwards.",
+  "frames": {
+    "service_z088": { "camX": 960.0, "camY": 860.0, "zoom": 0.88 },
+    "gate_z148": { "camX": 1960.0, "camY": 310.0, "zoom": 1.48 },
+    "overview_z036": { "camX": 1600.0, "camY": 1380.0, "zoom": 0.36 },
+    "bookmark_z100": { "camX": 960.0, "camY": 860.0, "zoom": 1.00 },
+    "bookmark_z148": { "camX": 960.0, "camY": 860.0, "zoom": 1.48 }
+  },
+  "sky_band_top_fraction": 0.25,
+  "environment": {
+    "sky_distinctness": {
+      "morning_minus_noon_abs_ge": 8.0,
+      "noon_minus_evening_abs_ge": 6.0,
+      "evening_minus_night_abs_ge": 8.0,
+      "noon_minus_night_abs_ge": 18.0
+    },
+    "noon_brightest": {
+      "noon_sky_ge_morning_sky": true,
+      "noon_frame_mean_minus_night_frame_mean_ge": 5.0
+    },
+    "weather_mood_noon_service": {
+      "cloudy_sky_le_clear_minus": 5.0,
+      "rain_sky_le_clear_minus": 8.0,
+      "storm_sky_le_clear_minus": 12.0,
+      "storm_darker_than_rain": true
+    },
+    "no_flood_same_hour": {
+      "max_abs_delta_mean_lt_percent": 8.0
+    },
+    "determinism": {
+      "byte_identical_at_time0": true,
+      "cached_mask_count_eq": 7
+    }
+  },
+  "clouds": {
+    "visible_cloud_in_sky_band": {
+      "comment": "C1: Mây phải có mặt trong vùng bầu trời (sky band, top 25%) tại khung gameplay z0.88. Đo bằng phần pixels trong sky band có độ sáng khác biệt rõ với màu nền trời (cloud presence ratio).",
+      "min_cloud_presence_ratio": 0.05
+    },
+    "cloudy_denser_than_clear": {
+      "comment": "C3: CLOUDY sky band mean <= CLEAR sky band minus 3.0 (mây dày hơn làm trời tối hơn).",
+      "cloudy_sky_le_clear_minus": 3.0
+    },
+    "storm_cloud_character": {
+      "comment": "C4: STORM sky band mean <= CLEAR sky band minus 12.0, và STORM <= RAIN minus 2.0 (giông tối/u ám hơn mưa thường).",
+      "storm_sky_le_clear_minus": 12.0,
+      "storm_sky_le_rain_minus": 2.0
+    },
+    "deterministic_drift": {
+      "comment": "C5: Cùng camera/hour/weather, timeSec 0 render 2 lần byte-identical.",
+      "byte_identical_at_time0": true
+    },
+    "cull_offscreen": {
+      "comment": "C6: Cloud hoàn toàn off-screen không được vẽ (kiểm tra qua code review + render không có artifact mây ngoài vùng bầu trời).",
+      "code_review_required": true
+    }
+  },
+  "gate": {
+    "rift_roi_mean_le": 40.0,
+    "rift_before_after_abs_delta_mean_le": 4.0,
+    "night_halo_ge_noon_halo": true,
+    "halo_region_mean_le": 150.0
+  }
+}

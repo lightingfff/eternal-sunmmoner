@@ -26,6 +26,8 @@ on:
       - 'app/src/test/java/com/example/HdrLightingRenderTest.kt'
       - 'app/src/test/java/com/example/P26SkyRenderTest.kt'
       - 'app/src/test/java/com/example/P26SkyContractTest.kt'
+      - 'app/src/test/java/com/example/P26CCloudStormContractTest.kt'
+      - 'app/src/test/java/com/example/P26CCloudStormRenderTest.kt'
       - 'app/src/test/java/com/example/ui/P26UiShellTest.kt'
       - 'app/src/main/java/com/example/game/world/WorldEnvironment.kt'
       - 'app/src/main/java/com/example/game/pixel/SanctuaryWorldRenderer.kt'
@@ -37,8 +39,10 @@ on:
       - 'tools/p25_face_grammar.py'
       - 'tools/p25_validate_faces.py'
       - 'tools/p26_measure_sky.py'
+      - 'tools/p26c_measure_clouds.py'
       - 'docs/quality-loop/p25-architecture-volume/**'
       - 'docs/quality-loop/p26-environment-hub/**'
+      - 'docs/quality-loop/p26c-cloud-storm/**'
       - 'docs/visual-evidence/p25/**'
       - 'docs/visual-evidence/p26/**'
       - '.github/workflows/lyra-render-evidence.yml'
@@ -55,7 +59,8 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref || github.ref_name }}
+          # Pin tests to the triggering SHA even if the render bot updates the PR meanwhile.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Set up Java 21
         uses: actions/setup-java@v5
@@ -89,6 +94,17 @@ jobs:
               <string name="default_web_client_id" translatable="false">debug-placeholder.apps.googleusercontent.com</string>
           </resources>
           EOF
+
+      # Sequence required for PR #33: compile -> targeted contract -> targeted render
+      # -> complete render/contract regression below -> assembleDebug.
+      - name: Compile all debug unit tests (P26C included)
+        run: gradle :app:compileDebugUnitTestKotlin --stacktrace
+
+      - name: Verify P26C cloud/storm contract
+        run: gradle :app:testDebugUnitTest --tests "com.example.P26CCloudStormContractTest" --stacktrace
+
+      - name: Render P26C cloud and storm matrix (real draw code, Robolectric native graphics)
+        run: gradle :app:testDebugUnitTest --tests "com.example.P26CCloudStormRenderTest" --stacktrace
 
       - name: Render Lyra (real draw code, Robolectric native graphics)
         run: gradle :app:testDebugUnitTest --tests "com.example.LyraEngineRenderTest" --stacktrace
@@ -168,9 +184,24 @@ jobs:
       - name: Render terrain slice (real draw code, Robolectric native graphics)
         run: gradle :app:testDebugUnitTest --tests "com.example.MapForgeTerrainRenderTest" --stacktrace
 
+      - name: Assemble debug APK after the complete render and contract regression
+        run: |
+          # The build workflow provides the downloadable, signature-preserving APK;
+          # this job independently verifies assembleDebug *after* all tests passed.
+          if [ ! -f debug.keystore ]; then
+            keytool -genkeypair -noprompt -keystore debug.keystore -storepass android \
+              -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 \
+              -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+          gradle :app:assembleDebug --stacktrace
+          test -s app/build/outputs/apk/debug/app-debug.apk
+
       # The PNGs are also committed so reviewers (and the agent) can open them straight from
       # the branch; the artifact below is the same bytes for offline download.
       - name: Publish render PNGs into the branch
+        # A manual dispatch verifies the *final* evidence commit without pushing
+        # another bot commit that would move the SHA under review.
+        if: github.event_name == 'pull_request'
         run: |
           set -euo pipefail
           mkdir -p docs/visual-evidence/p17c/engine-render
@@ -210,6 +241,10 @@ jobs:
           mkdir -p docs/visual-evidence/p26/engine-render
           cp -f app/build/visual_screenshots/p26/*.png docs/visual-evidence/p26/engine-render/ || true
           cp -f app/build/visual_screenshots/p26/camera_props.json docs/visual-evidence/p26/ || true
+          # P26C: cloud/storm render evidence.
+          mkdir -p docs/visual-evidence/p26c/engine-render
+          cp -f app/build/visual_screenshots/p26c/*.png docs/visual-evidence/p26c/engine-render/ || true
+          cp -f app/build/visual_screenshots/p26c/camera_props.json docs/visual-evidence/p26c/ || true
           mkdir -p docs/visual-evidence/p26/ui
           cp -f app/build/visual_screenshots/p26/ui/*.png docs/visual-evidence/p26/ui/ || true
           if [ ! -d docs/visual-evidence/p26/engine-render-before ]; then
@@ -222,7 +257,7 @@ jobs:
           cp -f app/build/visual_screenshots/p23/camera_props.json docs/visual-evidence/p23/ || true
           git config user.name "eternal-render-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add docs/visual-evidence/p17c/engine-render docs/visual-evidence/p18/engine-render docs/visual-evidence/p19/engine-render docs/visual-evidence/p20/engine-render docs/visual-evidence/p21/engine-render docs/visual-evidence/p22/engine-render docs/visual-evidence/p22/camera_props.json docs/visual-evidence/p23/engine-render-before docs/visual-evidence/p23/engine-render docs/visual-evidence/p23/camera_props.json docs/visual-evidence/p24/engine-render-before docs/visual-evidence/p25/engine-render-before docs/visual-evidence/p25/camera_props.json docs/visual-evidence/p26/engine-render docs/visual-evidence/p26/engine-render-before docs/visual-evidence/p26/ui docs/visual-evidence/p26/camera_props.json docs/visual-evidence/p26/camera_props_before.json
+          git add docs/visual-evidence/p17c/engine-render docs/visual-evidence/p18/engine-render docs/visual-evidence/p19/engine-render docs/visual-evidence/p20/engine-render docs/visual-evidence/p21/engine-render docs/visual-evidence/p22/engine-render docs/visual-evidence/p22/camera_props.json docs/visual-evidence/p23/engine-render-before docs/visual-evidence/p23/engine-render docs/visual-evidence/p23/camera_props.json docs/visual-evidence/p24/engine-render-before docs/visual-evidence/p25/engine-render-before docs/visual-evidence/p25/camera_props.json docs/visual-evidence/p26/engine-render docs/visual-evidence/p26/engine-render-before docs/visual-evidence/p26/ui docs/visual-evidence/p26/camera_props.json docs/visual-evidence/p26/camera_props_before.json docs/visual-evidence/p26c/engine-render docs/visual-evidence/p26c/camera_props.json
           if git diff --cached --quiet; then echo "no render changes"; exit 0; fi
           git commit -m "P17-C: engine render evidence (automated, Robolectric native graphics)"
           # The branch can move while the render job runs (another commit lands, the agent pushes
@@ -236,6 +271,17 @@ jobs:
           done
           echo "render PNGs are available in the uploaded artifact but could not be pushed"
           exit 0
+
+      # The PNGs have been copied/committed above even if a visual gate fails, so
+      # reviewers can inspect the failing real render instead of a green-only claim.
+      - name: Measure P26C against matched P26B renderer frames
+        run: |
+          # Always measure freshly rendered images, including workflow_dispatch;
+          # dispatch intentionally skips the bot commit above to freeze the SHA.
+          mkdir -p docs/visual-evidence/p26c/engine-render
+          cp -f app/build/visual_screenshots/p26c/*.png docs/visual-evidence/p26c/engine-render/
+          cp -f app/build/visual_screenshots/p26c/camera_props.json docs/visual-evidence/p26c/
+          python3 tools/p26c_measure_clouds.py
 
       # Gradle logs and artifacts live on hosts this repo's reviewers may not reach, so on
       # failure the compiler output is committed back to the branch for triage.
@@ -291,6 +337,8 @@ jobs:
             app/build/visual_screenshots/p26/*.png
             app/build/visual_screenshots/p26/camera_props.json
             app/build/visual_screenshots/p26/ui/*.png
+            app/build/visual_screenshots/p26c/*.png
+            app/build/visual_screenshots/p26c/camera_props.json
             app/build/reports/tests/testDebugUnitTest/**
           if-no-files-found: warn
           retention-days: 30

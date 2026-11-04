@@ -1,0 +1,172 @@
+[
+  {
+    "file": "p26c_morning_clear_z088.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "hour": 7,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26c_noon_clear_z088.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "hour": 12,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26c_noon_cloudy_z088.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "hour": 12,
+    "weather": "CLOUDY",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26c_noon_rain_z088.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "hour": 12,
+    "weather": "RAIN",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26c_noon_storm_z088.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "hour": 12,
+    "weather": "STORM",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26c_evening_clear_z088.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "hour": 18.5,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26c_night_clear_z088.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "hour": 0,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26c_night_storm_z088.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "hour": 0,
+    "weather": "STORM",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26c_gate_night_storm_z148.png",
+    "camX": 1960,
+    "camY": 310,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "hour": 0,
+    "weather": "STORM",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26c_gate_noon_clear_z148.png",
+    "camX": 1960,
+    "camY": 310,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "hour": 12,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26c_overview_noon_z036.png",
+    "camX": 1600,
+    "camY": 1380,
+    "zoom": 0.36000001430511475,
+    "timeSec": 0,
+    "hour": 12,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26c_cloud_bookmark_z100.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 1,
+    "timeSec": 0,
+    "hour": 7,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26c_cloud_bookmark_z148.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "hour": 7,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26c_gate_cloud_bookmark_z148.png",
+    "camX": 1960,
+    "camY": 310,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "hour": 7,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26c_motion_t0.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 0.8799999952316284,
+    "timeSec": 0,
+    "hour": 12,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26c_motion_t4.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 0.8799999952316284,
+    "timeSec": 4,
+    "hour": 12,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  },
+  {
+    "file": "p26c_motion_t8.png",
+    "camX": 960,
+    "camY": 860,
+    "zoom": 0.8799999952316284,
+    "timeSec": 8,
+    "hour": 12,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  }
+]
