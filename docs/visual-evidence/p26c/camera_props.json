@@ -130,6 +130,16 @@
     "tier": "BALANCED"
   },
   {
+    "file": "p26c_gate_cloud_bookmark_z148.png",
+    "camX": 1960,
+    "camY": 310,
+    "zoom": 1.4800000190734863,
+    "timeSec": 0,
+    "hour": 7,
+    "weather": "CLEAR",
+    "tier": "BALANCED"
+  },
+  {
     "file": "p26c_motion_t0.png",
     "camX": 960,
     "camY": 860,
