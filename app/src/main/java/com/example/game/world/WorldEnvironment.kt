@@ -92,7 +92,9 @@ data class WorldLighting(
     cloudDensity = cloudDensity * (1f + 0.50f * state.cloud + 0.60f * state.rain + 0.10f * state.fog + (if (state.weatherType == WorldWeather.STORM) 0.30f else 0f)),
     cloudBrightness = cloudBrightness * (1f - 0.05f * state.cloud - 0.20f * state.rain - (if (state.weatherType == WorldWeather.STORM) 0.15f else 0f)),
     rayAlpha = rayAlpha * (1f - 0.55f * state.cloud - 0.80f * state.rain - (if (state.weatherType == WorldWeather.STORM) 0.40f else 0f)),
-    skyBrightness = skyBrightness * (1f - 0.15f * state.cloud - 0.22f * state.rain - 0.05f * state.fog - (if (state.weatherType == WorldWeather.STORM) 0.10f else 0f)),
+    // Darken the storm SKY itself, not the whole world with a fake fullscreen overlay.
+    // RAIN's denser precipitation dims the scene; STORM must still read darker in the sky.
+    skyBrightness = skyBrightness * (1f - 0.15f * state.cloud - 0.22f * state.rain - 0.05f * state.fog - (if (state.weatherType == WorldWeather.STORM) 0.30f else 0f)).coerceAtLeast(0f),
     hazeDensity = hazeDensity * (1f + 1.00f * state.fog + 0.50f * state.rain + (if (state.weatherType == WorldWeather.STORM) 0.80f else 0f)),
     localLightIntensity = localLightIntensity * (1f + 0.15f * state.rain + 0.05f * state.fog + (if (state.weatherType == WorldWeather.STORM) 0.20f else 0f)),
     cloudColor = if (state.weatherType == WorldWeather.STORM) Color(0xff4A5568) else cloudColor,

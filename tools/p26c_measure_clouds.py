@@ -1,230 +1,203 @@
 #!/usr/bin/env python3
-"""P26C pixel gates for visible clouds + storm mood.
+"""P26C render QA against *matched* P26B engine frames, never a sky-gradient proxy.
 
-Reads REAL ENGINE ROBOLECTRIC RENDER evidence committed by the render-bot:
-  - docs/visual-evidence/p26c/engine-render/       (AFTER frames, current candidate)
-  - docs/visual-evidence/p26c/camera_props.json    (hour/weather/tier of every frame)
+Run after the Robolectric native renderer has written P26C PNGs. The immutable BEFORE
+files in docs/visual-evidence/p26c/engine-render-before/ are copied byte-for-byte
+from P26B merged commit f0dc0de (see before_manifest.json for SHA-256 and exact camera
+props). STORM did not exist then: no same-weather STORM BEFORE is claimed.
 
-and applies the PRECOMMITTED thresholds in
-  - docs/quality-loop/p26c-cloud-storm/thresholds.json
+C1 uses luminance DIFFERENCE vs the real same-hour/camera/weather BEFORE image;
+counting pixels that differ from the median of the AFTER image falsely includes the
+sky gradient, rays and roofs. The denominator remains the entire top 25% sky band,
+with the precommitted 5% threshold (NOT relaxed after seeing the first failure).
+E4 compares the world below 42% of the frame on the seven actually matched pairs,
+not a self-comparison or a guessed pass for unmatched STORM frames.
 
-Mean luminance = Rec.709 (0.299 R + 0.587 G + 0.114 B), 0..255, PNG 1280x720.
-Sky band = top 25% of the frame.
-
-Cloud presence ratio: fraction of pixels in the sky band whose luminance differs
-from the median sky-band luminance by more than 12 levels (clouds stand out from
-the smooth sky gradient). Used to prove C1 (cloud actually visible, not just a
-function call).
-
-Gates (thresholds fixed BEFORE the candidate render):
-  C1 visible cloud in sky band      presence_ratio >= 0.05 (z0.88 CLEAR morning/noon)
-  C2 cloud depth layers             visual QA (not pixel-measured)
-  C3 cloudy denser than clear       cloudy sky <= clear sky - 3.0 (noon z0.88)
-  C4 storm cloud character          storm sky <= clear - 12.0 AND storm <= rain - 2.0
-  C5 deterministic drift            byte-identical at timeSec 0 (checked by test)
-  C6 cull off-screen                code review (not pixel-measured)
-  E1-E5                             same as P26B thresholds (preserved)
-  E3 extended                       storm sky <= clear - 12.0
-
-Exit code 0 = all gates PASS, 1 = any gate FAIL.
+Exit 0 only if every automated gate passes; C2 (three-layer appearance), C6 (cull)
+and legacy gate G1/G2 require their own review and are not silently auto-passed.
 """
 
+import hashlib
 import json
-import os
+from pathlib import Path
 import sys
 
-from PIL import Image
+from PIL import Image, ImageStat
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-QA_DIR = os.path.join(ROOT, "docs/quality-loop/p26c-cloud-storm")
-EV_DIR = os.path.join(ROOT, "docs/visual-evidence/p26c")
-AFTER_DIR = os.path.join(EV_DIR, "engine-render")
-
-
-def load_json(path):
-    with open(path) as fh:
-        return json.load(fh)
+ROOT = Path(__file__).resolve().parents[1]
+QA_DIR = ROOT / "docs/quality-loop/p26c-cloud-storm"
+EV_DIR = ROOT / "docs/visual-evidence/p26c"
+AFTER_DIR = EV_DIR / "engine-render"
+BEFORE_DIR = EV_DIR / "engine-render-before"
 
 
-def mean_luminance(im, box):
-    crop = im.crop(box).convert("RGB")
-    px = list(crop.getdata())
-    n = len(px)
-    r = sum(p[0] for p in px) / n
-    g = sum(p[1] for p in px) / n
-    b = sum(p[2] for p in px) / n
+def mean_luminance(image, box):
+    r, g, b = ImageStat.Stat(image.crop(box).convert("RGB")).mean
     return 0.299 * r + 0.587 * g + 0.114 * b
 
 
-def cloud_presence_ratio(im, sky_frac, diff_threshold=12.0):
-    """Fraction of sky-band pixels whose luminance differs from median by > threshold."""
-    w, h = im.size
-    sky_box = (0, 0, w, int(h * sky_frac))
-    crop = im.crop(sky_box).convert("L")
-    px = sorted(list(crop.getdata()))
-    n = len(px)
-    median = px[n // 2]
-    count = sum(1 for p in px if abs(p - median) > diff_threshold)
-    return count / n
-
-
-def frame_stats(im, sky_frac):
-    w, h = im.size
-    sky_box = (0, 0, w, int(h * sky_frac))
-    world_box = (0, int(h * sky_frac), w, h)
-    whole_box = (0, 0, w, h)
+def frame_stats(image, sky_frac):
+    w, h = image.size
     return {
-        "sky": mean_luminance(im, sky_box),
-        "world": mean_luminance(im, world_box),
-        "whole": mean_luminance(im, whole_box),
+        "sky": mean_luminance(image, (0, 0, w, int(h * sky_frac))),
+        "world42": mean_luminance(image, (0, int(h * .42), w, h)),
+        "whole": mean_luminance(image, (0, 0, w, h)),
     }
+
+
+def delta_ratio(after, before, sky_frac, threshold=12.0):
+    """Fraction of top-band pixels with an absolute Rec.709 AFTER−BEFORE delta >12."""
+    if after.size != before.size:
+        raise ValueError(f"BEFORE/AFTER dimensions differ: {before.size} vs {after.size}")
+    w, h = after.size
+    box = (0, 0, w, int(h * sky_frac))
+    ap = after.crop(box).convert("RGB").getdata()
+    bp = before.crop(box).convert("RGB").getdata()
+    changed = 0
+    for a, b in zip(ap, bp):
+        delta = 0.299 * (a[0] - b[0]) + 0.587 * (a[1] - b[1]) + 0.114 * (a[2] - b[2])
+        changed += abs(delta) > threshold
+    return changed / (box[2] * box[3])
 
 
 def main():
-    th = load_json(os.path.join(QA_DIR, "thresholds.json"))
-    props = load_json(os.path.join(EV_DIR, "camera_props.json"))
+    th = json.loads((QA_DIR / "thresholds.json").read_text())
+    props = json.loads((EV_DIR / "camera_props.json").read_text())
+    baseline = json.loads((EV_DIR / "before_manifest.json").read_text())
     sky_frac = float(th["sky_band_top_fraction"])
-
-    missing = [p["file"] for p in props if not os.path.exists(os.path.join(AFTER_DIR, p["file"]))]
-    if missing:
-        print("MISSING FRAMES: " + ", ".join(missing))
-        sys.exit(1)
+    by_name = {p["file"]: p for p in props}
+    if len(by_name) != len(props):
+        raise ValueError("Duplicate AFTER camera_props filenames")
+    if not baseline["matched_pairs"]:
+        raise ValueError("No actual matched BEFORE frames: cannot claim C1/E4")
 
     stats = {}
-    for p in props:
-        name = p["file"]
-        im = Image.open(os.path.join(AFTER_DIR, name))
-        stats[name] = {
-            "after": frame_stats(im, sky_frac),
-            "cloud_presence": cloud_presence_ratio(im, sky_frac),
-            "hour": p["hour"],
-            "weather": p["weather"],
-        }
+    for name, p in by_name.items():
+        path = AFTER_DIR / name
+        with Image.open(path) as image:
+            if image.size != (1280, 720):
+                raise ValueError(f"Not a full-size 1280x720 engine capture: {path}")
+            stats[name] = {"after": frame_stats(image, sky_frac),
+                           "hour": p["hour"], "weather": p["weather"]}
 
-    def get(name, key):
+    for pair in baseline["matched_pairs"]:
+        name = pair["file"]
+        if name not in by_name:
+            raise ValueError(f"No matched AFTER camera_props: {name}")
+        for key, value in pair["camera"].items():
+            actual = by_name[name][key]
+            if isinstance(value, (int, float)):
+                if abs(actual - value) > 0.0001:
+                    raise ValueError(f"Unmatched {key} for {name}: {value} vs {actual}")
+            elif value != actual:
+                raise ValueError(f"Unmatched {key} for {name}: {value} vs {actual}")
+        before_path = BEFORE_DIR / name
+        data = before_path.read_bytes()
+        if hashlib.sha256(data).hexdigest() != pair["sha256"]:
+            raise ValueError(f"P26B baseline changed: {before_path}")
+        with Image.open(before_path) as before, Image.open(AFTER_DIR / name) as after:
+            stats[name]["before"] = frame_stats(before, sky_frac)
+            stats[name]["cloud_delta_ratio"] = delta_ratio(after, before, sky_frac)
+
+    def f(name, key):
         return stats[name]["after"][key]
 
-    all_pass = True
     results = {}
+    cloud_th = th["clouds"]
+    env_th = th["environment"]
 
-    # ---------- C1 visible cloud in sky band ----------
-    c1_instances = []
-    for name in ["p26c_morning_clear_z088.png", "p26c_noon_clear_z088.png"]:
-        cp = stats[name]["cloud_presence"]
-        c1_instances.append((name, cp))
-        if cp < 0.05:
-            all_pass = False
-    results["C1"] = (all_pass and all(cp >= 0.05 for _, cp in c1_instances), c1_instances)
+    # C1: actual changed sky pixels against *same* gameplay camera, hour and CLEAR.
+    min_ratio = cloud_th["visible_cloud_in_sky_band"]["min_cloud_presence_ratio"]
+    c1_names = ("p26c_morning_clear_z088.png", "p26c_noon_clear_z088.png")
+    c1 = {n: round(stats[n]["cloud_delta_ratio"], 5) for n in c1_names}
+    results["C1"] = (all(v >= min_ratio for v in c1.values()),
+                     {"before_after_delta_ratio": c1, "min": min_ratio,
+                      "source_commit": baseline["source_commit"]})
 
-    # ---------- C3 cloudy denser than clear ----------
-    clear_sky = get("p26c_noon_clear_z088.png", "sky")
-    cloudy_sky = get("p26c_noon_cloudy_z088.png", "sky")
-    c3 = {"clear_sky": round(clear_sky, 1), "cloudy_sky": round(cloudy_sky, 1),
-          "diff": round(cloudy_sky - clear_sky, 1)}
-    c3_pass = cloudy_sky <= clear_sky - 3.0
-    all_pass = all_pass and c3_pass
-    results["C3"] = (c3_pass, c3)
+    clear = f("p26c_noon_clear_z088.png", "sky")
+    cloudy = f("p26c_noon_cloudy_z088.png", "sky")
+    rain = f("p26c_noon_rain_z088.png", "sky")
+    storm = f("p26c_noon_storm_z088.png", "sky")
+    c3_limit = cloud_th["cloudy_denser_than_clear"]["cloudy_sky_le_clear_minus"]
+    results["C3"] = (cloudy <= clear - c3_limit,
+                     {"clear": round(clear, 2), "cloudy": round(cloudy, 2),
+                      "cloudy_minus_clear": round(cloudy - clear, 2)})
+    c4_th = cloud_th["storm_cloud_character"]
+    results["C4"] = (storm <= clear - c4_th["storm_sky_le_clear_minus"]
+                     and storm <= rain - c4_th["storm_sky_le_rain_minus"],
+                     {"clear": round(clear, 2), "rain": round(rain, 2),
+                      "storm": round(storm, 2), "storm_minus_rain": round(storm - rain, 2),
+                      "before_storm": "NOT AVAILABLE: no STORM in P26B"})
 
-    # ---------- C4 storm cloud character ----------
-    rain_sky = get("p26c_noon_rain_z088.png", "sky")
-    storm_sky = get("p26c_noon_storm_z088.png", "sky")
-    c4 = {"clear_sky": round(clear_sky, 1), "rain_sky": round(rain_sky, 1),
-          "storm_sky": round(storm_sky, 1),
-          "storm_minus_clear": round(storm_sky - clear_sky, 1),
-          "storm_minus_rain": round(storm_sky - rain_sky, 1)}
-    c4_pass = storm_sky <= clear_sky - 12.0 and storm_sky <= rain_sky - 2.0
-    all_pass = all_pass and c4_pass
-    results["C4"] = (c4_pass, c4)
+    # C5 and E5: native renderer's repeated frame at exactly the same state/time.
+    det = (AFTER_DIR / "p26c_noon_clear_z088_det.png").read_bytes()
+    original = (AFTER_DIR / "p26c_noon_clear_z088.png").read_bytes()
+    results["C5"] = (det == original, {"byte_identical": det == original})
 
-    # ---------- C5 determinism ----------
-    det_file = "p26c_noon_clear_z088_det.png"
-    noon_file = "p26c_noon_clear_z088.png"
-    det_path = os.path.join(AFTER_DIR, det_file)
-    noon_path = os.path.join(AFTER_DIR, noon_file)
-    c5_pass = False
-    if os.path.exists(det_path):
-        with open(det_path, "rb") as fh:
-            det_bytes = fh.read()
-        with open(noon_path, "rb") as fh:
-            noon_bytes = fh.read()
-        c5_pass = det_bytes == noon_bytes
-    all_pass = all_pass and c5_pass
-    results["C5"] = (c5_pass, {"det_byte_identical": c5_pass})
+    m = f("p26c_morning_clear_z088.png", "sky")
+    e = f("p26c_evening_clear_z088.png", "sky")
+    n = f("p26c_night_clear_z088.png", "sky")
+    e1 = {"morning_noon": abs(m - clear), "noon_evening": abs(clear - e),
+          "evening_night": abs(e - n), "noon_night": abs(clear - n)}
+    e1_th = env_th["sky_distinctness"]
+    results["E1"] = (e1["morning_noon"] >= e1_th["morning_minus_noon_abs_ge"]
+                     and e1["noon_evening"] >= e1_th["noon_minus_evening_abs_ge"]
+                     and e1["evening_night"] >= e1_th["evening_minus_night_abs_ge"]
+                     and e1["noon_night"] >= e1_th["noon_minus_night_abs_ge"],
+                     {k: round(v, 2) for k, v in e1.items()})
+    day_night = f("p26c_noon_clear_z088.png", "whole") - f("p26c_night_clear_z088.png", "whole")
+    results["E2"] = (clear >= m and day_night >= env_th["noon_brightest"]["noon_frame_mean_minus_night_frame_mean_ge"],
+                     {"noon_sky_ge_morning": clear >= m, "whole_noon_minus_night": round(day_night, 2)})
+    mood = env_th["weather_mood_noon_service"]
+    results["E3"] = (cloudy <= clear - mood["cloudy_sky_le_clear_minus"]
+                     and rain <= clear - mood["rain_sky_le_clear_minus"]
+                     and storm <= clear - mood["storm_sky_le_clear_minus"]
+                     and (not mood["storm_darker_than_rain"] or storm < rain),
+                     {"cloudy_minus_clear": round(cloudy - clear, 2),
+                      "rain_minus_clear": round(rain - clear, 2),
+                      "storm_minus_clear": round(storm - clear, 2)})
 
-    # ---------- E1 sky distinctness ----------
-    m_sky = get("p26c_morning_clear_z088.png", "sky")
-    n_sky = get("p26c_noon_clear_z088.png", "sky")
-    e_sky = get("p26c_evening_clear_z088.png", "sky")
-    g_sky = get("p26c_night_clear_z088.png", "sky")
-    e1 = {
-        "morning_minus_noon_abs": abs(m_sky - n_sky),
-        "noon_minus_evening_abs": abs(n_sky - e_sky),
-        "evening_minus_night_abs": abs(e_sky - g_sky),
-        "noon_minus_night_abs": abs(n_sky - g_sky),
-    }
-    e1_pass = (e1["morning_minus_noon_abs"] >= 8.0 and e1["noon_minus_evening_abs"] >= 6.0
-               and e1["evening_minus_night_abs"] >= 8.0 and e1["noon_minus_night_abs"] >= 18.0)
-    all_pass = all_pass and e1_pass
-    results["E1"] = (e1_pass, e1)
-
-    # ---------- E2 noon brightest ----------
-    n_whole = get("p26c_noon_clear_z088.png", "whole")
-    g_whole = get("p26c_night_clear_z088.png", "whole")
-    e2 = {"noon_sky_ge_morning_sky": n_sky >= m_sky,
-          "noon_whole_minus_night_whole": round(n_whole - g_whole, 1)}
-    e2_pass = e2["noon_sky_ge_morning_sky"] and e2["noon_whole_minus_night_whole"] >= 5.0
-    all_pass = all_pass and e2_pass
-    results["E2"] = (e2_pass, e2)
-
-    # ---------- E3 weather mood (extended with storm) ----------
-    e3 = {
-        "cloudy_minus_clear": round(cloudy_sky - clear_sky, 1),
-        "rain_minus_clear": round(rain_sky - clear_sky, 1),
-        "storm_minus_clear": round(storm_sky - clear_sky, 1),
-    }
-    e3_pass = (cloudy_sky <= clear_sky - 5.0 and rain_sky <= clear_sky - 8.0
-               and storm_sky <= clear_sky - 12.0)
-    all_pass = all_pass and e3_pass
-    results["E3"] = (e3_pass, e3)
-
-    # ---------- E4 no-flood ----------
+    # E4 is NOT a self-comparison. It covers only 7 P26B states with identical props.
     e4_pairs = {}
     e4_pass = True
-    for name in sorted(stats):
-        a_world = stats[name]["after"]["world"]
-        # BEFORE not yet available for P26C (first CI run); use self-comparison guard
-        # For round 1, E4 is verified by code review: clouds are sky-only, no world flood.
-        e4_pairs[name] = {"world_mean": round(a_world, 1), "note": "sky-only layer, no world flood"}
-    results["E4"] = (True, e4_pairs)  # code-review gate, see QA_MATRIX C6/E4
+    e4_limit = env_th["no_flood_same_hour"]["max_abs_delta_mean_lt_percent"]
+    for pair in baseline["matched_pairs"]:
+        name = pair["file"]
+        before_mean = stats[name]["before"]["world42"]
+        after_mean = stats[name]["after"]["world42"]
+        pct = 100.0 * (after_mean - before_mean) / max(abs(before_mean), 1.0)
+        e4_pairs[name] = {"before": round(before_mean, 2), "after": round(after_mean, 2),
+                          "delta_pct": round(pct, 3)}
+        if abs(pct) >= e4_limit:
+            e4_pass = False
+    results["E4"] = (e4_pass, {"matched_only": e4_pairs, "max_abs_pct_lt": e4_limit,
+                               "no_baseline": "STORM, overview NOON, z1.0/z1.48 bookmarks"})
+    results["E5"] = results["C5"]
 
-    # ---------- E5 determinism ----------
-    e5_pass = c5_pass
-    all_pass = all_pass and e5_pass
-    results["E5"] = (e5_pass, {"byte_identical": e5_pass})
-
-    report = {"sky_band_top_fraction": sky_frac,
-              "gates": {k: {"pass": v[0], "detail": v[1]} for k, v in results.items()},
-              "frames": {name: {"sky": round(s["after"]["sky"], 1),
-                                "cloud_presence": round(s["cloud_presence"], 3),
-                                "hour": s["hour"], "weather": s["weather"]}
-                         for name, s in stats.items()}}
-    with open(os.path.join(QA_DIR, "roi_measurements.json"), "w") as fh:
-        json.dump(report, fh, indent=2)
-
-    lines = ["P26C MEASUREMENT (real Robolectric render evidence, 1280x720, Rec.709)",
-             "=" * 60]
-    for gate_name in ["C1", "C3", "C4", "C5", "E1", "E2", "E3", "E4", "E5"]:
-        pass_flag, detail = results[gate_name]
-        lines.append(f"{gate_name}: {'PASS' if pass_flag else 'FAIL'} {detail}")
-    lines.append("=" * 60)
-    total = sum(1 for v in results.values() if v[0])
-    lines.append(f"TOTAL: {total}/{len(results)} gates PASS")
-    text = "\n".join(lines)
-    with open(os.path.join(QA_DIR, "roi_measurements.txt"), "w") as fh:
-        fh.write(text + "\n")
-    print(text)
-    sys.exit(0 if all_pass else 1)
+    report = {
+        "source": "REAL Robolectric renderer; AFTER camera_props.json; BEFORE P26B merged SHA",
+        "before_source_commit": baseline["source_commit"],
+        "sky_band_top_fraction": sky_frac,
+        "gates": {k: {"pass": flag, "detail": detail} for k, (flag, detail) in results.items()},
+        "frames": {name: {"sky": round(s["after"]["sky"], 2),
+                          "cloud_before_after_delta": round(s["cloud_delta_ratio"], 5) if "cloud_delta_ratio" in s else None,
+                          "hour": s["hour"], "weather": s["weather"]}
+                   for name, s in stats.items()},
+        "manual_review": {"C2": "NOT AUTOMATED", "C6": "NOT AUTOMATED",
+                          "legacy_G1_G2": "NOT CLAIMED PASS"},
+    }
+    (QA_DIR / "roi_measurements.json").write_text(json.dumps(report, indent=2) + "\n")
+    lines = ["P26C real render comparison to P26B f0dc0de (1280x720, Rec.709)", "=" * 64]
+    for gate in ("C1", "C3", "C4", "C5", "E1", "E2", "E3", "E4", "E5"):
+        flag, detail = results[gate]
+        lines.append(f"{gate}: {'PASS' if flag else 'FAIL'} {detail}")
+    passed = sum(flag for flag, _ in results.values())
+    lines += ["=" * 64, f"Automated: {passed}/{len(results)} PASS (C2/C6/G1/G2 need separate review)"]
+    text = "\n".join(lines) + "\n"
+    (QA_DIR / "roi_measurements.txt").write_text(text)
+    print(text, end="")
+    return 0 if passed == len(results) else 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

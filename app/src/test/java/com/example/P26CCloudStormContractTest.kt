@@ -138,6 +138,18 @@ class P26CCloudStormContractTest {
   }
 
   @Test
+  fun stormSkyBandCacheKeepsWeatherTypeSeparateFromRain() {
+    // At a transition both states can quantise to identical rain/cloud/fog buckets.
+    // The STORM sky is colder/darker and must not inherit RAIN's cached band buffer.
+    val rain = SanctuaryWorldRenderer.skyBandColors(12f,
+      WeatherState(rain = 0.7f, cloud = 1f, weatherType = WorldWeather.RAIN))
+    val storm = SanctuaryWorldRenderer.skyBandColors(12f,
+      WeatherState(rain = 0.7f, cloud = 1f, weatherType = WorldWeather.STORM))
+    assertTrue("STORM sky band cannot reuse RAIN's cache entry", rain !== storm)
+    assertTrue("STORM sky must be darker than RAIN at equal precipitation", storm[0] < rain[0])
+  }
+
+  @Test
   fun lightingContinuousAcrossHour() {
     // Ánh sáng liên tục qua từng giờ (không nhảy đột ngột khi vào STORM).
     for (i in 0..2399) {

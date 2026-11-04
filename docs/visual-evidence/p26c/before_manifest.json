@@ -1,0 +1,105 @@
+{
+  "source_commit": "f0dc0de6b63794082ba5db88244a2cc8c486bcdb",
+  "source": "P26B merged renderer, GitHub Actions Robolectric native PNGs from docs/visual-evidence/p26/engine-render/",
+  "matched_pairs": [
+    {
+      "file": "p26c_morning_clear_z088.png",
+      "source_path": "docs/visual-evidence/p26/engine-render/p26_sky_morning_z088.png",
+      "sha256": "90cd5df50006487978de42554227c298d817c77b09ec53f9b5cb647a7c93f913",
+      "camera": {
+        "camX": 960,
+        "camY": 860,
+        "zoom": 0.8799999952316284,
+        "timeSec": 0,
+        "hour": 7,
+        "weather": "CLEAR",
+        "tier": "BALANCED"
+      }
+    },
+    {
+      "file": "p26c_noon_clear_z088.png",
+      "source_path": "docs/visual-evidence/p26/engine-render/p26_sky_noon_z088.png",
+      "sha256": "d0141a230b6946f777628fa8a5c792249bd8931352f7f6c3fb9f8ac9a10144c3",
+      "camera": {
+        "camX": 960,
+        "camY": 860,
+        "zoom": 0.8799999952316284,
+        "timeSec": 0,
+        "hour": 12,
+        "weather": "CLEAR",
+        "tier": "BALANCED"
+      }
+    },
+    {
+      "file": "p26c_noon_cloudy_z088.png",
+      "source_path": "docs/visual-evidence/p26/engine-render/p26_sky_noon_cloudy_z088.png",
+      "sha256": "afe9ef65eebeac59270a4e9858fda3b6e044cc3e7d1d28d84d36d431e6982c78",
+      "camera": {
+        "camX": 960,
+        "camY": 860,
+        "zoom": 0.8799999952316284,
+        "timeSec": 0,
+        "hour": 12,
+        "weather": "CLOUDY",
+        "tier": "BALANCED"
+      }
+    },
+    {
+      "file": "p26c_noon_rain_z088.png",
+      "source_path": "docs/visual-evidence/p26/engine-render/p26_sky_noon_rain_z088.png",
+      "sha256": "56aae5aa96cff7607efd546771ca0db1d98d66d75c2a6c9a02e54c61d1f7d1f8",
+      "camera": {
+        "camX": 960,
+        "camY": 860,
+        "zoom": 0.8799999952316284,
+        "timeSec": 0,
+        "hour": 12,
+        "weather": "RAIN",
+        "tier": "BALANCED"
+      }
+    },
+    {
+      "file": "p26c_evening_clear_z088.png",
+      "source_path": "docs/visual-evidence/p26/engine-render/p26_sky_evening_z088.png",
+      "sha256": "1c4d72b78e2d71c67d2d35afb90d5830753a60f883827daa9fbdcda7af4e5708",
+      "camera": {
+        "camX": 960,
+        "camY": 860,
+        "zoom": 0.8799999952316284,
+        "timeSec": 0,
+        "hour": 18.5,
+        "weather": "CLEAR",
+        "tier": "BALANCED"
+      }
+    },
+    {
+      "file": "p26c_night_clear_z088.png",
+      "source_path": "docs/visual-evidence/p26/engine-render/p26_sky_night_z088.png",
+      "sha256": "334b54cf12d5457ef2ebb5da99c6aa3e3498b2bd2b50fba08f7adf52e315d1bf",
+      "camera": {
+        "camX": 960,
+        "camY": 860,
+        "zoom": 0.8799999952316284,
+        "timeSec": 0,
+        "hour": 0,
+        "weather": "CLEAR",
+        "tier": "BALANCED"
+      }
+    },
+    {
+      "file": "p26c_gate_noon_clear_z148.png",
+      "source_path": "docs/visual-evidence/p26/engine-render/p26_gate_noon_z148.png",
+      "sha256": "6ce2883c400763d3d74b611272960b4165d086095abb683543f1a7abd49b5c50",
+      "camera": {
+        "camX": 1960,
+        "camY": 310,
+        "zoom": 1.4800000190734863,
+        "timeSec": 0,
+        "hour": 12,
+        "weather": "CLEAR",
+        "tier": "BALANCED"
+      }
+    }
+  ],
+  "missing_before": "STORM did not exist at P26B; overview NOON and other zoom/time bookmarks were not captured at P26B. These have no same-state BEFORE."
+}

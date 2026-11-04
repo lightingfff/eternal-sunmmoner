@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
@@ -41,21 +42,22 @@ object SanctuaryWorldRenderer {
    */
   private const val GRASS_BLOCK_MIN_TILE_SCREEN_PX = 25
 
-  // P26C: neo mây trên khung (screen-space), khai báo một lần ở cấp object
-  // để KHÔNG cấp phát list/đối tượng mới mỗi lần vẽ frame.
+  // P26C: screen-space anchors, kept at object level (no per-frame list allocation).
+  // Gameplay camera (960, 860, 0.88) shows sky only above/left of the fortress wall;
+  // anchors MUST intersect that real visible wedge, not just the centre of the framebuffer.
   private data class CloudAnchor(val x: Float, val y: Float, val scale: Float, val parallax: Float, val depth: Int)
   private val cloudSpecs = listOf(
-    // Lớp xa: mựn mờ, bay chậm, alpha thấp
-    CloudAnchor(-180f, 70f, 0.85f, 0.12f, 0),
-    CloudAnchor(420f, 110f, 0.95f, 0.18f, 0),
-    CloudAnchor(950f, 50f, 0.80f, 0.10f, 0),
-    // Lớp trung: cumulus có khối, 3 cấp sáng/tối, bụng có shade
-    CloudAnchor(90f, 190f, 1.10f, 0.42f, 1),
-    CloudAnchor(680f, 140f, 1.15f, 0.48f, 1),
-    CloudAnchor(1050f, 175f, 1.00f, 0.38f, 1),
-    // Lớp trước: sợi mây lửng lơ, bay nhanh hơn, alpha thấp hơn
-    CloudAnchor(260f, 270f, 0.65f, 0.60f, 2),
-    CloudAnchor(820f, 230f, 0.70f, 0.55f, 2),
+    // Far bank: small, slow shapes behind the fortress silhouette.
+    CloudAnchor(-565f, 36f, 0.95f, 0.12f, 0),
+    CloudAnchor(-355f, 20f, 1.00f, 0.18f, 0),
+    CloudAnchor(760f, 70f, 0.95f, 0.10f, 0),
+    // Middle cumulus: readable volume inside the open sky at gameplay zoom.
+    CloudAnchor(-495f, 87f, 1.15f, 0.42f, 1),
+    CloudAnchor(-345f, 65f, 0.93f, 0.48f, 1),
+    CloudAnchor(540f, 115f, 1.08f, 0.38f, 1),
+    // Foreground wisps: smaller/faster, masked naturally by walls and buildings.
+    CloudAnchor(-495f, 140f, 0.80f, 0.60f, 2),
+    CloudAnchor(700f, 180f, 0.70f, 0.55f, 2),
   )
 
   fun DrawScope.drawSanctuaryFloatingWorld(
@@ -438,7 +440,16 @@ object SanctuaryWorldRenderer {
     val rb = ((weather.rain * 3f).roundToInt().coerceIn(0, 3)).toLong()
     val cb = ((weather.cloud * 3f).roundToInt().coerceIn(0, 3)).toLong()
     val fb = ((weather.fog * 3f).roundToInt().coerceIn(0, 3)).toLong()
-    val key = hb * 64L + rb * 16L + cb * 4L + fb
+    // STORM and RAIN can quantise to the same rain/cloud buckets during a transition.
+    // Keep their different sky brightness out of one another's cache entries.
+    val weatherKey = when (weather.weatherType) {
+      com.example.game.world.WorldWeather.CLEAR -> 0L
+      com.example.game.world.WorldWeather.CLOUDY -> 1L
+      com.example.game.world.WorldWeather.RAIN -> 2L
+      com.example.game.world.WorldWeather.STORM -> 3L
+      com.example.game.world.WorldWeather.FOG -> 4L
+    }
+    val key = (hb * 64L + rb * 16L + cb * 4L + fb) * 8L + weatherKey
     val cached = skyBandCache[key]
     if (cached != null) return cached
     val lighting = com.example.game.world.WorldLighting.at(hour).withWeather(weather)
@@ -549,10 +560,11 @@ object SanctuaryWorldRenderer {
     } else {
       baseCloudCol
     }
-    val alphaScale = (lighting.cloudDensity * lighting.cloudBrightness * cloudCover).coerceIn(0f, 1f)
+    // The original CLEAR value (~0.135) disappeared against the sky after compositing.
+    // Keep the sparse CLEAR bank legible; weather still increases density/opacity.
+    val alphaScale = (0.28f + lighting.cloudDensity * lighting.cloudBrightness * cloudCover * 0.95f).coerceIn(0f, 1f)
 
     val halfW = size.width / 2f
-    val halfH = size.height / 2f
     // Parallax nhẹ: mây di chuyển theo camera nhưng chậm hơn đảo (0.15f hệ số).
     val parallaxX = camX * 0.15f
 
@@ -574,36 +586,35 @@ object SanctuaryWorldRenderer {
       if (screenX !in -300f..(size.width + 300f) || screenY !in -120f..(size.height * 0.72f)) return@forEachIndexed
 
       val layerAlpha = when (depth) {
-        0 -> 0.50f // xa: mờ hơn
-        1 -> 0.62f // trung: rõ nét nhất
-        else -> 0.40f // trước: lửng lơ
+        0 -> 0.68f // far bank
+        1 -> 0.92f // middle volume
+        else -> 0.70f // foreground wisps
       }
 
-      drawCloudPuff(screenX, screenY, s, cloudCol, alphaScale * layerAlpha, idx)
+      drawCloudPuff(screenX, screenY, s, cloudCol, alphaScale * layerAlpha,
+        storm = weatherType == com.example.game.world.WorldWeather.STORM)
     }
   }
 
-  /** Vẽ một cụm mây kiểu pixel-art: nhiều oval chồng lớp, 3 cấp sáng/tối, bụng mây có shade,
-   *  bên đón nắng, viền không rung khi zoom. Không dùng gradient brush mỗi frame. */
+  /** Three-tone cumulus (body, underside, rim). No per-frame Brush/Path/Bitmap. */
   private fun DrawScope.drawCloudPuff(
     cx: Float,
     cy: Float,
     s: Float,
     color: Color,
     alphaScale: Float,
-    puffIdx: Int,
+    storm: Boolean,
   ) {
     val a = alphaScale
-    // Thân mây chính (cấp medium)
-    drawOval(color.copy(alpha = 0.50f * a), Offset(cx - 95f * s, cy - 16f * s), Size(190f * s, 44f * s))
-    drawOval(color.copy(alpha = 0.44f * a), Offset(cx - 80f * s, cy - 30f * s), Size(100f * s, 40f * s))
-    drawOval(color.copy(alpha = 0.38f * a), Offset(cx - 38f * s, cy - 46f * s), Size(95f * s, 52f * s))
-    drawOval(color.copy(alpha = 0.44f * a), Offset(cx + 22f * s, cy - 28f * s), Size(75f * s, 40f * s))
-    // Bụng mây tối hơn (shade) — tạo khối, không phải ellipse phẳng
-    drawOval(color.copy(alpha = 0.30f * a), Offset(cx - 70f * s, cy - 6f * s), Size(150f * s, 30f * s))
-    // Viền đón nắng sáng hơn (highlight) — tạo cảm giác nguồn sáng phía trên
-    drawOval(color.copy(alpha = 0.22f * a), Offset(cx - 62f * s, cy - 34f * s), Size(65f * s, 28f * s))
-    drawOval(color.copy(alpha = 0.18f * a), Offset(cx + 8f * s, cy - 20f * s), Size(50f * s, 24f * s))
+    val underside = if (storm) Color(0xFF233449) else lerp(color, Color(0xFF64748B), 0.42f)
+    val rim = if (storm) Color(0xFF9FB6C9) else lerp(color, Color.White, 0.30f)
+    drawOval(color.copy(alpha = 0.70f * a), Offset(cx - 95f * s, cy - 16f * s), Size(190f * s, 44f * s))
+    drawOval(color.copy(alpha = 0.58f * a), Offset(cx - 80f * s, cy - 30f * s), Size(100f * s, 40f * s))
+    drawOval(color.copy(alpha = 0.52f * a), Offset(cx - 38f * s, cy - 46f * s), Size(95f * s, 52f * s))
+    drawOval(color.copy(alpha = 0.58f * a), Offset(cx + 22f * s, cy - 28f * s), Size(75f * s, 40f * s))
+    drawOval(underside.copy(alpha = 0.40f * a), Offset(cx - 70f * s, cy - 6f * s), Size(150f * s, 30f * s))
+    drawOval(rim.copy(alpha = 0.32f * a), Offset(cx - 62f * s, cy - 34f * s), Size(65f * s, 28f * s))
+    drawOval(rim.copy(alpha = 0.26f * a), Offset(cx + 8f * s, cy - 20f * s), Size(50f * s, 24f * s))
   }
 
   private fun DrawScope.drawFloatingIslandCliffUnderside(

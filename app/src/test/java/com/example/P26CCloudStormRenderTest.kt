@@ -163,6 +163,12 @@ class P26CCloudStormRenderTest {
       render("p26c_cloud_bookmark_z148", 960f, 860f, 1.48f)
       record(props, "p26c_cloud_bookmark_z148", 960f, 860f, 1.48f, 0f, 7f, "CLEAR", "BALANCED")
 
+      // Gate is a normal gameplay camera that still exposes sky at z1.48; the service
+      // close-up above contains buildings edge-to-edge and is a negative occlusion control.
+      prepare(7f, WorldWeather.CLEAR)
+      render("p26c_gate_cloud_bookmark_z148", 1960f, 310f, 1.48f)
+      record(props, "p26c_gate_cloud_bookmark_z148", 1960f, 310f, 1.48f, 0f, 7f, "CLEAR", "BALANCED")
+
       // L. Motion A/B timeSec 0, 4, 8 tại cùng camera/hour/weather (động mây thật); frame t=0 lặp hai lần phải byte-identical.
       prepare(12f, WorldWeather.CLEAR)
       render("p26c_motion_t0", 960f, 860f, 0.88f, 0f)

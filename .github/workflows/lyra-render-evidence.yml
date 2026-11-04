@@ -199,6 +199,9 @@ jobs:
       # The PNGs are also committed so reviewers (and the agent) can open them straight from
       # the branch; the artifact below is the same bytes for offline download.
       - name: Publish render PNGs into the branch
+        # A manual dispatch verifies the *final* evidence commit without pushing
+        # another bot commit that would move the SHA under review.
+        if: github.event_name == 'pull_request'
         run: |
           set -euo pipefail
           mkdir -p docs/visual-evidence/p17c/engine-render
@@ -268,6 +271,17 @@ jobs:
           done
           echo "render PNGs are available in the uploaded artifact but could not be pushed"
           exit 0
+
+      # The PNGs have been copied/committed above even if a visual gate fails, so
+      # reviewers can inspect the failing real render instead of a green-only claim.
+      - name: Measure P26C against matched P26B renderer frames
+        run: |
+          # Always measure freshly rendered images, including workflow_dispatch;
+          # dispatch intentionally skips the bot commit above to freeze the SHA.
+          mkdir -p docs/visual-evidence/p26c/engine-render
+          cp -f app/build/visual_screenshots/p26c/*.png docs/visual-evidence/p26c/engine-render/
+          cp -f app/build/visual_screenshots/p26c/camera_props.json docs/visual-evidence/p26c/
+          python3 tools/p26c_measure_clouds.py
 
       # Gradle logs and artifacts live on hosts this repo's reviewers may not reach, so on
       # failure the compiler output is committed back to the branch for triage.

@@ -2,9 +2,9 @@
 
 ## 0. Summary
 
-**Branch**: `arena/06fa6c23-eternal-sunmmoner` (from `main = f0dc0de`, PR #32 merged) · **PR**: not yet opened · **Owner review requested**.
+**Branch**: `arena/06fa6c23-eternal-sunmmoner` (from `main = f0dc0de`, PR #32 merged) · **PR #33: OPEN, chưa merge**.
 
-P26C delivers visible clouds in gameplay camera + STORM weather state + render evidence matrix.
+Round 1 attempted visible clouds + STORM; CI compiled and rendered, but actual visual gate FAILED. Code implementation below is not evidence of visible clouds at the service gameplay camera.
 P26B results (E1–E5 PASS, legacy G1/G2 FAIL, G1b/G2b PASS = 7/9) are preserved — P26C does not
 modify the sky gradient bands or gate portal, only the cloud layer and weather model.
 
@@ -83,13 +83,18 @@ Rendered via `P26CCloudStormRenderTest` (Robolectric NATIVE graphics, same draw 
 
 Rubric applied before implementation; thresholds precommitted in `thresholds.json`.
 
-**Technical PASS**:
-- Daytime states distinct; no cloud-only alpha hacks
-- Cloud present in sky-visible gameplay bookmark (C1, pixel evidence)
-- CLEAR vs CLOUDY vs RAIN vs STORM distinct at same hour/camera (C3, C4, E3)
-- Storm deterministic tests, graceful pause/resume, no per-frame allocation
-- Night portal void dark + ring light visible; no bloom on void core
-- No impact on anchor, roof geometry, hitbox, inventory, save, Tower Floor, PR #28
+**Round-1 verification (SHA `c255395`, renderer PNG commit `c466d65`)**:
+- CI compile, P26C contract/render, regression suite and assembleDebug: SUCCESS
+  ([render 41686884922](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41686884922),
+  [APK 41686885163](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/41686885163)).
+- **C1 FAIL**: true matched BEFORE↔AFTER clear-sky changed-pixel ratio **0.00%**
+  at z0.88 (required ≥5%). Previous median-based PASS ≈69% was a false positive.
+- **C4 FAIL / E3 FAIL**: STORM noon sky 84.68 vs RAIN 82.06, delta **+2.62**
+  (required ≤−2). Do not mark STORM distinct merely because enum/test compiles.
+- E4 no-flood verified on 7 exact matched BEFORE/AFTER pairs; STORM has no P26B BEFORE.
+- 8 anchor types × 7 ovals = 56 potential draw calls; not device performance evidence.
+- Legacy G1/G2 remain FAIL under original metric; not hidden by this new run.
+- Root causes and targeted Round-2 changes are recorded in `QA_MATRIX.md`.
 
 **Visual QA (0–4)**:
 | Criterion | Score | Evidence |
@@ -108,4 +113,5 @@ All criteria below 3 require root-cause fix within the 3-round budget.
 | Round | Commit | CI run | C1 | C2 | C3 | C4 | C5 | C6 | E1 | E2 | E3 | E4 | E5 | TOTAL |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | baseline audit | `f0dc0de` | — | — | — | — | — | — | — | PASS | PASS | PASS | PASS | PASS | audit |
-| round 1 | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
+| round 1 | `c255395` / evidence `c466d65` | `41686884922` ✅ | FAIL (0%) | FAIL visual | PASS | FAIL (+2.62) | PASS | code cull | PASS | PASS | FAIL | PASS (7 pairs) | PASS | 6/9 automated |
+| round 2 (targeted) | pending | pending | pending | pending | pending | pending | pending | pending | pending | pending | pending | pending | pending | NOT VERIFIED |
