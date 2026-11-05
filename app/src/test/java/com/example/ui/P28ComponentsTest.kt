@@ -87,7 +87,7 @@ class P28ComponentsTest {
     assertEquals("cảnh báo", center.notices[1].body)      // then TACTICAL
     assertEquals("đã cập nhật", center.notices[2].body)    // INFO last, updated body
     for (i in 0 until 12) {
-      center.offer(GameNoticeUi("burst_$i", NoticePriority.INFO, null, "nhiều sự kiện $i", createdAtMs = 10 + i))
+      center.offer(GameNoticeUi("burst_$i", NoticePriority.INFO, null, "nhiều sự kiện $i", createdAtMs = 10L + i))
     }
     assertTrue(center.notices.size <= NoticeCenter.MAX_RETAINED)
     center.dismiss("c")
