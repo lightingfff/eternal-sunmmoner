@@ -77,20 +77,43 @@ class P27BStructureContractTest {
    * the bottom would float above its shadow and above its own collider.
    */
   @Test
-  fun everyReplacementIsBottomAnchoredAndNotFloating() {
+  fun everyReplacementKeepsItsGroundContact() {
+    // Two legitimate anchoring styles exist in the shipped art, so a blanket
+    // "content must touch the bottom row" is wrong:
+    //   * most sprites are bottom-anchored and their base fills the last rows;
+    //   * some carry a deliberate transparent foot band (barrels sit 3 px above the line),
+    //     which is exactly the number the renderer uses for trees.
+    // The real requirement is narrower: whatever the shipped sprite did, the replacement
+    // does too - otherwise the sprite moves relative to its collider and its shadow.
+    // `barrels` is where this surfaced: it was fine while the re-cut filled the canvas, and
+    // only became wrong once the inherited foot padding was restored.
+    // Ship-measured transparent foot bands: the canopy/pine/oak trees (their band is the
+    // draw offset) and the barrel cluster (rests 3 px above the line).
+    val footBands = mapOf("barrels" to 3, "canopy_a" to 5, "pine" to 5, "oak" to 1)
     for ((name, size) in contracts) {
       val bytes = assetBytes("sanctuary_p27b_2/structures/$name.png")
       val png = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)!!
-      var opaqueInBottomRows = 0
-      for (y in (size.second - 3) until size.second) {
+      val band = footBands[name] ?: 0
+      var opaqueInGroundRows = 0
+      for (y in (size.second - 3 - band) until (size.second - band)) {
         for (x in 0 until size.first) {
-          if ((png.getPixel(x, y) ushr 24) > 0) opaqueInBottomRows++
+          if ((png.getPixel(x, y) ushr 24) > 0) opaqueInGroundRows++
         }
       }
       assertTrue(
-        "$name: bottom 3 rows are empty, so the sprite would float off its ground line",
-        opaqueInBottomRows > 0,
+        "$name: the rows just above its ground line are empty, so the sprite would float",
+        opaqueInGroundRows > 0,
       )
+      // And the band itself must be empty, or it is not a foot band at all.
+      if (band > 0) {
+        var opaqueInBand = 0
+        for (y in (size.second - band) until size.second) {
+          for (x in 0 until size.first) {
+            if ((png.getPixel(x, y) ushr 24) > 0) opaqueInBand++
+          }
+        }
+        assertEquals("$name: expected a $band-row clear foot band", 0, opaqueInBand)
+      }
     }
   }
 
