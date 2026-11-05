@@ -1,12 +1,12 @@
 ### test results
 total 8
--rw-r--r-- 1 runner runner 3354 Nov  5 13:19 TEST-com.example.MapForgeP22ContractTest.xml
-drwxr-xr-x 2 runner runner 4096 Nov  5 13:19 binary
+-rw-r--r-- 1 runner runner 3353 Nov  5 13:48 TEST-com.example.MapForgeP22ContractTest.xml
+drwxr-xr-x 2 runner runner 4096 Nov  5 13:48 binary
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.example.MapForgeP22ContractTest" tests="3" skipped="1" failures="1" errors="0" timestamp="2026-11-05T13:19:39.197Z" hostname="runnervmnwato" time="6.627">
+<testsuite name="com.example.MapForgeP22ContractTest" tests="3" skipped="1" failures="1" errors="0" timestamp="2026-11-05T13:48:44.800Z" hostname="runnervmwuk1x" time="4.435">
   <properties/>
-  <testcase name="lockedControlsOakAndCypressAreByteIdenticalToP18AndP20Baselines" classname="com.example.MapForgeP22ContractTest" time="5.729"/>
-  <testcase name="authoredTreesPreserveExactCanvasAndAlpha128FootRowOffsets" classname="com.example.MapForgeP22ContractTest" time="0.077">
+  <testcase name="lockedControlsOakAndCypressAreByteIdenticalToP18AndP20Baselines" classname="com.example.MapForgeP22ContractTest" time="3.886"/>
+  <testcase name="authoredTreesPreserveExactCanvasAndAlpha128FootRowOffsets" classname="com.example.MapForgeP22ContractTest" time="0.05">
     <failure message="java.lang.AssertionError: expected:&lt;126&gt; but was:&lt;131&gt;" type="java.lang.AssertionError">java.lang.AssertionError: expected:&lt;126&gt; but was:&lt;131&gt;
 	at org.junit.Assert.fail(Assert.java:89)
 	at org.junit.Assert.failNotEquals(Assert.java:835)
@@ -39,7 +39,7 @@ drwxr-xr-x 2 runner runner 4096 Nov  5 13:19 binary
 	at java.base/java.lang.Thread.run(Thread.java:1583)
 </failure>
   </testcase>
-  <testcase name="authoredShrubsMatchProceduralCanvasFootRowAndSafeFallbackContract" classname="com.example.MapForgeP22ContractTest" time="0.348">
+  <testcase name="authoredShrubsMatchProceduralCanvasFootRowAndSafeFallbackContract" classname="com.example.MapForgeP22ContractTest" time="0.205">
     <skipped/>
   </testcase>
   <system-out><![CDATA[]]></system-out>
