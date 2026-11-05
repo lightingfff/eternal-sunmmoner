@@ -1,11 +1,11 @@
 ### test results
 total 8
--rw-r--r-- 1 runner runner  451 Nov  5 11:25 TEST-com.example.MapForgeTerrainRenderTest.xml
-drwxr-xr-x 2 runner runner 4096 Nov  5 11:25 binary
+-rw-r--r-- 1 runner runner  451 Nov  5 12:43 TEST-com.example.MapForgeTerrainRenderTest.xml
+drwxr-xr-x 2 runner runner 4096 Nov  5 12:43 binary
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.example.MapForgeTerrainRenderTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-05T11:25:29.608Z" hostname="runnervmnwato" time="9.31">
+<testsuite name="com.example.MapForgeTerrainRenderTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-05T12:43:42.100Z" hostname="runnervmwuk1x" time="7.39">
   <properties/>
-  <testcase name="captureTerrainSliceThroughTheRealRenderer" classname="com.example.MapForgeTerrainRenderTest" time="8.806"/>
+  <testcase name="captureTerrainSliceThroughTheRealRenderer" classname="com.example.MapForgeTerrainRenderTest" time="7.059"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

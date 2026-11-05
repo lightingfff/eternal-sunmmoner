@@ -3,50 +3,93 @@ Calculating task graph as no cached configuration is available for tasks: :app:c
 > Task :app:preBuild UP-TO-DATE
 > Task :app:preDebugBuild UP-TO-DATE
 > Task :app:processDebugGoogleServices UP-TO-DATE
-> Task :app:generateDebugResources UP-TO-DATE
 > Task :app:generateDebugBuildConfig UP-TO-DATE
 > Task :app:kspDebugKotlin SKIPPED
-> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
 > Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
 > Task :app:parseDebugLocalResources UP-TO-DATE
 > Task :app:generateDebugRFile UP-TO-DATE
-> Task :app:compileDebugKotlin UP-TO-DATE
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_26-1793877987188.json
+> Task :app:compileDebugKotlin
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:667:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:735:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:747:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:752:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:757:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:763:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:769:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:776:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:782:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:787:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:792:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:797:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:802:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:807:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:812:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:818:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:829:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:834:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:839:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:844:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:853:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:858:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:863:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:877:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:882:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:887:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:892:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:897:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:915:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:933:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:938:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:952:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:958:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:964:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:971:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:977:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:982:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:987:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:992:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:1047:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:1070:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:1098:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///home/runner/work/eternal-sunmmoner/eternal-sunmmoner/app/src/main/java/com/example/ui/screens/HeroProfileModal.kt:176:28 Condition is always 'true'.
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_26-1793882684012.json
 
-BUILD SUCCESSFUL in 1s
-8 actionable tasks: 8 up-to-date
+BUILD SUCCESSFUL in 50s
+8 actionable tasks: 1 executed, 7 up-to-date
 Configuration cache entry stored.
 ### :app:compileDebugUnitTestKotlin
 Reusing configuration cache.
 > Task :app:preBuild UP-TO-DATE
-> Task :app:preDebugUnitTestBuild UP-TO-DATE
 > Task :app:preDebugBuild UP-TO-DATE
 > Task :app:processDebugGoogleServices UP-TO-DATE
-> Task :app:generateDebugBuildConfig UP-TO-DATE
-> Task :app:kspDebugKotlin SKIPPED
 > Task :app:generateDebugResources UP-TO-DATE
 > Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:kspDebugKotlin SKIPPED
 > Task :app:packageDebugResources UP-TO-DATE
 > Task :app:mapDebugSourceSetPaths UP-TO-DATE
 > Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
-> Task :app:processDebugNavigationResources UP-TO-DATE
 > Task :app:extractDeepLinksDebug UP-TO-DATE
-> Task :app:parseDebugLocalResources UP-TO-DATE
-> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
 > Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
 > Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
 > Task :app:generateDebugRFile UP-TO-DATE
 > Task :app:processDebugMainManifest UP-TO-DATE
 > Task :app:processDebugManifest UP-TO-DATE
 > Task :app:processDebugManifestForPackage UP-TO-DATE
 > Task :app:compileDebugKotlin UP-TO-DATE
-> Task :app:compileDebugJavaWithJavac UP-TO-DATE
 > Task :app:processDebugResources UP-TO-DATE
-> Task :app:bundleDebugClassesToCompileJar UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:bundleDebugClassesToCompileJar
 > Task :app:kspDebugUnitTestKotlin SKIPPED
-> Task :app:compileDebugUnitTestKotlin UP-TO-DATE
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_26-1793877525000.json
+> Task :app:compileDebugUnitTestKotlin
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_26-1793882304212.json
 
-BUILD SUCCESSFUL in 1s
-22 actionable tasks: 22 up-to-date
+BUILD SUCCESSFUL in 30s
+22 actionable tasks: 2 executed, 20 up-to-date
 Configuration cache entry reused.
