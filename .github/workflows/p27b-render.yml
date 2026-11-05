@@ -12,6 +12,7 @@ on:
       - 'app/src/main/java/com/example/game/pixel/**'
       - 'app/src/main/java/com/example/ui/**'
       - 'app/src/test/java/com/example/P27B*Test.kt'
+      - 'app/src/test/java/com/example/SanctuaryMaterialTest.kt'
       - 'app/src/test/java/com/example/ui/P27B*Test.kt'
   pull_request:
     branches: [main]
@@ -21,6 +22,7 @@ on:
       - 'app/src/main/java/com/example/game/pixel/**'
       - 'app/src/main/java/com/example/ui/**'
       - 'app/src/test/java/com/example/P27B*Test.kt'
+      - 'app/src/test/java/com/example/SanctuaryMaterialTest.kt'
       - 'app/src/test/java/com/example/ui/P27B*Test.kt'
   workflow_dispatch:
 
