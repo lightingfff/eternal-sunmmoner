@@ -66,7 +66,7 @@ class P28ComponentsTest {
       "card_nameplate", "rarity_star_on", "rarity_star_off",
       "notice_standard", "notice_warning", "notice_ceremony", "loading_sigil")) {
       val bmp = ESP28Assets.image(frameId)!!
-      assertTrue("$frameId must be RGBA with transparency", bmp.asAndroidBitmap().hasAlpha)
+      assertTrue("$frameId must be RGBA with transparency", bmp.asAndroidBitmap().hasAlpha())
     }
   }
 
