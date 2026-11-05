@@ -88,6 +88,7 @@ jobs:
             --tests 'com.example.SanctuaryMaterialTest' \
             --tests 'com.example.P27BGroundRepeatTest' \
             --tests 'com.example.P27BStructureContractTest' \
+            --tests 'com.example.P27BNightResponseTest' \
             --stacktrace > "$RUNNER_TEMP/p27b-assets.log" 2>&1
           result=$?
           cat "$RUNNER_TEMP/p27b-assets.log"

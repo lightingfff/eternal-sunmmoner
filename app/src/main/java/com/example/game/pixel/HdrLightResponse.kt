@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.withTransform
@@ -297,6 +298,9 @@ object HdrLightResponse {
     // Shape-aware face grading for EVERY building, including those without a local
     // source. This is what separates roof / front / side values instead of a vague glow.
     if (isBuilding(obs.propKind)) drawVolumeGrade(obs, cx, cy, s, specFor(obs.propKind))
+    // Debt C: the building absorbs moonlight BEFORE any emissive window glow is stamped,
+    // so the wall darkens with the night while the lit windows keep their value.
+    if (isBuilding(obs.propKind)) drawNightAbsorption(obs, cx, cy, s)
     // Wide, flat contact AO on the .72 ground plane, AFTER the sprite so it is visible.
     // The long directional silhouette remains owned by SanctuaryEnvironmentShadows.
     if (isBuilding(obs.propKind) && balanced()) {
@@ -369,6 +373,72 @@ object HdrLightResponse {
    * not a fullscreen pass, not a blur and not a sticker rectangle: roof, front and side
    * planes gain separate values while pixel art stays sharp.
    */
+  /**
+   * P27B-V5 checkpoint 3 (debt C): a building must ABSORB moonlight, not wear it.
+   *
+   * Measured before this code: at 00:00 the Gate facade was still 124 luma against a
+   * 160 noon value, while the global grade only applies flat navy over everything. The
+   * result reads as a photo pasted on a night scene, because bright ivory stone was
+   * being darkened by exactly the same amount as dark grass.
+   *
+   * This stamp uses the sprite's own cached silhouette and scales its density by the
+   * sprite's measured mean brightness, so pale limestone loses far more moonlight than
+   * a dark roof does. Emissive windows are drawn AFTER this pass, so they keep their
+   * glow instead of being dimmed with the wall.
+   */
+  private fun DrawScope.drawNightAbsorption(obs: WorldObstacle, cx: Float, cy: Float, s: Float) {
+    if (!balanced() || s < .30f) return
+    val bmp = SanctuaryEnvironmentShadows.sprite(obs) ?: return
+    val night = (1f - WorldEnvironment.lighting.ambientIntensity).coerceIn(0f, 1f)
+    if (night <= .02f) return
+    val ps = ObliqueSpriteGeometry.pixelScale(obs.propKind) * s
+    val bounds = ObliqueSpriteGeometry.bounds(bmp)
+    val footY = cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, bmp) * s
+    val baseY = footY - (bounds.bottomPadding + 1f) * ps
+    val halfW = bmp.width * ps * .5f
+    if (cx + halfW < 0f || cx - halfW > size.width ||
+      baseY + ps * 2f < 0f || baseY - bounds.visibleHeight * ps > size.height
+    ) return
+    // Pale stone absorbs more; a dark roof is already close to the night value.
+    val pale = ((meanLuma(bmp) - 60f) / 120f).coerceIn(0f, 1f)
+    val alpha = (night * (0.16f + 0.26f * pale)).coerceAtMost(.34f)
+    if (alpha <= 0f) return
+    val shape = SanctuaryEnvironmentShadows.silhouette(bmp)
+    // The silhouette Path lives in sprite-local units, so it is drawn through the same
+    // transform the volume grade uses. Color is a value class, so copy(alpha=) allocates
+    // nothing: this stays one drawPath per building per frame.
+    withTransform({
+      translate(cx, baseY)
+      scale(ps, -ps, Offset.Zero)
+    }) {
+      drawPath(shape, NIGHT_ABSORB.copy(alpha = alpha))
+    }
+  }
+
+  private val nightAbsorbCache = HashMap<ImageBitmap, Float>()
+
+  /** Mean luminance of the sprite's OPAQUE pixels, cached per bitmap (never per frame). */
+  internal fun meanLuma(bitmap: ImageBitmap): Float = nightAbsorbCache.getOrPut(bitmap) {
+    val bmp = bitmap.asAndroidBitmap()
+    val w = bmp.width
+    val h = bmp.height
+    if (w <= 0 || h <= 0) return@getOrPut 0f
+    val pixels = IntArray(w * h)
+    bmp.getPixels(pixels, 0, w, 0, 0, w, h)
+    var total = 0.0
+    var count = 0
+    for (pixel in pixels) {
+      if ((pixel ushr 24) <= 128) continue
+      total += 0.299 * ((pixel shr 16) and 0xFF) +
+        0.587 * ((pixel shr 8) and 0xFF) +
+        0.114 * (pixel and 0xFF)
+      count++
+    }
+    if (count == 0) 0f else (total / count).toFloat()
+  }
+
+  private val NIGHT_ABSORB = Color(0xff101a2e)
+
   private fun DrawScope.drawVolumeGrade(
     obs: WorldObstacle,
     cx: Float,
