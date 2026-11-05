@@ -1,0 +1,78 @@
+name: P27B matched Sanctuary render evidence
+
+# Pre-art and post-art commits run the exact same renderer/Compose UI tests.
+# Unlike visual preview generators these files come from Robolectric native graphics.
+on:
+  push:
+    branches:
+      - arena/683a732b-eternal-sunmmoner
+    paths:
+      - '.github/workflows/p27b-render.yml'
+      - 'app/src/main/assets/sanctuary_p27b/**'
+      - 'app/src/main/java/com/example/game/pixel/**'
+      - 'app/src/main/java/com/example/ui/**'
+      - 'app/src/test/java/com/example/P27B*Test.kt'
+      - 'app/src/test/java/com/example/ui/P27B*Test.kt'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/p27b-render.yml'
+      - 'app/src/main/assets/sanctuary_p27b/**'
+      - 'app/src/main/java/com/example/game/pixel/**'
+      - 'app/src/main/java/com/example/ui/**'
+      - 'app/src/test/java/com/example/P27B*Test.kt'
+      - 'app/src/test/java/com/example/ui/P27B*Test.kt'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install Android SDK packages
+        run: |
+          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager | head -n 1)
+          set +o pipefail
+          yes | "$SDKMANAGER" --licenses
+          license_status=${PIPESTATUS[1]}
+          set -o pipefail
+          test "$license_status" -eq 0
+          "$SDKMANAGER" --install "platform-tools" "platforms;android-36.1" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.3.1'
+      - name: Debug-only Google resource, no auth modifications in app
+        run: |
+          mkdir -p app/src/debug/res/values
+          cat > app/src/debug/res/values/google_services_placeholder.xml <<'EOF'
+          <resources><string name="default_web_client_id" translatable="false">debug-placeholder.apps.googleusercontent.com</string></resources>
+          EOF
+      - name: Run matched world and UI render/behavior tests
+        run: gradle :app:testDebugUnitTest --tests 'com.example.P27BRenderTest' --tests 'com.example.ui.P27BUiTest' --stacktrace
+      - name: Assemble Android APK (technical verification only)
+        run: |
+          gradle :app:assembleDebug --stacktrace
+          sha256sum app/build/outputs/apk/debug/app-debug.apk
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p27b-render-${{ github.sha }}
+          path: app/build/visual_screenshots/p27b/**
+          if-no-files-found: warn
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: p27b-apk-${{ github.sha }}
+          path: app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 14
