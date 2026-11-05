@@ -28,19 +28,24 @@ object PixelStructureAtlas {
     SanctuaryArtAssets.preferredLandmark("summoning_hall", 268, 206) ?: summoningHallFallback
   private val summoningHallFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildSummoningHall() }
   val heroRegistryStructure: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("premium_slice/hero_registry.png") ?: heroRegistryFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/hero_registry.png")
+      ?: SanctuaryArtAssets.assetSafe("premium_slice/hero_registry.png") ?: heroRegistryFallback
   private val heroRegistryFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildHeroRegistryHall() }
   val trainingGroundStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildTrainingGround() }
-  val armoryStructure: ImageBitmap get() = SanctuaryArtAssets.assetSafe("premium_slice/armory.png") ?: armoryFallback
+  val armoryStructure: ImageBitmap get() = SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/armory.png")
+      ?: SanctuaryArtAssets.assetSafe("premium_slice/armory.png") ?: armoryFallback
   private val armoryFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildArmory() }
   val synthesisLabStructure: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("premium_slice/synthesis_lab.png") ?: synthesisLabFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/synthesis_lab.png")
+      ?: SanctuaryArtAssets.assetSafe("premium_slice/synthesis_lab.png") ?: synthesisLabFallback
   private val synthesisLabFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildSynthesisLab() }
   val heroQuartersStructure: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("premium_slice/hero_quarters.png") ?: heroQuartersFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/hero_quarters.png")
+      ?: SanctuaryArtAssets.assetSafe("premium_slice/hero_quarters.png") ?: heroQuartersFallback
   private val heroQuartersFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildHeroQuarters() }
   val restaurantStructure: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("premium_slice/restaurant.png") ?: restaurantFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/restaurant.png")
+      ?: SanctuaryArtAssets.assetSafe("premium_slice/restaurant.png") ?: restaurantFallback
   private val restaurantFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildRestaurantExterior() }
   val floorVistaArchStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildFloorVistaArch() }
 

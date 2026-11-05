@@ -193,6 +193,90 @@
       "visual_qa": "needs engine-side review"
     },
     {
+      "id": "facility_hero_quarters",
+      "file": "structures/hero_quarters.png",
+      "size": [
+        200,
+        168
+      ],
+      "replaces": "premium_slice/hero_quarters",
+      "pivot": [
+        100,
+        168
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/facility_hero_quarters.png",
+      "source_sha256": "ebeed615302392c0163e4526335b7224ec3a550beeac0c866543c985b295a277",
+      "sha256": "0eb2770dc220108e93c1a5575bc03b09ae4127b2391bcbb2a921c22bc802a844",
+      "mean_luma": 83.4,
+      "old_mean_luma": 50.0,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+    },
+    {
+      "id": "facility_armory",
+      "file": "structures/armory.png",
+      "size": [
+        190,
+        166
+      ],
+      "replaces": "premium_slice/armory",
+      "pivot": [
+        95,
+        166
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/facility_armory.png",
+      "source_sha256": "7f553aa5694782a1b84255d0894690eba1b13254aaa7245ca35c46fda18a3b26",
+      "sha256": "8d39899734e8c20f1eca6a13b30c86822e3c2070d08058fbe62e67ba642bbfec",
+      "mean_luma": 84.4,
+      "old_mean_luma": 51.1,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+    },
+    {
+      "id": "facility_synthesis_lab",
+      "file": "structures/synthesis_lab.png",
+      "size": [
+        188,
+        168
+      ],
+      "replaces": "premium_slice/synthesis_lab",
+      "pivot": [
+        94,
+        168
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/facility_synthesis_lab.png",
+      "source_sha256": "1409bf500165c0b95aa64ec537e9d46af3aefffbc3ff5a053a291398d3b580e1",
+      "sha256": "ec1727d79b30831409372ab4cfcce787bcc9a41d2bd5ba3c4eaceeef752f53a7",
+      "mean_luma": 90.0,
+      "old_mean_luma": 54.5,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+    },
+    {
+      "id": "facility_restaurant",
+      "file": "structures/restaurant.png",
+      "size": [
+        206,
+        172
+      ],
+      "replaces": "premium_slice/restaurant",
+      "pivot": [
+        103,
+        172
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/facility_restaurant.png",
+      "source_sha256": "544e8eea81c598b0c57494eb97f0c9de377f2dd18bbe2371f61585994f13df91",
+      "sha256": "8b9938ba131a593acb8717e4ca6ad39a4b81b22e19430029fc535d4bf902d1ab",
+      "mean_luma": 75.7,
+      "old_mean_luma": 58.5,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+    },
+    {
       "id": "sakura_a",
       "file": "structures/canopy_a.png",
       "size": [

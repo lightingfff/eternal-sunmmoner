@@ -41,6 +41,11 @@ class P27BStructureContractTest {
     "canopy_a" to (114 to 132),
     "pine" to (96 to 128),
     "oak" to (112 to 136),
+    // Facilities keep their premium_slice canvas sizes.
+    "hero_quarters" to (200 to 168),
+    "armory" to (190 to 166),
+    "synthesis_lab" to (188 to 168),
+    "restaurant" to (206 to 172),
   )
 
   private fun assetBytes(path: String): ByteArray {
@@ -127,7 +132,9 @@ class P27BStructureContractTest {
     }
     // P27B landmark measured from the shipped structures: summoning_hall ~180, tower_gate ~171.
     val landmarkLuma = 175.0
-    val p3 = listOf("townhouse_a" to 51.4, "townhouse_b" to 58.9, "oak" to 51.3)
+    val p3 = listOf("townhouse_a" to 51.4, "townhouse_b" to 58.9, "oak" to 51.3,
+      "hero_quarters" to 50.0, "armory" to 51.1, "synthesis_lab" to 54.5,
+      "restaurant" to 58.5)
     for ((name, oldLuma) in p3) {
       val now = luma(name)
       val oldGap = kotlin.math.abs(landmarkLuma - oldLuma)
@@ -151,5 +158,7 @@ class P27BStructureContractTest {
     assertEquals(40, PixelStructureAtlas.trainingDummySprite!!.width)
     assertNotNull(PixelStructureAtlas.streetLanternFrames.firstOrNull())
     assertEquals(32, PixelStructureAtlas.streetLanternFrames.first().width)
+    assertEquals(200, PixelStructureAtlas.heroQuartersStructure.width)
+    assertEquals(190, PixelStructureAtlas.armoryStructure.width)
   }
 }

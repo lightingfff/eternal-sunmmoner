@@ -57,6 +57,14 @@ PROP_SPECS = [
   ('training_dummy',   4, (40, 58),  'training_dummy'),
 ]
 
+# Facilities keep their premium_slice canvas sizes: same reason as the houses.
+FACILITY_SPECS = {
+  'facility_hero_quarters': {'file': 'hero_quarters.png', 'size': (200, 168), 'replaces_premium': 'hero_quarters'},
+  'facility_armory':        {'file': 'armory.png',        'size': (190, 166), 'replaces_premium': 'armory'},
+  'facility_synthesis_lab': {'file': 'synthesis_lab.png', 'size': (188, 168), 'replaces_premium': 'synthesis_lab'},
+  'facility_restaurant':    {'file': 'restaurant.png',    'size': (206, 172), 'replaces_premium': 'restaurant'},
+}
+
 # Vegetation comes from its own painted sheet: three trees, three inherited canvases.
 TREE_SHEET = 'tree_set_01.png'
 TREE_SPECS = [
@@ -238,6 +246,36 @@ def main() -> None:
             manifest['assets'].append(record)
             print(f'{name:20} -> {replaces+".png":18} luma {record["mean_luma"]:5.1f} '
                   f'(was {record["old_mean_luma"]})')
+    # ---- facilities --------------------------------------------------------
+    premium = ROOT / 'app/src/main/assets/premium_slice'
+    for name, spec in FACILITY_SPECS.items():
+        source_path = SOURCE / f'{name}.png'
+        if not source_path.is_file():
+            print(f'skip {name}: no source')
+            continue
+        canvas = to_canvas(neutral_background_cutout(Image.open(source_path)), spec['size'])
+        out_path = OUT / spec['file']
+        canvas.save(out_path, optimize=True)
+        old_path = premium / f'{spec["replaces_premium"]}.png'
+        record = {
+            'id': name,
+            'file': f'structures/{spec["file"]}',
+            'size': list(canvas.size),
+            'replaces': f'premium_slice/{spec["replaces_premium"]}',
+            'pivot': [spec['size'][0] // 2, spec['size'][1]],
+            'alpha': 'binary RGBA',
+            'source_path': str(source_path.relative_to(ROOT)),
+            'source_sha256': hashlib.sha256(source_path.read_bytes()).hexdigest(),
+            'sha256': hashlib.sha256(out_path.read_bytes()).hexdigest(),
+            'mean_luma': round(luma(canvas), 1),
+            'old_mean_luma': round(luma(Image.open(old_path)), 1) if old_path.is_file() else None,
+            'qa_status': 'GAME_CANDIDATE',
+            'visual_qa': 'needs engine-side review at z0.88 and z1.48',
+        }
+        manifest['assets'].append(record)
+        print(f'{name:24} -> {spec["file"]:18} luma {record["mean_luma"]:5.1f} '
+              f'(was {record["old_mean_luma"]})')
+
     # ---- vegetation --------------------------------------------------------
     tree_source = SOURCE / TREE_SHEET
     if tree_source.is_file():
