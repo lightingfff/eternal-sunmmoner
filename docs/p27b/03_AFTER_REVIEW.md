@@ -2,7 +2,7 @@
 
 ## Bằng chứng
 - BEFORE: CI run `41982824376` (SHA `5a2876e`), ảnh `docs/p27b/previews/before/`.
-- AFTER: cùng harness `P27BRenderTest` + `P27BUiTest`, cùng 1280×720, `timeSec=0`, BALANCED, hour 12/0 CLEAR, camera/zoom y hệt (`camera_props.json` ghi `source_sha`), ảnh `docs/p27b/previews/after/`. CI run và SHA AFTER cuối được ghi ở `BASELINE.md`.
+- AFTER: cùng harness `P27BRenderTest` + `P27BUiTest`, cùng 1280×720, `timeSec=0`, BALANCED, hour 12/0 CLEAR, camera/zoom y hệt ảnh `docs/p27b/previews/after/`. CI [run #42017255236](https://github.com/lightingfff/eternal-sunmmoner/actions/runs/42017255236) trên `4baa7d1`, bot commit `c6f5adc`; validator 82/82, `P27BAssetContractTest`, `SanctuaryMaterialTest`, world render, Compose UI và `assembleDebug` đều PASS.
 - Ảnh đều là Robolectric native Skia + code vẽ thật. Không ảnh concept, không screenshot điện thoại. **Không có FPS/GPU/thermal** — `NOT TESTED`.
 
 ## Đã xem và so sánh trực tiếp
