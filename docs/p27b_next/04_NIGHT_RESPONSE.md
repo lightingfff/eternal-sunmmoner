@@ -24,13 +24,26 @@ Toà nhà giảm **ít hơn** nền → đúng cảm giác "ảnh dán lên cả
 - chạy **sau** volume grade nhưng **trước** stamp cửa sổ phát sáng, nên tường tối đi còn cửa sổ giữ nguyên độ sáng;
 - chỉ BALANCED, chỉ khi `s ≥ 0.30`, `night > 0.02`, có cull theo màn hình. Không fullscreen pass, không bitmap per-frame.
 
-## 3. Kết quả đo sau khi sửa
+## 3. Kết quả đo sau khi sửa — ĐÃ ĐÍNH CHÍNH 2026-11-05
+
+> **Số "26.3% facade" ở dưới là XANH GIẢ.** Band "facade Gate" thực ra rơi vào nền trời,
+> nên con số đó là chênh noon→night của grade môi trường, không phải của absorption.
+> Bằng chứng: pixel-diff giữa render `c7ffdc0` (repaint only) và `38645e3` (repaint +
+> `drawGeometryNightAbsorption`), cùng camera `gate_night_z148`: band facade **+0.0%** —
+> không đổi một pixel; toàn bộ hiệu ứng thật nằm ở 4046 px (0.44% khung) trên 2 đoạn tường
+> hai bên, luma **−8.7%** (164.6→150.3). Xem `previews/night_absorption/README.md`.
+
+Bảng gốc (giữ để đối chiếu, band đo trên trời):
 | | noon | night (sau CP3) | giảm |
 |---|---|---|---|
-| facade Gate | 171.9 | **126.7** | **26.3%** |
+| facade Gate (band có trời) | 171.9 | **126.7** | **26.3%** |
 | nền cùng khung | 102.3 | 80.9 | 21.0% |
 
-Quan hệ đã **đảo đúng chiều**: đá sáng mất nhiều ánh trăng hơn cỏ (26.3% > 21.0%), thay vì ít hơn. Facade tối đi 11.2 luma so với trước CP3.
+Phần **đo được và đúng** là ở đường sprite (`drawNightAbsorption`): test
+`landmarkFacadeAnswersNightMoreThanTheGroundDoes` render thật noon vs midnight và FAIL nếu
+facade giảm < 1.05× nền — quan hệ đã đảo đúng chiều (đo được 1.25×). Phần geometry vẽ
+bằng code (`drawGeometryNightAbsorption`) có tác dụng thật nhưng nhỏ: **−8.7% trên 4046 px**
+tại camera gate night, tường phía nam nằm ngoài khung nên không đổi pixel nào.
 
 ## 4. Test mới (`P27BNightResponseTest`)
 | Kiểm tra | Nội dung |

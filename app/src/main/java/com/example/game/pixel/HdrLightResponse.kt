@@ -399,6 +399,12 @@ object HdrLightResponse {
    *
    * Same rule and the same curve as the sprite path: a pale limestone face absorbs more than
    * a dark roof. One extra path fill per segment (4 segments per frame), not a fullscreen pass.
+   *
+   * Measured effect (pixel-diff of `gate_night_z148` between `c7ffdc0` and `38645e3`,
+   * 2026-11-05): only 4046 of 1280x720 px change (0.44% of the frame), on the two wall
+   * segments visible in that camera, luma -8.7% there (164.6 -> 150.3). The southern wall
+   * sits outside that camera's view, so its calls change no pixel in that shot. Do not
+   * quote larger percentages for this pass.
    */
   fun DrawScope.drawGeometryNightAbsorption(path: Path, baseLuma: Float) =
     drawGeometryNightAbsorptionImpl({ drawPath(path, it) }, baseLuma)

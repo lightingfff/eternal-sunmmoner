@@ -14,7 +14,7 @@ Cả 3 workflow trên HEAD này đều **success**: APK `42057485727`, P27B `420
 |---|---|---|
 | **A.** Nhà/props còn art P03, lệch tông | **ĐÓNG** | 20/20 sprite thay bằng art P27B-V5. Luma: nhà 51→86…148, tháp 57/55→152/153, registry 55→153. Tường chu vi + vành đảo repaint. |
 | **B.** Terrain lặp chu kỳ | **đóng một phần** | `period-repeat 33/64`, 64/64 cell distinct, wrap seam < 4. Không tuyên bố "seamless". |
-| **C.** Gate/Hall quá sáng ban đêm | **ĐÓNG (2 lần)** | CP3: facade giảm 26.3% vs nền 21.0%. CP5: chu vi (code vẽ) giảm 54–78%. |
+| **C.** Gate/Hall quá sáng ban đêm | **PARTIAL (đo lại 05/11: số cũ sai)** | CP3 (sprite): test `P27BNightResponseTest` PASS, facade giảm ≥1.05× nền. CP5 (geometry code vẽ): pixel-diff render `c7ffdc0` vs `38645e3` (`gate_night_z148`) chỉ đổi **4046 px (0.44% khung)**, luma **−8.7%** (164.6→150.3) trên đúng 2 đoạn tường hai bên; cổng/tường nam 0 px. Số "26.3%" là grade môi trường, "54–78%" không tái lập được — xem `previews/night_absorption/README.md`. |
 | **D.** HUD/Auth/Loading thiếu design system | **ĐÓNG phần lớn** | Token layer + 42 màu hardcode → 6; HUD panel 71%→88%; auth scrim 0.42→0.76. |
 | **E.** Summon result cắt chữ | **ĐÓNG** | Test đo `boundsInRoot` thật, ảnh 800×360dp không còn glyph bị cắt. |
 
@@ -65,6 +65,10 @@ Cả 3 workflow trên HEAD này đều **success**: APK `42057485727`, P27B `420
 
 ## 6. Việc còn mở (không tuyên bố đã xong)
 
+- **Debt C còn mở một phần:** absorption cho geometry chu vi chỉ làm tối **−8.7% trên 4046 px
+  (0.44% khung)** ở `gate_night_z148` (đo bằng pixel-diff, xem `previews/night_absorption/`);
+  tường phía nam ngoài khung camera này chưa được kiểm chứng bằng ảnh. Số "−54…−78%" trước
+  đây không đúng.
 - Debt B (chu kỳ terrain) mới đóng một phần; `period-repeat 33/64` chưa phải "hết lặp".
 - HUD/facility panel chưa restyle toàn diện — mới có token + 2 chỗ đo contrast.
 - PR #28 (Mission 01) và #13 vẫn conflicted; #13 nội dung đã nằm trong `main`.
