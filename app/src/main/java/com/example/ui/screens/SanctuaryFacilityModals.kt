@@ -129,7 +129,12 @@ fun SanctuaryFacilityModalOverlay(
   BackHandler(onBack = onClose)
 
   val profile = state.profile ?: MasterProfile()
-  val accentColor = facilityAccentColor(facility)
+  // A dedicated Summon parchment surface; the rest of the facility windows remain
+  // dark glass. Ink is explicitly dark here (light gold text on ivory is illegible).
+  val isIvory = facility == FacilityType.SUMMONING_HALL
+  val ink = if (isIvory) Color(0xFF283B4B) else ParchmentLight
+  val secondaryInk = if (isIvory) Color(0xFF506474) else RuneSilver
+  val accentColor = if (isIvory) Color(0xFF416D82) else facilityAccentColor(facility)
   var nowEpochSec by remember { mutableLongStateOf(System.currentTimeMillis() / 1000L) }
   LaunchedEffect(facility) {
     while (true) {
@@ -149,7 +154,7 @@ fun SanctuaryFacilityModalOverlay(
   BoxWithConstraints(
     modifier = Modifier
       .fillMaxSize()
-      .background(ObsidianVoid.copy(alpha = 0.85f))
+      .background(ObsidianVoid.copy(alpha = if (isIvory) 0.74f else 0.85f))
       .windowInsetsPadding(WindowInsets.safeDrawing)
       .padding(horizontal = 12.dp, vertical = 8.dp),
     contentAlignment = Alignment.Center,
@@ -161,9 +166,9 @@ fun SanctuaryFacilityModalOverlay(
         .fillMaxSize()
         .widthIn(max = 760.dp)
         .heightIn(max = 680.dp)
-        .border(1.5.dp, accentColor.copy(alpha = 0.72f), RoundedCornerShape(18.dp)),
+        .border(1.5.dp, if (isIvory) Color(0xFFC7A36C) else accentColor.copy(alpha = 0.72f), RoundedCornerShape(18.dp)),
       shape = RoundedCornerShape(18.dp),
-      color = FantasySkin.Panel,
+      color = if (isIvory) Color(0xFFF5F1E7) else FantasySkin.Panel,
       tonalElevation = 10.dp,
     ) {
       Column(
@@ -189,7 +194,7 @@ fun SanctuaryFacilityModalOverlay(
               Text(
                 text = facility.subtitleVi,
                 style = MaterialTheme.typography.bodySmall,
-                color = RuneSilver,
+                color = secondaryInk,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
               )
@@ -216,10 +221,13 @@ fun SanctuaryFacilityModalOverlay(
             onClick = onClose,
             modifier = Modifier.size(48.dp).testTag("close_facility_modal_button"),
           ) {
-            Icon(Icons.Default.Close, contentDescription = "Đóng", tint = ParchmentLight)
+            Icon(Icons.Default.Close, contentDescription = "Đóng", tint = ink)
           }
         }
 
+        if (isIvory) {
+          Spacer(modifier = Modifier.fillMaxWidth().height(1.dp).background(Color(0xFFC7A36C).copy(alpha = 0.65f)))
+        }
         Spacer(modifier = Modifier.height(6.dp))
 
         // Single-line Horizontally Scrollable Resource Bar
@@ -229,12 +237,12 @@ fun SanctuaryFacilityModalOverlay(
             .horizontalScroll(rememberScrollState()),
           horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-          ResourcePillBadge("Vàng", profile.gold, SummonerGold)
-          ResourcePillBadge("Mana", profile.manaCrystals, PortalCyan)
-          ResourcePillBadge("Mảnh Hồn", profile.soulShards, ArcaneViolet)
-          ResourcePillBadge("Quặng Sắt", profile.ironOre, RuneSilver)
-          ResourcePillBadge("Tinh Hoa", profile.arcaneEssence, EmeraldVitality)
-          ResourcePillBadge("Khẩu Phần", profile.rations, AmberWarning)
+          ResourcePillBadge("Vàng", profile.gold, SummonerGold, lightOnIvory = isIvory)
+          ResourcePillBadge("Mana", profile.manaCrystals, PortalCyan, lightOnIvory = isIvory)
+          ResourcePillBadge("Mảnh Hồn", profile.soulShards, ArcaneViolet, lightOnIvory = isIvory)
+          ResourcePillBadge("Quặng Sắt", profile.ironOre, RuneSilver, lightOnIvory = isIvory)
+          ResourcePillBadge("Tinh Hoa", profile.arcaneEssence, EmeraldVitality, lightOnIvory = isIvory)
+          ResourcePillBadge("Khẩu Phần", profile.rations, AmberWarning, lightOnIvory = isIvory)
         }
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -323,13 +331,20 @@ private fun SummoningHallContent(
   if(confirmSummon) {
     androidx.compose.material3.AlertDialog(
       onDismissRequest={confirmSummon=false},
-      containerColor=FantasySkin.Panel,
-      title={Text("Xác nhận triệu hồi",color=FantasySkin.Gold)},
-      text={Text("Tiêu hao 20 Mảnh Linh Hồn và 40 Mana. Anh hùng nhận được sẽ được lưu vào đội ngũ của bạn.")},
+      containerColor=Color(0xFFF5F1E7),
+      // The app theme may still supply a light content colour; state it explicitly so
+      // the message never becomes ivory-on-ivory in either light or dark app themes.
+      textContentColor=Color(0xFF506474),
+      titleContentColor=Color(0xFF283B4B),
+      title={Text("Xác nhận triệu hồi",color=Color(0xFF283B4B))},
+      text={Text("Tiêu hao 20 Mảnh Linh Hồn và 40 Mana. Anh hùng nhận được sẽ được lưu vào đội ngũ của bạn.",color=Color(0xFF506474))},
       confirmButton={Button(onClick={confirmSummon=false;onSummonHero()},
         enabled=!isBusy && profile.soulShards>=20 && profile.manaCrystals>=40,
-        modifier=Modifier.testTag("confirm_summon_spend")) {Text("Triệu hồi • 20 Hồn / 40 Mana")}},
-      dismissButton={androidx.compose.material3.TextButton(onClick={confirmSummon=false},modifier=Modifier.testTag("cancel_summon_spend")) {Text("Hủy",color=RuneSilver)}})
+        modifier=Modifier.testTag("confirm_summon_spend"),
+        colors=ButtonDefaults.buttonColors(containerColor=Color(0xFF2D728C),contentColor=Color.White)) {
+        Text("Triệu hồi • 20 Hồn / 40 Mana")
+      }},
+      dismissButton={androidx.compose.material3.TextButton(onClick={confirmSummon=false},modifier=Modifier.testTag("cancel_summon_spend")) {Text("Hủy",color=Color(0xFF506474))}})
   }
   val infinite = rememberInfiniteTransition(label = "summonRune")
   val angle by infinite.animateFloat(
@@ -350,8 +365,8 @@ private fun SummoningHallContent(
         modifier = Modifier
           .fillMaxWidth()
           .clip(RoundedCornerShape(14.dp))
-          .background(AstralSlate)
-          .border(1.dp, ArcaneViolet.copy(alpha = 0.65f), RoundedCornerShape(14.dp))
+          .background(Color(0xFFFFFDF8))
+          .border(1.dp, Color(0xFFC7A36C).copy(alpha = 0.72f), RoundedCornerShape(14.dp))
           .padding(14.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
       ) {
@@ -363,7 +378,7 @@ private fun SummoningHallContent(
           Box(modifier = Modifier.size(56.dp), contentAlignment = Alignment.Center) {
             Canvas(modifier = Modifier.fillMaxSize()) {
               rotate(angle) {
-                drawCircle(ArcaneViolet, radius = size.minDimension * 0.45f, style = Stroke(3f))
+                drawCircle(Color(0xFF2D8EAC), radius = size.minDimension * 0.45f, style = Stroke(3f))
                 drawRect(
                   color = PortalCyan.copy(alpha = 0.7f),
                   topLeft = Offset(size.width * 0.22f, size.height * 0.22f),
@@ -379,14 +394,14 @@ private fun SummoningHallContent(
             Text(
               text = "Nghi Thức Triệu Hồi Tinh Hệ",
               style = MaterialTheme.typography.titleSmall,
-              color = ParchmentLight,
+              color = Color(0xFF283B4B),
               maxLines = 1,
               overflow = TextOverflow.Ellipsis,
             )
             Text(
               text = "Tiêu hao: 20 Mảnh Linh Hồn + 40 Tinh Thể Mana từ Tòa Tháp",
               style = MaterialTheme.typography.bodySmall,
-              color = RuneSilver,
+              color = Color(0xFF506474),
               maxLines = 2,
               overflow = TextOverflow.Ellipsis,
             )
@@ -394,7 +409,7 @@ private fun SummoningHallContent(
               Text(
                 text = "Thiếu nguyên liệu triệu hồi (Hiện có: ${profile.soulShards}/20 Hồn • ${profile.manaCrystals}/40 Mana).",
                 style = MaterialTheme.typography.labelSmall,
-                color = AmberWarning,
+                color = Color(0xFF9B572F),
               )
             }
           }
@@ -404,7 +419,10 @@ private fun SummoningHallContent(
           onClick = { confirmSummon=true },
           enabled = !isBusy && canSummon,
           modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("summon_ritual_button"),
-          colors = FantasySkin.buttonColors(containerColor = ArcaneViolet, contentColor = Color.White),
+          colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFF2D728C), contentColor = Color.White,
+            disabledContainerColor = Color(0xFFD5D9D9), disabledContentColor = Color(0xFF506474),
+          ),
         ) {
           Icon(Icons.Default.AutoFixHigh, contentDescription = null, modifier = Modifier.size(16.dp))
           Spacer(modifier = Modifier.width(6.dp))
@@ -420,23 +438,23 @@ private fun SummoningHallContent(
             .fillMaxWidth()
             .testTag("summon_result")
             .clip(RoundedCornerShape(14.dp))
-            .background(FantasySkin.Panel)
-            .border(1.5.dp, SummonerGold, RoundedCornerShape(14.dp))
+            .background(Color(0xFFFFFDF8))
+            .border(1.5.dp, Color(0xFFC7A36C), RoundedCornerShape(14.dp))
             .padding(12.dp),
         ) {
           Text(
             text = "★ TRIỆU HỒI THÀNH CÔNG • ${"★".repeat(newlySummoned.rarity.toInt())}",
             style = MaterialTheme.typography.labelMedium,
-            color = SummonerGold,
+            color = Color(0xFF8A5A16),
           )
           Spacer(modifier = Modifier.height(6.dp))
           Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             PixelHeroPortraitAvatar(heroClass = newlySummoned.classType, sizeDp = 52.dp)
             Column(modifier = Modifier.weight(1f)) {
-              Text("${newlySummoned.name} — ${newlySummoned.title}", style = MaterialTheme.typography.titleSmall, color = ParchmentLight)
-              Text("${newlySummoned.classType.labelVi} • ${newlySummoned.personalityType.labelVi}", style = MaterialTheme.typography.bodySmall, color = PortalCyan)
-              Text("Đã lưu vào Anh hùng • mở Hồ sơ để nâng cấp và trang bị.",style=MaterialTheme.typography.labelSmall,color=FantasySkin.Gold)
-              Text("«${newlySummoned.personalityType.sampleQuoteVi}»", style = MaterialTheme.typography.bodySmall, color = RuneSilver)
+              Text("${newlySummoned.name} — ${newlySummoned.title}", style = MaterialTheme.typography.titleSmall, color = Color(0xFF283B4B))
+              Text("${newlySummoned.classType.labelVi} • ${newlySummoned.personalityType.labelVi}", style = MaterialTheme.typography.bodySmall, color = Color(0xFF2D728C))
+              Text("Đã lưu vào Anh hùng • mở Hồ sơ để nâng cấp và trang bị.",style=MaterialTheme.typography.labelSmall,color=Color(0xFF79552E))
+              Text("«${newlySummoned.personalityType.sampleQuoteVi}»", style = MaterialTheme.typography.bodySmall, color = Color(0xFF506474))
             }
           }
         }
@@ -447,7 +465,7 @@ private fun SummoningHallContent(
       Text(
         text = "Danh Sách Anh Hùng Sở Hữu (${heroes.size})",
         style = MaterialTheme.typography.titleSmall,
-        color = SummonerGold,
+        color = Color(0xFF79552E),
       )
     }
 
@@ -457,8 +475,8 @@ private fun SummoningHallContent(
         modifier = Modifier
           .fillMaxWidth()
           .clip(RoundedCornerShape(12.dp))
-          .background(ObsidianVoid.copy(alpha = 0.72f))
-          .border(1.dp, if (hero.inActiveSquad) SummonerGold.copy(alpha = 0.75f) else BorderRune, RoundedCornerShape(12.dp))
+          .background(Color(0xFFFFFDF8))
+          .border(1.dp, if (hero.inActiveSquad) Color(0xFFC7A36C) else Color(0xFFD6CDBA), RoundedCornerShape(12.dp))
           .clickable(enabled = onOpenHeroProfile != null) { onOpenHeroProfile?.invoke(hero) }
           .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -469,21 +487,21 @@ private fun SummoningHallContent(
           Text(
             text = "${hero.name} (${"★".repeat(hero.rarity.toInt())}) • Lv.${hero.level}",
             style = MaterialTheme.typography.titleSmall,
-            color = ParchmentLight,
+            color = Color(0xFF283B4B),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
           )
           Text(
             text = hero.consistentActivityLabelVi(nowEpochSec),
             style = MaterialTheme.typography.labelSmall,
-            color = if (injured) AmberWarning else PortalCyan,
+            color = if (injured) Color(0xFF9B572F) else Color(0xFF2D728C),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
           )
           Text(
             text = "HP ${hero.totalMaxHp(equipment)} | ATK ${hero.totalAttack(equipment)} | DEF ${hero.totalDefense(equipment)} | Sĩ khí ${hero.morale}%",
             style = MaterialTheme.typography.labelSmall,
-            color = RuneSilver,
+            color = Color(0xFF506474),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
           )
@@ -499,7 +517,7 @@ private fun SummoningHallContent(
               hero.inActiveSquad -> "Trong Đội"
               else -> "Vào Đội"
             },
-            color = if (injured) AmberWarning else if (hero.inActiveSquad) SummonerGold else ParchmentLight,
+            color = if (injured) Color(0xFF9B572F) else if (hero.inActiveSquad) Color(0xFF79552E) else Color(0xFF283B4B),
             maxLines = 1,
           )
         }

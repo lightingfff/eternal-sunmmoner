@@ -18,11 +18,14 @@ object PixelStructureAtlas {
   // are identical between PNG and fallback, so the renderer's bottom-centred blit, the door
   // triggers and the depth sort anchors are unchanged either way. Nothing is generated at draw
   // time: one cached decode, then one blit per facility per frame.
+  // P27B: PNG-first, exact old canvas/foot pivot. If optional art is absent or
+  // malformed, fall back to the unchanged P21 PNG (then procedural). The projected
+  // shadow gets the same selected ImageBitmap, so its silhouette cache remains valid.
   val towerGateMonument: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("premium_slice/tower_gate.png") ?: towerGateMonumentFallback
+    SanctuaryArtAssets.preferredLandmark("tower_gate", 260, 224) ?: towerGateMonumentFallback
   private val towerGateMonumentFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildTowerGateMonument() }
   val summoningHallStructure: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("premium_slice/summoning_hall.png") ?: summoningHallFallback
+    SanctuaryArtAssets.preferredLandmark("summoning_hall", 268, 206) ?: summoningHallFallback
   private val summoningHallFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildSummoningHall() }
   val heroRegistryStructure: ImageBitmap get() =
     SanctuaryArtAssets.assetSafe("premium_slice/hero_registry.png") ?: heroRegistryFallback

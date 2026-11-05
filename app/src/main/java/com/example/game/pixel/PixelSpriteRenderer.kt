@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.example.data.model.HeroClassType
@@ -336,10 +337,14 @@ object PixelSpriteRenderer {
           }
         }
 
+        // P27B ground is a 4x4 mosaic indexed by WORLD coordinates, so the same
+        // material grammar holds here as in the island renderer; legacy families
+        // (and the curbs) keep their hash choice.
         val bmp = when {
-          onRoadCore && roadTiles != null -> roadTiles[hash % roadTiles.size]
+          onRoadCore && roadTiles != null ->
+            roadTiles[PixelTileAtlas.sanctuaryTileIndex(roadTiles, tx, ty, hash)]
           onRoadEdge && roadEdgeTiles != null -> roadEdgeTiles[hash % roadEdgeTiles.size]
-          else -> baseTiles[hash % baseTiles.size]
+          else -> baseTiles[PixelTileAtlas.sanctuaryTileIndex(baseTiles, tx, ty, hash)]
         }
 
         drawImage(
@@ -449,6 +454,15 @@ object PixelSpriteRenderer {
     val rx = zone.interactRadius * 0.56f * zoom
     val ry = rx * ObliqueCamera.GROUND_ELLIPSE_RATIO
     if (cx + rx < 0f || cx - rx > size.width || cy + ry < 0f || cy - ry > size.height) return
+
+    // P27B review: the ivory summoning ground is delivered by the hall sprite itself, which
+    // bakes a limestone apron that already covers this zone. Two extra attempts to paint an
+    // ivory ground layer here were rejected on real engine renders:
+    //   * a translucent ellipse pad read as a pasted disc (vector edge over authored apron);
+    //   * world-tile paving spilled past the apron onto grass and the island rim.
+    // An opaque layer under a sprite that already contains the same material can only double
+    // the surface. The `summon_ivory` 4x4 family stays packaged and validated for a future
+    // floor that owns its footprint; it is deliberately not painted here.
 
     val baseColor = Color(zone.colorArgb)
     val glowAlpha = if (isMasterInside) 0.42f else (0.12f + 0.05f * sin(timeSec * 2.4f))

@@ -1,0 +1,2280 @@
+{
+  "schema": "eternal-summoner.p27b.visual-profile.v1",
+  "status": "GAME_CANDIDATE",
+  "asset_count": 82,
+  "number_of_image_tool_sources": 6,
+  "note": "5 material families from four original sources (ivory recolors limestone); two edited original structure sources; 4x4 mosaic variants from each material. Distinguish original images from derived atlas cells.",
+  "visual_profile": "P27B PNG-first, P03/premium_slice fallback when absent",
+  "camera_ground_y_scale": 0.72,
+  "tile_px": 64,
+  "terrain_mosaic_grid": [
+    4,
+    4
+  ],
+  "terrain_count_per_family": 16,
+  "families": {
+    "grass": {
+      "source_file": "art/p27b_sources/grass_source.png",
+      "source_sha256": "bcd0d000846ae9c087a6c3c0b91b2e2d69245a1083cd7a4af8cecbe73a345db3",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "mosaic_grid": [
+        4,
+        4
+      ],
+      "number_of_distinct_tiles": 16,
+      "max_x_edge_jump_rgb": 18.46,
+      "max_y_edge_jump_rgb": 16.21,
+      "mean_rgb": [
+        83.3,
+        107.3,
+        66.0
+      ],
+      "pixel_source": "single generated material source; BOX over full mosaic; no-dither palette; 8px periodic-wrap border",
+      "seam_status": "NEEDS_VISUAL_QA: numerical continuity alone does not prove seamless",
+      "qa_status": "DRAFT"
+    },
+    "soil": {
+      "source_file": "art/p27b_sources/soil_source.png",
+      "source_sha256": "c70131c82f3926dd3b38deedda2bf23b5694efd3ec7ebe43128b8ab313792e30",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "mosaic_grid": [
+        4,
+        4
+      ],
+      "number_of_distinct_tiles": 16,
+      "max_x_edge_jump_rgb": 8.14,
+      "max_y_edge_jump_rgb": 7.27,
+      "mean_rgb": [
+        171.4,
+        140.1,
+        100.9
+      ],
+      "pixel_source": "single generated material source; BOX over full mosaic; no-dither palette; 8px periodic-wrap border",
+      "seam_status": "NEEDS_VISUAL_QA: numerical continuity alone does not prove seamless",
+      "qa_status": "DRAFT"
+    },
+    "flagstone": {
+      "source_file": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "mosaic_grid": [
+        4,
+        4
+      ],
+      "number_of_distinct_tiles": 16,
+      "max_x_edge_jump_rgb": 24.28,
+      "max_y_edge_jump_rgb": 27.73,
+      "mean_rgb": [
+        170.0,
+        173.7,
+        169.6
+      ],
+      "pixel_source": "single generated material source; BOX over full mosaic; no-dither palette; 8px periodic-wrap border",
+      "seam_status": "NEEDS_VISUAL_QA: numerical continuity alone does not prove seamless",
+      "qa_status": "DRAFT"
+    },
+    "cobble": {
+      "source_file": "art/p27b_sources/cobble_source.png",
+      "source_sha256": "491b261c6d6a8876362f8021c478b0ef26976d5b1c188b2bbcd82f392ee3ba41",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "mosaic_grid": [
+        4,
+        4
+      ],
+      "number_of_distinct_tiles": 16,
+      "max_x_edge_jump_rgb": 15.94,
+      "max_y_edge_jump_rgb": 10.67,
+      "mean_rgb": [
+        104.5,
+        115.2,
+        118.3
+      ],
+      "pixel_source": "single generated material source; BOX over full mosaic; no-dither palette; 8px periodic-wrap border",
+      "seam_status": "NEEDS_VISUAL_QA: numerical continuity alone does not prove seamless",
+      "qa_status": "DRAFT"
+    },
+    "summon_ivory": {
+      "source_file": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "mosaic_grid": [
+        4,
+        4
+      ],
+      "number_of_distinct_tiles": 16,
+      "max_x_edge_jump_rgb": 23.58,
+      "max_y_edge_jump_rgb": 25.92,
+      "mean_rgb": [
+        226.3,
+        223.4,
+        213.6
+      ],
+      "pixel_source": "single generated material source; BOX over full mosaic; no-dither palette; 8px periodic-wrap border",
+      "seam_status": "NEEDS_VISUAL_QA: numerical continuity alone does not prove seamless",
+      "qa_status": "DRAFT"
+    }
+  },
+  "assets": [
+    {
+      "id": "grass_0",
+      "family": "grass",
+      "path": "terrain/grass_0.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/grass_source.png",
+      "source_sha256": "bcd0d000846ae9c087a6c3c0b91b2e2d69245a1083cd7a4af8cecbe73a345db3",
+      "preview_sha256": "eb7d19bc85ce0f4829e0b989cde67cafe17df8ade961fda870c9a6ec433162d8",
+      "sha256": "24ff0c80b72590a0a80d9b2f7775c119a6664422e644954578a9198e52ac7ed1",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "grass_1",
+      "family": "grass",
+      "path": "terrain/grass_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/grass_source.png",
+      "source_sha256": "bcd0d000846ae9c087a6c3c0b91b2e2d69245a1083cd7a4af8cecbe73a345db3",
+      "preview_sha256": "eb7d19bc85ce0f4829e0b989cde67cafe17df8ade961fda870c9a6ec433162d8",
+      "sha256": "a865b3ee9c719f25a564a252bf90562754c618e806b90b90f16ff18824b6f391",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "grass_2",
+      "family": "grass",
+      "path": "terrain/grass_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/grass_source.png",
+      "source_sha256": "bcd0d000846ae9c087a6c3c0b91b2e2d69245a1083cd7a4af8cecbe73a345db3",
+      "preview_sha256": "eb7d19bc85ce0f4829e0b989cde67cafe17df8ade961fda870c9a6ec433162d8",
+      "sha256": "667e8208a84fc60bf4d0d572c713a216fa44de83492de6067c6de0f7fbf8e7c3",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "grass_3",
+      "family": "grass",
+      "path": "terrain/grass_3.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/grass_source.png",
+      "source_sha256": "bcd0d000846ae9c087a6c3c0b91b2e2d69245a1083cd7a4af8cecbe73a345db3",
+      "preview_sha256": "eb7d19bc85ce0f4829e0b989cde67cafe17df8ade961fda870c9a6ec433162d8",
+      "sha256": "f15f7e7130875e94dacf79948077e357b3811089db413d6b7f8584a2147e125a",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "grass_4",
+      "family": "grass",
+      "path": "terrain/grass_4.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/grass_source.png",
+      "source_sha256": "bcd0d000846ae9c087a6c3c0b91b2e2d69245a1083cd7a4af8cecbe73a345db3",
+      "preview_sha256": "eb7d19bc85ce0f4829e0b989cde67cafe17df8ade961fda870c9a6ec433162d8",
+      "sha256": "da40e662ed964203063d9ef2a534d52992d35bbd9e8cbdf8043eb2212d3cb5a7",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "grass_5",
+      "family": "grass",
+      "path": "terrain/grass_5.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/grass_source.png",
+      "source_sha256": "bcd0d000846ae9c087a6c3c0b91b2e2d69245a1083cd7a4af8cecbe73a345db3",
+      "preview_sha256": "eb7d19bc85ce0f4829e0b989cde67cafe17df8ade961fda870c9a6ec433162d8",
+      "sha256": "2d383b68137ae78ade5fd0c2139f6c1c0491224aad3fc72283f8f24046a5ae52",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "grass_6",
+      "family": "grass",
+      "path": "terrain/grass_6.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/grass_source.png",
+      "source_sha256": "bcd0d000846ae9c087a6c3c0b91b2e2d69245a1083cd7a4af8cecbe73a345db3",
+      "preview_sha256": "eb7d19bc85ce0f4829e0b989cde67cafe17df8ade961fda870c9a6ec433162d8",
+      "sha256": "e7ba2c46990db3e38f1798cd0b5af4bb128e65a22d326f9915aa4c0ccb1a26e3",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "grass_7",
+      "family": "grass",
+      "path": "terrain/grass_7.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/grass_source.png",
+      "source_sha256": "bcd0d000846ae9c087a6c3c0b91b2e2d69245a1083cd7a4af8cecbe73a345db3",
+      "preview_sha256": "eb7d19bc85ce0f4829e0b989cde67cafe17df8ade961fda870c9a6ec433162d8",
+      "sha256": "0189cc9a03370c2561f75b11613a4b597508c14054f1f89b349dde0708f1cfe5",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "grass_8",
+      "family": "grass",
+      "path": "terrain/grass_8.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/grass_source.png",
+      "source_sha256": "bcd0d000846ae9c087a6c3c0b91b2e2d69245a1083cd7a4af8cecbe73a345db3",
+      "preview_sha256": "eb7d19bc85ce0f4829e0b989cde67cafe17df8ade961fda870c9a6ec433162d8",
+      "sha256": "856774f5f585916c0656c1590d7c7767fa15a1853cd7d406c2001906fc5bf4d6",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "grass_9",
+      "family": "grass",
+      "path": "terrain/grass_9.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/grass_source.png",
+      "source_sha256": "bcd0d000846ae9c087a6c3c0b91b2e2d69245a1083cd7a4af8cecbe73a345db3",
+      "preview_sha256": "eb7d19bc85ce0f4829e0b989cde67cafe17df8ade961fda870c9a6ec433162d8",
+      "sha256": "98bc28add2bc89efcbbcf03c47ae37329d8b4c04e7eedc9cd7109408b029959f",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "grass_10",
+      "family": "grass",
+      "path": "terrain/grass_10.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/grass_source.png",
+      "source_sha256": "bcd0d000846ae9c087a6c3c0b91b2e2d69245a1083cd7a4af8cecbe73a345db3",
+      "preview_sha256": "eb7d19bc85ce0f4829e0b989cde67cafe17df8ade961fda870c9a6ec433162d8",
+      "sha256": "f0d79d28dee8a6912d0128286466415aa66168dfa4032ec0fc7e442724e47b85",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "grass_11",
+      "family": "grass",
+      "path": "terrain/grass_11.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/grass_source.png",
+      "source_sha256": "bcd0d000846ae9c087a6c3c0b91b2e2d69245a1083cd7a4af8cecbe73a345db3",
+      "preview_sha256": "eb7d19bc85ce0f4829e0b989cde67cafe17df8ade961fda870c9a6ec433162d8",
+      "sha256": "91b81fe595fbb24d55de3416c64dd55b24e4e1b9284f5dd3b5959f6c84e78584",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "grass_12",
+      "family": "grass",
+      "path": "terrain/grass_12.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/grass_source.png",
+      "source_sha256": "bcd0d000846ae9c087a6c3c0b91b2e2d69245a1083cd7a4af8cecbe73a345db3",
+      "preview_sha256": "eb7d19bc85ce0f4829e0b989cde67cafe17df8ade961fda870c9a6ec433162d8",
+      "sha256": "af8324ac9a0c445bed26092f9ae08f70041e6b9e49d91ded9adb912f00763461",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "grass_13",
+      "family": "grass",
+      "path": "terrain/grass_13.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/grass_source.png",
+      "source_sha256": "bcd0d000846ae9c087a6c3c0b91b2e2d69245a1083cd7a4af8cecbe73a345db3",
+      "preview_sha256": "eb7d19bc85ce0f4829e0b989cde67cafe17df8ade961fda870c9a6ec433162d8",
+      "sha256": "406771bccf7496b43f851eea8a356fd1fa1b43878bb2efc0b9b7280c63726f9f",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "grass_14",
+      "family": "grass",
+      "path": "terrain/grass_14.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/grass_source.png",
+      "source_sha256": "bcd0d000846ae9c087a6c3c0b91b2e2d69245a1083cd7a4af8cecbe73a345db3",
+      "preview_sha256": "eb7d19bc85ce0f4829e0b989cde67cafe17df8ade961fda870c9a6ec433162d8",
+      "sha256": "8705c853ca55cdad51caa3d843047acab816aadedb595758afc07a1a16737b0b",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "grass_15",
+      "family": "grass",
+      "path": "terrain/grass_15.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/grass_source.png",
+      "source_sha256": "bcd0d000846ae9c087a6c3c0b91b2e2d69245a1083cd7a4af8cecbe73a345db3",
+      "preview_sha256": "eb7d19bc85ce0f4829e0b989cde67cafe17df8ade961fda870c9a6ec433162d8",
+      "sha256": "1ac8721b69aed0e51641245c71cc034c47d245c04a0f1d7ea8019813e976a3d3",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "soil_0",
+      "family": "soil",
+      "path": "terrain/soil_0.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/soil_source.png",
+      "source_sha256": "c70131c82f3926dd3b38deedda2bf23b5694efd3ec7ebe43128b8ab313792e30",
+      "preview_sha256": "1f611235fed3594cbfc5b1f786a7bb17bf0e744dfeb2d83874837e0d5ca97f46",
+      "sha256": "6037b4e0f4b5d3e0c960baa99509d7234569376f5af1fbce1721da53bb2fa699",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "soil_1",
+      "family": "soil",
+      "path": "terrain/soil_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/soil_source.png",
+      "source_sha256": "c70131c82f3926dd3b38deedda2bf23b5694efd3ec7ebe43128b8ab313792e30",
+      "preview_sha256": "1f611235fed3594cbfc5b1f786a7bb17bf0e744dfeb2d83874837e0d5ca97f46",
+      "sha256": "89436de8c8198620f55a8ca3021aee433fed33fd58944fd702f25a0ac77628af",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "soil_2",
+      "family": "soil",
+      "path": "terrain/soil_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/soil_source.png",
+      "source_sha256": "c70131c82f3926dd3b38deedda2bf23b5694efd3ec7ebe43128b8ab313792e30",
+      "preview_sha256": "1f611235fed3594cbfc5b1f786a7bb17bf0e744dfeb2d83874837e0d5ca97f46",
+      "sha256": "3e2ef5a099aae8f208c25d30f88c6b0df209b4d0f5f7f358352f9da62e936ee5",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "soil_3",
+      "family": "soil",
+      "path": "terrain/soil_3.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/soil_source.png",
+      "source_sha256": "c70131c82f3926dd3b38deedda2bf23b5694efd3ec7ebe43128b8ab313792e30",
+      "preview_sha256": "1f611235fed3594cbfc5b1f786a7bb17bf0e744dfeb2d83874837e0d5ca97f46",
+      "sha256": "3b09383204cc89e2192cf98d80b565af1f5cc6469f3aeaa8e3731fa2ef874ccb",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "soil_4",
+      "family": "soil",
+      "path": "terrain/soil_4.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/soil_source.png",
+      "source_sha256": "c70131c82f3926dd3b38deedda2bf23b5694efd3ec7ebe43128b8ab313792e30",
+      "preview_sha256": "1f611235fed3594cbfc5b1f786a7bb17bf0e744dfeb2d83874837e0d5ca97f46",
+      "sha256": "8bd2c5fed3fdc2f8d590c1c9cecd67984d9d7f8980985606de92b6620cdf12bf",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "soil_5",
+      "family": "soil",
+      "path": "terrain/soil_5.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/soil_source.png",
+      "source_sha256": "c70131c82f3926dd3b38deedda2bf23b5694efd3ec7ebe43128b8ab313792e30",
+      "preview_sha256": "1f611235fed3594cbfc5b1f786a7bb17bf0e744dfeb2d83874837e0d5ca97f46",
+      "sha256": "6dac2c660cb3f0b4901c3f51cca8172b4819ead463b01a9a18512bcc4b2bea3b",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "soil_6",
+      "family": "soil",
+      "path": "terrain/soil_6.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/soil_source.png",
+      "source_sha256": "c70131c82f3926dd3b38deedda2bf23b5694efd3ec7ebe43128b8ab313792e30",
+      "preview_sha256": "1f611235fed3594cbfc5b1f786a7bb17bf0e744dfeb2d83874837e0d5ca97f46",
+      "sha256": "67856f8e8be9fb6c5826754d130d64058a2c32682ce3d75e41f9aa61a79fc800",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "soil_7",
+      "family": "soil",
+      "path": "terrain/soil_7.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/soil_source.png",
+      "source_sha256": "c70131c82f3926dd3b38deedda2bf23b5694efd3ec7ebe43128b8ab313792e30",
+      "preview_sha256": "1f611235fed3594cbfc5b1f786a7bb17bf0e744dfeb2d83874837e0d5ca97f46",
+      "sha256": "15a8fd2b8ce68223376b05bb806d241bc551b96ff250cea873b04d6b47d6d05b",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "soil_8",
+      "family": "soil",
+      "path": "terrain/soil_8.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/soil_source.png",
+      "source_sha256": "c70131c82f3926dd3b38deedda2bf23b5694efd3ec7ebe43128b8ab313792e30",
+      "preview_sha256": "1f611235fed3594cbfc5b1f786a7bb17bf0e744dfeb2d83874837e0d5ca97f46",
+      "sha256": "b9ddb0c0e564ba2e277ab2d82ad4d888f8f62c8f1bee29e33f66754c4a5aa865",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "soil_9",
+      "family": "soil",
+      "path": "terrain/soil_9.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/soil_source.png",
+      "source_sha256": "c70131c82f3926dd3b38deedda2bf23b5694efd3ec7ebe43128b8ab313792e30",
+      "preview_sha256": "1f611235fed3594cbfc5b1f786a7bb17bf0e744dfeb2d83874837e0d5ca97f46",
+      "sha256": "57f815c3f92d1e7830889a44dbf8f97076d52d05fd70ba0d47dcdbab3f856380",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "soil_10",
+      "family": "soil",
+      "path": "terrain/soil_10.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/soil_source.png",
+      "source_sha256": "c70131c82f3926dd3b38deedda2bf23b5694efd3ec7ebe43128b8ab313792e30",
+      "preview_sha256": "1f611235fed3594cbfc5b1f786a7bb17bf0e744dfeb2d83874837e0d5ca97f46",
+      "sha256": "3b4dd944cd56181970e288532b9bf6f3b81d44de5b8e1cc130477239ffcdadcf",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "soil_11",
+      "family": "soil",
+      "path": "terrain/soil_11.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/soil_source.png",
+      "source_sha256": "c70131c82f3926dd3b38deedda2bf23b5694efd3ec7ebe43128b8ab313792e30",
+      "preview_sha256": "1f611235fed3594cbfc5b1f786a7bb17bf0e744dfeb2d83874837e0d5ca97f46",
+      "sha256": "e5536844261da39bf8a75d44c16b92e12b85bf39b8c21719f38a66e6d75d1267",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "soil_12",
+      "family": "soil",
+      "path": "terrain/soil_12.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/soil_source.png",
+      "source_sha256": "c70131c82f3926dd3b38deedda2bf23b5694efd3ec7ebe43128b8ab313792e30",
+      "preview_sha256": "1f611235fed3594cbfc5b1f786a7bb17bf0e744dfeb2d83874837e0d5ca97f46",
+      "sha256": "92241845f2df4f6e50f78f5ae5964c82d07e36e91624e912e65f96cdc919f20d",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "soil_13",
+      "family": "soil",
+      "path": "terrain/soil_13.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/soil_source.png",
+      "source_sha256": "c70131c82f3926dd3b38deedda2bf23b5694efd3ec7ebe43128b8ab313792e30",
+      "preview_sha256": "1f611235fed3594cbfc5b1f786a7bb17bf0e744dfeb2d83874837e0d5ca97f46",
+      "sha256": "0e8cc687a96781cd6e2f8983f3578f9cfe2796155a55545a2d5a42ed959cff47",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "soil_14",
+      "family": "soil",
+      "path": "terrain/soil_14.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/soil_source.png",
+      "source_sha256": "c70131c82f3926dd3b38deedda2bf23b5694efd3ec7ebe43128b8ab313792e30",
+      "preview_sha256": "1f611235fed3594cbfc5b1f786a7bb17bf0e744dfeb2d83874837e0d5ca97f46",
+      "sha256": "1bff616037bfe00da9b23ae0dcdb141c8365b753363e1b967ae49e486dcaaba7",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "soil_15",
+      "family": "soil",
+      "path": "terrain/soil_15.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/soil_source.png",
+      "source_sha256": "c70131c82f3926dd3b38deedda2bf23b5694efd3ec7ebe43128b8ab313792e30",
+      "preview_sha256": "1f611235fed3594cbfc5b1f786a7bb17bf0e744dfeb2d83874837e0d5ca97f46",
+      "sha256": "83445c06fc5393db2556b9e29b7b902be48668c0145eb85495e64dd4b99dd6ab",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "flagstone_0",
+      "family": "flagstone",
+      "path": "terrain/flagstone_0.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "e4f9d18622c316abfb24ebe42442170c7441d397edfdd589613dfdda20c57961",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "flagstone_1",
+      "family": "flagstone",
+      "path": "terrain/flagstone_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "9ce3af3c4ab36d634ec734cabaedb917e152639cf5c6f6adbf45151bb53ac898",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "flagstone_2",
+      "family": "flagstone",
+      "path": "terrain/flagstone_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "6418957b5bcc71b2eecd5c7b1ab183bbb88a218b01e67043cd902929affa7246",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "flagstone_3",
+      "family": "flagstone",
+      "path": "terrain/flagstone_3.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "6fe6c207f067ff471c029622e35834a73a5d88bc87415f93c9543bdbc6f55f1a",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "flagstone_4",
+      "family": "flagstone",
+      "path": "terrain/flagstone_4.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "6b2888cae6b4c2cb463e90bea50cdde700700c2eff1c11fbbaa3b24513b2f0cf",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "flagstone_5",
+      "family": "flagstone",
+      "path": "terrain/flagstone_5.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "8a7523c1187ad55cd9d0174c75e9383b4a68fb975ab896d9f5647ae459865238",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "flagstone_6",
+      "family": "flagstone",
+      "path": "terrain/flagstone_6.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "379a326bbe92f3f7b79bb16f9f0e792cff0fa42ca008d341bc22ef233a0bf7b7",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "flagstone_7",
+      "family": "flagstone",
+      "path": "terrain/flagstone_7.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "872fa97bda6bf1ee6117fbe42884afe72f37c909153258ce9ba4bbe1c2882c4a",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "flagstone_8",
+      "family": "flagstone",
+      "path": "terrain/flagstone_8.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "c9e476daf6b76e0689369019cc4af0bb9accc41f488a39d37cf44ed5b611eb2e",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "flagstone_9",
+      "family": "flagstone",
+      "path": "terrain/flagstone_9.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "c1baefc6ce6ee49a0da84f971e8efce2fe07fa289d213641c2e5e6290c66c652",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "flagstone_10",
+      "family": "flagstone",
+      "path": "terrain/flagstone_10.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "660ba49bc07daaa00d097e3b01f08ba2eb91d55d128bf082bc112e2aecbfd239",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "flagstone_11",
+      "family": "flagstone",
+      "path": "terrain/flagstone_11.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "b863148e484e3e94da215eb902cd52671994f31c3c733118ce9571c1adfea9ca",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "flagstone_12",
+      "family": "flagstone",
+      "path": "terrain/flagstone_12.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "68466a64d6e089a4bb2bd00215503a564b5b1cd504f66e710e49cbd230ae031f",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "flagstone_13",
+      "family": "flagstone",
+      "path": "terrain/flagstone_13.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "7e9696100b2177edcf07a8e9eff7dd7ca48d15306be701d641a76f4cef95f17e",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "flagstone_14",
+      "family": "flagstone",
+      "path": "terrain/flagstone_14.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "b8d2601e8a18be4280ed89cc97a97072e685ae2186426e39823924c3957e18fb",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "flagstone_15",
+      "family": "flagstone",
+      "path": "terrain/flagstone_15.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "9ee448f0a762256c19406fb928d536209acef6bc9480f5c9b03fd2da15ad5a30",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "cobble_0",
+      "family": "cobble",
+      "path": "terrain/cobble_0.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/cobble_source.png",
+      "source_sha256": "491b261c6d6a8876362f8021c478b0ef26976d5b1c188b2bbcd82f392ee3ba41",
+      "preview_sha256": "c47cc7961137c348a827af5f1b524e01028e68a6abc355e24dea3d6057928a47",
+      "sha256": "215abcba1e2f625288bf54d697d6b2179a0705050e3dca02f2d3f683f49ef8f5",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "cobble_1",
+      "family": "cobble",
+      "path": "terrain/cobble_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/cobble_source.png",
+      "source_sha256": "491b261c6d6a8876362f8021c478b0ef26976d5b1c188b2bbcd82f392ee3ba41",
+      "preview_sha256": "c47cc7961137c348a827af5f1b524e01028e68a6abc355e24dea3d6057928a47",
+      "sha256": "7ad5409685cf57fe2b48d0a6415a32cc36b864fea8c652d2401ed07692eba574",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "cobble_2",
+      "family": "cobble",
+      "path": "terrain/cobble_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/cobble_source.png",
+      "source_sha256": "491b261c6d6a8876362f8021c478b0ef26976d5b1c188b2bbcd82f392ee3ba41",
+      "preview_sha256": "c47cc7961137c348a827af5f1b524e01028e68a6abc355e24dea3d6057928a47",
+      "sha256": "d27e547f4106608582071762ca2820db10d3e1376d6d579dd27c653817fa1d21",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "cobble_3",
+      "family": "cobble",
+      "path": "terrain/cobble_3.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/cobble_source.png",
+      "source_sha256": "491b261c6d6a8876362f8021c478b0ef26976d5b1c188b2bbcd82f392ee3ba41",
+      "preview_sha256": "c47cc7961137c348a827af5f1b524e01028e68a6abc355e24dea3d6057928a47",
+      "sha256": "95f01b5888bb58be86e977852445328f9972bd30ab9016e39e864e6481d79d4a",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "cobble_4",
+      "family": "cobble",
+      "path": "terrain/cobble_4.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/cobble_source.png",
+      "source_sha256": "491b261c6d6a8876362f8021c478b0ef26976d5b1c188b2bbcd82f392ee3ba41",
+      "preview_sha256": "c47cc7961137c348a827af5f1b524e01028e68a6abc355e24dea3d6057928a47",
+      "sha256": "2f1e1e44fead0faed5fe00c4423d3588fef80b5f5d07a75d96f1b64dd0229f2b",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "cobble_5",
+      "family": "cobble",
+      "path": "terrain/cobble_5.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/cobble_source.png",
+      "source_sha256": "491b261c6d6a8876362f8021c478b0ef26976d5b1c188b2bbcd82f392ee3ba41",
+      "preview_sha256": "c47cc7961137c348a827af5f1b524e01028e68a6abc355e24dea3d6057928a47",
+      "sha256": "3f837b7b88e2e60536b53d7f7693af20ffdee07d205accc526c9402d9556bc33",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "cobble_6",
+      "family": "cobble",
+      "path": "terrain/cobble_6.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/cobble_source.png",
+      "source_sha256": "491b261c6d6a8876362f8021c478b0ef26976d5b1c188b2bbcd82f392ee3ba41",
+      "preview_sha256": "c47cc7961137c348a827af5f1b524e01028e68a6abc355e24dea3d6057928a47",
+      "sha256": "083d5dd2ca97071f50f165407ae9c48bfe6db15e56b172c38654ec8dc7d530bf",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "cobble_7",
+      "family": "cobble",
+      "path": "terrain/cobble_7.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/cobble_source.png",
+      "source_sha256": "491b261c6d6a8876362f8021c478b0ef26976d5b1c188b2bbcd82f392ee3ba41",
+      "preview_sha256": "c47cc7961137c348a827af5f1b524e01028e68a6abc355e24dea3d6057928a47",
+      "sha256": "df63b520f924205c4af7ab395862d3e5672905b78b1bcfde0f8553d3f14f302c",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "cobble_8",
+      "family": "cobble",
+      "path": "terrain/cobble_8.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/cobble_source.png",
+      "source_sha256": "491b261c6d6a8876362f8021c478b0ef26976d5b1c188b2bbcd82f392ee3ba41",
+      "preview_sha256": "c47cc7961137c348a827af5f1b524e01028e68a6abc355e24dea3d6057928a47",
+      "sha256": "3ccf07f46844672521163c90828834667630ab657b675e7f5e09ba65eb97967a",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "cobble_9",
+      "family": "cobble",
+      "path": "terrain/cobble_9.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/cobble_source.png",
+      "source_sha256": "491b261c6d6a8876362f8021c478b0ef26976d5b1c188b2bbcd82f392ee3ba41",
+      "preview_sha256": "c47cc7961137c348a827af5f1b524e01028e68a6abc355e24dea3d6057928a47",
+      "sha256": "705a874191e7112df133b3551bdb6d2ca02bb9cd855b352816b4118235735b96",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "cobble_10",
+      "family": "cobble",
+      "path": "terrain/cobble_10.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/cobble_source.png",
+      "source_sha256": "491b261c6d6a8876362f8021c478b0ef26976d5b1c188b2bbcd82f392ee3ba41",
+      "preview_sha256": "c47cc7961137c348a827af5f1b524e01028e68a6abc355e24dea3d6057928a47",
+      "sha256": "516c1eb795da1b7f9ba16d954d4efbc57a8a4e6cbbbec7f7d3f7f22dae7b5434",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "cobble_11",
+      "family": "cobble",
+      "path": "terrain/cobble_11.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/cobble_source.png",
+      "source_sha256": "491b261c6d6a8876362f8021c478b0ef26976d5b1c188b2bbcd82f392ee3ba41",
+      "preview_sha256": "c47cc7961137c348a827af5f1b524e01028e68a6abc355e24dea3d6057928a47",
+      "sha256": "870006a69bf546670603f883f8d3560510aa875ce4596ef94aa5073a94a47f8f",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "cobble_12",
+      "family": "cobble",
+      "path": "terrain/cobble_12.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/cobble_source.png",
+      "source_sha256": "491b261c6d6a8876362f8021c478b0ef26976d5b1c188b2bbcd82f392ee3ba41",
+      "preview_sha256": "c47cc7961137c348a827af5f1b524e01028e68a6abc355e24dea3d6057928a47",
+      "sha256": "daa7563a62c80e037d66e47b7c188d55a654838ee9a8f09fbc24188534d031d3",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "cobble_13",
+      "family": "cobble",
+      "path": "terrain/cobble_13.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/cobble_source.png",
+      "source_sha256": "491b261c6d6a8876362f8021c478b0ef26976d5b1c188b2bbcd82f392ee3ba41",
+      "preview_sha256": "c47cc7961137c348a827af5f1b524e01028e68a6abc355e24dea3d6057928a47",
+      "sha256": "26c139d19d4fd1b7e6b3e815d31362befad5a78f6edaeaee8cdc6840fcd4e0cd",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "cobble_14",
+      "family": "cobble",
+      "path": "terrain/cobble_14.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/cobble_source.png",
+      "source_sha256": "491b261c6d6a8876362f8021c478b0ef26976d5b1c188b2bbcd82f392ee3ba41",
+      "preview_sha256": "c47cc7961137c348a827af5f1b524e01028e68a6abc355e24dea3d6057928a47",
+      "sha256": "c55cfe941eb175e1c2430936cd431cd632dfea4042ea51b532c1898487f64247",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "cobble_15",
+      "family": "cobble",
+      "path": "terrain/cobble_15.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/cobble_source.png",
+      "source_sha256": "491b261c6d6a8876362f8021c478b0ef26976d5b1c188b2bbcd82f392ee3ba41",
+      "preview_sha256": "c47cc7961137c348a827af5f1b524e01028e68a6abc355e24dea3d6057928a47",
+      "sha256": "360b9a026691165961ee15bd99ad320e99ee1f53bda6494f5015ec77906ef445",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "summon_ivory_0",
+      "family": "summon_ivory",
+      "path": "terrain/summon_ivory_0.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "81cfae11c00c646b19289f35f587fdab76e699dc1c4a1b3ac9e5fbd02e0ee494",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "summon_ivory_1",
+      "family": "summon_ivory",
+      "path": "terrain/summon_ivory_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "3119efb8162d15b059b7358ec6d6a09b3770776e6e7df83ccd9b0124bc316075",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "summon_ivory_2",
+      "family": "summon_ivory",
+      "path": "terrain/summon_ivory_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "40651f92402f5d9ca0338cbf97d03815aa2ac7d840b493e06ee29cf4665bb141",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "summon_ivory_3",
+      "family": "summon_ivory",
+      "path": "terrain/summon_ivory_3.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        0
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "46114754d66b31986eaf14ac024d008d64a330f7e74f8092401132024b448b2c",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "summon_ivory_4",
+      "family": "summon_ivory",
+      "path": "terrain/summon_ivory_4.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "7dca914006c0b8290ee4f1c6a6a27f71ac371cb7c614fdc6a7b7d4a293ab3e9a",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "summon_ivory_5",
+      "family": "summon_ivory",
+      "path": "terrain/summon_ivory_5.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "82283978bb73d8d4045ecbcb59021e91161a464eca33ba91264911e7a11d26f6",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "summon_ivory_6",
+      "family": "summon_ivory",
+      "path": "terrain/summon_ivory_6.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "5f4ec7943ea5b98e05e5f6559188e9c5b4b689b8f7fe658b297d8883de45d002",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "summon_ivory_7",
+      "family": "summon_ivory",
+      "path": "terrain/summon_ivory_7.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        1
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "6faabd33609f4e02cec2bcbf699de88f65ce8452966b68e4b430f7f9728edf6d",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "summon_ivory_8",
+      "family": "summon_ivory",
+      "path": "terrain/summon_ivory_8.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "86b94a03565bf22a53a64b3a268c2105f14c4cf700906593f6a68aa68fa7312c",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "summon_ivory_9",
+      "family": "summon_ivory",
+      "path": "terrain/summon_ivory_9.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "7ded4ddfce591dcb473cfb2f7ff4a8f2aef7b812c642f8f070593928302ac7de",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "summon_ivory_10",
+      "family": "summon_ivory",
+      "path": "terrain/summon_ivory_10.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "ea8fa005625fe1f051cd6158eb6511a60b0457080a1b45293729abced2ed648f",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "summon_ivory_11",
+      "family": "summon_ivory",
+      "path": "terrain/summon_ivory_11.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        2
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "b1b0f16d93fe86ee164b386fa6ca534262886cdb42b6b7580ca06ac40baa4ba9",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "summon_ivory_12",
+      "family": "summon_ivory",
+      "path": "terrain/summon_ivory_12.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        0,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "ffecc656a2597101ebf17d9af371cfbb73fec34393fab838054154db30ca5d50",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "summon_ivory_13",
+      "family": "summon_ivory",
+      "path": "terrain/summon_ivory_13.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        1,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "1295e56f9146a09dd362fdb63b3f997e4a69b5075c9c5d5a4f70ac4b65442201",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "summon_ivory_14",
+      "family": "summon_ivory",
+      "path": "terrain/summon_ivory_14.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        2,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "ddf9e8f81aab59cd4cbdae1fab9428253d20bfa6877057a08ffcada0dd32344d",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "summon_ivory_15",
+      "family": "summon_ivory",
+      "path": "terrain/summon_ivory_15.png",
+      "size": [
+        64,
+        64
+      ],
+      "channels": "RGB opaque",
+      "frame_count": 1,
+      "mosaic_xy": [
+        3,
+        3
+      ],
+      "world_tile_px": [
+        64,
+        64
+      ],
+      "source_type": "original image-tool material sample; BOX mosaic normalization",
+      "source_path": "art/p27b_sources/flagstone_source.png",
+      "source_sha256": "6bfad62a34bf455e4f179ff6ad204a2f050a71acb4d6a9560224830b6e363b12",
+      "preview_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "56b969ca2dc6ad81243926ee0a27152cd9a0a3beda2e57bf92333cc861e1de7c",
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "5x5 checked offline; engine still required; visible 4x4 repeat"
+    },
+    {
+      "id": "summoning_hall",
+      "family": "structure",
+      "path": "structures/summoning_hall.png",
+      "size": [
+        268,
+        206
+      ],
+      "channels": "RGBA binary alpha",
+      "frame_count": 1,
+      "pivot": [
+        134,
+        206
+      ],
+      "focus": [
+        111,
+        176
+      ],
+      "world_scale_multiplier": "2 * worldObstacle.scale * zoom (unchanged)",
+      "source_type": "original Arena image generation edited from game-owned P21 sprite",
+      "source_path": "art/p27b_sources/summoning_hall_source.png",
+      "source_sha256": "97a30dd4eb0b6ef067f5a9460ace545855372492da10759d14f7e995b961a513",
+      "preview_sha256": "23b83a6e9461970ffcf65cdb10122e76df6adda3cf7bff3c1f4eec7f29e01013",
+      "sha256": "5a5caf366377650f25574dbe6b7093a174c127fa1b06393ccba60a69104fcce6",
+      "alpha_bbox": [
+        9,
+        23,
+        261,
+        206
+      ],
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "contact cutout checked; pending renderer pivot/light review"
+    },
+    {
+      "id": "tower_gate",
+      "family": "structure",
+      "path": "structures/tower_gate.png",
+      "size": [
+        260,
+        224
+      ],
+      "channels": "RGBA binary alpha",
+      "frame_count": 1,
+      "pivot": [
+        130,
+        224
+      ],
+      "focus": [
+        130,
+        120
+      ],
+      "world_scale_multiplier": "2 * worldObstacle.scale * zoom (unchanged)",
+      "source_type": "original Arena image generation edited from game-owned P21 sprite",
+      "source_path": "art/p27b_sources/tower_gate_rework.png",
+      "source_sha256": "4b097cdb49cce7252c5f8827baee54567cf955e48b0ca3328121d1ba13ae2dae",
+      "preview_sha256": "1dbe12bf83b15efa6e4939d451b84b08d9e7cf9eab3b46512ae4976bd41aedaa",
+      "sha256": "c28e93fffd518c9a808752c68224a78931add6f729520897de017139a1640fb2",
+      "alpha_bbox": [
+        20,
+        5,
+        252,
+        224
+      ],
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "contact cutout checked; pending renderer pivot/light review"
+    }
+  ]
+}

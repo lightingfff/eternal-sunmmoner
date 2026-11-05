@@ -263,12 +263,13 @@ fun ResourcePillBadge(
   amount: Long,
   accent: Color,
   modifier: Modifier = Modifier,
+  lightOnIvory: Boolean = false,
 ) {
   Row(
     modifier = modifier
       .clip(RoundedCornerShape(8.dp))
-      .background(ObsidianVoid.copy(alpha = 0.88f))
-      .border(1.dp, accent.copy(alpha = 0.55f), RoundedCornerShape(8.dp))
+      .background(if (lightOnIvory) Color(0xFFEBE6DB) else ObsidianVoid.copy(alpha = 0.88f))
+      .border(1.dp, if (lightOnIvory) Color(0xFFA7977D) else accent.copy(alpha = 0.55f), RoundedCornerShape(8.dp))
       .padding(horizontal = 7.dp, vertical = 4.dp),
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -282,7 +283,7 @@ fun ResourcePillBadge(
     Text(
       text = "$label $amount",
       style = MaterialTheme.typography.labelSmall,
-      color = MaterialTheme.colorScheme.onSurface,
+      color = if (lightOnIvory) Color(0xFF283B4B) else MaterialTheme.colorScheme.onSurface,
       maxLines = 1,
       softWrap = false,
       overflow = TextOverflow.Ellipsis,

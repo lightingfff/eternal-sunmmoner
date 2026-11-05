@@ -1,0 +1,143 @@
+name: P27B matched Sanctuary render evidence
+
+# Matched pre-art and post-art tests, real Compose Canvas/Robolectric native Skia.
+# GitHub Actions artifact storage is quota-exhausted in this repo as of P27B baseline;
+# PNGs are committed to *this* branch, NOT packaged in the APK or fake screenshots.
+on:
+  push:
+    branches: [arena/683a732b-eternal-sunmmoner]
+    paths:
+      - '.github/workflows/p27b-render.yml'
+      - 'app/src/main/assets/sanctuary_p27b/**'
+      - 'app/src/main/java/com/example/game/pixel/**'
+      - 'app/src/main/java/com/example/ui/**'
+      - 'app/src/test/java/com/example/P27B*Test.kt'
+      - 'app/src/test/java/com/example/SanctuaryMaterialTest.kt'
+      - 'app/src/test/java/com/example/ui/P27B*Test.kt'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/p27b-render.yml'
+      - 'app/src/main/assets/sanctuary_p27b/**'
+      - 'app/src/main/java/com/example/game/pixel/**'
+      - 'app/src/main/java/com/example/ui/**'
+      - 'app/src/test/java/com/example/P27B*Test.kt'
+      - 'app/src/test/java/com/example/SanctuaryMaterialTest.kt'
+      - 'app/src/test/java/com/example/ui/P27B*Test.kt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install Android SDK packages
+        run: |
+          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager | head -n 1)
+          set +o pipefail
+          yes | "$SDKMANAGER" --licenses
+          license_status=${PIPESTATUS[1]}
+          set -o pipefail
+          test "$license_status" -eq 0
+          "$SDKMANAGER" --install "platform-tools" "platforms;android-36.1" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.3.1'
+      - name: Debug-only Google resource, no auth modifications in app
+        run: |
+          mkdir -p app/src/debug/res/values
+          cat > app/src/debug/res/values/google_services_placeholder.xml <<'EOF'
+          <resources><string name="default_web_client_id" translatable="false">debug-placeholder.apps.googleusercontent.com</string></resources>
+          EOF
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      # P27B: structural PNG gate. Not a sign-off: 5x5 repeats and engine light still need eyes.
+      - name: Validate shipped PNGs, hashes, alpha, pivots and mosaic seam guard
+        run: |
+          python3 -m pip install --quiet --disable-pip-version-check pillow==13.0.0
+          python3 tools/p27b_validate.py
+      - name: P27B runtime selectors and unchanged P03 material regression
+        run: |
+          set +e
+          gradle :app:testDebugUnitTest \
+            --tests 'com.example.P27BAssetContractTest' \
+            --tests 'com.example.SanctuaryMaterialTest' \
+            --stacktrace > "$RUNNER_TEMP/p27b-assets.log" 2>&1
+          result=$?
+          cat "$RUNNER_TEMP/p27b-assets.log"
+          if [ "$result" -ne 0 ]; then python3 tools/p27b_ci_failure.py "$RUNNER_TEMP/p27b-assets.log" app/build/test-results/testDebugUnitTest; fi
+          exit "$result"
+      - name: Matched real-world renderer screenshots
+        id: render_world
+        run: |
+          set +e
+          gradle :app:testDebugUnitTest --tests 'com.example.P27BRenderTest' --stacktrace > "$RUNNER_TEMP/p27b-world.log" 2>&1
+          result=$?
+          cat "$RUNNER_TEMP/p27b-world.log"
+          if [ "$result" -ne 0 ]; then python3 tools/p27b_ci_failure.py "$RUNNER_TEMP/p27b-world.log" app/build/test-results/testDebugUnitTest; fi
+          exit "$result"
+      - name: Matched Compose UI screenshots and summon behavior
+        id: render_ui
+        if: ${{ always() && steps.render_world.outcome == 'success' }}
+        run: |
+          set +e
+          gradle :app:testDebugUnitTest --tests 'com.example.ui.P27BUiTest' --stacktrace > "$RUNNER_TEMP/p27b-ui.log" 2>&1
+          result=$?
+          cat "$RUNNER_TEMP/p27b-ui.log"
+          if [ "$result" -ne 0 ]; then python3 tools/p27b_ci_failure.py "$RUNNER_TEMP/p27b-ui.log" app/build/test-results/testDebugUnitTest; fi
+          exit "$result"
+      - name: Assemble Android APK (technical verification only)
+        if: ${{ always() && steps.render_world.outcome == 'success' }}
+        run: |
+          # app/build.gradle.kts explicitly signs debug with root debug.keystore.
+          # Don't alter signing configs or ship a key; this ephemeral key only verifies compilation.
+          if [ ! -f debug.keystore ]; then
+            keytool -genkeypair -noprompt -keystore debug.keystore -storepass android \
+              -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 \
+              -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+          set +e
+          gradle :app:assembleDebug --stacktrace > "$RUNNER_TEMP/p27b-apk.log" 2>&1
+          result=$?
+          cat "$RUNNER_TEMP/p27b-apk.log"
+          if [ "$result" -ne 0 ]; then
+            python3 tools/p27b_ci_failure.py "$RUNNER_TEMP/p27b-apk.log" app/build/test-results/testDebugUnitTest
+            exit "$result"
+          fi
+          test -s app/build/outputs/apk/debug/app-debug.apk
+          sha256sum app/build/outputs/apk/debug/app-debug.apk
+          echo "APK compiled on $GITHUB_SHA, artifact QUOTA_BLOCKED; APK not committed (ephemeral debug signature)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Commit matched renderer captures to this branch (quota-safe)
+        if: ${{ always() && github.event_name == 'push' }}
+        run: |
+          set -euo pipefail
+          if [ ! -s app/build/visual_screenshots/p27b/world/camera_props.json ]; then
+            echo 'No real world renders: nothing to publish'; exit 0
+          fi
+          phase=before
+          if [ -s app/src/main/assets/sanctuary_p27b/manifest.json ]; then phase=after; fi
+          dest="docs/p27b/previews/$phase"
+          mkdir -p "$dest/world" "$dest/ui"
+          cp -f app/build/visual_screenshots/p27b/world/*.png "$dest/world/"
+          cp -f app/build/visual_screenshots/p27b/world/camera_props.json "$dest/world/"
+          if [ -d app/build/visual_screenshots/p27b/ui ]; then
+            cp -f app/build/visual_screenshots/p27b/ui/*.png "$dest/ui/" || true
+          fi
+          git config user.name 'p27b-render-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add "$dest"
+          if git diff --cached --quiet; then echo 'same renderer images; no commit'; exit 0; fi
+          git commit -m "P27B: real Robolectric ${phase} render on ${GITHUB_SHA:0:7}"
+          # Do not force push, auto-merge, or update other branches.
+          git push origin HEAD:arena/683a732b-eternal-sunmmoner
