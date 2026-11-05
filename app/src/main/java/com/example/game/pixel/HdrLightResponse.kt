@@ -2,10 +2,12 @@ package com.example.game.pixel
 
 import android.graphics.Bitmap
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -386,6 +388,38 @@ object HdrLightResponse {
    * a dark roof does. Emissive windows are drawn AFTER this pass, so they keep their
    * glow instead of being dimmed with the wall.
    */
+  /**
+   * Night response for GEOMETRY drawn in code rather than from a sprite.
+   *
+   * The perimeter ring (`SanctuaryWorldRenderer.drawFortressWall` and its two siblings) is
+   * one continuous fill per segment, so it never passes through drawNightAbsorption(). After
+   * the ring was repainted to ivory limestone that omission became visible in every night
+   * frame: the sky and grass went night-blue while the walls behind stayed bright, i.e. the
+   * exact "pasted on" look debt C was about, back on 3 of the 4 wall segments.
+   *
+   * Same rule and the same curve as the sprite path: a pale limestone face absorbs more than
+   * a dark roof. One extra path fill per segment (4 segments per frame), not a fullscreen pass.
+   */
+  fun DrawScope.drawGeometryNightAbsorption(path: Path, baseLuma: Float) =
+    drawGeometryNightAbsorptionImpl({ drawPath(path, it) }, baseLuma)
+
+  /** Rect overload: the perimeter uses drawRect, and a Rect cannot be passed as a Path. */
+  fun DrawScope.drawGeometryNightAbsorption(rect: Rect, baseLuma: Float) =
+    drawGeometryNightAbsorptionImpl({ drawRect(rect, color = it) }, baseLuma)
+
+  private fun DrawScope.drawGeometryNightAbsorptionImpl(
+    emit: (Color) -> Unit,
+    baseLuma: Float,
+  ) {
+    if (!balanced()) return
+    val night = (1f - WorldEnvironment.lighting.ambientIntensity).coerceIn(0f, 1f)
+    if (night <= .02f) return
+    val pale = ((baseLuma - 60f) / 120f).coerceIn(0f, 1f)
+    val alpha = (night * (0.16f + 0.26f * pale)).coerceAtMost(.34f)
+    if (alpha <= 0f) return
+    emit(NIGHT_ABSORB.copy(alpha = alpha))
+  }
+
   private fun DrawScope.drawNightAbsorption(obs: WorldObstacle, cx: Float, cy: Float, s: Float) {
     if (!balanced() || s < .30f) return
     val bmp = SanctuaryEnvironmentShadows.sprite(obs) ?: return

@@ -1165,12 +1165,18 @@ object SanctuaryWorldRenderer {
 
     // Inner stone vertical face visible toward the island interior
     val innerLeft = if (isWestSide) cx + walkHalfW else cx - walkHalfW - innerFaceW
+    val innerSize = Size(innerFaceW, (base1Y - top0Y).coerceAtLeast(4f))
     drawRect(
       // Same repaint as drawFortressWall: this segment is the side wall of the same ring.
       color = if (isWestSide) Color(0xFFB9AF9C) else Color(0xFFAFA592),
       topLeft = Offset(innerLeft, top0Y),
-      size = Size(innerFaceW, (base1Y - top0Y).coerceAtLeast(4f)),
+      size = innerSize,
     )
+    // See drawFortressWall: geometry drawn in code needs its own night response, otherwise
+    // it stays bright while the sky and grass go night-blue.
+    with(HdrLightResponse) {
+      drawGeometryNightAbsorption(Rect(Offset(innerLeft, top0Y), innerSize), 185f)
+    }
     drawRect(
       color = Color(0xFF6F6656),
       topLeft = Offset(innerLeft, top0Y),
@@ -1179,11 +1185,15 @@ object SanctuaryWorldRenderer {
     )
 
     // Sunlit stone top rampart walkway
+    val walkSize = Size(walkHalfW * 2f, (top1Y - top0Y).coerceAtLeast(4f))
     drawRect(
       color = Color(0xFFF2EAD9),
       topLeft = Offset(cx - walkHalfW, top0Y),
-      size = Size(walkHalfW * 2f, (top1Y - top0Y).coerceAtLeast(4f)),
+      size = walkSize,
     )
+    with(HdrLightResponse) {
+      drawGeometryNightAbsorption(Rect(Offset(cx - walkHalfW, top0Y), walkSize), 232f)
+    }
     drawRect(
       color = Color(0xFF6F6656),
       topLeft = Offset(cx - walkHalfW, top0Y),
@@ -1226,6 +1236,11 @@ object SanctuaryWorldRenderer {
     // atlas entry, which is why repainting an asset did not change it.
     // Repainted to the P27B-V5 limestone family; geometry is untouched.
     drawPath(extFace, if (x0 < 1600f) Color(0xFFB9AF9C) else Color(0xFFAFA592))
+    // Night: this face is code, not a sprite, so it needs its own absorption or it stays
+    // bright while the sky and grass go night-blue (debt C, resurfacing on the ring).
+    with(HdrLightResponse) {
+      drawGeometryNightAbsorption(extFace, 185f)
+    }
 
     for (c in 1..4) {
       val f = c / 5f
@@ -1253,6 +1268,7 @@ object SanctuaryWorldRenderer {
     }
     // Walkway is the sunlit top surface: brightest ivory in the ring.
     drawPath(walkwayPath, Color(0xFFF2EAD9))
+    with(HdrLightResponse) { drawGeometryNightAbsorption(walkwayPath, 232f) }
     drawPath(walkwayPath, Color(0xFF6F6656), style = Stroke(width = (1.6f * zoom).coerceAtLeast(1f)))
 
     // 3. Crenellated Battlement Merlons
@@ -1274,6 +1290,7 @@ object SanctuaryWorldRenderer {
         close()
       }
       drawPath(merlon, Color(0xFFDCD3C0))
+      with(HdrLightResponse) { drawGeometryNightAbsorption(merlon, 220f) }
       drawPath(merlon, Color(0xFF6F6656), style = Stroke(width = (1.3f * zoom).coerceAtLeast(0.8f)))
     }
   }
@@ -1360,6 +1377,7 @@ object SanctuaryWorldRenderer {
         close()
       }
       drawPath(merlon, Color(0xFFDCD3C0))
+      with(HdrLightResponse) { drawGeometryNightAbsorption(merlon, 220f) }
       drawPath(merlon, Color(0xFF6F6656), style = Stroke(width = (1.3f * zoom).coerceAtLeast(0.8f)))
     }
 
