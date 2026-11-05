@@ -1,0 +1,234 @@
+{
+ "pack": "ui_p28",
+ "version": 1,
+ "note": "Original P28 'Astral Reliquary' UI assets. AI-generated art (generate_image) post-processed for alpha/size; silver/obsidian frames and progress/buttons/icons are procedural derivatives drawn with PIL. No reference artwork, faces, names, logos or text baked in. Text/rarity/stats always rendered from game state in code.",
+ "assets": {
+  "card_frame_bronze": {
+   "id": "card_frame_bronze",
+   "path": "ui_p28/cards/hero_card_frame_bronze.png",
+   "use": "hero card frame, bronze tier",
+   "width": 384,
+   "height": 576,
+   "transparency": true,
+   "sha256": "e6dc2959af5b938ab945d51e81c498748f7a51d99ce35625d8676cde4dcbf9ac",
+   "method": "ai-generated original (post-processed alpha/resize)"
+  },
+  "card_frame_silver": {
+   "id": "card_frame_silver",
+   "path": "ui_p28/cards/hero_card_frame_silver.png",
+   "use": "hero card frame, silver tier (derived from bronze, same geometry)",
+   "width": 384,
+   "height": 576,
+   "transparency": true,
+   "sha256": "8e8ec66e0532a8d880c77129da4a08f22390c8c3622de848969631af3cdefbff",
+   "method": "procedural (PIL vector draw)"
+  },
+  "card_frame_obsidian": {
+   "id": "card_frame_obsidian",
+   "path": "ui_p28/cards/hero_card_frame_obsidian.png",
+   "use": "hero card frame, obsidian/high-rarity tier (derived from bronze)",
+   "width": 384,
+   "height": 576,
+   "transparency": true,
+   "sha256": "12907ce3ed3ce9a5edf2774e07ac344448095622af403cb76762bf4e7fc25790",
+   "method": "procedural (PIL vector draw)"
+  },
+  "card_backdrop": {
+   "id": "card_backdrop",
+   "path": "ui_p28/cards/hero_card_backdrop.png",
+   "use": "portrait backdrop pattern behind hero art",
+   "width": 384,
+   "height": 576,
+   "transparency": false,
+   "sha256": "d465e4b0e14911c856af460f02020dcdd3de1791cfc57b1c1395912520c70443",
+   "method": "ai-generated original (post-processed alpha/resize)"
+  },
+  "card_nameplate": {
+   "id": "card_nameplate",
+   "path": "ui_p28/cards/hero_card_nameplate.png",
+   "use": "nameplate strip at card bottom; text drawn in code on top",
+   "width": 384,
+   "height": 128,
+   "transparency": true,
+   "sha256": "d0a36b088c04d53461eddf9382c00640618a75a378d696f7f9ae8639261f8762",
+   "method": "ai-generated original (post-processed alpha/resize)"
+  },
+  "rarity_star_on": {
+   "id": "rarity_star_on",
+   "path": "ui_p28/cards/rarity_star_on.png",
+   "use": "filled rarity star",
+   "width": 64,
+   "height": 64,
+   "transparency": true,
+   "sha256": "12410ad65426c49ec6bf3be72262420f10761a8660dde720fbb7aaa677c3baec",
+   "method": "ai-generated original (post-processed alpha/resize)"
+  },
+  "rarity_star_off": {
+   "id": "rarity_star_off",
+   "path": "ui_p28/cards/rarity_star_off.png",
+   "use": "empty rarity star",
+   "width": 64,
+   "height": 64,
+   "transparency": true,
+   "sha256": "f4488aaa31bb9b3d9e91bb449e2e613a34d1bd1d6dc22a70a18acf75517d6d96",
+   "method": "ai-generated original (post-processed alpha/resize)"
+  },
+  "notice_standard": {
+   "id": "notice_standard",
+   "path": "ui_p28/notices/notice_frame_standard.png",
+   "use": "9-slice frame, standard toast/notice",
+   "width": 288,
+   "height": 96,
+   "transparency": true,
+   "sha256": "d0aeb1a92361f7d3c268e3560b13bb9a9e70661591ab84f46d5f8aa3ec35a7c2",
+   "method": "ai-generated original (post-processed alpha/resize)",
+   "nineSliceInsetPx": 24
+  },
+  "notice_warning": {
+   "id": "notice_warning",
+   "path": "ui_p28/notices/notice_frame_warning.png",
+   "use": "9-slice frame, tactical warning",
+   "width": 288,
+   "height": 96,
+   "transparency": true,
+   "sha256": "26d58a54c2976c429331114f075094859b65ed6a08c184f91972ebb15d84e3cf",
+   "method": "ai-generated original (post-processed alpha/resize)",
+   "nineSliceInsetPx": 24
+  },
+  "notice_ceremony": {
+   "id": "notice_ceremony",
+   "path": "ui_p28/notices/notice_frame_ceremony.png",
+   "use": "9-slice frame, ceremonial event",
+   "width": 288,
+   "height": 96,
+   "transparency": true,
+   "sha256": "c74c33ff26e555f96fe273e90dbe0fd0838aca337e3de75b4b0b644cc340c990",
+   "method": "ai-generated original (post-processed alpha/resize)",
+   "nineSliceInsetPx": 24
+  },
+  "loading_bg": {
+   "id": "loading_bg",
+   "path": "ui_p28/loading/loading_bg_fantasy.png",
+   "use": "cinematic loading backdrop, opaque, no text/logo",
+   "width": 1280,
+   "height": 720,
+   "transparency": false,
+   "sha256": "33e7864d011bf40d85fc842e8f92109545a6048b45eeb1c24281df4b40d9798e",
+   "method": "ai-generated original (post-processed alpha/resize)"
+  },
+  "loading_sigil": {
+   "id": "loading_sigil",
+   "path": "ui_p28/loading/eternal_summoner_sigil.png",
+   "use": "original brand sigil",
+   "width": 256,
+   "height": 256,
+   "transparency": true,
+   "sha256": "21706825a10630e779400718929604119e8f429fcb68b6c4f82dd16566f8427f",
+   "method": "ai-generated original (post-processed alpha/resize)"
+  },
+  "progress_track": {
+   "id": "progress_track",
+   "path": "ui_p28/loading/progress_track.png",
+   "use": "loading progress track with endcaps",
+   "width": 480,
+   "height": 48,
+   "transparency": true,
+   "sha256": "20098febc1bc98f0b4b8b65ef2a2bd6744f9a83a35329e94e5c85e29b8327baa",
+   "method": "procedural (PIL vector draw)",
+   "nineSliceInsetPx": 8
+  },
+  "progress_fill": {
+   "id": "progress_fill",
+   "path": "ui_p28/loading/progress_fill.png",
+   "use": "loading progress fill, clipped by fraction in code",
+   "width": 480,
+   "height": 48,
+   "transparency": true,
+   "sha256": "fe34136e03b7157bca9748a8ee493439354d713320e3220b42af77125f8e91bc",
+   "method": "procedural (PIL vector draw)",
+   "nineSliceInsetPx": 8
+  },
+  "button_primary": {
+   "id": "button_primary",
+   "path": "ui_p28/controls/button_primary.png",
+   "use": "9-slice primary button face",
+   "width": 288,
+   "height": 96,
+   "transparency": true,
+   "sha256": "f965f364979c7595b0628ca25077e49acd891a4292b8252a9feea1de9c5a9053",
+   "method": "procedural (PIL vector draw)",
+   "nineSliceInsetPx": 24
+  },
+  "button_secondary": {
+   "id": "button_secondary",
+   "path": "ui_p28/controls/button_secondary.png",
+   "use": "9-slice secondary button face",
+   "width": 288,
+   "height": 96,
+   "transparency": true,
+   "sha256": "c723d2ff020a6ba8bf5654221835887dfbbf074c684a922379754dadf31799d7",
+   "method": "procedural (PIL vector draw)",
+   "nineSliceInsetPx": 24
+  },
+  "icon_event": {
+   "id": "icon_event",
+   "path": "ui_p28/icons/icon_event.png",
+   "use": "story/event icon",
+   "width": 64,
+   "height": 64,
+   "transparency": true,
+   "sha256": "d067cb323e0bb2b8a46e7dcdf88ece94e0ed846592f8288f519c45534951c817",
+   "method": "procedural (PIL vector draw)"
+  },
+  "icon_shield": {
+   "id": "icon_shield",
+   "path": "ui_p28/icons/icon_shield.png",
+   "use": "defense/buff icon",
+   "width": 64,
+   "height": 64,
+   "transparency": true,
+   "sha256": "5d69a751fe8b1b41969d72bb5e917e15eb24ffce629647833a6f2cd5af3eadf6",
+   "method": "procedural (PIL vector draw)"
+  },
+  "icon_debuff": {
+   "id": "icon_debuff",
+   "path": "ui_p28/icons/icon_debuff.png",
+   "use": "debuff/weakening icon",
+   "width": 64,
+   "height": 64,
+   "transparency": true,
+   "sha256": "c04ba4a8723fd208a992aec77de580f6fedc8213d2915fd386ee47942a62b9c1",
+   "method": "procedural (PIL vector draw)"
+  },
+  "icon_retreat": {
+   "id": "icon_retreat",
+   "path": "ui_p28/icons/icon_retreat.png",
+   "use": "retreat icon",
+   "width": 64,
+   "height": 64,
+   "transparency": true,
+   "sha256": "64b3905f5b0917ade50b3d3bed161a9360db572212476e615f42c0b70b4ad131",
+   "method": "procedural (PIL vector draw)"
+  },
+  "icon_heal": {
+   "id": "icon_heal",
+   "path": "ui_p28/icons/icon_heal.png",
+   "use": "heal icon",
+   "width": 64,
+   "height": 64,
+   "transparency": true,
+   "sha256": "8545a2c4b7f76f2f50a4fe2dcadc89884f1ef6ebd4f8759ee32d9c582eb060ff",
+   "method": "procedural (PIL vector draw)"
+  },
+  "icon_summon": {
+   "id": "icon_summon",
+   "path": "ui_p28/icons/icon_summon.png",
+   "use": "summon/ritual icon",
+   "width": 64,
+   "height": 64,
+   "transparency": true,
+   "sha256": "1db2ce88040e905e0bb890352d01e03a7c4020f6d69fb9d88b470451919c8d91",
+   "method": "procedural (PIL vector draw)"
+  }
+ }
+}

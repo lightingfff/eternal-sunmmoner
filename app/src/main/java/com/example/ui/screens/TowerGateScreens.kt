@@ -80,6 +80,7 @@ import com.example.game.tower.TowerFloorCatalog
 import com.example.ui.SummonerUiState
 import com.example.ui.components.PixelHeroPortraitAvatar
 import com.example.ui.components.ResourcePillBadge
+import com.example.ui.components.p28.ESMiniHeroPortrait
 import com.example.ui.theme.ArcaneViolet
 import com.example.ui.theme.BorderRune
 import com.example.ui.theme.CrimsonBlood
