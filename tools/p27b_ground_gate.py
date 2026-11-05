@@ -27,6 +27,35 @@ ROOT = Path(__file__).resolve().parents[1]
 SHEET_DIR = ROOT / 'app/src/main/assets/sanctuary_p27b_2/terrain'
 MANIFEST = ROOT / 'app/src/main/assets/sanctuary_p27b_2/manifest.json'
 FAMILIES = ('grass', 'soil', 'flagstone', 'cobble')
+SHIPPED = ROOT / 'app/src/main/assets/sanctuary_p27b/terrain'
+# Mean luma of the art being replaced. A sheet that is far brighter than the shipped
+# atlas reads as "drawn on top of" the world; the first V5 flagstone sheet came out at
+# 174 against a shipped 166 and was visibly chalky through the plaza overlay.
+LUMA_TOLERANCE = 12.0
+# A sheet that lost its content (bad roll, wrong source) collapses to near-uniform.
+MIN_STDDEV = 6.0
+
+
+def mean_luma(image: Image.Image) -> float:
+    pixels = list(image.convert('RGB').resize((128, 128)).getdata())
+    return sum(0.299 * r + 0.587 * g + 0.114 * b for r, g, b in pixels) / len(pixels)
+
+
+def luma_stddev(image: Image.Image) -> float:
+    small = image.convert('L').resize((128, 128))
+    values = list(small.getdata())
+    mean = sum(values) / len(values)
+    return (sum((v - mean) ** 2 for v in values) / len(values)) ** 0.5
+
+
+def shipped_atlas(family: str) -> Image.Image | None:
+    cells = [SHIPPED / f'{family}_{index}.png' for index in range(16)]
+    if not all(path.is_file() for path in cells):
+        return None
+    atlas = Image.new('RGB', (256, 256))
+    for index, path in enumerate(cells):
+        atlas.paste(Image.open(path).convert('RGB'), ((index % 4) * 64, (index // 4) * 64))
+    return atlas
 GRID = 8
 CELL = 64
 
@@ -95,6 +124,19 @@ def main() -> int:
 
         # Two decimals: gutters like cobble have genuinely similar cell means (spread
         # ~2.6 luma), so integer rounding would report a false "pasted block".
+        spread = luma_stddev(sheet)
+        if spread < MIN_STDDEV:
+            failures.append(f'{family}: sheet is nearly uniform (luma sd {spread:.1f} < '
+                            f'{MIN_STDDEV:.0f}); the roll or the source dropped the content')
+        shipped = shipped_atlas(family)
+        luma_delta = None
+        if shipped is not None:
+            luma_delta = mean_luma(sheet) - mean_luma(shipped)
+            if abs(luma_delta) > LUMA_TOLERANCE:
+                failures.append(f'{family}: mean luma is {luma_delta:+.1f} off the shipped atlas '
+                                f'(tolerance +/-{LUMA_TOLERANCE:.0f}); it would read as a patch '
+                                f'pasted onto the ground instead of the ground')
+
         distinct = len({tuple(round(v, 2) for v in cell) for cell in cells})
         if distinct < GRID * GRID // 2:
             failures.append(f'{family}: only {distinct}/64 distinct cell means; sheet is a pasted block')
@@ -123,6 +165,10 @@ def main() -> int:
             'mean_rgb_step_4_tiles': round(step4, 3),
             'max_identity_at_4_tiles': round(worst_identity, 3),
             'distinct_cell_means': distinct,
+            'luma_stddev': round(spread, 2),
+            'mean_luma': round(mean_luma(sheet), 2),
+            'shipped_mean_luma': None if shipped is None else round(mean_luma(shipped), 2),
+            'luma_delta_vs_shipped': None if luma_delta is None else round(luma_delta, 2),
             'wrap_seam': round(wrap, 2),
             'interior_boundary_p95': round(interior, 2),
             'period_world_px': declared.get('ground_period_world_px'),

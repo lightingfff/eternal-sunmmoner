@@ -145,19 +145,14 @@ jobs:
         if: ${{ always() && github.event_name == 'push' }}
         run: |
           set -euo pipefail
+          # docs/p27b is the MERGED PR #34 baseline and must stay byte-identical for
+          # comparison. From V5 on, evidence lands in docs/p27b_next only.
+          git restore --source=HEAD -- docs/p27b || true
           if [ ! -s app/build/visual_screenshots/p27b/world/camera_props.json ] &&
              [ ! -s app/build/visual_screenshots/p27b_next/world/camera_props.json ]; then
             echo 'No real world renders: nothing to publish'; exit 0
           fi
-          phase=before
-          if [ -s app/src/main/assets/sanctuary_p27b/manifest.json ]; then phase=after; fi
-          dest="docs/p27b/previews/$phase"
-          mkdir -p "$dest/world" "$dest/ui"
-          cp -f app/build/visual_screenshots/p27b/world/*.png "$dest/world/" || true
-          cp -f app/build/visual_screenshots/p27b/world/camera_props.json "$dest/world/"
-          if [ -d app/build/visual_screenshots/p27b/ui ]; then
-            cp -f app/build/visual_screenshots/p27b/ui/*.png "$dest/ui/" || true
-          fi
+          # P27B baseline evidence is frozen (PR #34 merged); only V5 evidence is written.
           # V5 evidence lives beside, not on top of, the frozen P27B baseline.
           if [ -s app/build/visual_screenshots/p27b_next/world/camera_props.json ]; then
             next="docs/p27b_next/previews/after"
@@ -168,8 +163,7 @@ jobs:
           fi
           git config user.name 'p27b-render-bot'
           git config user.email 'actions@users.noreply.github.com'
-          git add "$dest"
           if git diff --cached --quiet; then echo 'same renderer images; no commit'; exit 0; fi
-          git commit -m "P27B: real Robolectric ${phase} render on ${GITHUB_SHA:0:7}"
+          git commit -m "P27B V5: real Robolectric render on ${GITHUB_SHA:0:7}"
           # Do not force push, auto-merge, or update other branches.
           git push origin HEAD:arena/8be73f1b-eternal-sunmmoner
