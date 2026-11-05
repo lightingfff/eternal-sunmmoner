@@ -1,5 +1,5 @@
 {
-  "source": "REAL Robolectric renderer; AFTER camera_props.json; BEFORE P26B merged SHA",
+  "source": "REAL Robolectric renderer; AFTER camera_props.json; C1 BEFORE = P26B merged SHA; E4 BEFORE = re-seated P27B art baseline",
   "before_source_commit": "f0dc0de6b63794082ba5db88244a2cc8c486bcdb",
   "sky_band_top_fraction": 0.25,
   "gates": {
@@ -7,8 +7,8 @@
       "pass": true,
       "detail": {
         "before_after_delta_ratio": {
-          "p26c_morning_clear_z088.png": 0.1017,
-          "p26c_noon_clear_z088.png": 0.09573
+          "p26c_morning_clear_z088.png": 0.49602,
+          "p26c_noon_clear_z088.png": 0.50189
         },
         "min": 0.05,
         "source_commit": "f0dc0de6b63794082ba5db88244a2cc8c486bcdb"
@@ -17,18 +17,18 @@
     "C3": {
       "pass": true,
       "detail": {
-        "clear": 107.28,
-        "cloudy": 98.61,
-        "cloudy_minus_clear": -8.68
+        "clear": 122.3,
+        "cloudy": 112.76,
+        "cloudy_minus_clear": -9.54
       }
     },
     "C4": {
       "pass": true,
       "detail": {
-        "clear": 107.28,
-        "rain": 88.67,
-        "storm": 79.73,
-        "storm_minus_rain": -8.94,
+        "clear": 122.3,
+        "rain": 100.0,
+        "storm": 90.34,
+        "storm_minus_rain": -9.66,
         "before_storm": "NOT AVAILABLE: no STORM in P26B"
       }
     },
@@ -41,25 +41,25 @@
     "E1": {
       "pass": true,
       "detail": {
-        "morning_noon": 11.86,
-        "noon_evening": 40.15,
-        "evening_night": 12.59,
-        "noon_night": 52.73
+        "morning_noon": 13.39,
+        "noon_evening": 42.74,
+        "evening_night": 13.9,
+        "noon_night": 56.64
       }
     },
     "E2": {
       "pass": true,
       "detail": {
         "noon_sky_ge_morning": true,
-        "whole_noon_minus_night": 27.18
+        "whole_noon_minus_night": 34.65
       }
     },
     "E3": {
       "pass": true,
       "detail": {
-        "cloudy_minus_clear": -8.68,
-        "rain_minus_clear": -18.61,
-        "storm_minus_clear": -27.55
+        "cloudy_minus_clear": -9.54,
+        "rain_minus_clear": -22.3,
+        "storm_minus_clear": -31.96
       }
     },
     "E4": {
@@ -67,42 +67,43 @@
       "detail": {
         "matched_only": {
           "p26c_morning_clear_z088.png": {
-            "before": 77.0,
-            "after": 77.0,
-            "delta_pct": 0.0
+            "before": 107.26,
+            "after": 107.26,
+            "delta_pct": -0.002
           },
           "p26c_noon_clear_z088.png": {
-            "before": 81.69,
-            "after": 81.69,
-            "delta_pct": 0.0
+            "before": 115.41,
+            "after": 115.41,
+            "delta_pct": 0.004
           },
           "p26c_noon_cloudy_z088.png": {
-            "before": 76.96,
-            "after": 76.96,
-            "delta_pct": 0.0
+            "before": 109.3,
+            "after": 109.3,
+            "delta_pct": -0.001
           },
           "p26c_noon_rain_z088.png": {
-            "before": 76.41,
-            "after": 76.41,
-            "delta_pct": -0.005
+            "before": 102.66,
+            "after": 102.66,
+            "delta_pct": -0.004
           },
           "p26c_evening_clear_z088.png": {
-            "before": 67.9,
-            "after": 67.9,
-            "delta_pct": 0.0
+            "before": 95.89,
+            "after": 95.89,
+            "delta_pct": 0.003
           },
           "p26c_night_clear_z088.png": {
-            "before": 63.97,
-            "after": 63.97,
-            "delta_pct": 0.0
+            "before": 89.23,
+            "after": 89.23,
+            "delta_pct": 0.002
           },
           "p26c_gate_noon_clear_z148.png": {
-            "before": 67.89,
-            "after": 67.89,
-            "delta_pct": 0.0
+            "before": 120.39,
+            "after": 120.39,
+            "delta_pct": -0.002
           }
         },
         "max_abs_pct_lt": 8.0,
+        "compared_against": "P27B art baseline (re-seated), not P26B",
         "no_baseline": "STORM, overview NOON, z1.0/z1.48 bookmarks"
       }
     },
@@ -115,103 +116,103 @@
   },
   "frames": {
     "p26c_morning_clear_z088.png": {
-      "sky": 95.42,
-      "cloud_before_after_delta": 0.1017,
+      "sky": 108.91,
+      "cloud_before_after_delta": 0.49602,
       "hour": 7,
       "weather": "CLEAR"
     },
     "p26c_noon_clear_z088.png": {
-      "sky": 107.28,
-      "cloud_before_after_delta": 0.09573,
+      "sky": 122.3,
+      "cloud_before_after_delta": 0.50189,
       "hour": 12,
       "weather": "CLEAR"
     },
     "p26c_noon_cloudy_z088.png": {
-      "sky": 98.61,
-      "cloud_before_after_delta": 0.11317,
+      "sky": 112.76,
+      "cloud_before_after_delta": 0.51468,
       "hour": 12,
       "weather": "CLOUDY"
     },
     "p26c_noon_rain_z088.png": {
-      "sky": 88.67,
-      "cloud_before_after_delta": 0.11789,
+      "sky": 100.0,
+      "cloud_before_after_delta": 0.48612,
       "hour": 12,
       "weather": "RAIN"
     },
     "p26c_noon_storm_z088.png": {
-      "sky": 79.73,
+      "sky": 90.34,
       "cloud_before_after_delta": null,
       "hour": 12,
       "weather": "STORM"
     },
     "p26c_evening_clear_z088.png": {
-      "sky": 67.13,
-      "cloud_before_after_delta": 0.08112,
+      "sky": 79.56,
+      "cloud_before_after_delta": 0.4664,
       "hour": 18.5,
       "weather": "CLEAR"
     },
     "p26c_night_clear_z088.png": {
-      "sky": 54.55,
-      "cloud_before_after_delta": 0.00421,
+      "sky": 65.66,
+      "cloud_before_after_delta": 0.37176,
       "hour": 0,
       "weather": "CLEAR"
     },
     "p26c_night_storm_z088.png": {
-      "sky": 54.12,
+      "sky": 62.12,
       "cloud_before_after_delta": null,
       "hour": 0,
       "weather": "STORM"
     },
     "p26c_gate_night_storm_z148.png": {
-      "sky": 49.75,
+      "sky": 64.63,
       "cloud_before_after_delta": null,
       "hour": 0,
       "weather": "STORM"
     },
     "p26c_gate_noon_clear_z148.png": {
-      "sky": 155.96,
-      "cloud_before_after_delta": 0.2265,
+      "sky": 187.87,
+      "cloud_before_after_delta": 0.55061,
       "hour": 12,
       "weather": "CLEAR"
     },
     "p26c_overview_noon_z036.png": {
-      "sky": 125.96,
+      "sky": 143.93,
       "cloud_before_after_delta": null,
       "hour": 12,
       "weather": "CLEAR"
     },
     "p26c_cloud_bookmark_z100.png": {
-      "sky": 90.76,
+      "sky": 104.74,
       "cloud_before_after_delta": null,
       "hour": 7,
       "weather": "CLEAR"
     },
     "p26c_cloud_bookmark_z148.png": {
-      "sky": 70.03,
+      "sky": 88.41,
       "cloud_before_after_delta": null,
       "hour": 7,
       "weather": "CLEAR"
     },
     "p26c_gate_cloud_bookmark_z148.png": {
-      "sky": 132.75,
+      "sky": 160.31,
       "cloud_before_after_delta": null,
       "hour": 7,
       "weather": "CLEAR"
     },
     "p26c_motion_t0.png": {
-      "sky": 107.28,
+      "sky": 122.3,
       "cloud_before_after_delta": null,
       "hour": 12,
       "weather": "CLEAR"
     },
     "p26c_motion_t4.png": {
-      "sky": 107.26,
+      "sky": 122.28,
       "cloud_before_after_delta": null,
       "hour": 12,
       "weather": "CLEAR"
     },
     "p26c_motion_t8.png": {
-      "sky": 107.19,
+      "sky": 122.21,
       "cloud_before_after_delta": null,
       "hour": 12,
       "weather": "CLEAR"

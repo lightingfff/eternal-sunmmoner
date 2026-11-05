@@ -19,6 +19,8 @@ object SanctuaryArtAssets {
   private val images = mutableMapOf<String, ImageBitmap>()
   private val families = mutableMapOf<String, List<ImageBitmap>>()
   private val optionalFamilies = mutableMapOf<String, List<ImageBitmap>?>()
+  private val groundSheets = mutableMapOf<String, ImageBitmap?>()
+  private val mirroredSheets = mutableMapOf<String, ImageBitmap?>()
   internal val cachedImageCount get() = images.size
   /** Decoded PNG cache only; generated actor atlases and GPU copies are not included. Sample at 1 Hz. */
   internal val cachedBitmapBytes: Long get() = images.values.sumOf { it.asAndroidBitmap().allocationByteCount.toLong() }
@@ -75,6 +77,58 @@ object SanctuaryArtAssets {
     }
     optionalFamilies[name] = cells
     return cells
+  }
+
+  /** P27B-V5 ground: one 512x512 sheet per family, sampled as an 8x8 mosaic.
+   *
+   * The shipped 4x4 atlas became a translation-invariant lattice: the same block
+   * repeated every 256 world px, which is what the plaza z1.0 review saw. A sheet
+   * quadruples the period to 512 world px and, because it is a single bitmap, holds
+   * *less* memory than 64 separate 64x64 cells (1 MB vs ~1 MB plus 64 objects, and
+   * one texture instead of 64). Negative-cached exactly like [p27bFamily]: a missing
+   * or mis-sized sheet falls back to the whole P27B 4x4 family, never a half atlas.
+   */
+  internal fun groundSheet(name: String): ImageBitmap? {
+    if (visualProfile != SanctuaryVisualProfile.P27B || context == null) return null
+    if (groundSheets.containsKey(name)) return groundSheets[name]
+    val sheet = assetSafe("sanctuary_p27b_2/terrain/${name}_mosaic.png")
+      ?.takeIf { it.width == 512 && it.height == 512 }
+    groundSheets[name] = sheet
+    return sheet
+  }
+
+  /** Rotated copy of a ground sheet, used to break the sheet's own repeat period.
+   *
+   * The 8x8 sheet is still periodic: the same 512 world-px block recurs. Rather than
+   * paying for a 1024 px sheet (4x the memory, and it needs source art at the correct
+   * stone density which does not exist yet), each world tile picks at random between
+   * the sheet and its 180-degree rotation. The cell art is identical either way, but the
+   * *arrangement* is no longer periodic, so the eye cannot lock onto the lattice.
+   *
+   * Built once per family by a Matrix copy (never inside a draw pass) and negative
+   * cached like every other optional asset.
+   */
+  internal fun groundSheetMirrored(name: String): ImageBitmap? {
+    if (mirroredSheets.containsKey(name)) return mirroredSheets[name]
+    val original = groundSheet(name)
+    if (original == null) {
+      mirroredSheets[name] = null
+      return null
+    }
+    val rotated = try {
+      val src = original.asAndroidBitmap()
+      val matrix = android.graphics.Matrix().apply { setScale(-1f, -1f) }
+      android.graphics.Bitmap
+        .createBitmap(src, 0, 0, src.width, src.height, matrix, false)
+        .asImageBitmap()
+    } catch (e: IllegalArgumentException) {
+      null
+    } catch (e: OutOfMemoryError) {
+      // A cheap-quality device keeps the unmirrored sheet; the map stays correct.
+      null
+    }
+    mirroredSheets[name] = rotated
+    return rotated
   }
 
   internal fun preferredLandmark(name: String, width: Int, height: Int): ImageBitmap? {

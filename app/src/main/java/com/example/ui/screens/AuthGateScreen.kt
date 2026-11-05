@@ -116,15 +116,23 @@ fun AuthGateScreen(
       alpha = 0.60f,
     )
 
+    // P27B-V5 CP6 (debt D): this scrim carried the whole legibility of the login screen.
+    // Its text is SummonerGold / PortalCyan / RuneSilver, which measure 11.2 / 9.3 / 8.8:1
+    // on ObsidianVoid but only 1.37 / 1.34:1 on a light backdrop. At 0.42 alpha on top the
+    // brightest world (lit ivory, luma ~240) the title sat at 4.3:1 and the subtitle at
+    // 4.1:1 - borderline, and it is the first screen anyone sees. Measured floor against
+    // the brightest possible backing (lit ivory): 0.68 -> gold 4.45, 0.76 -> 5.90 / 4.90 /
+    // 6.08. 0.76 is the smallest step that clears 4.5 on all three colours while the
+    // sanctuary art still clearly reads through the scrim.
     Box(
       modifier = Modifier
         .fillMaxSize()
         .background(
           Brush.verticalGradient(
             colors = listOf(
-              ObsidianVoid.copy(alpha = 0.42f),
-              ObsidianVoid.copy(alpha = 0.72f),
-              ObsidianVoid.copy(alpha = 0.94f),
+              ObsidianVoid.copy(alpha = 0.76f),
+              ObsidianVoid.copy(alpha = 0.86f),
+              ObsidianVoid.copy(alpha = 0.96f),
             )
           )
         ),

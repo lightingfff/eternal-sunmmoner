@@ -1,0 +1,431 @@
+{
+  "schema": "eternal-summoner.p27b2.structures.v1",
+  "status": "GAME_CANDIDATE",
+  "note": "Houses re-cut into the inherited P03 canvas/pivot contracts. Canvas size, pivot and collider are unchanged; only the art is new.",
+  "assets": [
+    {
+      "id": "house_timber_crest",
+      "file": "structures/townhouse_a.png",
+      "size": [
+        152,
+        156
+      ],
+      "replaces": "sanctuary_p03/townhouse_a",
+      "pivot": [
+        76,
+        156
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/house_timber_crest.png",
+      "source_sha256": "68b3712c1cda938e6a71749c9b2abf85a1ed41a8c12ef69a4c2f63b7b31e28ad",
+      "sha256": "99ff1041f7236806c22d89ebef809941dfd4b9bc76abc20ccb2afa16ef10b325",
+      "mean_luma": 86.1,
+      "old_mean_luma": null,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+    },
+    {
+      "id": "house_thatched",
+      "file": "structures/cottage_brown.png",
+      "size": [
+        132,
+        144
+      ],
+      "replaces": "sanctuary_p03/cottage_brown",
+      "pivot": [
+        66,
+        144
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/house_thatched.png",
+      "source_sha256": "5281f7653f7efbb87e830e03805621cb190b0f9d33494c86944e5617199e256b",
+      "sha256": "494c8dbd958cec018ea5f1bd89c99c579e54d2cd09f55760e7795bbd81cc2431",
+      "mean_luma": 148.4,
+      "old_mean_luma": null,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+    },
+    {
+      "id": "house_stone_guild",
+      "file": "structures/townhouse_b.png",
+      "size": [
+        144,
+        160
+      ],
+      "replaces": "sanctuary_p03/townhouse_b",
+      "pivot": [
+        72,
+        160
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/house_stone_guild.png",
+      "source_sha256": "99b66a318407b96c0315a5ad0876ac9482c0a834ce4d5f32ee656bcf1d1130b2",
+      "sha256": "f0822fa9efc0239d88ae02a3cbac497c10c7e7f4707bea60ebdad40589974872",
+      "mean_luma": 117.9,
+      "old_mean_luma": null,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+    },
+    {
+      "id": "house_slate_wing",
+      "file": "structures/cottage_slate.png",
+      "size": [
+        132,
+        144
+      ],
+      "replaces": "sanctuary_p03/cottage_slate",
+      "pivot": [
+        66,
+        144
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/house_slate_wing.png",
+      "source_sha256": "ab5b05d042cd9484ae246041e7d745dd99d1358b185a1c2ece7f89d6bacf1d47",
+      "sha256": "dfb35e98c81bbe40165faa981201b9864db7c3ab07a43766ecd63996227dd0b4",
+      "mean_luma": 93.9,
+      "old_mean_luma": null,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+    },
+    {
+      "id": "street_lantern",
+      "file": "structures/street_lantern_0.png",
+      "size": [
+        32,
+        66
+      ],
+      "replaces": "sanctuary_p03/street_lantern_0",
+      "pivot": [
+        16,
+        66
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/prop_set_01.png",
+      "source_sha256": "a9112e53d17b4c43d43a0b9c1ee5a29f698aca8af6ab24c1df095ff7716a06c2",
+      "sha256": "49a4a1706defc6b0ca12bd6a6262277545e6d0397bfa69789515125ee1b9aaae",
+      "mean_luma": 92.2,
+      "old_mean_luma": 48.4,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review"
+    },
+    {
+      "id": "wooden_bench",
+      "file": "structures/wooden_bench.png",
+      "size": [
+        58,
+        36
+      ],
+      "replaces": "sanctuary_p03/wooden_bench",
+      "pivot": [
+        29,
+        36
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/prop_set_01.png",
+      "source_sha256": "a9112e53d17b4c43d43a0b9c1ee5a29f698aca8af6ab24c1df095ff7716a06c2",
+      "sha256": "ca03bac9e52d9ee296f3ea39816b9db5dfcbe64510856261750f00660eeebc56",
+      "mean_luma": 89.0,
+      "old_mean_luma": 45.9,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review"
+    },
+    {
+      "id": "barrel_cluster",
+      "file": "structures/barrels.png",
+      "size": [
+        52,
+        44
+      ],
+      "replaces": "sanctuary_p03/barrels",
+      "pivot": [
+        26,
+        44
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/prop_set_01.png",
+      "source_sha256": "a9112e53d17b4c43d43a0b9c1ee5a29f698aca8af6ab24c1df095ff7716a06c2",
+      "sha256": "d1afaa7a3d0e29613df0451891a0b4c08658eba97217c7aa4978840120e6bb89",
+      "mean_luma": 72.6,
+      "old_mean_luma": 86.4,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review"
+    },
+    {
+      "id": "flower_planter",
+      "file": "structures/flower_planter.png",
+      "size": [
+        64,
+        36
+      ],
+      "replaces": "sanctuary_p03/flower_planter",
+      "pivot": [
+        32,
+        36
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/prop_set_01.png",
+      "source_sha256": "a9112e53d17b4c43d43a0b9c1ee5a29f698aca8af6ab24c1df095ff7716a06c2",
+      "sha256": "0249a7b99216405b45a7e35726724b834e865ad670442a4020876ef0e6a15a87",
+      "mean_luma": 118.7,
+      "old_mean_luma": 77.9,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review"
+    },
+    {
+      "id": "training_dummy",
+      "file": "structures/training_dummy.png",
+      "size": [
+        40,
+        58
+      ],
+      "replaces": "sanctuary_p03/training_dummy",
+      "pivot": [
+        20,
+        58
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/prop_set_01.png",
+      "source_sha256": "a9112e53d17b4c43d43a0b9c1ee5a29f698aca8af6ab24c1df095ff7716a06c2",
+      "sha256": "80ce0d2d57ff2e7acd6a10d1f99d984b4fc7b402708e3f58590a0dd4714a22f4",
+      "mean_luma": 110.4,
+      "old_mean_luma": 62.2,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review"
+    },
+    {
+      "id": "facility_hero_quarters",
+      "file": "structures/hero_quarters.png",
+      "size": [
+        200,
+        168
+      ],
+      "replaces": "premium_slice/hero_quarters",
+      "pivot": [
+        100,
+        168
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/facility_hero_quarters.png",
+      "source_sha256": "ebeed615302392c0163e4526335b7224ec3a550beeac0c866543c985b295a277",
+      "sha256": "0eb2770dc220108e93c1a5575bc03b09ae4127b2391bcbb2a921c22bc802a844",
+      "mean_luma": 83.4,
+      "old_mean_luma": 50.0,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+    },
+    {
+      "id": "facility_armory",
+      "file": "structures/armory.png",
+      "size": [
+        190,
+        166
+      ],
+      "replaces": "premium_slice/armory",
+      "pivot": [
+        95,
+        166
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/facility_armory.png",
+      "source_sha256": "7f553aa5694782a1b84255d0894690eba1b13254aaa7245ca35c46fda18a3b26",
+      "sha256": "8d39899734e8c20f1eca6a13b30c86822e3c2070d08058fbe62e67ba642bbfec",
+      "mean_luma": 84.4,
+      "old_mean_luma": 51.1,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+    },
+    {
+      "id": "facility_synthesis_lab",
+      "file": "structures/synthesis_lab.png",
+      "size": [
+        188,
+        168
+      ],
+      "replaces": "premium_slice/synthesis_lab",
+      "pivot": [
+        94,
+        168
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/facility_synthesis_lab.png",
+      "source_sha256": "1409bf500165c0b95aa64ec537e9d46af3aefffbc3ff5a053a291398d3b580e1",
+      "sha256": "ec1727d79b30831409372ab4cfcce787bcc9a41d2bd5ba3c4eaceeef752f53a7",
+      "mean_luma": 90.0,
+      "old_mean_luma": 54.5,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+    },
+    {
+      "id": "facility_restaurant",
+      "file": "structures/restaurant.png",
+      "size": [
+        206,
+        172
+      ],
+      "replaces": "premium_slice/restaurant",
+      "pivot": [
+        103,
+        172
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/facility_restaurant.png",
+      "source_sha256": "544e8eea81c598b0c57494eb97f0c9de377f2dd18bbe2371f61585994f13df91",
+      "sha256": "8b9938ba131a593acb8717e4ca6ad39a4b81b22e19430029fc535d4bf902d1ab",
+      "mean_luma": 75.7,
+      "old_mean_luma": 58.5,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+    },
+    {
+      "id": "facility_hero_registry",
+      "file": "structures/hero_registry.png",
+      "size": [
+        188,
+        166
+      ],
+      "replaces": "premium_slice/hero_registry",
+      "pivot": [
+        94,
+        166
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/facility_hero_registry.png",
+      "source_sha256": "037a39ab9bf7d0e1cac9e3611d483c5ee5df6e1e0e21684ba585c4a9144b2975",
+      "sha256": "171e80d2d899cabaf6c6dc6a37c9a90539b7f05e22117b74dad489081c9c70f0",
+      "mean_luma": 152.6,
+      "old_mean_luma": 54.7,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review; corner tower repeats around the wall"
+    },
+    {
+      "id": "tower_corner",
+      "file": "structures/fortress_tower.png",
+      "size": [
+        80,
+        118
+      ],
+      "replaces": "sanctuary_p03/fortress_tower",
+      "pivot": [
+        40,
+        118
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/tower_corner.png",
+      "source_sha256": "430b27e202f79f61b8e3d4669f592bbcbf5d503c7544db14cd0cbcdf0f554c6a",
+      "sha256": "0434b838c7fa34b5f6bb8664890892e513df4a25ff3dda81a4b1beaca434753e",
+      "mean_luma": 151.7,
+      "old_mean_luma": 57.4,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review; corner tower repeats around the wall"
+    },
+    {
+      "id": "tower_gatehouse",
+      "file": "structures/gate_tower.png",
+      "size": [
+        96,
+        136
+      ],
+      "replaces": "sanctuary_p03/gate_tower",
+      "pivot": [
+        48,
+        136
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/tower_gatehouse.png",
+      "source_sha256": "21860f64006ef287116c25fda48f9ea035e4bb11aa3ae73f3b574dadaea4de55",
+      "sha256": "0074d212bb4e1afab901e07a1abcceefe0346b14f99ea12f07937178b3dedccd",
+      "mean_luma": 153.4,
+      "old_mean_luma": 54.8,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review; corner tower repeats around the wall"
+    },
+    {
+      "id": "curtain_wall",
+      "file": "structures/retaining_wall.png",
+      "size": [
+        88,
+        48
+      ],
+      "replaces": "sanctuary_p03/retaining_wall",
+      "pivot": [
+        44,
+        48
+      ],
+      "alpha": "binary RGBA",
+      "tiling": "horizontal",
+      "seam_shift_px": 84,
+      "seam_before": 36.62,
+      "seam_after": 9.17,
+      "source_path": "art/p27b_sources_next/retaining_wall.png",
+      "source_sha256": "b2ee1593fb1d4439da2bc15cd3acf8627e62e1c755b1c086df495d0e79fdb4bd",
+      "sha256": "923c1e8bbc35440237148138e76a2f2aaa02d6ea799c3b0a7355d04ff513f3ca",
+      "mean_luma": 192.2,
+      "old_mean_luma": 75.4,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "tiled around the whole perimeter; check at z0.36 and z1.48"
+    },
+    {
+      "id": "sakura_a",
+      "file": "structures/canopy_a.png",
+      "size": [
+        114,
+        132
+      ],
+      "replaces": "sanctuary_p03/canopy_a",
+      "pivot": [
+        57,
+        132
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/tree_set_01.png",
+      "source_sha256": "966dcc648fe1a2c443d16213a35e3d8e18e87210c3f8fc5dd4532e3c588b6142",
+      "sha256": "4978efe6cead82226938ea0482b81b08c9ea39f0b8b78478f5f388a6f0903ff5",
+      "mean_luma": 129.8,
+      "old_mean_luma": 57.1,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review for canopy occlusion"
+    },
+    {
+      "id": "pine",
+      "file": "structures/pine.png",
+      "size": [
+        96,
+        128
+      ],
+      "replaces": "sanctuary_p03/pine",
+      "pivot": [
+        48,
+        128
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/tree_set_01.png",
+      "source_sha256": "966dcc648fe1a2c443d16213a35e3d8e18e87210c3f8fc5dd4532e3c588b6142",
+      "sha256": "36b68815dfa61366684ded369f12a88c373c9bcb6b3a38fc28da26266f5e40c8",
+      "mean_luma": 70.2,
+      "old_mean_luma": 50.4,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review for canopy occlusion"
+    },
+    {
+      "id": "oak",
+      "file": "structures/oak.png",
+      "size": [
+        112,
+        136
+      ],
+      "replaces": "sanctuary_p03/oak",
+      "pivot": [
+        56,
+        136
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/tree_set_01.png",
+      "source_sha256": "966dcc648fe1a2c443d16213a35e3d8e18e87210c3f8fc5dd4532e3c588b6142",
+      "sha256": "f21e35111370c0386aa4935b7857bbe6b4955458d108bb9fe4ee4de06eac2822",
+      "mean_luma": 102.5,
+      "old_mean_luma": 51.3,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review for canopy occlusion"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "report": {
+    "grass": {
+      "mean_rgb_step_1_tile": 0.73,
+      "mean_rgb_step_4_tiles": 0.596,
+      "max_identity_at_4_tiles": 1.86,
+      "distinct_cell_means": 64,
+      "luma_stddev": 12.31,
+      "tiles_matching_one_period_later": 33,
+      "tiles_compared": 64,
+      "mean_luma": 95.33,
+      "shipped_mean_luma": 95.45,
+      "luma_delta_vs_shipped": -0.12,
+      "wrap_seam": 8.04,
+      "interior_boundary_p95": 18.99,
+      "period_world_px": 512,
+      "bytes": 506438
+    },
+    "soil": {
+      "mean_rgb_step_1_tile": 0.844,
+      "mean_rgb_step_4_tiles": 0.959,
+      "max_identity_at_4_tiles": 3.085,
+      "distinct_cell_means": 64,
+      "luma_stddev": 6.95,
+      "tiles_matching_one_period_later": 33,
+      "tiles_compared": 64,
+      "mean_luma": 144.7,
+      "shipped_mean_luma": 144.97,
+      "luma_delta_vs_shipped": -0.27,
+      "wrap_seam": 1.74,
+      "interior_boundary_p95": 8.09,
+      "period_world_px": 512,
+      "bytes": 400920
+    },
+    "flagstone": {
+      "mean_rgb_step_1_tile": 2.131,
+      "mean_rgb_step_4_tiles": 2.341,
+      "max_identity_at_4_tiles": 8.537,
+      "distinct_cell_means": 64,
+      "luma_stddev": 16.15,
+      "tiles_matching_one_period_later": 33,
+      "tiles_compared": 64,
+      "mean_luma": 169.48,
+      "shipped_mean_luma": 172.1,
+      "luma_delta_vs_shipped": -2.63,
+      "wrap_seam": 1.98,
+      "interior_boundary_p95": 9.85,
+      "period_world_px": 512,
+      "bytes": 356665
+    },
+    "cobble": {
+      "mean_rgb_step_1_tile": 2.713,
+      "mean_rgb_step_4_tiles": 3.483,
+      "max_identity_at_4_tiles": 8.128,
+      "distinct_cell_means": 64,
+      "luma_stddev": 17.38,
+      "tiles_matching_one_period_later": 33,
+      "tiles_compared": 64,
+      "mean_luma": 111.98,
+      "shipped_mean_luma": 112.35,
+      "luma_delta_vs_shipped": -0.37,
+      "wrap_seam": 3.52,
+      "interior_boundary_p95": 11.48,
+      "period_world_px": 512,
+      "bytes": 411806
+    }
+  },
+  "failures": []
+}

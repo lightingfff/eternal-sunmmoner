@@ -10,8 +10,18 @@ C1 uses luminance DIFFERENCE vs the real same-hour/camera/weather BEFORE image;
 counting pixels that differ from the median of the AFTER image falsely includes the
 sky gradient, rays and roofs. The denominator remains the entire top 25% sky band,
 with the precommitted 5% threshold (NOT relaxed after seeing the first failure).
-E4 compares the world below 42% of the frame on the seven actually matched pairs,
-not a self-comparison or a guessed pass for unmatched STORM frames.
+Two DIFFERENT baselines, because two different questions are being asked:
+
+  * cloud work (C1) is measured against the P26B frames in engine-render-before/,
+    because "are the new clouds visible against the old sky" only means something
+    against the old sky;
+  * world exposure (E4) is measured against the accepted P27B art frames in
+    engine-render-art-baseline/, because P27B deliberately made the island brighter
+    (landmark luma 46 -> 175). Comparing P27B art to P26B art measured the art change,
+    not a flood: on 2026-11-05 E4 failed +19..+21% on all seven pairs with 0.00%
+    highlight clipping. Re-seating that baseline keeps E4's real meaning - "the NEXT
+    change must not move world exposure by 8%" - instead of relaxing the threshold or
+    deleting the gate. See docs/quality-loop/p26c-cloud-storm/e4_rebaseline.json.
 
 Exit 0 only if every automated gate passes; C2 (three-layer appearance), C6 (cull)
 and legacy gate G1/G2 require their own review and are not silently auto-passed.
@@ -157,13 +167,21 @@ def main():
                       "rain_minus_clear": round(rain - clear, 2),
                       "storm_minus_clear": round(storm - clear, 2)})
 
-    # E4 is NOT a self-comparison. It covers only 7 P26B states with identical props.
+    # E4 is NOT a self-comparison. It covers only the 7 states with identical props, and
+    # it compares the world band against the ACCEPTED P27B art baseline (see header).
     e4_pairs = {}
     e4_pass = True
     e4_limit = env_th["no_flood_same_hour"]["max_abs_delta_mean_lt_percent"]
+    art_baseline = baseline.get("art_baseline") or {}
+    if not art_baseline.get("frames"):
+        raise ValueError("E4 has no art baseline; run tools/p26c_reseat_baseline.py once "
+                         "after an accepted art change (never delete E4 instead)")
+    art_means = {row["file"]: row["p27b_world_mean"] for row in art_baseline["frames"]}
     for pair in baseline["matched_pairs"]:
         name = pair["file"]
-        before_mean = stats[name]["before"]["world42"]
+        if name not in art_means:
+            raise ValueError(f"No re-seated art baseline for {name}")
+        before_mean = art_means[name]
         after_mean = stats[name]["after"]["world42"]
         pct = 100.0 * (after_mean - before_mean) / max(abs(before_mean), 1.0)
         e4_pairs[name] = {"before": round(before_mean, 2), "after": round(after_mean, 2),
@@ -171,11 +189,14 @@ def main():
         if abs(pct) >= e4_limit:
             e4_pass = False
     results["E4"] = (e4_pass, {"matched_only": e4_pairs, "max_abs_pct_lt": e4_limit,
+                               "compared_against": "P27B art baseline (re-seated), "
+                                                   "not P26B",
                                "no_baseline": "STORM, overview NOON, z1.0/z1.48 bookmarks"})
     results["E5"] = results["C5"]
 
     report = {
-        "source": "REAL Robolectric renderer; AFTER camera_props.json; BEFORE P26B merged SHA",
+        "source": "REAL Robolectric renderer; AFTER camera_props.json; "
+                  "C1 BEFORE = P26B merged SHA; E4 BEFORE = re-seated P27B art baseline",
         "before_source_commit": baseline["source_commit"],
         "sky_band_top_fraction": sky_frac,
         "gates": {k: {"pass": flag, "detail": detail} for k, (flag, detail) in results.items()},

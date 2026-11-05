@@ -1,0 +1,159 @@
+{
+  "schema": "eternal-summoner.p27b2.visual-profile.v1",
+  "status": "GAME_CANDIDATE",
+  "note": "8x8 ground mosaic sheets sampled by (tx & 7, ty & 7). Fixes the measured 4-tile lattice; adjacency is true mosaic adjacency, so no cell is ever placed against a cell it was not cut from.",
+  "camera_ground_y_scale": 0.72,
+  "tile_px": 64,
+  "mosaic_grid": [
+    8,
+    8
+  ],
+  "sheet_canvas": [
+    512,
+    512
+  ],
+  "terrain_count_per_family": 1,
+  "source_scale": "1 source pixel : 1/256 sheet at 4x tile size -> 1:1 with shipped",
+  "families": {
+    "grass": {
+      "path": "terrain/grass_mosaic.png",
+      "size": [
+        512,
+        512
+      ],
+      "channels": "RGB opaque",
+      "mosaic_grid": [
+        8,
+        8
+      ],
+      "cell_px": 64,
+      "distinct_cells": 64,
+      "source_path": "art/p27b_sources_next/grass_source.png",
+      "source_size": [
+        1254,
+        1254
+      ],
+      "source_sha256": "f1fa7406afa650372f6a92d893b1737091c0aee8a9b53ae8f8fff0d21d304308",
+      "crop_fraction": 1.0,
+      "features_per_512_estimate": 61.0,
+      "shipped_features_per_512_estimate": 100.0,
+      "density_note": "linear estimate, compared to the shipped atlas for scale only; the two counters are NOT resolution invariant, so this is a sanity check, not a pass/fail gate",
+      "sha256": "f6e3e40a07bb0cbbb09c4e716014f51c1800e450e353fcde9c3b5f9844babfaa",
+      "mean_rgb": [
+        82.8,
+        107.4,
+        66.2
+      ],
+      "max_x_edge_jump_rgb": 30.09,
+      "max_y_edge_jump_rgb": 30.04,
+      "ground_period_world_px": 512,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "8x8 repeat is 512 world px; still a mosaic, still needs engine review"
+    },
+    "soil": {
+      "path": "terrain/soil_mosaic.png",
+      "size": [
+        512,
+        512
+      ],
+      "channels": "RGB opaque",
+      "mosaic_grid": [
+        8,
+        8
+      ],
+      "cell_px": 64,
+      "distinct_cells": 64,
+      "source_path": "art/p27b_sources_next/soil_source.png",
+      "source_size": [
+        1254,
+        1254
+      ],
+      "source_sha256": "499485e73194c7ca05b1d8cd8334e61b29ab1dd47a3c484d9807453999dd2113",
+      "crop_fraction": 1.0,
+      "features_per_512_estimate": 18.0,
+      "shipped_features_per_512_estimate": 44.0,
+      "density_note": "linear estimate, compared to the shipped atlas for scale only; the two counters are NOT resolution invariant, so this is a sanity check, not a pass/fail gate",
+      "sha256": "b14432d412247745f106482947515bc47e4b2ee034055cdfbc013f5a8c8c3b20",
+      "mean_rgb": [
+        170.6,
+        140.0,
+        100.7
+      ],
+      "max_x_edge_jump_rgb": 17.28,
+      "max_y_edge_jump_rgb": 17.07,
+      "ground_period_world_px": 512,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "8x8 repeat is 512 world px; still a mosaic, still needs engine review"
+    },
+    "flagstone": {
+      "path": "terrain/flagstone_mosaic.png",
+      "size": [
+        512,
+        512
+      ],
+      "channels": "RGB opaque",
+      "mosaic_grid": [
+        8,
+        8
+      ],
+      "cell_px": 64,
+      "distinct_cells": 64,
+      "source_path": "art/p27b_sources_next/flagstone_source.png",
+      "source_size": [
+        1254,
+        1254
+      ],
+      "source_sha256": "66f16be3e47898d7bda88a11bd08727a8e7036c4c260cff2d05195fbb6cc0a72",
+      "crop_fraction": 1.0,
+      "features_per_512_estimate": 13.0,
+      "shipped_features_per_512_estimate": 38.0,
+      "density_note": "linear estimate, compared to the shipped atlas for scale only; the two counters are NOT resolution invariant, so this is a sanity check, not a pass/fail gate",
+      "sha256": "cb1f457e88df818dffcec06c28225eef2b22d4a44b3e8aac904f62bc6bc3ee16",
+      "mean_rgb": [
+        166.2,
+        170.8,
+        171.5
+      ],
+      "max_x_edge_jump_rgb": 52.46,
+      "max_y_edge_jump_rgb": 37.67,
+      "ground_period_world_px": 512,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "8x8 repeat is 512 world px; still a mosaic, still needs engine review"
+    },
+    "cobble": {
+      "path": "terrain/cobble_mosaic.png",
+      "size": [
+        512,
+        512
+      ],
+      "channels": "RGB opaque",
+      "mosaic_grid": [
+        8,
+        8
+      ],
+      "cell_px": 64,
+      "distinct_cells": 64,
+      "source_path": "art/p27b_sources_next/cobble_source.png",
+      "source_size": [
+        1254,
+        1254
+      ],
+      "source_sha256": "55f46b9be83805e1ea28628013ecbacd25c21dd2b4330ee036db11866e9225be",
+      "crop_fraction": 1.0,
+      "features_per_512_estimate": 34.0,
+      "shipped_features_per_512_estimate": 84.0,
+      "density_note": "linear estimate, compared to the shipped atlas for scale only; the two counters are NOT resolution invariant, so this is a sanity check, not a pass/fail gate",
+      "sha256": "c97edf739845d55638a34088e52964c860de95140f7d6de9f7ed048586945576",
+      "mean_rgb": [
+        104.6,
+        114.6,
+        117.8
+      ],
+      "max_x_edge_jump_rgb": 40.8,
+      "max_y_edge_jump_rgb": 36.52,
+      "ground_period_world_px": 512,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "8x8 repeat is 512 world px; still a mosaic, still needs engine review"
+    }
+  }
+}

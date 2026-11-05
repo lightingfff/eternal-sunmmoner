@@ -1,6 +1,7 @@
 package com.example.game.pixel
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -153,12 +154,44 @@ object SanctuaryWorldRenderer {
       // by one pre-composed 4x4 block with the same authored art. That drops the terrain
       // draw-command count by ~85% exactly where the island-wide camera used to stall.
       // From gameplay zoom up the per-tile path stays in charge and the art is untouched.
-      val grassBlocks = if (tileScreenH < GRASS_BLOCK_MIN_TILE_SCREEN_PX) {
+      // P27B-V5: when the 8x8 sheet is present the overview path draws the WHOLE sheet
+      // once per world cell instead of sixteen squashed tiles. Zooming a 512 px texture
+      // down is the same sampling that squashing 16 tiles individually performs, so the
+      // pixels are equivalent, the draw count is lower than the old 4x4 block path, and
+      // the repeat period stays the same as the gameplay path (no zoom-dependent lattice).
+      val grassSheet = PixelTileAtlas.sanctuaryGrassSheet
+      val grassSheetRotated = PixelTileAtlas.sanctuaryGrassSheetRotated
+      val grassBlocks = if (grassSheet == null && tileScreenH < GRASS_BLOCK_MIN_TILE_SCREEN_PX) {
         PixelTileAtlas.sanctuaryGrassBlocks
       } else {
         emptyList()
       }
-      if (grassBlocks.isNotEmpty()) {
+      if (grassSheet != null && tileScreenH < GRASS_BLOCK_MIN_TILE_SCREEN_PX) {
+        val sheetWorldSize = (PixelTileAtlas.TILE_PX * 8).toFloat()
+        val cellScreenW = (sheetWorldSize * zoom).roundToInt().coerceAtLeast(2)
+        val cellScreenH = (sheetWorldSize * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt().coerceAtLeast(2)
+        // floorDiv, not "/": tile coordinates are negative west/north of the origin and
+        // truncating division would shift the sheet one world cell at the map edge.
+        val startSx = (startTx * PixelTileAtlas.TILE_PX).floorDiv(512)
+        val endSx = (endTx * PixelTileAtlas.TILE_PX).floorDiv(512)
+        val startSy = (startTy * PixelTileAtlas.TILE_PX).floorDiv(512)
+        val endSy = (endTy * PixelTileAtlas.TILE_PX).floorDiv(512)
+        for (cy in startSy..endSy) {
+          val dstY = sy(cy * sheetWorldSize).roundToInt()
+          for (cx in startSx..endSx) {
+            // Same rotation rule as the per-tile path: at sheet granularity it is what
+            // stops the overview from showing a clean 512 px grid of identical blocks.
+            val useRotated = grassSheetRotated != null &&
+              PixelTileAtlas.sanctuarySheetRotated(cx * 8, cy * 8)
+            drawImage(
+              image = if (useRotated) grassSheetRotated!! else grassSheet,
+              dstOffset = IntOffset(sx(cx * sheetWorldSize).roundToInt(), dstY),
+              dstSize = IntSize(cellScreenW + 1, cellScreenH + 1),
+              filterQuality = FilterQuality.None,
+            )
+          }
+        }
+      } else if (grassBlocks.isNotEmpty()) {
         val blockWorldSize = PixelTileAtlas.GRASS_BLOCK_WORLD_SIZE.toFloat()
         val blockScreenW = (blockWorldSize * zoom).roundToInt().coerceAtLeast(2)
         val blockScreenH = (blockWorldSize * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt().coerceAtLeast(2)
@@ -187,11 +220,10 @@ object SanctuaryWorldRenderer {
             val wx = tx * worldTileSize
             val dstX = sx(wx).roundToInt()
             val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
-            drawImage(
-              image = grassTiles[PixelTileAtlas.sanctuaryTileIndex(grassTiles, tx, ty, hash)],
-              dstOffset = IntOffset(dstX, dstY),
-              dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
-              filterQuality = FilterQuality.None,
+            drawGroundTile(
+              grassSheet, grassTiles, tx, ty, hash,
+              dstX, dstY, tileScreenW + 1, tileScreenH + 1,
+              rotated = grassSheetRotated,
             )
           }
         }
@@ -330,11 +362,10 @@ object SanctuaryWorldRenderer {
           val wx = tx * worldTileSize
           val dstX = sx(wx).roundToInt()
           val hash = ((tx * 49297) xor (ty * 91813)) and 0x7FFFFFFF
-          drawImage(
-            image = sandTiles[PixelTileAtlas.sanctuaryTileIndex(sandTiles, tx, ty, hash)],
-            dstOffset = IntOffset(dstX, dstY),
-            dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
-            filterQuality = FilterQuality.None,
+          drawGroundTile(
+            PixelTileAtlas.sanctuarySoilSheet, sandTiles, tx, ty, hash,
+            dstX, dstY, tileScreenW + 1, tileScreenH + 1,
+            rotated = PixelTileAtlas.sanctuarySoilSheetRotated,
           )
         }
       }
@@ -442,11 +473,10 @@ object SanctuaryWorldRenderer {
           if (!SanctuaryRoadCoverage.mayContainRoad(paths, tx, ty)) continue
           val dstX = sx(wx).roundToInt()
           val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
-          drawImage(
-            image = cobbleTiles[PixelTileAtlas.sanctuaryTileIndex(cobbleTiles, tx, ty, hash)],
-            dstOffset = IntOffset(dstX, dstY),
-            dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
-            filterQuality = FilterQuality.None,
+          drawGroundTile(
+            PixelTileAtlas.sanctuaryCobbleSheet, cobbleTiles, tx, ty, hash,
+            dstX, dstY, tileScreenW + 1, tileScreenH + 1,
+            rotated = PixelTileAtlas.sanctuaryCobbleSheetRotated,
           )
         }
       }
@@ -870,11 +900,17 @@ object SanctuaryWorldRenderer {
     val plazaClip = Path().apply { addOval(androidx.compose.ui.geometry.Rect(cx-rx*0.95f,cy-ry*0.95f,cx+rx*0.95f,cy+ry*0.95f)) }
     clipPath(plazaClip) {
       val tiles = PixelTileAtlas.sanctuaryStoneTiles
+      val sheet = PixelTileAtlas.sanctuaryFlagstoneSheet
+      val rotatedSheet = PixelTileAtlas.sanctuaryFlagstoneSheetRotated
       for (ty in 10..28) for (tx in 21..39) {
         val hash = ((tx * 73856093 xor ty * 19349663) and 0x7fffffff)
-        val image = tiles[PixelTileAtlas.sanctuaryTileIndex(tiles, tx, ty, hash)]
-        drawImage(image, dstOffset=IntOffset(sx(tx*64f).roundToInt(),sy(ty*64f,0f).roundToInt()),
-          dstSize=IntSize((64*zoom).roundToInt()+1,(64*zoom*ObliqueCamera.OBLIQUE_Y_SCALE).roundToInt()+1),filterQuality=FilterQuality.None)
+        drawGroundTile(
+          sheet, tiles, tx, ty, hash,
+          sx(tx * 64f).roundToInt(), sy(ty * 64f, 0f).roundToInt(),
+          (64 * zoom).roundToInt() + 1,
+          (64 * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt() + 1,
+          rotated = rotatedSheet,
+        )
       }
     }
 
@@ -1130,26 +1166,37 @@ object SanctuaryWorldRenderer {
 
     // Inner stone vertical face visible toward the island interior
     val innerLeft = if (isWestSide) cx + walkHalfW else cx - walkHalfW - innerFaceW
+    val innerSize = Size(innerFaceW, (base1Y - top0Y).coerceAtLeast(4f))
     drawRect(
-      color = if (isWestSide) Color(0xFF4A4E5E) else Color(0xFF3E424D),
+      // Same repaint as drawFortressWall: this segment is the side wall of the same ring.
+      color = if (isWestSide) Color(0xFFB9AF9C) else Color(0xFFAFA592),
       topLeft = Offset(innerLeft, top0Y),
-      size = Size(innerFaceW, (base1Y - top0Y).coerceAtLeast(4f)),
+      size = innerSize,
     )
+    // See drawFortressWall: geometry drawn in code needs its own night response, otherwise
+    // it stays bright while the sky and grass go night-blue.
+    with(HdrLightResponse) {
+      drawGeometryNightAbsorption(Rect(Offset(innerLeft, top0Y), innerSize), 185f)
+    }
     drawRect(
-      color = Color(0xFF2B2520),
+      color = Color(0xFF6F6656),
       topLeft = Offset(innerLeft, top0Y),
       size = Size(innerFaceW, (base1Y - top0Y).coerceAtLeast(4f)),
       style = Stroke(width = (1.3f * zoom).coerceAtLeast(0.8f)),
     )
 
     // Sunlit stone top rampart walkway
+    val walkSize = Size(walkHalfW * 2f, (top1Y - top0Y).coerceAtLeast(4f))
     drawRect(
-      color = Color(0xFF4A4E5E),
+      color = Color(0xFFF2EAD9),
       topLeft = Offset(cx - walkHalfW, top0Y),
-      size = Size(walkHalfW * 2f, (top1Y - top0Y).coerceAtLeast(4f)),
+      size = walkSize,
     )
+    with(HdrLightResponse) {
+      drawGeometryNightAbsorption(Rect(Offset(cx - walkHalfW, top0Y), walkSize), 232f)
+    }
     drawRect(
-      color = Color(0xFF2B2520),
+      color = Color(0xFF6F6656),
       topLeft = Offset(cx - walkHalfW, top0Y),
       size = Size(walkHalfW * 2f, (top1Y - top0Y).coerceAtLeast(4f)),
       style = Stroke(width = (1.6f * zoom).coerceAtLeast(1f)),
@@ -1183,22 +1230,34 @@ object SanctuaryWorldRenderer {
       lineTo(base0X, base0Y + cliffRetainingDrop)
       close()
     }
-    drawPath(extFace, if (x0 < 1600f) Color(0xFF3A3F4A) else Color(0xFF323540))
+    // P27B-V5 CP5 (debt A): this ring was the last dark surface on the island - a charcoal
+    // wall (0xFF3A3F4A / 0xFF323540 / 0xFF4A4E5E) around a rim whose gate, towers and
+    // retaining walls are all ivory limestone at ~152 luma. From z0.36 up it was the single
+    // clearest "two different games" tell, and it is drawn here in code rather than from an
+    // atlas entry, which is why repainting an asset did not change it.
+    // Repainted to the P27B-V5 limestone family; geometry is untouched.
+    drawPath(extFace, if (x0 < 1600f) Color(0xFFB9AF9C) else Color(0xFFAFA592))
+    // Night: this face is code, not a sprite, so it needs its own absorption or it stays
+    // bright while the sky and grass go night-blue (debt C, resurfacing on the ring).
+    with(HdrLightResponse) {
+      drawGeometryNightAbsorption(extFace, 185f)
+    }
 
     for (c in 1..4) {
       val f = c / 5f
       val ly0 = top0Y + (base0Y + cliffRetainingDrop - top0Y) * f
       val ly1 = top1Y + (base1Y + cliffRetainingDrop - top1Y) * f
-      drawLine(Color(0xFF6B6355), Offset(base0X, ly0), Offset(base1X, ly1), strokeWidth = (1.1f * zoom).coerceAtLeast(0.7f))
+      // Course lines: warm mortar, lighter than the face so the ashlar reads as masonry.
+      drawLine(Color(0xFF8E8474), Offset(base0X, ly0), Offset(base1X, ly1), strokeWidth = (1.1f * zoom).coerceAtLeast(0.7f))
     }
     for (i in 1 until 6) {
       val t = i / 6f
       val px = base0X + (base1X - base0X) * t
       val pyTop = top0Y + (top1Y - top0Y) * t
       val pyBot = base0Y + (base1Y - base0Y) * t + cliffRetainingDrop
-      drawLine(Color(0xFF7D7464), Offset(px, pyTop), Offset(px, pyBot), strokeWidth = 3.5f * zoom)
+      drawLine(Color(0xFFCFC5B0), Offset(px, pyTop), Offset(px, pyBot), strokeWidth = 3.5f * zoom)
     }
-    drawPath(extFace, Color(0xFF2B2520), style = Stroke(width = (1.8f * zoom).coerceAtLeast(1f)))
+    drawPath(extFace, Color(0xFF6F6656), style = Stroke(width = (1.8f * zoom).coerceAtLeast(1f)))
 
     // 2. Sunlit Top Rampart Walkway
     val walkwayPath = Path().apply {
@@ -1208,8 +1267,10 @@ object SanctuaryWorldRenderer {
       lineTo(base0X, top0Y)
       close()
     }
-    drawPath(walkwayPath, Color(0xFF3E424D))
-    drawPath(walkwayPath, Color(0xFF2B2520), style = Stroke(width = (1.6f * zoom).coerceAtLeast(1f)))
+    // Walkway is the sunlit top surface: brightest ivory in the ring.
+    drawPath(walkwayPath, Color(0xFFF2EAD9))
+    with(HdrLightResponse) { drawGeometryNightAbsorption(walkwayPath, 232f) }
+    drawPath(walkwayPath, Color(0xFF6F6656), style = Stroke(width = (1.6f * zoom).coerceAtLeast(1f)))
 
     // 3. Crenellated Battlement Merlons
     val lenWorld = hypot(x1 - x0, y1 - y0)
@@ -1229,8 +1290,9 @@ object SanctuaryWorldRenderer {
         lineTo(mx0, my0 + 1f)
         close()
       }
-      drawPath(merlon, Color(0xFF4A4E5E))
-      drawPath(merlon, Color(0xFF2B2520), style = Stroke(width = (1.3f * zoom).coerceAtLeast(0.8f)))
+      drawPath(merlon, Color(0xFFDCD3C0))
+      with(HdrLightResponse) { drawGeometryNightAbsorption(merlon, 220f) }
+      drawPath(merlon, Color(0xFF6F6656), style = Stroke(width = (1.3f * zoom).coerceAtLeast(0.8f)))
     }
   }
 
@@ -1261,13 +1323,16 @@ object SanctuaryWorldRenderer {
       lineTo(base0X, base0Y)
       close()
     }
-    drawPath(facePath, Color(0xFF3A3F4A))
+    // Same ring, front segments: repainted to the P27B-V5 limestone family (see
+    // drawFortressWall). Charcoal here was what still showed as a dark band after the
+    // atlas art was replaced, because this face is drawn in code, not from a PNG.
+    drawPath(facePath, Color(0xFFB9AF9C))
 
     // Recessed architectural wall panels & horizontal ashlar courses
     for (c in 1..4) {
       val f = c / 5f
       drawLine(
-        color = Color(0xFF8F8572),
+        color = Color(0xFF8E8474),
         start = Offset(base0X, top0Y + (base0Y - top0Y) * f),
         end = Offset(base1X, top1Y + (base1Y - top1Y) * f),
         strokeWidth = (1.1f * zoom).coerceAtLeast(0.7f),
@@ -1279,7 +1344,7 @@ object SanctuaryWorldRenderer {
       val px = base0X + (base1X - base0X) * t
       val pyTop = top0Y + (top1Y - top0Y) * t
       val pyBot = base0Y + (base1Y - base0Y) * t
-      drawLine(Color(0xFF9C917D), Offset(px, pyTop), Offset(px, pyBot), strokeWidth = 4.2f * zoom)
+      drawLine(Color(0xFFCFC5B0), Offset(px, pyTop), Offset(px, pyBot), strokeWidth = 4.2f * zoom)
     }
 
     // 2. Sunlit Top Stone Parapet Walkway Ribbon
@@ -1290,9 +1355,9 @@ object SanctuaryWorldRenderer {
       lineTo(base0X, top0Y)
       close()
     }
-    drawPath(walkwayPath, Color(0xFF444A5A))
-    drawPath(facePath, Color(0xFF2B2520), style = Stroke(width = (1.8f * zoom).coerceAtLeast(1f)))
-    drawPath(walkwayPath, Color(0xFF2B2520), style = Stroke(width = (1.8f * zoom).coerceAtLeast(1f)))
+    drawPath(walkwayPath, Color(0xFFF2EAD9))
+    drawPath(facePath, Color(0xFF6F6656), style = Stroke(width = (1.8f * zoom).coerceAtLeast(1f)))
+    drawPath(walkwayPath, Color(0xFF6F6656), style = Stroke(width = (1.8f * zoom).coerceAtLeast(1f)))
 
     // 3. Crenellated Battlement Merlons along Top Outer Edge!
     val lenWorld = hypot(x1 - x0, y1 - y0)
@@ -1312,8 +1377,9 @@ object SanctuaryWorldRenderer {
         lineTo(mx0, my0 + 1f)
         close()
       }
-      drawPath(merlon, Color(0xFF52566A))
-      drawPath(merlon, Color(0xFF2B2520), style = Stroke(width = (1.3f * zoom).coerceAtLeast(0.8f)))
+      drawPath(merlon, Color(0xFFDCD3C0))
+      with(HdrLightResponse) { drawGeometryNightAbsorption(merlon, 220f) }
+      drawPath(merlon, Color(0xFF6F6656), style = Stroke(width = (1.3f * zoom).coerceAtLeast(0.8f)))
     }
 
     // 4. North Wall Arched Gate Tunnel at x = 1560f (exact match to reference!)

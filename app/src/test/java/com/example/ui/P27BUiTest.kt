@@ -5,6 +5,8 @@ import android.graphics.Canvas as AndroidCanvas
 import android.view.View
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.onRoot
+import org.junit.Assert.assertTrue
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -111,6 +113,38 @@ class P27BUiTest {
   fun summonResultLandscape() {
     val view = modal(state(summoned = true))
     rule.onNodeWithTag("summon_result").assertExists()
+    capture(view(), "summon_result_land_800")
+  }
+
+  /**
+   * P27B-V5 checkpoint 4 (debt E). The shipped screenshot showed the summon result
+   * card running off the bottom of a 360dp-high landscape window with its quote line
+   * cut mid-glyph.
+   *
+   * Asserted here as a geometric fact on the real composable: the card's bounds must
+   * sit inside the window, and its own content must fit inside the card. A lazy list
+   * would happily lay the row out past the edge (that is how the defect survived), so
+   * a tag-exists check cannot catch it - bounds can.
+   */
+  @Test @Config(qualifiers = "w800dp-h360dp-land-xhdpi")
+  fun summonResultFitsInsideShortLandscapeViewport() {
+    val view = modal(state(summoned = true))
+    rule.waitForIdle()
+    val root = rule.onRoot().fetchSemanticsNode().size
+    val node = rule.onNodeWithTag("summon_result").fetchSemanticsNode()
+    val card = node.boundsInRoot
+    assertTrue(
+      "result card bottom ${card.bottom} exceeds the ${root.height}px window",
+      card.bottom <= root.height,
+    )
+    assertTrue("result card top ${card.top} must not start above the window", card.top >= 0f)
+    // And the card must be tall enough to actually contain the text it drew: if the
+    // compact branch were skipped the card would demand more than the window has.
+    assertTrue(
+      "result card height ${card.height} leaves no room for its own content in a " +
+        "${root.height}px window",
+      card.height <= root.height,
+    )
     capture(view(), "summon_result_land_800")
   }
 

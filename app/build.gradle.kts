@@ -64,7 +64,17 @@ android {
     compose = true
     buildConfig = true
   }
-  testOptions { unitTests { isIncludeAndroidResources = true } }
+  testOptions {
+    unitTests {
+      isIncludeAndroidResources = true
+      // Robolectric native-graphics render tests allocate a whole 1280x720 Skia surface per
+      // capture. With the default 512 MB test JVM, LyraEngineRenderTest died without writing
+      // any JUnit XML (a red step with no assertion and no result file - it looked like a
+      // mystery failure and cost a full 9-minute CI cycle to triage). Give it a real heap so
+      // the failure mode is an exception with a message, not a silent JVM death.
+      all { it.maxHeapSize = "2g" }
+    }
+  }
   dependenciesInfo {
     includeInApk = false
     includeInBundle = true

@@ -1,0 +1,46 @@
+{
+  "checkpoint": 1,
+  "state": "cp1_committed_evidence_verified",
+  "base_sha": "e5e04e1b64c973290b3a2b1e27e87c4eaf4a027c",
+  "head_sha": "8f35ab3",
+  "ci_runs": [
+    {
+      "id": 42023592875,
+      "sha": "a09e4ca",
+      "conclusion": "success",
+      "note": "first CP1 pass; renders exposed stone scale, heel band and luma defects"
+    },
+    {
+      "id": 42026395257,
+      "sha": "91563f4",
+      "conclusion": "success",
+      "note": "calibrated sheets, first clean evidence set"
+    },
+    {
+      "id": 42027232321,
+      "sha": "04ed113",
+      "conclusion": "failure",
+      "note": "evidence push rejected: a newer commit landed mid-run (no force push used)"
+    },
+    {
+      "id": 42028077617,
+      "sha": "607d118",
+      "conclusion": "success",
+      "note": "final CP1 evidence, 15 world frames committed by the bot"
+    }
+  ],
+  "evidence": "docs/p27b_next/previews/after/world (15 frames) + docs/p27b_next/previews/terrain",
+  "baseline_frozen": "git diff e5e04e1 HEAD -- docs/p27b is empty",
+  "debts": {
+    "B": "4-tile lattice removed and measured; sheet still repeats at 512 world px, so B is partially closed, not closed",
+    "A": "not started (checkpoint 2)",
+    "C": "not started (checkpoint 3)",
+    "D": "not started (checkpoints 4-5)",
+    "E": "not started (checkpoint 4)"
+  },
+  "not_tested": [
+    "FPS",
+    "thermal",
+    "real device"
+  ]
+}

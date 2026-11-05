@@ -28,19 +28,24 @@ object PixelStructureAtlas {
     SanctuaryArtAssets.preferredLandmark("summoning_hall", 268, 206) ?: summoningHallFallback
   private val summoningHallFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildSummoningHall() }
   val heroRegistryStructure: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("premium_slice/hero_registry.png") ?: heroRegistryFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/hero_registry.png")
+      ?: SanctuaryArtAssets.assetSafe("premium_slice/hero_registry.png") ?: heroRegistryFallback
   private val heroRegistryFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildHeroRegistryHall() }
   val trainingGroundStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildTrainingGround() }
-  val armoryStructure: ImageBitmap get() = SanctuaryArtAssets.assetSafe("premium_slice/armory.png") ?: armoryFallback
+  val armoryStructure: ImageBitmap get() = SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/armory.png")
+      ?: SanctuaryArtAssets.assetSafe("premium_slice/armory.png") ?: armoryFallback
   private val armoryFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildArmory() }
   val synthesisLabStructure: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("premium_slice/synthesis_lab.png") ?: synthesisLabFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/synthesis_lab.png")
+      ?: SanctuaryArtAssets.assetSafe("premium_slice/synthesis_lab.png") ?: synthesisLabFallback
   private val synthesisLabFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildSynthesisLab() }
   val heroQuartersStructure: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("premium_slice/hero_quarters.png") ?: heroQuartersFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/hero_quarters.png")
+      ?: SanctuaryArtAssets.assetSafe("premium_slice/hero_quarters.png") ?: heroQuartersFallback
   private val heroQuartersFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildHeroQuarters() }
   val restaurantStructure: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("premium_slice/restaurant.png") ?: restaurantFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/restaurant.png")
+      ?: SanctuaryArtAssets.assetSafe("premium_slice/restaurant.png") ?: restaurantFallback
   private val restaurantFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildRestaurantExterior() }
   val floorVistaArchStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildFloorVistaArch() }
 
@@ -49,25 +54,44 @@ object PixelStructureAtlas {
   // `paintAnimeHalfTimberHouse` callers. They are now authored PNGs with the same canvas, the
   // same bottom-centred blit and the same 6 s / 2 s draw contract, so anchors, footprints,
   // colliders and depth sort are untouched. The procedural builders stay as the fallback path.
+  // P27B-V5 (checkpoint 2, debt A): the residential art was still P03, measured at luma
+  // 51-59 against P27B landmarks at ~175. The P27B-V5 houses below share the landmark
+  // palette and are cut to the SAME canvas and bottom-centre pivot, so footprints,
+  // colliders, doorway triggers and depth sort are untouched. P03 stays as the next
+  // fallback tier, then the procedural builder.
   val medievalTownhouseA: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("sanctuary_p03/townhouse_a.png") ?: medievalTownhouseAFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/townhouse_a.png")
+      ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/townhouse_a.png")
+      ?: medievalTownhouseAFallback
   private val medievalTownhouseAFallback: ImageBitmap by lazy { buildMedievalTownhouse(variant = 0) }
   val medievalTownhouseB: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("sanctuary_p03/townhouse_b.png") ?: medievalTownhouseBFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/townhouse_b.png")
+      ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/townhouse_b.png")
+      ?: medievalTownhouseBFallback
   private val medievalTownhouseBFallback: ImageBitmap by lazy { buildMedievalTownhouse(variant = 1) }
   val sanctuaryCottageBrown: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("sanctuary_p03/cottage_brown.png") ?: sanctuaryCottageBrownFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/cottage_brown.png")
+      ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/cottage_brown.png")
+      ?: sanctuaryCottageBrownFallback
   private val sanctuaryCottageBrownFallback: ImageBitmap by lazy { buildSanctuaryCottage(useBlueSlate = false) }
   val sanctuaryCottageSlate: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("sanctuary_p03/cottage_slate.png") ?: sanctuaryCottageSlateFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/cottage_slate.png")
+      ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/cottage_slate.png")
+      ?: sanctuaryCottageSlateFallback
   private val sanctuaryCottageSlateFallback: ImageBitmap by lazy { buildSanctuaryCottage(useBlueSlate = true) }
+  // P27B-V5 CP5 (debt A): the wall line changed tone mid-run because the two towers
+  // flanking it were still P03 art at luma ~51 next to P27B ivory at ~175. Same canvas
+  // and pivot, so the wall anchoring and depth sort are unchanged.
   val fortressCornerTowerSprite: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("sanctuary_p03/fortress_tower.png") ?: fortressCornerTowerFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/fortress_tower.png")
+      ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/fortress_tower.png") ?: fortressCornerTowerFallback
   private val fortressCornerTowerFallback: ImageBitmap by lazy { buildFortressTower(isGatehouse = false) }
   val southernGateTowerSprite: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("sanctuary_p03/gate_tower.png") ?: southernGateTowerFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/gate_tower.png")
+      ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/gate_tower.png") ?: southernGateTowerFallback
   private val southernGateTowerFallback: ImageBitmap by lazy { buildFortressTower(isGatehouse = true) }
-  val sakuraTreeSpriteA: ImageBitmap get() = SanctuaryArtAssets.image("canopy_a") ?: sakuraTreeSpriteAFallback
+  val sakuraTreeSpriteA: ImageBitmap get() = SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/canopy_a.png")
+      ?: SanctuaryArtAssets.image("canopy_a") ?: sakuraTreeSpriteAFallback
   private val sakuraTreeSpriteAFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(0, 114, 132) }
   val sakuraTreeSpriteB: ImageBitmap get() = SanctuaryArtAssets.image("canopy_b") ?: sakuraTreeSpriteBFallback
   private val sakuraTreeSpriteBFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(1, 96, 114) }
@@ -86,18 +110,31 @@ object PixelStructureAtlas {
   // only the flame inside the glass differs, so the lamp cannot jitter between frames.
   val streetLanternFrames: List<ImageBitmap> by lazy {
     (0..2).map { frame ->
-      SanctuaryArtAssets.assetSafe("sanctuary_p03/street_lantern_$frame.png")
+      // P27B-V5: the new lantern is ONE authored sprite, so all three frames use it. A
+      // P03 frame-1/2 fallback would put two lantern designs in the same street, so the
+      // only fallback from here is the procedural builder at the matching frame.
+      SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/street_lantern_0.png")
+        ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/street_lantern_$frame.png")
         ?: buildStreetLantern(frame)
     }
   }
-  val barrelClusterSprite: ImageBitmap get() = SanctuaryArtAssets.image("barrels") ?: barrelClusterSpriteFallback
+  val barrelClusterSprite: ImageBitmap get() =
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/barrels.png")
+      ?: SanctuaryArtAssets.image("barrels") ?: barrelClusterSpriteFallback
   private val barrelClusterSpriteFallback: ImageBitmap by lazy { buildBarrelCluster() }
   val woodenBenchSprite: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("sanctuary_p03/wooden_bench.png") ?: woodenBenchFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/wooden_bench.png")
+      ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/wooden_bench.png") ?: woodenBenchFallback
   private val woodenBenchFallback: ImageBitmap by lazy { buildWoodenBench34() }
   val arcaneBookshelfSprite: ImageBitmap by lazy { buildArcaneBookshelf34() }
+  // P27B-V5 CP5 (debt A, last big P03 block): the perimeter curtain wall was the dark
+  // blue-grey P03 slab (luma 75) repeated around an ivory island. Same 88x48 tile, same
+  // tiling, new ivory art; the tile is rotated to its least-visible joint because a
+  // vertical cut repeated ~40 times around the rim reads as a rendering bug.
   val stoneRetainingWallSprite: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("sanctuary_p03/retaining_wall.png") ?: stoneRetainingWallFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/retaining_wall.png")
+      ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/retaining_wall.png")
+      ?: stoneRetainingWallFallback
   private val stoneRetainingWallFallback: ImageBitmap by lazy { buildStoneRetainingWall() }
 
   // 3/4 Restaurant Interior Furnishings (Reference 2)
@@ -110,9 +147,12 @@ object PixelStructureAtlas {
   val obsidianColumnSprite: ImageBitmap get() = SanctuaryArtAssets.image("pillar") ?: obsidianColumnSpriteFallback
   private val obsidianColumnSpriteFallback: ImageBitmap by lazy { buildObsidianColumn() }
   val royalStatueSprite: ImageBitmap by lazy { buildRoyalStatue() }
-  val oakTreeSprite: ImageBitmap get() = SanctuaryArtAssets.image("oak") ?: oakTreeSpriteFallback
+  val oakTreeSprite: ImageBitmap get() = SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/oak.png")
+      ?: SanctuaryArtAssets.image("oak") ?: oakTreeSpriteFallback
   private val oakTreeSpriteFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(0, 112, 136) }
-  val spiritPineSprite: ImageBitmap get() = SanctuaryArtAssets.image("pine") ?: spiritPineSpriteFallback
+  val spiritPineSprite: ImageBitmap get() =
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/pine.png")
+      ?: SanctuaryArtAssets.image("pine") ?: spiritPineSpriteFallback
   private val spiritPineSpriteFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(2, 96, 128) }
   val mysticPlumTreeSprite: ImageBitmap get() = SanctuaryArtAssets.image("twisted") ?: mysticPlumTreeSpriteFallback
   private val mysticPlumTreeSpriteFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(3, 112, 132) }
@@ -128,9 +168,11 @@ object PixelStructureAtlas {
   // P23 props that have no procedural builder: the planter and the training yard set are
   // PNG-only, and every caller keeps its previous Canvas path as the fallback (`?: null`).
   val flowerPlanterSprite: ImageBitmap?
-    get() = SanctuaryArtAssets.assetSafe("sanctuary_p03/flower_planter.png")
+    get() = SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/flower_planter.png")
+      ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/flower_planter.png")
   val trainingDummySprite: ImageBitmap?
-    get() = SanctuaryArtAssets.assetSafe("sanctuary_p03/training_dummy.png")
+    get() = SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/training_dummy.png")
+      ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/training_dummy.png")
   val weaponRackSprite: ImageBitmap?
     get() = SanctuaryArtAssets.assetSafe("sanctuary_p03/weapon_rack.png")
   val mossyBoulderSprite: ImageBitmap get() = SanctuaryArtAssets.image("boulder") ?: boulderFallback
@@ -375,16 +417,22 @@ object PixelStructureAtlas {
     val w = 164
     val h = 64
     val c = PixelCanvas(w, h)
+    // P27B-V5 CP5 (debt A, the actual perimeter): this was the last big dark surface on
+    // the island - a PURPLE stone cliff wall (0xFF2E264F family) tiled around a rim whose
+    // landmarks, towers and now the retaining walls are ivory at ~152 luma. The old palette
+    // belonged to the dark manhwa theme and read as a different game from z0.36 up.
+    // Palette-matched to the P27B-V5 limestone (ivory 0xFFDCD3C0 / 0xFFF2EAD9, warm grey
+    // shadow 0xFF8E8474) so the wall reads as the same stone family as the gate.
     // Top beveled stone parapet coping
-    c.fillRect(2, 8, w - 4, 8, 0xFF695BA3.toInt())
-    c.hLine(2, 8, w - 4, 0xFF9384CC.toInt())
-    c.hLine(2, 15, w - 4, 0xFFF5B841.toInt())
+    c.fillRect(2, 8, w - 4, 8, 0xFFDCD3C0.toInt())
+    c.hLine(2, 8, w - 4, 0xFFF2EAD9.toInt())
+    c.hLine(2, 15, w - 4, 0xFFC7A36C.toInt())
     // Vertical carved ashlar cliff face showing unmistakable 3/4 elevation drop!
-    c.drawStoneWall34(4, 16, w - 8, 42, sideDepthPx = 0, stoneBase = 0xFF2E264F.toInt(), stoneAlt = 0xFF392F61.toInt(), stoneHi = 0xFF56488A.toInt(), stoneShadow = 0xFF1A142E.toInt(), seed = 620)
+    c.drawStoneWall34(4, 16, w - 8, 42, sideDepthPx = 0, stoneBase = 0xFFB9AF9C.toInt(), stoneAlt = 0xFFC7BDA9.toInt(), stoneHi = 0xFFF2EAD9.toInt(), stoneShadow = 0xFF8E8474.toInt(), seed = 620)
     // Buttress pilasters + glowing cyan rune slits
     for (px in listOf(14, w / 2 - 8, w - 30)) {
-      c.fillRect(px, 12, 16, 46, 0xFF473B73.toInt())
-      c.fillRect(px + 2, 14, 5, 42, 0xFF635499.toInt())
+      c.fillRect(px, 12, 16, 46, 0xFFA79C88.toInt())
+      c.fillRect(px + 2, 14, 5, 42, 0xFFCFC5B0.toInt())
       c.fillRect(px + 7, 24, 2, 20, 0xFF38BDF8.toInt())
     }
     c.applyCrispOutline()
