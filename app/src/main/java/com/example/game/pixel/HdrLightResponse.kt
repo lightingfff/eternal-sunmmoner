@@ -405,7 +405,10 @@ object HdrLightResponse {
 
   /** Rect overload: the perimeter uses drawRect, and a Rect cannot be passed as a Path. */
   fun DrawScope.drawGeometryNightAbsorption(rect: Rect, baseLuma: Float) =
-    drawGeometryNightAbsorptionImpl({ drawRect(rect, color = it) }, baseLuma)
+    drawGeometryNightAbsorptionImpl(
+      { drawRect(color = it, topLeft = rect.topLeft, size = rect.size) },
+      baseLuma,
+    )
 
   private fun DrawScope.drawGeometryNightAbsorptionImpl(
     emit: (Color) -> Unit,
