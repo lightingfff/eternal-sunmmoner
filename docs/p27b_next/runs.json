@@ -1,6 +1,37 @@
 {
   "checkpoint": 1,
-  "base_sha": "e5e04e1",
-  "state": "awaiting_ci",
-  "note": "Pushed to trigger the P27B render workflow on the new branch; updated with the run ids and verdicts once the run finishes."
+  "state": "code_committed_evidence_rendered",
+  "base_branch_sha": "e5e04e1b64c973290b3a2b1e27e87c4eaf4a027c",
+  "commits": [
+    "ad9693b",
+    "a09e4ca",
+    "91563f4",
+    "dca70dc"
+  ],
+  "ci_runs": [
+    {
+      "id": 42023592875,
+      "sha": "a09e4ca",
+      "conclusion": "success",
+      "note": "first CP1 pass; renders exposed stone scale, heel band and luma problems"
+    },
+    {
+      "id": 42026395257,
+      "sha": "91563f4",
+      "conclusion": "success",
+      "note": "calibrated sheets; evidence in docs/p27b_next/previews/after/world"
+    }
+  ],
+  "debts": {
+    "B_4x4_lattice": "structurally removed and measured (cell 4 tiles away is no longer identical); NOT fully closed - the 8x8 sheet still repeats every 512 world px",
+    "A_p03_tone": "not started (checkpoint 2)",
+    "C_night_light": "not started (checkpoint 3)",
+    "D_ui_system": "not started (checkpoint 4-5)",
+    "E_result_card_clip": "not started (checkpoint 4)"
+  },
+  "not_tested": [
+    "FPS",
+    "thermal",
+    "real device"
+  ]
 }
