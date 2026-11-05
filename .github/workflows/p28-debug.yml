@@ -41,8 +41,16 @@ jobs:
           mkdir -p app/src/debug/res/values
           printf '<resources><string name="default_web_client_id" translatable="false">debug-placeholder.apps.googleusercontent.com</string></resources>\n' > app/src/debug/res/values/google_services_placeholder.xml
 
-      - name: Compile (log to file, never fail the job)
-        run: gradle :app:assembleDebug > /tmp/build.log 2>&1 || true
+      - name: Compile main + tests (log to file, never fail the job)
+        run: |
+          gradle :app:compileDebugKotlin :app:compileDebugUnitTestKotlin > /tmp/build.log 2>&1 || true
+          gradle :app:testDebugUnitTest \
+            --tests 'com.example.P28ComponentsTest' \
+            --tests 'com.example.ui.P27BUiTest' \
+            --tests 'com.example.ui.SanctuaryHudContrastTest' \
+            --tests 'com.example.ui.SanctuaryUiTokenTest' \
+            --tests 'com.example.ui.LayoutResponsivenessRobolectricTest' \
+            --tests 'com.example.P27BNightResponseTest' >> /tmp/build.log 2>&1 || true
 
       - name: Post Kotlin errors as PR comment
         if: always()
@@ -50,11 +58,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           {
-            echo "P28 debug — compile errors on $(git rev-parse --short HEAD):"
+            echo "P28 debug — errors on $(git rev-parse --short HEAD):"
             echo '```'
-            grep -E '^e: |error: ' /tmp/build.log | head -60 || echo "(no 'e:'/'error:' lines found — tail below)"
+            grep -E '^e: |error: ' /tmp/build.log | head -60 || echo "(no compile errors)"
+            echo '--- failed tests ---'
+            grep -E 'FAILED|failed,' /tmp/build.log | head -30 || true
             echo '--- tail of build log ---'
-            tail -30 /tmp/build.log
+            grep -E 'BUILD|Task :app:(compile|test)' /tmp/build.log | tail -10
+            tail -20 /tmp/build.log
             echo '```'
           } > /tmp/comment.md
           gh pr comment 36 --repo lightingfff/eternal-sunmmoner --body-file /tmp/comment.md || echo "comment failed"
