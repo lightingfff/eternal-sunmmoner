@@ -68,6 +68,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -448,13 +449,39 @@ private fun SummoningHallContent(
             color = Color(0xFF8A5A16),
           )
           Spacer(modifier = Modifier.height(6.dp))
+          // Debt E: on a 360dp-high landscape viewport this card used to overflow the
+          // window and the quote line was cut mid-glyph. Three changes, all local:
+          //  1. the avatar shrinks with the viewport instead of a fixed 52dp;
+          //  2. every line is capped with an ellipsis, so it degrades by truncating one
+          //     line instead of painting outside the card;
+          //  3. the quote is the line that carries the least information, so it is the
+          //     one allowed to disappear on a short viewport.
+          val compact = LocalConfiguration.current.screenHeightDp < 420
           Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            PixelHeroPortraitAvatar(heroClass = newlySummoned.classType, sizeDp = 52.dp)
+            PixelHeroPortraitAvatar(heroClass = newlySummoned.classType, sizeDp = if (compact) 40.dp else 52.dp)
             Column(modifier = Modifier.weight(1f)) {
-              Text("${newlySummoned.name} — ${newlySummoned.title}", style = MaterialTheme.typography.titleSmall, color = Color(0xFF283B4B))
-              Text("${newlySummoned.classType.labelVi} • ${newlySummoned.personalityType.labelVi}", style = MaterialTheme.typography.bodySmall, color = Color(0xFF2D728C))
-              Text("Đã lưu vào Anh hùng • mở Hồ sơ để nâng cấp và trang bị.",style=MaterialTheme.typography.labelSmall,color=Color(0xFF79552E))
-              Text("«${newlySummoned.personalityType.sampleQuoteVi}»", style = MaterialTheme.typography.bodySmall, color = Color(0xFF506474))
+              Text(
+                "${newlySummoned.name} — ${newlySummoned.title}",
+                style = MaterialTheme.typography.titleSmall, color = Color(0xFF283B4B),
+                maxLines = 1, overflow = TextOverflow.Ellipsis,
+              )
+              Text(
+                "${newlySummoned.classType.labelVi} • ${newlySummoned.personalityType.labelVi}",
+                style = MaterialTheme.typography.bodySmall, color = Color(0xFF2D728C),
+                maxLines = 1, overflow = TextOverflow.Ellipsis,
+              )
+              if (!compact) {
+                Text(
+                  "Đã lưu vào Anh hùng • mở Hồ sơ để nâng cấp và trang bị.",
+                  style = MaterialTheme.typography.labelSmall, color = Color(0xFF79552E),
+                  maxLines = 1, overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                  "«${newlySummoned.personalityType.sampleQuoteVi}»",
+                  style = MaterialTheme.typography.bodySmall, color = Color(0xFF506474),
+                  maxLines = 2, overflow = TextOverflow.Ellipsis,
+                )
+              }
             }
           }
         }
