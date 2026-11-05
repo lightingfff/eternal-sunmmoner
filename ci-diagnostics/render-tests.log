@@ -1,47 +1,11 @@
 ### test results
 total 8
--rw-r--r-- 1 runner runner 3353 Nov  5 14:22 TEST-com.example.MapForgeP22ContractTest.xml
-drwxr-xr-x 2 runner runner 4096 Nov  5 14:22 binary
+-rw-r--r-- 1 runner runner  452 Nov  5 14:33 TEST-com.example.MapForgeTerrainRenderTest.xml
+drwxr-xr-x 2 runner runner 4096 Nov  5 14:33 binary
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.example.MapForgeP22ContractTest" tests="3" skipped="1" failures="1" errors="0" timestamp="2026-11-05T14:22:50.944Z" hostname="runnervmnwato" time="4.551">
+<testsuite name="com.example.MapForgeTerrainRenderTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-05T14:33:17.938Z" hostname="runnervmwuk1x" time="8.976">
   <properties/>
-  <testcase name="lockedControlsOakAndCypressAreByteIdenticalToP18AndP20Baselines" classname="com.example.MapForgeP22ContractTest" time="3.996"/>
-  <testcase name="authoredTreesPreserveExactCanvasAndAlpha128FootRowOffsets" classname="com.example.MapForgeP22ContractTest" time="0.049">
-    <failure message="java.lang.AssertionError: expected:&lt;126&gt; but was:&lt;131&gt;" type="java.lang.AssertionError">java.lang.AssertionError: expected:&lt;126&gt; but was:&lt;131&gt;
-	at org.junit.Assert.fail(Assert.java:89)
-	at org.junit.Assert.failNotEquals(Assert.java:835)
-	at org.junit.Assert.assertEquals(Assert.java:120)
-	at org.junit.Assert.assertEquals(Assert.java:146)
-	at com.example.MapForgeP22ContractTest.authoredTreesPreserveExactCanvasAndAlpha128FootRowOffsets(MapForgeP22ContractTest.kt:62)
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
-	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
-	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
-	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
-	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
-	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
-	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
-	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:524)
-	at org.robolectric.internal.SandboxTestRunner.executeInSandbox(SandboxTestRunner.java:494)
-	at org.robolectric.internal.SandboxTestRunner.access$900(SandboxTestRunner.java:67)
-	at org.robolectric.internal.SandboxTestRunner$7.evaluate(SandboxTestRunner.java:442)
-	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
-	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
-	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
-	at org.robolectric.internal.SandboxTestRunner.access$600(SandboxTestRunner.java:67)
-	at org.robolectric.internal.SandboxTestRunner$6.evaluate(SandboxTestRunner.java:333)
-	at org.robolectric.internal.SandboxTestRunner$3.evaluate(SandboxTestRunner.java:233)
-	at org.robolectric.internal.SandboxTestRunner$5.lambda$evaluate$0(SandboxTestRunner.java:317)
-	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:101)
-	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
-	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
-	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
-	at java.base/java.lang.Thread.run(Thread.java:1583)
-</failure>
-  </testcase>
-  <testcase name="authoredShrubsMatchProceduralCanvasFootRowAndSafeFallbackContract" classname="com.example.MapForgeP22ContractTest" time="0.23">
-    <skipped/>
-  </testcase>
+  <testcase name="captureTerrainSliceThroughTheRealRenderer" classname="com.example.MapForgeTerrainRenderTest" time="8.546"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
