@@ -62,6 +62,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      # P27B: structural PNG gate. Not a sign-off: 5x5 repeats and engine light still need eyes.
       - name: Validate shipped PNGs, hashes, alpha, pivots and mosaic seam guard
         run: |
           python3 -m pip install --quiet --disable-pip-version-check pillow==13.0.0

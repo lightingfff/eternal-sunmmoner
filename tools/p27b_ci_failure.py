@@ -14,7 +14,9 @@ selected = [line.strip() for line in log if re.search(
     r'(^e:|error:|FAILED|FAILURE|What went wrong|Unresolved reference|Compilation error)', line, re.I)]
 lines = selected[:15] or log[-15:]
 results = Path(sys.argv[2])
-for xml_path in sorted(results.glob('TEST-*P27B*.xml')):
+# The asset job also runs SanctuaryMaterialTest, which shares this harness; include
+# every result XML so a failing assertion text reaches the check annotation.
+for xml_path in sorted(results.glob('TEST-*.xml')):
     try:
         root = ET.parse(xml_path).getroot()
         for case in root.iter('testcase'):
