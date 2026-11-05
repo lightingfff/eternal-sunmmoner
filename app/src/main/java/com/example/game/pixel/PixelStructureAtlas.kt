@@ -417,16 +417,22 @@ object PixelStructureAtlas {
     val w = 164
     val h = 64
     val c = PixelCanvas(w, h)
+    // P27B-V5 CP5 (debt A, the actual perimeter): this was the last big dark surface on
+    // the island - a PURPLE stone cliff wall (0xFF2E264F family) tiled around a rim whose
+    // landmarks, towers and now the retaining walls are ivory at ~152 luma. The old palette
+    // belonged to the dark manhwa theme and read as a different game from z0.36 up.
+    // Palette-matched to the P27B-V5 limestone (ivory 0xFFDCD3C0 / 0xFFF2EAD9, warm grey
+    // shadow 0xFF8E8474) so the wall reads as the same stone family as the gate.
     // Top beveled stone parapet coping
-    c.fillRect(2, 8, w - 4, 8, 0xFF695BA3.toInt())
-    c.hLine(2, 8, w - 4, 0xFF9384CC.toInt())
-    c.hLine(2, 15, w - 4, 0xFFF5B841.toInt())
+    c.fillRect(2, 8, w - 4, 8, 0xFFDCD3C0.toInt())
+    c.hLine(2, 8, w - 4, 0xFFF2EAD9.toInt())
+    c.hLine(2, 15, w - 4, 0xFFC7A36C.toInt())
     // Vertical carved ashlar cliff face showing unmistakable 3/4 elevation drop!
-    c.drawStoneWall34(4, 16, w - 8, 42, sideDepthPx = 0, stoneBase = 0xFF2E264F.toInt(), stoneAlt = 0xFF392F61.toInt(), stoneHi = 0xFF56488A.toInt(), stoneShadow = 0xFF1A142E.toInt(), seed = 620)
+    c.drawStoneWall34(4, 16, w - 8, 42, sideDepthPx = 0, stoneBase = 0xFFB9AF9C.toInt(), stoneAlt = 0xFFC7BDA9.toInt(), stoneHi = 0xFFF2EAD9.toInt(), stoneShadow = 0xFF8E8474.toInt(), seed = 620)
     // Buttress pilasters + glowing cyan rune slits
     for (px in listOf(14, w / 2 - 8, w - 30)) {
-      c.fillRect(px, 12, 16, 46, 0xFF473B73.toInt())
-      c.fillRect(px + 2, 14, 5, 42, 0xFF635499.toInt())
+      c.fillRect(px, 12, 16, 46, 0xFFA79C88.toInt())
+      c.fillRect(px + 2, 14, 5, 42, 0xFFCFC5B0.toInt())
       c.fillRect(px + 7, 24, 2, 20, 0xFF38BDF8.toInt())
     }
     c.applyCrispOutline()
