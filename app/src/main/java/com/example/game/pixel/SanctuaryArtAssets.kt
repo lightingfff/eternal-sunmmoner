@@ -19,6 +19,7 @@ object SanctuaryArtAssets {
   private val images = mutableMapOf<String, ImageBitmap>()
   private val families = mutableMapOf<String, List<ImageBitmap>>()
   private val optionalFamilies = mutableMapOf<String, List<ImageBitmap>?>()
+  private val groundSheets = mutableMapOf<String, ImageBitmap?>()
   internal val cachedImageCount get() = images.size
   /** Decoded PNG cache only; generated actor atlases and GPU copies are not included. Sample at 1 Hz. */
   internal val cachedBitmapBytes: Long get() = images.values.sumOf { it.asAndroidBitmap().allocationByteCount.toLong() }
@@ -75,6 +76,24 @@ object SanctuaryArtAssets {
     }
     optionalFamilies[name] = cells
     return cells
+  }
+
+  /** P27B-V5 ground: one 512x512 sheet per family, sampled as an 8x8 mosaic.
+   *
+   * The shipped 4x4 atlas became a translation-invariant lattice: the same block
+   * repeated every 256 world px, which is what the plaza z1.0 review saw. A sheet
+   * quadruples the period to 512 world px and, because it is a single bitmap, holds
+   * *less* memory than 64 separate 64x64 cells (1 MB vs ~1 MB plus 64 objects, and
+   * one texture instead of 64). Negative-cached exactly like [p27bFamily]: a missing
+   * or mis-sized sheet falls back to the whole P27B 4x4 family, never a half atlas.
+   */
+  internal fun groundSheet(name: String): ImageBitmap? {
+    if (visualProfile != SanctuaryVisualProfile.P27B || context == null) return null
+    if (groundSheets.containsKey(name)) return groundSheets[name]
+    val sheet = assetSafe("sanctuary_p27b_2/terrain/${name}_mosaic.png")
+      ?.takeIf { it.width == 512 && it.height == 512 }
+    groundSheets[name] = sheet
+    return sheet
   }
 
   internal fun preferredLandmark(name: String, width: Int, height: Int): ImageBitmap? {

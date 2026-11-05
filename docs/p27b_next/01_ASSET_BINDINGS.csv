@@ -1,0 +1,43 @@
+group,id,draw_call,source_asset,canvas,world_x,world_y,scale,footprint_half_w,footprint_depth_north,draw_px_at_zoom_0.88,draw_px_at_zoom_1.48,notes
+landmark,summoning_hall,"PropKind.FACILITY_SUMMONING_HALL -> drawCrispSprite",sanctuary_p27b/structures/summoning_hall.png,268x206,2430,2005,1.08,195,135,"2*0.88*1.08*268=510","2*1.48*1.08*268=857",P27B new; apron baked in sprite; zoneFloorRing stays glow-only
+landmark,tower_gate,"PropKind.FACILITY_TOWER_GATE -> drawCrispSprite",sanctuary_p27b/structures/tower_gate.png,260x224,1960,585,0.96,155,110,"2*0.88*0.96*260=440","2*1.48*0.96*260=739",P27B new; animated rift drawn after sprite
+facility,hero_registry,"PropKind.FACILITY_HERO_REGISTRY -> drawCrispSprite",premium_slice/hero_registry.png,188x166,1470,760,0.80,72,54,"2*0.88*0.80*188=265","2*1.48*0.80*188=445",OLD ART - tone mismatch (A)
+facility,armory,"PropKind.FACILITY_ARMORY -> drawCrispSprite",premium_slice/armory.png,190x166,995,655,0.80,72,54,"2*0.88*0.80*190=268","2*1.48*0.80*190=450",OLD ART - tone mismatch (A)
+facility,synthesis_lab,"PropKind.FACILITY_SYNTHESIS_LAB -> drawCrispSprite",premium_slice/synthesis_lab.png,188x168,1270,555,0.80,70,52,"2*0.88*0.80*188=265","2*1.48*0.80*188=445",OLD ART - tone mismatch (A)
+facility,hero_quarters,"PropKind.FACILITY_HERO_QUARTERS -> drawCrispSprite",premium_slice/hero_quarters.png,200x168,825,790,0.80,74,54,"2*0.88*0.80*200=282","2*1.48*0.80*200=474",OLD ART - tone mismatch (A)
+facility,restaurant,"PropKind.FACILITY_RESTAURANT -> drawCrispSprite",premium_slice/restaurant.png,206x172,1105,925,0.80,74,54,"2*0.88*0.80*206=290","2*1.48*0.80*206=488",OLD ART - tone mismatch (A)
+house,townhouse_a,"PropKind.MEDIEVAL_TOWNHOUSE_A -> drawCrispSprite",sanctuary_p03/townhouse_a.png,152x156,varies,varies,0.80,64-74,46-54,"2*0.88*0.80*152=214","2*1.48*0.80*152=360",OLD ART (A)
+house,townhouse_b,"PropKind.MEDIEVAL_TOWNHOUSE_B -> drawCrispSprite",sanctuary_p03/townhouse_b.png,144x160,655,930,0.84,64,50,"212","356",OLD ART (A)
+house,cottage_brown,"PropKind.SANCTUARY_COTTAGE_BROWN -> drawCrispSprite",sanctuary_p03/cottage_brown.png,132x144,495,1075,0.86,58,46,"200","336",OLD ART (A)
+house,cottage_slate,"PropKind.SANCTUARY_COTTAGE_SLATE -> drawCrispSprite",sanctuary_p03/cottage_slate.png,132x144,1395,675,0.82,54,44,"191","321",OLD ART (A)
+tower,fortress_corner,"cornerTowerSpots loop -> drawCrispSprite",sanctuary_p03/fortress_tower.png,80x118,8 perimeter spots,,varies,0,0,"~141","~237",OLD ART; perimeter silhouette OK
+tower,gatehouse,"PropKind southern gate towers",sanctuary_p03/gate_tower.png,96x136,2 spots,2240-2400,,varies,0,0,"~169","~284",OLD ART
+ground,grass,"sanctuaryGrassTiles / 4x4 block",sanctuary_p27b/terrain/grass_0..15.png,16x64x64,tiled world,?,1.0,,,"64*0.88=56","64*1.48=95",4x4 periodic sampling (B)
+ground,soil,"drawOrganicTrainingSandArena",sanctuary_p27b/terrain/soil_0..15.png,16x64x64,tiled world,,1.0,,,"56","95",4x4 periodic (B)
+ground,flagstone,"plaza clip 21..39 x 10..28",sanctuary_p27b/terrain/flagstone_0..15.png,16x64x64,tiled world,,1.0,,,"56","95",4x4 periodic (B) - visible at z1.0
+ground,cobble,"road paths + curbs",sanctuary_p27b/terrain/cobble_0..15.png,16x64x64,path polygons,,1.0,,,"56","95",4x4 periodic (B)
+ground,summon_ivory,"packaged, intentionally NOT painted",sanctuary_p27b/terrain/summon_ivory_0..15.png,16x64x64,none,,,-,-,-,-,kept for future floor that owns its footprint; regression guard
+prop,street_lantern,"PropKind.STREET_LANTERN (3 frames)",sanctuary_p03/street_lantern_0..2.png,32x66,varies,,1.0,0,0,56,94,OLD ART; housing constant across frames
+prop,wooden_bench,"PropKind.WOODEN_BENCH",sanctuary_p03/wooden_bench.png,58x36,varies,,1.0,0,0,102,172,OLD ART
+prop,barrels,"PropKind.BARREL_CLUSTER",sanctuary_p03/barrels.png,52x44,varies,,1.0,0,0,92,154,OLD ART
+prop,flower_planter,"PropKind.FLOWER_PLANTER",sanctuary_p03/flower_planter.png,64x36,varies,,1.0,0,0,113,189,OLD ART
+prop,training_dummy,"PropKind.TRAINING_DUMMY",sanctuary_p03/training_dummy.png,40x58,varies,,1.0,0,0,70,118,OLD ART
+prop,striking_post,"PropKind.STRIKING_POST",sanctuary_p03/striking_post.png,36x86,varies,,1.0,0,0,63,106,OLD ART
+prop,weapon_rack,"PropKind.WEAPON_RACK",sanctuary_p03/weapon_rack.png,68x48,varies,,1.0,0,0,120,201,OLD ART
+veg,sakura_a,"PropKind tree canopy",sanctuary_p03/canopy_a.png,114x132,varies,,1.0,0,0,"201","337",OLD ART; occlusion via occludesUpperCanopy
+veg,sakura_b,"PropKind tree canopy",sanctuary_p03/canopy_b.png,96x114,varies,,1.0,0,0,"169","284",OLD ART
+veg,oak,"PropKind.OAK_TREE",sanctuary_p03/oak.png,112x136,varies,,1.0,0,0,"197","331",OLD ART
+veg,pine,"PropKind.SPIRIT_PINE",sanctuary_p03/pine.png,96x128,varies,,1.0,0,0,"169","284",OLD ART
+veg,twisted_plum,"PropKind.MYSTIC_PLUM",sanctuary_p03/twisted.png,112x132,varies,,1.0,0,0,"197","337",OLD ART
+veg,cypress,"PropKind.CYPRESS",sanctuary_p03/cypress.png,48x88,varies,,1.0,0,0,84,142,OLD ART
+veg,hedge_bush,"PropKind.GARDEN_HEDGE",sanctuary_p03/hedge_bush.png,64x40,varies,,1.0,0,0,113,189,OLD ART
+veg,forest_bush,"PropKind.FOREST_BUSH",sanctuary_p03/forest_bush.png,64x40,varies,,1.0,0,0,113,189,OLD ART
+prop,mossy_boulder,"PropKind.MOSSY_BOULDER",sanctuary_p03/boulder.png,48x38,varies,,1.0,0,0,84,142,OLD ART
+prop,monolith,"PropKind.MONOLITH",sanctuary_p03/monolith.png,44x74,varies,,1.0,0,0,77,130,OLD ART
+prop,ruin_arch,"PropKind.RUIN_ARCH",sanctuary_p03/ruin_arch.png,96x86,varies,,1.0,0,0,169,284,OLD ART
+prop,retaining_wall,"PropKind.STONE_WALL",sanctuary_p03/retaining_wall.png,88x48,varies,,1.0,0,0,155,261,OLD ART
+ui,hud,"Compose sanctuary_top_hud",com.example.ui.screens.SanctuaryLobbyScreen,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,unchanged since BEFORE (D)
+ui,summon_modal,"Compose SanctuaryFacilityModalOverlay",com.example.ui.screens.SanctuaryFacilityModals,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,ivory redesign done in P27B
+ui,summon_result,"Compose summon_result item",com.example.ui.screens.SanctuaryFacilityModals,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,clipped at short landscape (E)
+ui,auth,"Compose AuthGateScreen",com.example.ui.screens.AuthGateScreen,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,no design system (D)
+ui,management,"Compose FantasyManagement",com.example.ui.components.FantasyManagement,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,dark glass panels (D)

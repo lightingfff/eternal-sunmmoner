@@ -5,10 +5,13 @@ name: P27B matched Sanctuary render evidence
 # PNGs are committed to *this* branch, NOT packaged in the APK or fake screenshots.
 on:
   push:
-    branches: [arena/683a732b-eternal-sunmmoner]
+    branches: [arena/8be73f1b-eternal-sunmmoner]
     paths:
       - '.github/workflows/p27b-render.yml'
       - 'app/src/main/assets/sanctuary_p27b/**'
+      - 'app/src/main/assets/sanctuary_p27b_2/**'
+      - 'docs/p27b_next/runs.json'
+      - '.github/render-trigger/**'
       - 'app/src/main/java/com/example/game/pixel/**'
       - 'app/src/main/java/com/example/ui/**'
       - 'app/src/test/java/com/example/P27B*Test.kt'
@@ -19,6 +22,9 @@ on:
     paths:
       - '.github/workflows/p27b-render.yml'
       - 'app/src/main/assets/sanctuary_p27b/**'
+      - 'app/src/main/assets/sanctuary_p27b_2/**'
+      - 'docs/p27b_next/runs.json'
+      - '.github/render-trigger/**'
       - 'app/src/main/java/com/example/game/pixel/**'
       - 'app/src/main/java/com/example/ui/**'
       - 'app/src/test/java/com/example/P27B*Test.kt'
@@ -67,12 +73,19 @@ jobs:
         run: |
           python3 -m pip install --quiet --disable-pip-version-check pillow==13.0.0
           python3 tools/p27b_validate.py
+      # P27B-V5 Checkpoint 1: 8x8 ground sheets. Fails on a 4-tile period, on a
+      # mis-sized sheet, or on a wrap seam that a real stone edge cannot explain.
+      - name: Measure 8x8 ground sheets (period, wrap seam, distinct cells)
+        run: |
+          python3 -m pip install --quiet --disable-pip-version-check pillow==11.3.0
+          python3 tools/p27b_ground_gate.py
       - name: P27B runtime selectors and unchanged P03 material regression
         run: |
           set +e
           gradle :app:testDebugUnitTest \
             --tests 'com.example.P27BAssetContractTest' \
             --tests 'com.example.SanctuaryMaterialTest' \
+            --tests 'com.example.P27BGroundRepeatTest' \
             --stacktrace > "$RUNNER_TEMP/p27b-assets.log" 2>&1
           result=$?
           cat "$RUNNER_TEMP/p27b-assets.log"
@@ -86,6 +99,16 @@ jobs:
           result=$?
           cat "$RUNNER_TEMP/p27b-world.log"
           if [ "$result" -ne 0 ]; then python3 tools/p27b_ci_failure.py "$RUNNER_TEMP/p27b-world.log" app/build/test-results/testDebugUnitTest; fi
+          exit "$result"
+      - name: P27B-V5 render matrix (terrain zooms, hour sweep, house close-ups)
+        id: render_next
+        if: ${{ always() && steps.render_world.outcome == 'success' }}
+        run: |
+          set +e
+          gradle :app:testDebugUnitTest --tests 'com.example.P27BNextRenderTest' --stacktrace > "$RUNNER_TEMP/p27b-next.log" 2>&1
+          result=$?
+          cat "$RUNNER_TEMP/p27b-next.log"
+          if [ "$result" -ne 0 ]; then python3 tools/p27b_ci_failure.py "$RUNNER_TEMP/p27b-next.log" app/build/test-results/testDebugUnitTest; fi
           exit "$result"
       - name: Matched Compose UI screenshots and summon behavior
         id: render_ui
@@ -122,17 +145,26 @@ jobs:
         if: ${{ always() && github.event_name == 'push' }}
         run: |
           set -euo pipefail
-          if [ ! -s app/build/visual_screenshots/p27b/world/camera_props.json ]; then
+          if [ ! -s app/build/visual_screenshots/p27b/world/camera_props.json ] &&
+             [ ! -s app/build/visual_screenshots/p27b_next/world/camera_props.json ]; then
             echo 'No real world renders: nothing to publish'; exit 0
           fi
           phase=before
           if [ -s app/src/main/assets/sanctuary_p27b/manifest.json ]; then phase=after; fi
           dest="docs/p27b/previews/$phase"
           mkdir -p "$dest/world" "$dest/ui"
-          cp -f app/build/visual_screenshots/p27b/world/*.png "$dest/world/"
+          cp -f app/build/visual_screenshots/p27b/world/*.png "$dest/world/" || true
           cp -f app/build/visual_screenshots/p27b/world/camera_props.json "$dest/world/"
           if [ -d app/build/visual_screenshots/p27b/ui ]; then
             cp -f app/build/visual_screenshots/p27b/ui/*.png "$dest/ui/" || true
+          fi
+          # V5 evidence lives beside, not on top of, the frozen P27B baseline.
+          if [ -s app/build/visual_screenshots/p27b_next/world/camera_props.json ]; then
+            next="docs/p27b_next/previews/after"
+            mkdir -p "$next/world"
+            cp -f app/build/visual_screenshots/p27b_next/world/*.png "$next/world/"
+            cp -f app/build/visual_screenshots/p27b_next/world/camera_props.json "$next/world/"
+            git add "$next"
           fi
           git config user.name 'p27b-render-bot'
           git config user.email 'actions@users.noreply.github.com'
@@ -140,4 +172,4 @@ jobs:
           if git diff --cached --quiet; then echo 'same renderer images; no commit'; exit 0; fi
           git commit -m "P27B: real Robolectric ${phase} render on ${GITHUB_SHA:0:7}"
           # Do not force push, auto-merge, or update other branches.
-          git push origin HEAD:arena/683a732b-eternal-sunmmoner
+          git push origin HEAD:arena/8be73f1b-eternal-sunmmoner

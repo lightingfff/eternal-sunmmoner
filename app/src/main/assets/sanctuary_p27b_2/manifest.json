@@ -1,0 +1,146 @@
+{
+  "schema": "eternal-summoner.p27b2.visual-profile.v1",
+  "status": "GAME_CANDIDATE",
+  "note": "8x8 ground mosaic sheets, sampled by (tx & 7, ty & 7). Fixes the measured 4-tile lattice; adjacency is true mosaic adjacency so no cell is ever placed against a cell it was not cut from.",
+  "camera_ground_y_scale": 0.72,
+  "tile_px": 64,
+  "mosaic_grid": [
+    8,
+    8
+  ],
+  "sheet_canvas": [
+    512,
+    512
+  ],
+  "terrain_count_per_family": 1,
+  "families": {
+    "grass": {
+      "path": "terrain/grass_mosaic.png",
+      "size": [
+        512,
+        512
+      ],
+      "channels": "RGB opaque",
+      "mosaic_grid": [
+        8,
+        8
+      ],
+      "cell_px": 64,
+      "distinct_cells": 64,
+      "source_path": "art/p27b_sources/preview/grass_source_768.jpg",
+      "source_kind": "preview_768",
+      "source_size": [
+        768,
+        768
+      ],
+      "source_sha256": "eb7d19bc85ce0f4829e0b989cde67cafe17df8ade961fda870c9a6ec433162d8",
+      "sha256": "bc02f80eae792fca33768b5b8191d7b94ee9e0ab04056177d70fe6831b2a4c42",
+      "mean_rgb": [
+        82.3,
+        107.5,
+        66.5
+      ],
+      "max_x_edge_jump_rgb": 33.95,
+      "max_y_edge_jump_rgb": 33.81,
+      "ground_period_world_px": 512,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "8x8 repeat is 512 world px; still a mosaic, still needs engine review"
+    },
+    "soil": {
+      "path": "terrain/soil_mosaic.png",
+      "size": [
+        512,
+        512
+      ],
+      "channels": "RGB opaque",
+      "mosaic_grid": [
+        8,
+        8
+      ],
+      "cell_px": 64,
+      "distinct_cells": 64,
+      "source_path": "art/p27b_sources/preview/soil_source_768.jpg",
+      "source_kind": "preview_768",
+      "source_size": [
+        768,
+        768
+      ],
+      "source_sha256": "1f611235fed3594cbfc5b1f786a7bb17bf0e744dfeb2d83874837e0d5ca97f46",
+      "sha256": "abbecea3217532cc43a6b79085d5994f58b0a981a9b188d9930987b21c648c14",
+      "mean_rgb": [
+        171.0,
+        140.2,
+        101.1
+      ],
+      "max_x_edge_jump_rgb": 20.05,
+      "max_y_edge_jump_rgb": 27.02,
+      "ground_period_world_px": 512,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "8x8 repeat is 512 world px; still a mosaic, still needs engine review"
+    },
+    "flagstone": {
+      "path": "terrain/flagstone_mosaic.png",
+      "size": [
+        512,
+        512
+      ],
+      "channels": "RGB opaque",
+      "mosaic_grid": [
+        8,
+        8
+      ],
+      "cell_px": 64,
+      "distinct_cells": 64,
+      "source_path": "art/p27b_sources/preview/flagstone_source_768.jpg",
+      "source_kind": "preview_768",
+      "source_size": [
+        768,
+        768
+      ],
+      "source_sha256": "76af5977b1f89ad277cdadeed83a4ec3f8905afc1a40b3ebaebe9c01cf38b221",
+      "sha256": "ff527450074d12b5de31ebfaffb5f5d7f71bb63b2dd114722d32d3a23fbf2fef",
+      "mean_rgb": [
+        169.9,
+        173.9,
+        169.5
+      ],
+      "max_x_edge_jump_rgb": 87.35,
+      "max_y_edge_jump_rgb": 86.65,
+      "ground_period_world_px": 512,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "8x8 repeat is 512 world px; still a mosaic, still needs engine review"
+    },
+    "cobble": {
+      "path": "terrain/cobble_mosaic.png",
+      "size": [
+        512,
+        512
+      ],
+      "channels": "RGB opaque",
+      "mosaic_grid": [
+        8,
+        8
+      ],
+      "cell_px": 64,
+      "distinct_cells": 64,
+      "source_path": "art/p27b_sources/preview/cobble_source_768.jpg",
+      "source_kind": "preview_768",
+      "source_size": [
+        768,
+        768
+      ],
+      "source_sha256": "c47cc7961137c348a827af5f1b524e01028e68a6abc355e24dea3d6057928a47",
+      "sha256": "2881e79f55c37a5706724dcdb766dd153b53a0fdef94da378c70b5e3ddd140b3",
+      "mean_rgb": [
+        104.7,
+        114.5,
+        118.7
+      ],
+      "max_x_edge_jump_rgb": 45.77,
+      "max_y_edge_jump_rgb": 48.26,
+      "ground_period_world_px": 512,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "8x8 repeat is 512 world px; still a mosaic, still needs engine review"
+    }
+  }
+}

@@ -1,7 +1,11 @@
 package com.example.game.pixel
 
 import android.graphics.Bitmap
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import com.example.game.map.ObliqueCamera
@@ -249,6 +253,16 @@ object PixelTileAtlas {
   // P27B material art is a coherent 4×4 torus, sampled by WORLD tile coordinates.
   // P03 remains present and intact; a missing P27B family falls back as a whole.
   // No tile assets are opened in a warmed-up draw pass (p27bFamily caches success/failure).
+  // P27B-V5: the 8x8 sheet wins over the 4x4 cell family. Order is
+  // sheet -> P27B 4x4 cells -> P03 PNG -> procedural, and each tier is whole,
+  // never a mixed atlas.
+  private fun groundSheet(name: String): ImageBitmap? = SanctuaryArtAssets.groundSheet(name)
+
+  val sanctuaryGrassSheet: ImageBitmap? get() = groundSheet("grass")
+  val sanctuarySoilSheet: ImageBitmap? get() = groundSheet("soil")
+  val sanctuaryFlagstoneSheet: ImageBitmap? get() = groundSheet("flagstone")
+  val sanctuaryCobbleSheet: ImageBitmap? get() = groundSheet("cobble")
+
   val sanctuaryGrassTiles: List<ImageBitmap> get() =
     SanctuaryArtAssets.p27bFamily("grass") ?: SanctuaryArtAssets.tiles("grass", 8) ?: sanctuaryGrassTilesFallback
   private val sanctuaryGrassTilesFallback: List<ImageBitmap> by lazy {
@@ -276,6 +290,9 @@ object PixelTileAtlas {
   /** A matching 4×4 mosaic must use coordinate adjacency, not the old independent hash. */
   fun sanctuaryTileIndex(tiles: List<ImageBitmap>, tx: Int, ty: Int, legacyHash: Int): Int =
     if (tiles.size == 16) (((ty and 3) shl 2) or (tx and 3)) else legacyHash % tiles.size
+
+  /** Cell of the 8x8 sheet: true mosaic adjacency, period 8 tiles = 512 world px. */
+  fun sanctuarySheetCell(tx: Int, ty: Int): Int = (((ty and 7) shl 3) or (tx and 7))
 
   /** Optional, brighter limestone restricted to the existing Summoning Hall ground zone. */
   val summoningIvoryTiles: List<ImageBitmap>? get() = SanctuaryArtAssets.p27bFamily("summon_ivory")
@@ -1003,5 +1020,48 @@ object PixelTileAtlas {
     repeat(16) { val fx=8+rng.nextInt(48); val fy=8+rng.nextInt(48); c.set(fx,fy,0xFF3A342E.toInt()); if (rng.nextInt(4)==0) c.set(fx+1,fy,0xFF4A4038.toInt()) }
     if (variant%2==0) repeat(4) { val mx=8+rng.nextInt(48); val my=8+rng.nextInt(48); c.set(mx,my,0xFF2A3D2B.toInt()); c.set(mx+1,my,0xFF1E2A1F.toInt()) }
     return c.toImageBitmap()
+  }
+}
+
+
+/**
+ * Draws ONE world ground tile from whichever source is active.
+ *
+ * [sheet] is the P27B-V5 8x8 mosaic: the cell is cut with a src rect from the single
+ * 512 px texture, so one texture per family and no per-tile allocation. A null [sheet]
+ * falls back to the 4x4 cell list / legacy list exactly as before, so a missing sheet
+ * degrades to the previous art instead of leaving a hole.
+ *
+ * Declared at package level rather than as a member extension so call sites can invoke
+ * it bare, as [drawGroundTile], from inside a DrawScope.
+ */
+fun DrawScope.drawGroundTile(
+  sheet: ImageBitmap?,
+  tiles: List<ImageBitmap>,
+  tx: Int,
+  ty: Int,
+  legacyHash: Int,
+  dstX: Int,
+  dstY: Int,
+  dstW: Int,
+  dstH: Int,
+) {
+  if (sheet != null) {
+    val cell = PixelTileAtlas.sanctuarySheetCell(tx, ty)
+    drawImage(
+      image = sheet,
+      srcOffset = IntOffset((cell and 7) * PixelTileAtlas.TILE_PX, (cell shr 3) * PixelTileAtlas.TILE_PX),
+      srcSize = IntSize(PixelTileAtlas.TILE_PX, PixelTileAtlas.TILE_PX),
+      dstOffset = IntOffset(dstX, dstY),
+      dstSize = IntSize(dstW, dstH),
+      filterQuality = FilterQuality.None,
+    )
+  } else {
+    drawImage(
+      image = tiles[PixelTileAtlas.sanctuaryTileIndex(tiles, tx, ty, legacyHash)],
+      dstOffset = IntOffset(dstX, dstY),
+      dstSize = IntSize(dstW, dstH),
+      filterQuality = FilterQuality.None,
+    )
   }
 }

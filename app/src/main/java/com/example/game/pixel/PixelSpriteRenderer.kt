@@ -337,22 +337,25 @@ object PixelSpriteRenderer {
           }
         }
 
-        // P27B ground is a 4x4 mosaic indexed by WORLD coordinates, so the same
-        // material grammar holds here as in the island renderer; legacy families
-        // (and the curbs) keep their hash choice.
-        val bmp = when {
-          onRoadCore && roadTiles != null ->
-            roadTiles[PixelTileAtlas.sanctuaryTileIndex(roadTiles, tx, ty, hash)]
-          onRoadEdge && roadEdgeTiles != null -> roadEdgeTiles[hash % roadEdgeTiles.size]
-          else -> baseTiles[PixelTileAtlas.sanctuaryTileIndex(baseTiles, tx, ty, hash)]
+        // P27B ground is a mosaic indexed by WORLD coordinates, so the same material
+        // grammar holds here as in the island renderer. The 8x8 sheet (period 512 px)
+        // is preferred; curbs and legacy families keep their hash choice.
+        when {
+          onRoadCore && roadTiles != null -> drawGroundTile(
+            PixelTileAtlas.sanctuaryCobbleSheet, roadTiles, tx, ty, hash,
+            dstX, dstY, tileScreenW + 1, tileScreenH + 1,
+          )
+          onRoadEdge && roadEdgeTiles != null -> drawImage(
+            image = roadEdgeTiles[hash % roadEdgeTiles.size],
+            dstOffset = IntOffset(dstX, dstY),
+            dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
+            filterQuality = FilterQuality.None,
+          )
+          else -> drawGroundTile(
+            PixelTileAtlas.sanctuaryGrassSheet, baseTiles, tx, ty, hash,
+            dstX, dstY, tileScreenW + 1, tileScreenH + 1,
+          )
         }
-
-        drawImage(
-          image = bmp,
-          dstOffset = IntOffset(dstX, dstY),
-          dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
-          filterQuality = FilterQuality.None,
-        )
       }
     }
 

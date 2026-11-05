@@ -153,12 +153,39 @@ object SanctuaryWorldRenderer {
       // by one pre-composed 4x4 block with the same authored art. That drops the terrain
       // draw-command count by ~85% exactly where the island-wide camera used to stall.
       // From gameplay zoom up the per-tile path stays in charge and the art is untouched.
-      val grassBlocks = if (tileScreenH < GRASS_BLOCK_MIN_TILE_SCREEN_PX) {
+      // P27B-V5: when the 8x8 sheet is present the overview path draws the WHOLE sheet
+      // once per world cell instead of sixteen squashed tiles. Zooming a 512 px texture
+      // down is the same sampling that squashing 16 tiles individually performs, so the
+      // pixels are equivalent, the draw count is lower than the old 4x4 block path, and
+      // the repeat period stays the same as the gameplay path (no zoom-dependent lattice).
+      val grassSheet = PixelTileAtlas.sanctuaryGrassSheet
+      val grassBlocks = if (grassSheet == null && tileScreenH < GRASS_BLOCK_MIN_TILE_SCREEN_PX) {
         PixelTileAtlas.sanctuaryGrassBlocks
       } else {
         emptyList()
       }
-      if (grassBlocks.isNotEmpty()) {
+      if (grassSheet != null && tileScreenH < GRASS_BLOCK_MIN_TILE_SCREEN_PX) {
+        val sheetWorldSize = (PixelTileAtlas.TILE_PX * 8).toFloat()
+        val cellScreenW = (sheetWorldSize * zoom).roundToInt().coerceAtLeast(2)
+        val cellScreenH = (sheetWorldSize * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt().coerceAtLeast(2)
+        // floorDiv, not "/": tile coordinates are negative west/north of the origin and
+        // truncating division would shift the sheet one world cell at the map edge.
+        val startSx = (startTx * PixelTileAtlas.TILE_PX).floorDiv(512)
+        val endSx = (endTx * PixelTileAtlas.TILE_PX).floorDiv(512)
+        val startSy = (startTy * PixelTileAtlas.TILE_PX).floorDiv(512)
+        val endSy = (endTy * PixelTileAtlas.TILE_PX).floorDiv(512)
+        for (cy in startSy..endSy) {
+          val dstY = sy(cy * sheetWorldSize).roundToInt()
+          for (cx in startSx..endSx) {
+            drawImage(
+              image = grassSheet,
+              dstOffset = IntOffset(sx(cx * sheetWorldSize).roundToInt(), dstY),
+              dstSize = IntSize(cellScreenW + 1, cellScreenH + 1),
+              filterQuality = FilterQuality.None,
+            )
+          }
+        }
+      } else if (grassBlocks.isNotEmpty()) {
         val blockWorldSize = PixelTileAtlas.GRASS_BLOCK_WORLD_SIZE.toFloat()
         val blockScreenW = (blockWorldSize * zoom).roundToInt().coerceAtLeast(2)
         val blockScreenH = (blockWorldSize * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt().coerceAtLeast(2)
@@ -187,11 +214,9 @@ object SanctuaryWorldRenderer {
             val wx = tx * worldTileSize
             val dstX = sx(wx).roundToInt()
             val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
-            drawImage(
-              image = grassTiles[PixelTileAtlas.sanctuaryTileIndex(grassTiles, tx, ty, hash)],
-              dstOffset = IntOffset(dstX, dstY),
-              dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
-              filterQuality = FilterQuality.None,
+            drawGroundTile(
+              grassSheet, grassTiles, tx, ty, hash,
+              dstX, dstY, tileScreenW + 1, tileScreenH + 1,
             )
           }
         }
@@ -330,11 +355,9 @@ object SanctuaryWorldRenderer {
           val wx = tx * worldTileSize
           val dstX = sx(wx).roundToInt()
           val hash = ((tx * 49297) xor (ty * 91813)) and 0x7FFFFFFF
-          drawImage(
-            image = sandTiles[PixelTileAtlas.sanctuaryTileIndex(sandTiles, tx, ty, hash)],
-            dstOffset = IntOffset(dstX, dstY),
-            dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
-            filterQuality = FilterQuality.None,
+          drawGroundTile(
+            PixelTileAtlas.sanctuarySoilSheet, sandTiles, tx, ty, hash,
+            dstX, dstY, tileScreenW + 1, tileScreenH + 1,
           )
         }
       }
@@ -442,11 +465,9 @@ object SanctuaryWorldRenderer {
           if (!SanctuaryRoadCoverage.mayContainRoad(paths, tx, ty)) continue
           val dstX = sx(wx).roundToInt()
           val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
-          drawImage(
-            image = cobbleTiles[PixelTileAtlas.sanctuaryTileIndex(cobbleTiles, tx, ty, hash)],
-            dstOffset = IntOffset(dstX, dstY),
-            dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
-            filterQuality = FilterQuality.None,
+          drawGroundTile(
+            PixelTileAtlas.sanctuaryCobbleSheet, cobbleTiles, tx, ty, hash,
+            dstX, dstY, tileScreenW + 1, tileScreenH + 1,
           )
         }
       }
@@ -870,11 +891,15 @@ object SanctuaryWorldRenderer {
     val plazaClip = Path().apply { addOval(androidx.compose.ui.geometry.Rect(cx-rx*0.95f,cy-ry*0.95f,cx+rx*0.95f,cy+ry*0.95f)) }
     clipPath(plazaClip) {
       val tiles = PixelTileAtlas.sanctuaryStoneTiles
+      val sheet = PixelTileAtlas.sanctuaryFlagstoneSheet
       for (ty in 10..28) for (tx in 21..39) {
         val hash = ((tx * 73856093 xor ty * 19349663) and 0x7fffffff)
-        val image = tiles[PixelTileAtlas.sanctuaryTileIndex(tiles, tx, ty, hash)]
-        drawImage(image, dstOffset=IntOffset(sx(tx*64f).roundToInt(),sy(ty*64f,0f).roundToInt()),
-          dstSize=IntSize((64*zoom).roundToInt()+1,(64*zoom*ObliqueCamera.OBLIQUE_Y_SCALE).roundToInt()+1),filterQuality=FilterQuality.None)
+        drawGroundTile(
+          sheet, tiles, tx, ty, hash,
+          sx(tx * 64f).roundToInt(), sy(ty * 64f, 0f).roundToInt(),
+          (64 * zoom).roundToInt() + 1,
+          (64 * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt() + 1,
+        )
       }
     }
 

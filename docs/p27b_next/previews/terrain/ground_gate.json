@@ -1,0 +1,45 @@
+{
+  "report": {
+    "grass": {
+      "mean_rgb_step_1_tile": 2.347,
+      "mean_rgb_step_4_tiles": 2.117,
+      "max_identity_at_4_tiles": 5.061,
+      "distinct_cell_means": 64,
+      "wrap_seam": 15.1,
+      "interior_boundary_p95": 17.01,
+      "period_world_px": 512,
+      "bytes": 461225
+    },
+    "soil": {
+      "mean_rgb_step_1_tile": 3.429,
+      "mean_rgb_step_4_tiles": 5.952,
+      "max_identity_at_4_tiles": 19.723,
+      "distinct_cell_means": 64,
+      "wrap_seam": 8.19,
+      "interior_boundary_p95": 8.16,
+      "period_world_px": 512,
+      "bytes": 362200
+    },
+    "flagstone": {
+      "mean_rgb_step_1_tile": 9.348,
+      "mean_rgb_step_4_tiles": 11.21,
+      "max_identity_at_4_tiles": 23.84,
+      "distinct_cell_means": 64,
+      "wrap_seam": 8.48,
+      "interior_boundary_p95": 10.42,
+      "period_world_px": 512,
+      "bytes": 268759
+    },
+    "cobble": {
+      "mean_rgb_step_1_tile": 2.076,
+      "mean_rgb_step_4_tiles": 1.944,
+      "max_identity_at_4_tiles": 6.733,
+      "distinct_cell_means": 64,
+      "wrap_seam": 15.34,
+      "interior_boundary_p95": 16.62,
+      "period_world_px": 512,
+      "bytes": 416870
+    }
+  },
+  "failures": []
+}
