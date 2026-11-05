@@ -188,7 +188,7 @@ object SanctuaryWorldRenderer {
             val dstX = sx(wx).roundToInt()
             val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
             drawImage(
-              image = grassTiles[hash % grassTiles.size],
+              image = grassTiles[PixelTileAtlas.sanctuaryTileIndex(grassTiles, tx, ty, hash)],
               dstOffset = IntOffset(dstX, dstY),
               dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
               filterQuality = FilterQuality.None,
@@ -331,7 +331,7 @@ object SanctuaryWorldRenderer {
           val dstX = sx(wx).roundToInt()
           val hash = ((tx * 49297) xor (ty * 91813)) and 0x7FFFFFFF
           drawImage(
-            image = sandTiles[hash % sandTiles.size],
+            image = sandTiles[PixelTileAtlas.sanctuaryTileIndex(sandTiles, tx, ty, hash)],
             dstOffset = IntOffset(dstX, dstY),
             dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
             filterQuality = FilterQuality.None,
@@ -443,7 +443,7 @@ object SanctuaryWorldRenderer {
           val dstX = sx(wx).roundToInt()
           val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
           drawImage(
-            image = cobbleTiles[hash % cobbleTiles.size],
+            image = cobbleTiles[PixelTileAtlas.sanctuaryTileIndex(cobbleTiles, tx, ty, hash)],
             dstOffset = IntOffset(dstX, dstY),
             dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
             filterQuality = FilterQuality.None,
@@ -871,7 +871,8 @@ object SanctuaryWorldRenderer {
     clipPath(plazaClip) {
       val tiles = PixelTileAtlas.sanctuaryStoneTiles
       for (ty in 10..28) for (tx in 21..39) {
-        val image = tiles[((tx * 73856093 xor ty * 19349663) and 0x7fffffff) % tiles.size]
+        val hash = ((tx * 73856093 xor ty * 19349663) and 0x7fffffff)
+        val image = tiles[PixelTileAtlas.sanctuaryTileIndex(tiles, tx, ty, hash)]
         drawImage(image, dstOffset=IntOffset(sx(tx*64f).roundToInt(),sy(ty*64f,0f).roundToInt()),
           dstSize=IntSize((64*zoom).roundToInt()+1,(64*zoom*ObliqueCamera.OBLIQUE_Y_SCALE).roundToInt()+1),filterQuality=FilterQuality.None)
       }

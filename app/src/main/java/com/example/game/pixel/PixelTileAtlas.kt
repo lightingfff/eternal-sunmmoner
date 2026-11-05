@@ -246,26 +246,39 @@ object PixelTileAtlas {
   const val GRASS_BLOCK_COUNT = 8
   const val GRASS_BLOCK_WORLD_SIZE = TILE_PX * GRASS_BLOCK_TILES
 
-  // Reference-Accurate Sunlit Anime Sanctuary Lawn, Sand, Alabaster Stone & Grey Cobble Tiles (64x64)
-  val sanctuaryGrassTiles: List<ImageBitmap> get() = SanctuaryArtAssets.tiles("grass", 8) ?: sanctuaryGrassTilesFallback
+  // P27B material art is a coherent 4×4 torus, sampled by WORLD tile coordinates.
+  // P03 remains present and intact; a missing P27B family falls back as a whole.
+  // No tile assets are opened in a warmed-up draw pass (p27bFamily caches success/failure).
+  val sanctuaryGrassTiles: List<ImageBitmap> get() =
+    SanctuaryArtAssets.p27bFamily("grass") ?: SanctuaryArtAssets.tiles("grass", 8) ?: sanctuaryGrassTilesFallback
   private val sanctuaryGrassTilesFallback: List<ImageBitmap> by lazy {
     (0 until 8).map { variant -> SanctuaryMaterials.grass(variant) }
   }
 
-  val sanctuarySandTiles: List<ImageBitmap> get() = SanctuaryArtAssets.tiles("soil", 6) ?: sanctuarySandTilesFallback
+  val sanctuarySandTiles: List<ImageBitmap> get() =
+    SanctuaryArtAssets.p27bFamily("soil") ?: SanctuaryArtAssets.tiles("soil", 6) ?: sanctuarySandTilesFallback
   private val sanctuarySandTilesFallback: List<ImageBitmap> by lazy {
     (0 until 6).map { variant -> SanctuaryMaterials.soil(variant) }
   }
 
-  val sanctuaryStoneTiles: List<ImageBitmap> get() = SanctuaryArtAssets.tiles("flagstone", 8) ?: sanctuaryStoneTilesFallback
+  val sanctuaryStoneTiles: List<ImageBitmap> get() =
+    SanctuaryArtAssets.p27bFamily("flagstone") ?: SanctuaryArtAssets.tiles("flagstone", 8) ?: sanctuaryStoneTilesFallback
   private val sanctuaryStoneTilesFallback: List<ImageBitmap> by lazy {
     (0 until 8).map { variant -> SanctuaryMaterials.stone(variant, large = true) }
   }
 
-  val sanctuaryCausewayTiles: List<ImageBitmap> get() = SanctuaryArtAssets.tiles("cobble", 6) ?: sanctuaryCausewayTilesFallback
+  val sanctuaryCausewayTiles: List<ImageBitmap> get() =
+    SanctuaryArtAssets.p27bFamily("cobble") ?: SanctuaryArtAssets.tiles("cobble", 6) ?: sanctuaryCausewayTilesFallback
   private val sanctuaryCausewayTilesFallback: List<ImageBitmap> by lazy {
     (0 until 6).map { variant -> SanctuaryMaterials.stone(variant, large = false) }
   }
+
+  /** A matching 4×4 mosaic must use coordinate adjacency, not the old independent hash. */
+  fun sanctuaryTileIndex(tiles: List<ImageBitmap>, tx: Int, ty: Int, legacyHash: Int): Int =
+    if (tiles.size == 16) (((ty and 3) shl 2) or (tx and 3)) else legacyHash % tiles.size
+
+  /** Optional, brighter limestone restricted to the existing Summoning Hall ground zone. */
+  val summoningIvoryTiles: List<ImageBitmap>? get() = SanctuaryArtAssets.p27bFamily("summon_ivory")
 
   val sanctuaryRoadCurbTiles: List<ImageBitmap> by lazy {
     (0 until 4).map { variant -> createSanctuaryCurbTile(variant) }
@@ -301,8 +314,13 @@ object PixelTileAtlas {
     val cellH = (TILE_PX * ObliqueCamera.OBLIQUE_Y_SCALE).toInt().coerceAtLeast(1)
     val blockW = cellW * GRASS_BLOCK_TILES
     val blockH = cellH * GRASS_BLOCK_TILES
-    val blocks = ArrayList<ImageBitmap>(GRASS_BLOCK_COUNT)
-    for (block in 0 until GRASS_BLOCK_COUNT) {
+    // A P27B 4×4 torus repeats every GRASS_BLOCK_TILES columns/rows, so every block
+    // covers the same 16 cells: cache ONE precomposed bitmap (the old P03 path keeps
+    // its eight independently seeded blocks).
+    val mosaic = tiles.size == 16
+    val blockCount = if (mosaic) 1 else GRASS_BLOCK_COUNT
+    val blocks = ArrayList<ImageBitmap>(blockCount)
+    for (block in 0 until blockCount) {
       val pixels = IntArray(blockW * blockH)
       for (cellY in 0 until GRASS_BLOCK_TILES) {
         for (cellX in 0 until GRASS_BLOCK_TILES) {
@@ -310,8 +328,10 @@ object PixelTileAtlas {
           // representative tile coordinate for this block variant.
           val tx = (block and 3) * GRASS_BLOCK_TILES + cellX
           val ty = (block shr 2) * GRASS_BLOCK_TILES + cellY
+          // For the mosaic (block 0 only) tx/ty are exactly the 0..3 world cells, so the
+          // block matches the per-tile path; the legacy hash is unused by that branch.
           val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
-          val src = sources[hash % sources.size]
+          val src = sources[sanctuaryTileIndex(tiles, tx, ty, hash)]
           for (y in 0 until cellH) {
             val srcRow = ((y * srcH) / cellH) * srcW
             val dstRow = (cellY * cellH + y) * blockW + cellX * cellW

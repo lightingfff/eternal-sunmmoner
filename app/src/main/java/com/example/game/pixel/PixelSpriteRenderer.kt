@@ -13,9 +13,11 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.example.data.model.HeroClassType
+import com.example.data.model.FacilityType
 import com.example.data.model.IslandExpansionMilestone
 import com.example.game.map.BiomeTheme
 import com.example.game.map.EnemyArchetype
@@ -336,10 +338,14 @@ object PixelSpriteRenderer {
           }
         }
 
+        // P27B ground is a 4x4 mosaic indexed by WORLD coordinates, so the same
+        // material grammar holds here as in the island renderer; legacy families
+        // (and the curbs) keep their hash choice.
         val bmp = when {
-          onRoadCore && roadTiles != null -> roadTiles[hash % roadTiles.size]
+          onRoadCore && roadTiles != null ->
+            roadTiles[PixelTileAtlas.sanctuaryTileIndex(roadTiles, tx, ty, hash)]
           onRoadEdge && roadEdgeTiles != null -> roadEdgeTiles[hash % roadEdgeTiles.size]
-          else -> baseTiles[hash % baseTiles.size]
+          else -> baseTiles[PixelTileAtlas.sanctuaryTileIndex(baseTiles, tx, ty, hash)]
         }
 
         drawImage(
@@ -448,7 +454,43 @@ object PixelSpriteRenderer {
     val cy = ObliqueCamera.worldToScreenY(zone.centerY, camY, zoom, size.height / 2f)
     val rx = zone.interactRadius * 0.56f * zoom
     val ry = rx * ObliqueCamera.GROUND_ELLIPSE_RATIO
-    if (cx + rx < 0f || cx - rx > size.width || cy + ry < 0f || cy - ry > size.height) return
+    val ivory = if (zone.facility == FacilityType.SUMMONING_HALL) PixelTileAtlas.summoningIvoryTiles else null
+    val floorRx = if (ivory != null) zone.interactRadius * 0.90f * zoom else rx
+    val floorRy = floorRx * ObliqueCamera.GROUND_ELLIPSE_RATIO
+    if (cx + floorRx < 0f || cx - floorRx > size.width || cy + floorRy < 0f || cy - floorRy > size.height) return
+
+    // Authored ivory 4x4 limestone mosaic, world-aligned and clipped to the existing
+    // summoning zone. This is a *ground* draw before sprites/shadows/actors; it does
+    // not change the zone radius, building anchor, collisions or interaction logic.
+    if (ivory != null) {
+      val floorRadiusWorld = zone.interactRadius * 0.90f
+      val oval = androidx.compose.ui.geometry.Rect(cx - floorRx, cy - floorRy, cx + floorRx, cy + floorRy)
+      val floorPath = Path().apply { addOval(oval) }
+      clipPath(floorPath) {
+        val left = ((zone.centerX - floorRadiusWorld) / 64f).toInt()
+        val right = ((zone.centerX + floorRadiusWorld) / 64f).toInt()
+        val top = ((zone.centerY - floorRadiusWorld) / 64f).toInt()
+        val bottom = ((zone.centerY + floorRadiusWorld) / 64f).toInt()
+        val tileWidth = (64f * zoom).roundToInt() + 1
+        val tileHeight = (64f * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt() + 1
+        for (ty in top..bottom) for (tx in left..right) {
+          val sx = ObliqueCamera.worldToScreenX(tx * 64f, camX, zoom, size.width / 2f)
+          val sy = ObliqueCamera.worldToScreenY(ty * 64f, camY, zoom, size.height / 2f)
+          drawImage(
+            image = ivory[PixelTileAtlas.sanctuaryTileIndex(ivory, tx, ty, 0)],
+            dstOffset = IntOffset(sx.roundToInt(), sy.roundToInt()),
+            dstSize = IntSize(tileWidth, tileHeight),
+            filterQuality = FilterQuality.None,
+          )
+        }
+      }
+      drawOval(
+        color = Color(0xFF859AA5).copy(alpha = 0.72f),
+        topLeft = Offset(cx - floorRx, cy - floorRy),
+        size = Size(floorRx * 2f, floorRy * 2f),
+        style = Stroke(width = (3.2f * zoom).coerceAtLeast(1f)),
+      )
+    }
 
     val baseColor = Color(zone.colorArgb)
     val glowAlpha = if (isMasterInside) 0.42f else (0.12f + 0.05f * sin(timeSec * 2.4f))

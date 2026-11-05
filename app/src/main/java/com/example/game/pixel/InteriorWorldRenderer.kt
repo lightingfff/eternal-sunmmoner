@@ -368,7 +368,7 @@ object InteriorWorldRenderer {
               val dstX = sx(tx * 64f).roundToInt()
               val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
               drawImage(
-                image = grassTiles[hash % grassTiles.size],
+                image = grassTiles[PixelTileAtlas.sanctuaryTileIndex(grassTiles, tx, ty, hash)],
                 dstOffset = IntOffset(dstX, dstY),
                 dstSize = IntSize(tsW + 1, tsH + 1),
                 filterQuality = FilterQuality.None,

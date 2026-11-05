@@ -57,6 +57,24 @@ jobs:
           cat > app/src/debug/res/values/google_services_placeholder.xml <<'EOF'
           <resources><string name="default_web_client_id" translatable="false">debug-placeholder.apps.googleusercontent.com</string></resources>
           EOF
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate shipped PNGs, hashes, alpha, pivots and mosaic seam guard
+        run: |
+          python3 -m pip install --quiet --disable-pip-version-check pillow==13.0.0
+          python3 tools/p27b_validate.py
+      - name: P27B runtime selectors and unchanged P03 material regression
+        run: |
+          set +e
+          gradle :app:testDebugUnitTest \
+            --tests 'com.example.P27BAssetContractTest' \
+            --tests 'com.example.SanctuaryMaterialTest' \
+            --stacktrace > "$RUNNER_TEMP/p27b-assets.log" 2>&1
+          result=$?
+          cat "$RUNNER_TEMP/p27b-assets.log"
+          if [ "$result" -ne 0 ]; then python3 tools/p27b_ci_failure.py "$RUNNER_TEMP/p27b-assets.log" app/build/test-results/testDebugUnitTest; fi
+          exit "$result"
       - name: Matched real-world renderer screenshots
         id: render_world
         run: |

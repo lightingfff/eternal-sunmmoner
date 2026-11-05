@@ -8,10 +8,10 @@ Nguồn quyết định: (a) engine thực ở SHA baseline (`docs/p27b/BASELINE
 | Thành phần | Luật sản xuất | Phép thử |
 |---|---|---|
 | Projection | `ObliqueCamera.OBLIQUE_Y_SCALE=0.72f`; tile nguồn là mặt đất vuông 64×64, renderer tự foreshorten Y, **không** skew/double-iso PNG | đường road union không răng cưa ở .36/.88/1.0; đứng đúng foot |
-| Grass | 70% nền yên, 20% cụm cỏ/khối lá 2–6px, ≤10% hoa/sỏi; 8 biến thể có luminance gần nhau | 3×3 + 5×5 + zoom .36/.88; không checkerboard, không nhiều nhiễu 1px |
-| Soil | đất cát nén ấm, không vẽ bậc/tường giả ở trung tâm training ground; 6 biến thể | training clip intact, heroes không như đi xuyên vật cản vẽ giả |
-| Flagstone | đá vôi xám sáng/lạnh nhẹ, grout vừa đủ + mẻ cạnh theo mặt, 8 biến thể; Summon **ivory chỉ trong zone riêng** | ring Summon rõ hơn plaza nhưng không cháy noon/night |
-| Road | cobble 6 biến thể, rãnh liên tục; chi tiết theo khối đá thay vì per-pixel noise | đường nối rẽ không vuông seam; clip path network nguyên vẹn |
+| Grass | 70% nền yên, 20% cụm cỏ/khối lá 2–6px, ≤10% hoa/sỏi; **P27B 16 ô trong torus 4×4**, P03 còn 8 fallback. Có chu kỳ 4 ô lộ ở 5×5: `GAME_CANDIDATE`, không gọi seamless READY | 3×3 + 5×5 + zoom .36/.88; không checkerboard, không nhiều nhiễu 1px |
+| Soil | đất cát nén ấm, không vẽ bậc/tường giả ở trung tâm training ground; P27B 16 ô, P03 6 fallback | training clip intact, heroes không như đi xuyên vật cản vẽ giả |
+| Flagstone | đá vôi xám sáng/lạnh nhẹ, grout vừa đủ + mẻ cạnh theo mặt; P27B 16 ô, P03 8 fallback; `summon_ivory` 16 ô **chỉ trong zone riêng** (grade từ cùng limestone source) | ring Summon rõ hơn plaza nhưng không cháy noon/night |
+| Road | cobble P27B 16 ô, P03 6 fallback; rãnh liên tục; chi tiết theo khối đá thay vì per-pixel noise | đường nối rẽ không vuông seam; clip path network nguyên vẹn |
 | Light | `SanctuaryLight` upper-left (P21 đã ghi azimuth 142°, elevation 48°), top plane sáng hơn front, side tối hơn 15–25% tương đối; night vẫn đọc volume | cùng camera 12h CLEAR / 0h CLEAR, không tô full-screen white |
 
 Swatches **điểm khởi đầu để tune bằng ảnh engine**, không phải filter overlay: grass shadow `#354A33`, mid `#557044`, sun `#78905B`; soil `#8A7055`/`#B09471`; warm limestone `#E8E5DC`, upper lit `#FAF9F3`, carving `#687B8D`, grout `#97A2A6`; cobble mid `#78848A`, depth `#485966`; wood `#755641`/`#A06D50`; cyan glow `#74D6EE` với alpha thấp. Họ tile 64×64 nguyên; không downscale nguồn 512 đầy tiểu tiết rồi gọi crisp. Preview lặp không phải renderer.
