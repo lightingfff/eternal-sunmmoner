@@ -46,6 +46,10 @@ class P27BStructureContractTest {
     "armory" to (190 to 166),
     "synthesis_lab" to (188 to 168),
     "restaurant" to (206 to 172),
+    // Debt A remainder: towers + hero registry. Still the P03 / premium canvas sizes.
+    "hero_registry" to (188 to 166),
+    "fortress_tower" to (80 to 118),
+    "gate_tower" to (96 to 136),
   )
 
   private fun assetBytes(path: String): ByteArray {
@@ -152,6 +156,7 @@ class P27BStructureContractTest {
       "hero_quarters" to 50.0, "armory" to 51.1, "synthesis_lab" to 54.5,
       "restaurant" to 58.5, "training_dummy" to 62.2, "wooden_bench" to 45.9,
       "flower_planter" to 77.9,
+      "hero_registry" to 54.7, "fortress_tower" to 57.4, "gate_tower" to 54.8,
     )
     for ((name, oldLuma) in replaced) {
       val now = luma(name)
@@ -182,5 +187,11 @@ class P27BStructureContractTest {
     assertEquals(32, PixelStructureAtlas.streetLanternFrames.first().width)
     assertEquals(200, PixelStructureAtlas.heroQuartersStructure.width)
     assertEquals(190, PixelStructureAtlas.armoryStructure.width)
+    // Debt A remainder. These two towers used to resolve straight to sanctuary_p03, so the
+    // wall line changed tone mid-run: ivory gate next to dark blue-grey P03 towers.
+    assertEquals("corner tower must resolve to the P27B-V5 canvas", 80, PixelStructureAtlas.fortressCornerTowerSprite.width)
+    assertEquals(118, PixelStructureAtlas.fortressCornerTowerSprite.height)
+    assertEquals(96, PixelStructureAtlas.southernGateTowerSprite.width)
+    assertEquals(188, PixelStructureAtlas.heroRegistryStructure.width)
   }
 }

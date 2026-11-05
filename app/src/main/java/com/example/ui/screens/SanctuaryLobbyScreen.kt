@@ -882,7 +882,7 @@ fun SanctuaryLobbyScreen(
             Text("Mục tiêu: chinh phục tầng ${(profile?.highestClearedFloor ?: 0)+1}",color=RuneSilver,style=MaterialTheme.typography.labelSmall,maxLines=1)
           }
           ResourcePillBadge("Vàng",profile?.gold ?: 0L,SummonerGold)
-          if(!isNarrowScreen) ResourcePillBadge("Hồn",profile?.soulShards ?: 0L,ArcaneViolet)
+          if(!isNarrowScreen) ResourcePillBadge("Hồn",profile?.soulShards ?: 0L,SanctuaryUi.violetOnDark)
           IconButton({showChronicleModal=true},Modifier.size(48.dp).testTag("quick_notifications_button")) {Icon(Icons.Default.Notifications,"Nhật ký",tint=RuneSilver)}
           IconButton(onOpenSettings,Modifier.size(48.dp).testTag("open_settings_button")) {Icon(Icons.Default.Settings,"Cài đặt",tint=RuneSilver)}
           IconButton({showPauseMapModal=true},Modifier.size(48.dp).testTag("pause_game_button")) {Icon(Icons.Default.Pause,"Bản đồ",tint=SummonerGold)}

@@ -257,6 +257,9 @@ fun PixelHeroPortraitAvatar(
   }
 }
 
+/** Violet for text/marks on dark glass; Color.kt ArcaneViolet is a fill colour. */
+private val arcaneVioletOnDark = Color(0xFFB79BFF)
+
 @Composable
 fun ResourcePillBadge(
   label: String,
@@ -274,11 +277,19 @@ fun ResourcePillBadge(
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(4.dp),
   ) {
+    // P27B-V5 CP5: on dark glass the dot is the only colour cue, so it has to clear the
+    // 3:1 non-text floor. ArcaneViolet (0xFF9D6BFF) measured 2.7:1 against the panel and
+    // 1.3:1 against the ivory world, i.e. effectively invisible; lifts to ~10:1.
+    val dotColor = if (lightOnIvory || accent.red + accent.green + accent.blue >= 1.5f) {
+      accent
+    } else {
+      arcaneVioletOnDark
+    }
     Box(
       modifier = Modifier
         .size(7.dp)
         .clip(CircleShape)
-        .background(accent),
+        .background(dotColor),
     )
     Text(
       text = "$label $amount",

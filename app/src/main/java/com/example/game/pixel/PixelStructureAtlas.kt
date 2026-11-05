@@ -79,11 +79,16 @@ object PixelStructureAtlas {
       ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/cottage_slate.png")
       ?: sanctuaryCottageSlateFallback
   private val sanctuaryCottageSlateFallback: ImageBitmap by lazy { buildSanctuaryCottage(useBlueSlate = true) }
+  // P27B-V5 CP5 (debt A): the wall line changed tone mid-run because the two towers
+  // flanking it were still P03 art at luma ~51 next to P27B ivory at ~175. Same canvas
+  // and pivot, so the wall anchoring and depth sort are unchanged.
   val fortressCornerTowerSprite: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("sanctuary_p03/fortress_tower.png") ?: fortressCornerTowerFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/fortress_tower.png")
+      ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/fortress_tower.png") ?: fortressCornerTowerFallback
   private val fortressCornerTowerFallback: ImageBitmap by lazy { buildFortressTower(isGatehouse = false) }
   val southernGateTowerSprite: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("sanctuary_p03/gate_tower.png") ?: southernGateTowerFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/gate_tower.png")
+      ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/gate_tower.png") ?: southernGateTowerFallback
   private val southernGateTowerFallback: ImageBitmap by lazy { buildFortressTower(isGatehouse = true) }
   val sakuraTreeSpriteA: ImageBitmap get() = SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/canopy_a.png")
       ?: SanctuaryArtAssets.image("canopy_a") ?: sakuraTreeSpriteAFallback

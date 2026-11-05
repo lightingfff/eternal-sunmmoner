@@ -65,6 +65,16 @@ FACILITY_SPECS = {
   'facility_restaurant':    {'file': 'restaurant.png',    'size': (206, 172), 'replaces_premium': 'restaurant'},
 }
 
+# Debt A, second pass: the corner towers and the hero-registry hall were still P03 art
+# while the gate itself was already P27B ivory, so the wall line changed tone mid-run.
+# These three close that gap. Canvas sizes again inherited from the shipped art, not
+# chosen: the corner towers are the SLOT the renderer already reserves.
+DEBT_A_SPECS = {
+  'facility_hero_registry': {'file': 'hero_registry.png',  'size': (188, 166), 'replaces_premium': 'hero_registry'},
+  'tower_corner':           {'file': 'fortress_tower.png',  'size': (80, 118),  'replaces': 'fortress_tower'},
+  'tower_gatehouse':        {'file': 'gate_tower.png',      'size': (96, 136),  'replaces': 'gate_tower'},
+}
+
 # Vegetation comes from its own painted sheet: three trees, three inherited canvases.
 TREE_SHEET = 'tree_set_01.png'
 TREE_SPECS = [
@@ -271,6 +281,40 @@ def main() -> None:
             'old_mean_luma': round(luma(Image.open(old_path)), 1) if old_path.is_file() else None,
             'qa_status': 'GAME_CANDIDATE',
             'visual_qa': 'needs engine-side review at z0.88 and z1.48',
+        }
+        manifest['assets'].append(record)
+        print(f'{name:24} -> {spec["file"]:18} luma {record["mean_luma"]:5.1f} '
+              f'(was {record["old_mean_luma"]})')
+
+    # ---- debt A remainder: towers + hero registry --------------------------
+    for name, spec in DEBT_A_SPECS.items():
+        source_path = SOURCE / f'{name}.png'
+        if not source_path.is_file():
+            print(f'skip {name}: no source')
+            continue
+        canvas = to_canvas(neutral_background_cutout(Image.open(source_path)), spec['size'])
+        out_path = OUT / spec['file']
+        canvas.save(out_path, optimize=True)
+        if 'replaces_premium' in spec:
+            old_path = premium / f'{spec["replaces_premium"]}.png'
+            replaces = f'premium_slice/{spec["replaces_premium"]}'
+        else:
+            old_path = OLD / f'{spec["replaces"]}.png'
+            replaces = f'sanctuary_p03/{spec["replaces"]}'
+        record = {
+            'id': name,
+            'file': f'structures/{spec["file"]}',
+            'size': list(canvas.size),
+            'replaces': replaces,
+            'pivot': [spec['size'][0] // 2, spec['size'][1]],
+            'alpha': 'binary RGBA',
+            'source_path': str(source_path.relative_to(ROOT)),
+            'source_sha256': hashlib.sha256(source_path.read_bytes()).hexdigest(),
+            'sha256': hashlib.sha256(out_path.read_bytes()).hexdigest(),
+            'mean_luma': round(luma(canvas), 1),
+            'old_mean_luma': round(luma(Image.open(old_path)), 1) if old_path.is_file() else None,
+            'qa_status': 'GAME_CANDIDATE',
+            'visual_qa': 'needs engine-side review; corner tower repeats around the wall',
         }
         manifest['assets'].append(record)
         print(f'{name:24} -> {spec["file"]:18} luma {record["mean_luma"]:5.1f} '

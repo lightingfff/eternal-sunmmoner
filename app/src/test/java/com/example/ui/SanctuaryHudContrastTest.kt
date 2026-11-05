@@ -27,21 +27,49 @@ class SanctuaryHudContrastTest {
   /** Brightest backdrop the sanctuary world produces: lit ivory stone highlights. */
   private val worstBackdrop = Color(0xFFF2EAD9)
 
+  /** Same value the pill uses for its identity dot on dark glass. */
+  private val accentDot = SanctuaryUi.violetOnDark
+
   private fun effective(panel: Color): Color = panel.compositeOver(worstBackdrop)
 
   @Test
   fun hudPanelOpacityKeepsTextLegibleOverBrightTerrain() {
     val behind = effective(FantasySkin.Panel)
-    val cases = listOf(
+    // Text tokens: 4.5:1 (WCAG AA for normal text).
+    val textCases = listOf(
       "SummonerGold" to SummonerGold,
       "RuneSilver" to RuneSilver,
       "muted label" to Color(0xFF9EA6B2),
-      "ArcaneViolet" to ArcaneViolet,
+      "violetOnDark" to SanctuaryUi.violetOnDark,
     )
-    for ((name, color) in cases) {
+    for ((name, color) in textCases) {
       val ratio = SanctuaryUi.contrastRatio(color, behind)
       assertTrue("$name on the HUD panel is $ratio over bright terrain, below 4.5", ratio >= 4.5)
     }
+    // Graphic tokens: 3:1, the WCAG non-text floor. These are the resource pill's identity
+    // dot and the parchment-tone gold; they carry meaning but not glyphs.
+    val markCases = listOf("accent dot" to accentDot)
+    for ((name, color) in markCases) {
+      val ratio = SanctuaryUi.contrastRatio(color, behind)
+      assertTrue("$name on the HUD panel is $ratio, below the 3:1 mark floor", ratio >= 3.0)
+    }
+  }
+
+  /**
+   * The bug this test was written for, kept as a regression.
+   *
+   * ArcaneViolet (0xFF9D6BFF) is a good FILL violet, but it was being used as text for the
+   * mage class label and the summoning-hall title, where it measures 3.5:1 on the HUD panel
+   * and ~1.3:1 against the ivory world. If someone switches the light violet back to
+   * ArcaneViolet for text, the assertion above fails; this one explains why.
+   */
+  @Test
+  fun arcaneVioletIsAFillNotATextColourOnGlass() {
+    val behind = effective(FantasySkin.Panel)
+    val asText = SanctuaryUi.contrastRatio(ArcaneViolet, behind)
+    assertTrue("ArcaneViolet unexpectedly passes as text ($asText); revisit the token split", asText < 4.5)
+    val replacement = SanctuaryUi.contrastRatio(SanctuaryUi.violetOnDark, behind)
+    assertTrue("violetOnDark must be the readable replacement ($replacement)", replacement >= 4.5)
   }
 
   @Test

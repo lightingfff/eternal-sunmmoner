@@ -83,6 +83,7 @@ import com.example.ui.components.PixelHeroPortraitAvatar
 import com.example.ui.components.ResourcePillBadge
 import com.example.ui.theme.AmberWarning
 import com.example.ui.theme.ArcaneViolet
+import com.example.ui.theme.ArcaneVioletDeep
 import com.example.ui.theme.AstralSlate
 import com.example.ui.theme.BorderRune
 import com.example.ui.theme.CrimsonBlood
@@ -92,13 +93,14 @@ import com.example.ui.theme.ParchmentLight
 import com.example.ui.theme.PortalCyan
 import com.example.ui.theme.RuneSilver
 import com.example.ui.theme.SanctuaryStone
+import com.example.ui.theme.SanctuaryUi
 import com.example.ui.theme.SummonerGold
 import kotlinx.coroutines.delay
 
 fun heroClassAccentColor(heroClass: HeroClassType): Color = when (heroClass) {
   HeroClassType.KNIGHT -> PortalCyan
   HeroClassType.ARCHER -> EmeraldVitality
-  HeroClassType.MAGE -> ArcaneViolet
+  HeroClassType.MAGE -> SanctuaryUi.violetOnDark
   HeroClassType.ASSASSIN -> Color(0xFFF43F5E)
   HeroClassType.PRIEST -> SummonerGold
   HeroClassType.BERSERKER -> AmberWarning
@@ -106,7 +108,7 @@ fun heroClassAccentColor(heroClass: HeroClassType): Color = when (heroClass) {
 
 fun facilityAccentColor(facility: FacilityType): Color = when (facility) {
   FacilityType.TOWER_GATE -> PortalCyan
-  FacilityType.SUMMONING_HALL -> ArcaneViolet
+  FacilityType.SUMMONING_HALL -> SanctuaryUi.violetOnDark
   FacilityType.TRAINING_GROUND -> AmberWarning
   FacilityType.ARMORY -> PortalCyan
   FacilityType.HERO_QUARTERS -> EmeraldVitality
@@ -685,7 +687,7 @@ private fun HeroStatsTab(
         StatComparisonRow("Sinh Lực (HP)", hero.maxHp.toInt(), totalHp, EmeraldVitality)
         StatComparisonRow("Công Kích (ATK)", hero.attack.toInt(), totalAtk, SummonerGold)
         StatComparisonRow("Phòng Ngự (DEF)", hero.defense.toInt(), totalDef, PortalCyan)
-        StatComparisonRow("Tốc Độ (SPD)", hero.speed.toInt(), totalSpd, ArcaneViolet)
+        StatComparisonRow("Tốc Độ (SPD)", hero.speed.toInt(), totalSpd, SanctuaryUi.violetOnDark)
       }
     }
 
@@ -996,7 +998,7 @@ private fun HeroSkillsTab(
         .fillMaxWidth()
         .heightIn(min = 48.dp)
         .testTag("profile_upgrade_skill_button"),
-      colors = FantasySkin.buttonColors(containerColor = ArcaneViolet, contentColor = Color.White),
+      colors = FantasySkin.buttonColors(containerColor = ArcaneVioletDeep, contentColor = Color.White),
     ) {
       Text("Nâng Cấp Kỹ Năng ($manaCost Mana + 1 Tinh Hoa)", fontWeight = FontWeight.Bold)
     }
@@ -1211,7 +1213,7 @@ fun IslandExpansionModal(
           ResourcePillBadge("Quặng Sắt", profile.ironOre, RuneSilver)
           ResourcePillBadge("Tinh Hoa", profile.arcaneEssence, EmeraldVitality)
           ResourcePillBadge("Master Lv", profile.masterLevel, PortalCyan)
-          ResourcePillBadge("Tầng Đã Vượt", profile.highestClearedFloor, ArcaneViolet)
+          ResourcePillBadge("Tầng Đã Vượt", profile.highestClearedFloor, SanctuaryUi.violetOnDark)
         }
 
         LazyColumn(

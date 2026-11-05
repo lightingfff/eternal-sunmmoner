@@ -277,6 +277,69 @@
       "visual_qa": "needs engine-side review at z0.88 and z1.48"
     },
     {
+      "id": "facility_hero_registry",
+      "file": "structures/hero_registry.png",
+      "size": [
+        188,
+        166
+      ],
+      "replaces": "premium_slice/hero_registry",
+      "pivot": [
+        94,
+        166
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/facility_hero_registry.png",
+      "source_sha256": "037a39ab9bf7d0e1cac9e3611d483c5ee5df6e1e0e21684ba585c4a9144b2975",
+      "sha256": "171e80d2d899cabaf6c6dc6a37c9a90539b7f05e22117b74dad489081c9c70f0",
+      "mean_luma": 152.6,
+      "old_mean_luma": 54.7,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review; corner tower repeats around the wall"
+    },
+    {
+      "id": "tower_corner",
+      "file": "structures/fortress_tower.png",
+      "size": [
+        80,
+        118
+      ],
+      "replaces": "sanctuary_p03/fortress_tower",
+      "pivot": [
+        40,
+        118
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/tower_corner.png",
+      "source_sha256": "430b27e202f79f61b8e3d4669f592bbcbf5d503c7544db14cd0cbcdf0f554c6a",
+      "sha256": "0434b838c7fa34b5f6bb8664890892e513df4a25ff3dda81a4b1beaca434753e",
+      "mean_luma": 151.7,
+      "old_mean_luma": 57.4,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review; corner tower repeats around the wall"
+    },
+    {
+      "id": "tower_gatehouse",
+      "file": "structures/gate_tower.png",
+      "size": [
+        96,
+        136
+      ],
+      "replaces": "sanctuary_p03/gate_tower",
+      "pivot": [
+        48,
+        136
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/tower_gatehouse.png",
+      "source_sha256": "21860f64006ef287116c25fda48f9ea035e4bb11aa3ae73f3b574dadaea4de55",
+      "sha256": "0074d212bb4e1afab901e07a1abcceefe0346b14f99ea12f07937178b3dedccd",
+      "mean_luma": 153.4,
+      "old_mean_luma": 54.8,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "needs engine-side review; corner tower repeats around the wall"
+    },
+    {
       "id": "sakura_a",
       "file": "structures/canopy_a.png",
       "size": [

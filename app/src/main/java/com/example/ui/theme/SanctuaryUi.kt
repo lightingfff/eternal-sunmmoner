@@ -78,6 +78,16 @@ object SanctuaryUi {
   /** On-accent text (button labels). */
   val onAccent = Color(0xFFFFFFFF)
 
+  /**
+   * Violet for TEXT on dark glass.
+   *
+   * `Color.kt`'s [ArcaneViolet] (0xFF9D6BFF) is a good graphic/fill violet but measures
+   * only 3.5:1 against the HUD panel, so it cannot carry the mage class label or the
+   * summoning-hall title — those were the least readable lines in the hero card.
+   * This lighter violet is 5.3:1 on the same glass and keeps the arcane identity.
+   */
+  val violetOnDark = Color(0xFFB79BFF)
+
   // ---- shape / spacing scale --------------------------------------------
   val radiusSmall = 8.dp
   val radiusMedium = 12.dp
