@@ -22,3 +22,6 @@ debug.keystore
 .aistudio/.tempmediaStorage/
 
 __pycache__/
+
+# CI triage logs are pushed to the run summary, never to the repo.
+ci-diagnostics/

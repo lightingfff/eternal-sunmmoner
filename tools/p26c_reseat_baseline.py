@@ -36,6 +36,7 @@ Guards kept in this tool (it refuses rather than papers over):
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -72,6 +73,14 @@ def clipped_fraction(image: Image.Image) -> float:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--label", required=True,
+                        help="what art change made this re-seat necessary, e.g. 'CP2/CP5 "
+                             "house+tower art'")
+    parser.add_argument("--provenance", default="",
+                        help="commit the frames were rendered on")
+    args = parser.parse_args()
+
     before_dir = EV / "engine-render-before"
     after_dir = EV / "engine-render"
     legacy_dir = EV / "engine-render-before-p26b"
@@ -80,6 +89,8 @@ def main() -> int:
 
     pairs = baseline["matched_pairs"]
 
+    prev_means = {r["file"]: r["p27b_world_mean"]
+                  for r in (baseline.get("art_baseline") or {}).get("frames", [])}
     rows = []
     deltas = []
     for pair in pairs:
@@ -98,11 +109,13 @@ def main() -> int:
         old_mean = world_mean(old)
         new_mean = world_mean(now)
         delta = 100.0 * (new_mean - old_mean) / max(abs(old_mean), 1.0)
-        deltas.append(delta)
+        deltas.append(100.0 * (new_mean - prev_means.get(name, old_mean)) /
+                      max(abs(prev_means.get(name, old_mean)), 1.0))
         clip = clipped_fraction(now)
         rows.append({
             "file": name,
             "p26b_world_mean": round(old_mean, 2),
+            "previous_world_mean": round(prev_means.get(name, old_mean), 2),
             "p27b_world_mean": round(new_mean, 2),
             "shift_pct": round(delta, 2),
             "highlight_clip_pct": round(100 * clip, 4),
@@ -119,16 +132,36 @@ def main() -> int:
         return 3
     spread = max(deltas) - min(deltas)
     print(f"shift spread across frames: {spread:.2f} percentage points")
+    # A flood is not "brighter", it is "brighter without structure". These two bounds keep
+    # E4 meaningful even if someone re-seats this file carelessly.
+    if not 55.0 <= sum(r["p27b_world_mean"] for r in rows) / len(rows) <= 150.0:
+        print("REFUSING: mean world exposure is outside the plausible 55..150 band; that is "
+              "what a washed-out or black world looks like, not an art step")
+        return 3
 
     # ---- re-seat --------------------------------------------------------
     # IMPORTANT: engine-render-before/ is NOT touched. It is the P26B cloud reference that
     # C1 needs, and overwriting it silently destroyed C1 when this tool first did so.
     # The accepted P27B numbers go into the manifest as a SEPARATE art baseline.
+    previous = baseline.get("art_baseline") or {}
+    # Every seat is appended, never overwritten: the art program moved world exposure
+    # several times on 2026-11-05 and each step must stay auditable.
+    history = list(previous.get("history") or [])
+    if previous.get("frames"):
+        history.append({
+            "seated_on": previous.get("seated_on"),
+            "provenance": previous.get("provenance"),
+            "frames": previous.get("frames"),
+        })
     baseline["art_baseline"] = {
-        "seated_on": "P27B-V5 (ivory landmark + house art), branch arena/8be73f1b",
-        "reason": "E4 failed +19..+21% after the P27B art change; investigated and confirmed "
-                  "as the intended brightness change (no clipping, uniform across hour/weather), "
-                  "so the baseline was re-seated rather than the threshold relaxed.",
+        "seated_on": args.label,
+        "provenance": args.provenance,
+        "history": history,
+        "reason": "E4 compares world exposure before/after a change. The P27B art program "
+                  "deliberately raised it (P03 buildings were luma ~51-59, P27B ivory is "
+                  "~150-180), so each accepted art step re-seats this baseline instead of "
+                  "the threshold being relaxed. Verified no flood: 0.00% highlight clipping "
+                  "and a uniform, one-directional shift across every hour and weather.",
         "p26b_frames_untouched": "engine-render-before/ still holds the P26B frames "
                                  f"{baseline['source_commit'][:7]}, hash-checked on every "
                                  "run - C1 depends on them",

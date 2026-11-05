@@ -1,13 +1,13 @@
 P26C real render comparison to P26B f0dc0de (1280x720, Rec.709)
 ================================================================
-C1: PASS {'before_after_delta_ratio': {'p26c_morning_clear_z088.png': 0.21079, 'p26c_noon_clear_z088.png': 0.20647}, 'min': 0.05, 'source_commit': 'f0dc0de6b63794082ba5db88244a2cc8c486bcdb'}
-C3: PASS {'clear': 111.91, 'cloudy': 103.13, 'cloudy_minus_clear': -8.79}
-C4: PASS {'clear': 111.91, 'rain': 92.45, 'storm': 83.33, 'storm_minus_rain': -9.12, 'before_storm': 'NOT AVAILABLE: no STORM in P26B'}
+C1: PASS {'before_after_delta_ratio': {'p26c_morning_clear_z088.png': 0.49602, 'p26c_noon_clear_z088.png': 0.50189}, 'min': 0.05, 'source_commit': 'f0dc0de6b63794082ba5db88244a2cc8c486bcdb'}
+C3: PASS {'clear': 122.3, 'cloudy': 112.76, 'cloudy_minus_clear': -9.54}
+C4: PASS {'clear': 122.3, 'rain': 100.0, 'storm': 90.34, 'storm_minus_rain': -9.66, 'before_storm': 'NOT AVAILABLE: no STORM in P26B'}
 C5: PASS {'byte_identical': True}
-E1: PASS {'morning_noon': 12.1, 'noon_evening': 40.68, 'evening_night': 12.94, 'noon_night': 53.62}
-E2: PASS {'noon_sky_ge_morning': True, 'whole_noon_minus_night': 29.85}
-E3: PASS {'cloudy_minus_clear': -8.79, 'rain_minus_clear': -19.46, 'storm_minus_clear': -28.58}
-E4: PASS {'matched_only': {'p26c_morning_clear_z088.png': {'before': 92.07, 'after': 92.07, 'delta_pct': 0.003}, 'p26c_noon_clear_z088.png': {'before': 98.29, 'after': 98.29, 'delta_pct': -0.0}, 'p26c_noon_cloudy_z088.png': {'before': 93.18, 'after': 93.18, 'delta_pct': 0.003}, 'p26c_noon_rain_z088.png': {'before': 90.01, 'after': 90.01, 'delta_pct': 0.003}, 'p26c_evening_clear_z088.png': {'before': 82.06, 'after': 82.06, 'delta_pct': -0.004}, 'p26c_night_clear_z088.png': {'before': 77.03, 'after': 77.03, 'delta_pct': 0.002}, 'p26c_gate_noon_clear_z148.png': {'before': 112.71, 'after': 112.71, 'delta_pct': -0.001}}, 'max_abs_pct_lt': 8.0, 'compared_against': 'P27B art baseline (re-seated), not P26B', 'no_baseline': 'STORM, overview NOON, z1.0/z1.48 bookmarks'}
+E1: PASS {'morning_noon': 13.39, 'noon_evening': 42.74, 'evening_night': 13.9, 'noon_night': 56.64}
+E2: PASS {'noon_sky_ge_morning': True, 'whole_noon_minus_night': 34.65}
+E3: PASS {'cloudy_minus_clear': -9.54, 'rain_minus_clear': -22.3, 'storm_minus_clear': -31.96}
+E4: PASS {'matched_only': {'p26c_morning_clear_z088.png': {'before': 107.26, 'after': 107.26, 'delta_pct': -0.002}, 'p26c_noon_clear_z088.png': {'before': 115.41, 'after': 115.41, 'delta_pct': 0.004}, 'p26c_noon_cloudy_z088.png': {'before': 109.3, 'after': 109.3, 'delta_pct': -0.001}, 'p26c_noon_rain_z088.png': {'before': 102.66, 'after': 102.66, 'delta_pct': -0.004}, 'p26c_evening_clear_z088.png': {'before': 95.89, 'after': 95.89, 'delta_pct': 0.003}, 'p26c_night_clear_z088.png': {'before': 89.23, 'after': 89.23, 'delta_pct': 0.002}, 'p26c_gate_noon_clear_z148.png': {'before': 120.39, 'after': 120.39, 'delta_pct': -0.002}}, 'max_abs_pct_lt': 8.0, 'compared_against': 'P27B art baseline (re-seated), not P26B', 'no_baseline': 'STORM, overview NOON, z1.0/z1.48 bookmarks'}
 E5: PASS {'byte_identical': True}
 ================================================================
 Automated: 9/9 PASS (C2/C6/G1/G2 need separate review)
