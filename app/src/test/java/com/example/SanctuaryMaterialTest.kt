@@ -54,7 +54,12 @@ class SanctuaryMaterialTest {
     for ((name, tiles) in materials) {
       for (repeatSize in listOf(3,5)) {
       val side = repeatSize * 64
-      val sheet = Bitmap.createBitmap(tiles.size * side, side, Bitmap.Config.ARGB_8888)
+      // 16-variant P27B families at 5x5 would need a 5120 px wide sheet, which exceeds
+      // the Skia texture limit on the Robolectric renderer and broke the review sheet
+      // rather than the art. Wrap variants into a grid of at most four columns.
+      val columns = tiles.size.coerceAtMost(4)
+      val rows = (tiles.size + columns - 1) / columns
+      val sheet = Bitmap.createBitmap(columns * side, rows * side, Bitmap.Config.ARGB_8888)
       val canvas = Canvas(sheet)
       for ((variant, tile) in tiles.withIndex()) {
         val bitmap = tile.asAndroidBitmap()
@@ -85,7 +90,11 @@ class SanctuaryMaterialTest {
             }
           }
         }
-        for (y in 0 until repeatSize) for (x in 0 until repeatSize) canvas.drawBitmap(bitmap, (variant * side + x * 64).toFloat(), (y * 64).toFloat(), Paint())
+        val originX = (variant % columns) * side
+        val originY = (variant / columns) * side
+        for (y in 0 until repeatSize) for (x in 0 until repeatSize) {
+          canvas.drawBitmap(bitmap, (originX + x * 64).toFloat(), (originY + y * 64).toFloat(), Paint())
+        }
       }
       File(out, "$name-${repeatSize}x$repeatSize.png").outputStream().use { sheet.compress(Bitmap.CompressFormat.PNG, 100, it) }
       }
