@@ -81,6 +81,27 @@ class SanctuaryHudContrastTest {
   }
 
   /**
+   * Login screen (CP6). Its scrim is what makes the whole screen readable: the title is
+   * SummonerGold, the tagline PortalCyan, the subtitle ParchmentLight, and those measure
+   * 1.37 / 1.34 / 1.3:1 on a light backdrop - so the scrim, not the text colour, carries
+   * it. At the old 0.42 alpha the title sat at 4.45:1 and the tagline at 3.69:1 over the
+   * brightest world. This pins the current values so a restyle cannot quietly undo it.
+   */
+  @Test
+  fun authGateScrimKeepsItsTextReadableOverTheBrightestWorld() {
+    val scrim = Color(0xFF0A0812).copy(alpha = 0.76f).compositeOver(worstBackdrop)
+    val cases = listOf(
+      "title (SummonerGold)" to SummonerGold,
+      "tagline (PortalCyan)" to Color(0xFF38BDF8),
+      "subtitle (ParchmentLight)" to Color(0xFFF5F1E7),
+    )
+    for ((name, color) in cases) {
+      val ratio = SanctuaryUi.contrastRatio(color, scrim)
+      assertTrue("$name on the auth scrim is $ratio, below 4.5", ratio >= 4.5)
+    }
+  }
+
+  /**
    * The panel must stay translucent: an opaque slab would hide the world, which is the
    * whole point of the lobby. This pins the other side of the trade-off so nobody
    * "fixes" contrast by solidifying every panel.
