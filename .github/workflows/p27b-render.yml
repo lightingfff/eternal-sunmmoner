@@ -90,6 +90,7 @@ jobs:
             --tests 'com.example.P27BStructureContractTest' \
             --tests 'com.example.P27BNightResponseTest' \
             --tests 'com.example.ui.SanctuaryUiTokenTest' \
+            --tests 'com.example.ui.SanctuaryHudContrastTest' \
             --stacktrace > "$RUNNER_TEMP/p27b-assets.log" 2>&1
           result=$?
           cat "$RUNNER_TEMP/p27b-assets.log"

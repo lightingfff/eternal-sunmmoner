@@ -15,7 +15,13 @@ import androidx.compose.ui.unit.dp
 /** Shared controls across management, inventory, tower preparation and settlement. */
 object FantasySkin {
   // P26: dark glass panel instead of an opaque slab, so the world reads through.
-  val Panel=Color(0xB5141D2A)
+  // P27B-V5 CP5: 0xB5 (71%) was measured against the real ivory world and failed the
+  // HUD legibility floor — over the brightest gate facade the standard gold HUD label
+  // dropped to 4.0:1 and the muted 0x9EA6B2 labels to 2.9:1. Raised to 88%: the world
+  // still reads through the glass (12% shows) but gold is 6.9:1 and muted 5.0:1 in the
+  // worst case, i.e. legible over ANY pixel the lobby can put behind it.
+  // Enforced by SanctuaryHudContrastTest.
+  val Panel=Color(0xE0141D2A)
   val Gold=Color(0xffc6b27f)
   @Composable fun buttonColors(containerColor: Color=Panel,contentColor: Color=Gold,
     disabledContainerColor: Color=Color(0xff242a30),disabledContentColor: Color=Color(0xff80868d)): ButtonColors {

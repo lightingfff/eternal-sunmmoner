@@ -22,8 +22,10 @@ import androidx.compose.ui.window.Dialog
 import com.example.data.model.HeroRecord
 
 private val Gold=Color(0xffbda46d)
-/** P26: dark glass instead of opaque ink — the world stays visible behind panels. */
-val PanelGlass=Color(0xB8121B2E)
+/** P26: dark glass instead of opaque ink — the world stays visible behind panels.
+ *  P27B-V5 CP5: 0xB8 (72%) failed the same measurement as [FantasySkin.Panel]; raised to
+ *  88% so panel text keeps >= 4.5:1 over the brightest terrain. */
+val PanelGlass=Color(0xE0121B2E)
 @Composable fun FantasyPanel(modifier: Modifier=Modifier,content: @Composable ()->Unit) {
   Surface(modifier,shape=RoundedCornerShape(12.dp),color=PanelGlass,border=BorderStroke(1.dp,Gold.copy(alpha=.55f)),content=content)
 }
