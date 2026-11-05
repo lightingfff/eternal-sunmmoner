@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.data.model.HeroRecord
+import com.example.ui.components.p28.ESMiniHeroPortrait
 
 private val Gold=Color(0xffbda46d)
 /** P26: dark glass instead of opaque ink — the world stays visible behind panels.

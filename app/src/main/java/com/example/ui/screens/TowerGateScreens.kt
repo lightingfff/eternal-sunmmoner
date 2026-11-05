@@ -874,7 +874,8 @@ private fun SquadHeroRosterList(
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-          PixelHeroPortraitAvatar(heroName = hero.name, heroClass = hero.classType, sizeDp = 48.dp)
+          // P28: framed portrait from the ui_p28 card assets (fallback glyph if no authored bust).
+          ESMiniHeroPortrait(heroName = hero.name, heroClass = hero.classType, sizeDp = 48.dp)
 
           Column(modifier = Modifier.weight(1f)) {
             Text(
