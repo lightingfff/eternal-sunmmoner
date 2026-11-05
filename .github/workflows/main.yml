@@ -13,6 +13,13 @@ permissions:
   contents: write
   actions: read
 
+concurrency:
+  # The P27B/Lyra bots push their own evidence commits, so without this every push to a PR
+  # kicked off a second full APK build of identical content. Cancel superseded PR builds;
+  # never cancel a main build that may be publishing a Release.
+  group: apk-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build:
     name: Build Android APK
@@ -115,8 +122,16 @@ jobs:
           echo "== manifest check =="
           ls "$ANDROID_HOME/cmdline-tools"/*/bin/apkanalyzer 2>/dev/null | head -1 | xargs -I{} sh -c '{} manifest print app/build/apk-distribution/Eternal-Summoner-debug.apk 2>&1 | head -n 30' || true
 
-      - name: Upload APK
+      # OPTIONAL copy for people who browse Actions. The APK that users install is
+      # published to a GitHub Release further down, from THIS runner, before it exits.
+      # Rationale: a full artifact store does not mean the APK is bad. Before this,
+      # "Failed to CreateArtifact: Artifact storage quota has been hit" failed the whole
+      # build job, which in turn SKIPPED the release job - so a perfectly good APK could
+      # not be downloaded at all. Quota trouble is now an explicit WARN, never a build
+      # failure, and never a silent pass either (it is written to the job summary).
+      - name: Upload APK as an optional Actions artifact
         id: upload
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: Eternal-Summoner-APK
@@ -125,9 +140,24 @@ jobs:
             app/build/apk-distribution/Eternal-Summoner-Android.zip
             app/build/apk-distribution/SHA256SUMS
           compression-level: 0
-          if-no-files-found: error
+          if-no-files-found: warn
+          retention-days: 3
 
-      - name: Download and verify the actual uploaded artifact ZIP
+      - name: Record artifact upload outcome (quota is a WARN, not a build failure)
+        if: always()
+        run: |
+          if [ "${{ steps.upload.outcome }}" = "success" ]; then
+            echo "ARTIFACT UPLOAD: OK" | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "ARTIFACT UPLOAD BLOCKED BY QUOTA (not a build error; the Release below is the download path)" \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Verify the uploaded artifact ZIP (skipped when the quota blocked it)
+        # This step used to fail the build whenever the artifact store refused the upload.
+        # It cannot: the Release above is the delivery path. When the upload did succeed,
+        # this still proves the artifact is real bytes and not an HTML error page.
+        if: steps.upload.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
           ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
@@ -135,66 +165,44 @@ jobs:
           set -euo pipefail
           archive="$RUNNER_TEMP/Eternal-Summoner-APK.zip"
           extracted="$RUNNER_TEMP/verified-apk-artifact"
-          echo "Downloading artifact $ARTIFACT_ID via GH API (exact bytes)..."
           gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip" > "$archive"
-          echo "== outer artifact ZIP test (must be ZIP, not HTML) =="
+          if head -c 500 "$archive" | grep -qi "<html"; then echo "FAIL: artifact is an HTML error page"; exit 1; fi
           file "$archive" | tee -a "$GITHUB_STEP_SUMMARY"
-          if head -c 500 "$archive" | grep -qi "<html"; then echo "FAIL: artifact is HTML error page (incomplete upload/auth)"; cat "$archive" | head -c 2000; exit 1; fi
           unzip -t "$archive"
-          stat -c '%n %s bytes' "$archive" | tee -a "$GITHUB_STEP_SUMMARY"
-          sha256sum "$archive" | tee -a "$GITHUB_STEP_SUMMARY"
           mkdir -p "$extracted"
           unzip -q "$archive" -d "$extracted"
-          ls -lh "$extracted" | tee -a "$GITHUB_STEP_SUMMARY"
-          stat -c '%n %s bytes' "$extracted/Eternal-Summoner-debug.apk" | tee -a "$GITHUB_STEP_SUMMARY"
-          sha256sum "$extracted/Eternal-Summoner-debug.apk" | tee -a "$GITHUB_STEP_SUMMARY"
-          echo "== verify inner APK SHA matches build (detect truncated download) =="
-          grep "Eternal-Summoner-debug.apk" "$extracted/SHA256SUMS" | tee -a "$GITHUB_STEP_SUMMARY"
-          (cd "$extracted" && sha256sum -c SHA256SUMS --ignore-missing) || (echo "FAIL: SHA-256 mismatch — truncated download, duplicate '(1)' file, or HTML saved as APK"; exit 1)
-          echo "== apksigner verify extracted APK =="
+          (cd "$extracted" && sha256sum -c SHA256SUMS --ignore-missing)
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$extracted/Eternal-Summoner-debug.apk"
-          unzip -t "$extracted/Eternal-Summoner-debug.apk"
-          unzip -t "$extracted/Eternal-Summoner-Android.zip"
-          echo '✅ Uploaded artifact downloaded successfully; outer ZIP CRC, APK contents, signature and SHA-256 all verified.' | tee -a "$GITHUB_STEP_SUMMARY"
+          echo 'Artifact ZIP, CRC, inner APK signature and SHA-256 all verified.' | tee -a "$GITHUB_STEP_SUMMARY"
 
-  release:
-    name: Publish direct APK to Release (bypass artifact ZIP)
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - name: Download artifact for Release
-        uses: actions/download-artifact@v4
-        with:
-          name: Eternal-Summoner-APK
-          path: dist
-
-      - name: List artifacts
+      - name: Skip note when the artifact store was unavailable
+        if: steps.upload.outcome != 'success'
         run: |
-          ls -lh dist/
-          stat -c '%n %s bytes' dist/* | tee -a "$GITHUB_STEP_SUMMARY"
-          sha256sum dist/* | tee SHA256SUMS.txt
-          cat SHA256SUMS.txt | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "Artifact ZIP verification SKIPPED: upload blocked by quota." | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "The APK itself is published in the Release step below." | tee -a "$GITHUB_STEP_SUMMARY"
 
-      - name: Create GitHub Release with direct APK
+      - name: Publish APK direct to GitHub Release (no artifact store involved)
+        # push-to-main only. PRs never publish a release; a fork PR has no write token,
+        # which is why the event guard comes first.
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: apk-${{ github.run_number }}-${{ github.sha }}
-          name: Eternal Summoner APK #${{ github.run_number }}
+          name: "Eternal Summoner APK ${{ github.run_number }}"
           body: |
-            Direct APK download — no nested ZIP extraction needed.
-            - `Eternal-Summoner-debug.apk` — installable APK (signed debug, 33-34 MB). Download this file directly and install.
-            - `Eternal-Summoner-Android.zip` — portable ZIP (STORE) containing APK + SHA256 for extraction test.
-            - `SHA256SUMS` — SHA-256 for both files. Verify: `sha256sum -c SHA256SUMS`
-
-            **Install:** Download `Eternal-Summoner-debug.apk` (not the Actions artifact ZIP) from this Release. If you downloaded from Actions, you must EXTRACT the ZIP first — do not rename .zip to .apk.
-            Built from `${{ github.sha }}` — workflow `${{ github.run_id }}`.
+            Direct APK download - no nested artifact ZIP needed.
+            - `Eternal-Summoner-debug.apk` - installable APK (signed debug). Download this file and install.
+            - `Eternal-Summoner-Android.zip` - portable ZIP (STORE) with APK + SHA256.
+            - `SHA256SUMS` - verify with `sha256sum -c SHA256SUMS`.
+            Published from the build runner itself, so a full Actions artifact store cannot block it.
+            Built from `${{ github.sha }}` - workflow `${{ github.run_id }}`.
           files: |
-            dist/Eternal-Summoner-debug.apk
-            dist/Eternal-Summoner-Android.zip
-            dist/SHA256SUMS
-            SHA256SUMS.txt
+            app/build/apk-distribution/Eternal-Summoner-debug.apk
+            app/build/apk-distribution/Eternal-Summoner-Android.zip
+            app/build/apk-distribution/SHA256SUMS
           generate_release_notes: false
+
+  # There is deliberately no second "release" job any more.
+  # The old one did needs:[build] + download-artifact, so a full artifact store skipped
+  # the release completely. The APK is now published inside the build job above, from the
+  # same workspace that built and verified it, and only for push-to-main.

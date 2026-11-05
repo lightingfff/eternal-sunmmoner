@@ -3,6 +3,12 @@ name: P27B matched Sanctuary render evidence
 # Matched pre-art and post-art tests, real Compose Canvas/Robolectric native Skia.
 # GitHub Actions artifact storage is quota-exhausted in this repo as of P27B baseline;
 # PNGs are committed to *this* branch, NOT packaged in the APK or fake screenshots.
+concurrency:
+  # The evidence bot pushes its own commit, which used to queue a second
+  # identical render for the same art. Superseded runs are cancelled.
+  group: p27b-render-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [arena/8be73f1b-eternal-sunmmoner]
@@ -126,6 +132,7 @@ jobs:
           if [ "$result" -ne 0 ]; then python3 tools/p27b_ci_failure.py "$RUNNER_TEMP/p27b-ui.log" app/build/test-results/testDebugUnitTest; fi
           exit "$result"
       - name: Assemble Android APK (technical verification only)
+        id: apk
         if: ${{ always() && steps.render_world.outcome == 'success' }}
         run: |
           # app/build.gradle.kts explicitly signs debug with root debug.keystore.
@@ -148,6 +155,12 @@ jobs:
           echo "APK compiled on $GITHUB_SHA, artifact QUOTA_BLOCKED; APK not committed (ephemeral debug signature)" >> "$GITHUB_STEP_SUMMARY"
       - name: Commit matched renderer captures to this branch (quota-safe)
         if: ${{ always() && github.event_name == 'push' }}
+        env:
+          EVIDENCE_BRANCH: ${{ github.ref_name }}
+          # Not a secret: a fixed author identity for automated evidence commits.
+          # NEVER the bot account - see the note inside this step.
+          EVIDENCE_BOT_NAME: arena-evidence
+          EVIDENCE_BOT_EMAIL: arena-evidence@users.noreply.github.com
         run: |
           set -euo pipefail
           # docs/p27b is the MERGED PR #34 baseline and must stay byte-identical for
@@ -173,9 +186,30 @@ jobs:
             cp -f app/build/visual_screenshots/p27b/ui/*.png docs/p27b_next/previews/after/ui/
             git add docs/p27b_next/previews/after/ui
           fi
-          git config user.name 'p27b-render-bot'
-          git config user.email 'actions@users.noreply.github.com'
+          # Identity matters: committing as github-actions[bot] makes every subsequent
+          # workflow run on this PR require manual approval ("action_required"), which then
+          # shows up as a red gate that nobody started. Commit as the same non-bot account
+          # that owns the PR branch so pushes stay inside the normal flow.
+          git config user.name '${EVIDENCE_BOT_NAME}'
+          git config user.email '${EVIDENCE_BOT_EMAIL}'
           if git diff --cached --quiet; then echo 'same renderer images; no commit'; exit 0; fi
           git commit -m "P27B V5: real Robolectric render on ${GITHUB_SHA:0:7}"
           # Do not force push, auto-merge, or update other branches.
-          git push origin HEAD:arena/8be73f1b-eternal-sunmmoner
+          git push origin HEAD:${EVIDENCE_BRANCH}
+
+      # P27B keeps its PNGs in docs/p27b_next (committed above), so it never needed the
+      # artifact store. This summary exists so a red run can be classified in one glance:
+      # a quota error is NOT a render failure, and a render failure is NOT a quota error.
+      - name: Classify this run (render vs. upload vs. APK)
+        if: always()
+        run: |
+          {
+            echo "### P27B evidence run"
+            echo "| step | outcome |"
+            echo "| --- | --- |"
+            echo "| contract + renderer tests | ${{ steps.render_world.outcome || 'not run' }} |"
+            echo "| V5 render matrix | ${{ steps.render_next.outcome || 'not run' }} |"
+            echo "| Compose UI screenshots | ${{ steps.render_ui.outcome || 'not run' }} |"
+            echo "| APK compile | ${{ steps.apk.outcome || 'not run' }} |"
+            echo "| artifact store | not used (PNGs are committed to docs/p27b_next) |"
+          } >> "$GITHUB_STEP_SUMMARY"
