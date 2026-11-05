@@ -12,7 +12,7 @@
     "height": 720,
     "note": "island silhouette",
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "8af2a81bbd6963ed50fd706c93867dc7f1bc7d06"
+    "source_sha": "227f60366325a7f0bc1c7710bb14758ef8115b65"
   },
   {
     "file": "service_noon_z088.png",
@@ -27,7 +27,7 @@
     "height": 720,
     "note": "houses, tone vs ground",
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "8af2a81bbd6963ed50fd706c93867dc7f1bc7d06"
+    "source_sha": "227f60366325a7f0bc1c7710bb14758ef8115b65"
   },
   {
     "file": "plaza_noon_z100.png",
@@ -42,7 +42,7 @@
     "height": 720,
     "note": "flagstone period",
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "8af2a81bbd6963ed50fd706c93867dc7f1bc7d06"
+    "source_sha": "227f60366325a7f0bc1c7710bb14758ef8115b65"
   },
   {
     "file": "plaza_noon_z148.png",
@@ -57,7 +57,7 @@
     "height": 720,
     "note": "flagstone at max zoom",
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "8af2a81bbd6963ed50fd706c93867dc7f1bc7d06"
+    "source_sha": "227f60366325a7f0bc1c7710bb14758ef8115b65"
   },
   {
     "file": "plaza_night_z100.png",
@@ -72,7 +72,7 @@
     "height": 720,
     "note": "ground grade at night",
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "8af2a81bbd6963ed50fd706c93867dc7f1bc7d06"
+    "source_sha": "227f60366325a7f0bc1c7710bb14758ef8115b65"
   },
   {
     "file": "summon_hour06_z148.png",
@@ -87,7 +87,7 @@
     "height": 720,
     "note": "",
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "8af2a81bbd6963ed50fd706c93867dc7f1bc7d06"
+    "source_sha": "227f60366325a7f0bc1c7710bb14758ef8115b65"
   },
   {
     "file": "summon_noon_z148.png",
@@ -102,7 +102,7 @@
     "height": 720,
     "note": "",
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "8af2a81bbd6963ed50fd706c93867dc7f1bc7d06"
+    "source_sha": "227f60366325a7f0bc1c7710bb14758ef8115b65"
   },
   {
     "file": "summon_hour18_z148.png",
@@ -117,7 +117,7 @@
     "height": 720,
     "note": "",
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "8af2a81bbd6963ed50fd706c93867dc7f1bc7d06"
+    "source_sha": "227f60366325a7f0bc1c7710bb14758ef8115b65"
   },
   {
     "file": "summon_night_z148.png",
@@ -132,7 +132,7 @@
     "height": 720,
     "note": "",
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "8af2a81bbd6963ed50fd706c93867dc7f1bc7d06"
+    "source_sha": "227f60366325a7f0bc1c7710bb14758ef8115b65"
   },
   {
     "file": "gate_hour06_z148.png",
@@ -147,7 +147,7 @@
     "height": 720,
     "note": "",
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "8af2a81bbd6963ed50fd706c93867dc7f1bc7d06"
+    "source_sha": "227f60366325a7f0bc1c7710bb14758ef8115b65"
   },
   {
     "file": "gate_noon_z148.png",
@@ -162,7 +162,7 @@
     "height": 720,
     "note": "",
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "8af2a81bbd6963ed50fd706c93867dc7f1bc7d06"
+    "source_sha": "227f60366325a7f0bc1c7710bb14758ef8115b65"
   },
   {
     "file": "gate_hour18_z148.png",
@@ -177,7 +177,7 @@
     "height": 720,
     "note": "",
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "8af2a81bbd6963ed50fd706c93867dc7f1bc7d06"
+    "source_sha": "227f60366325a7f0bc1c7710bb14758ef8115b65"
   },
   {
     "file": "gate_night_z148.png",
@@ -192,7 +192,7 @@
     "height": 720,
     "note": "",
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "8af2a81bbd6963ed50fd706c93867dc7f1bc7d06"
+    "source_sha": "227f60366325a7f0bc1c7710bb14758ef8115b65"
   },
   {
     "file": "house_quarters_noon_z148.png",
@@ -207,7 +207,7 @@
     "height": 720,
     "note": "P03 art vs P27B ground",
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "8af2a81bbd6963ed50fd706c93867dc7f1bc7d06"
+    "source_sha": "227f60366325a7f0bc1c7710bb14758ef8115b65"
   },
   {
     "file": "house_restaurant_noon_z148.png",
@@ -222,6 +222,6 @@
     "height": 720,
     "note": "P03 art vs P27B ground",
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "8af2a81bbd6963ed50fd706c93867dc7f1bc7d06"
+    "source_sha": "227f60366325a7f0bc1c7710bb14758ef8115b65"
   }
 ]
