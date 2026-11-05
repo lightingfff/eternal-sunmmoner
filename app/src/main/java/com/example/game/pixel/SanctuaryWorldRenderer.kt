@@ -159,6 +159,7 @@ object SanctuaryWorldRenderer {
       // pixels are equivalent, the draw count is lower than the old 4x4 block path, and
       // the repeat period stays the same as the gameplay path (no zoom-dependent lattice).
       val grassSheet = PixelTileAtlas.sanctuaryGrassSheet
+      val grassSheetRotated = PixelTileAtlas.sanctuaryGrassSheetRotated
       val grassBlocks = if (grassSheet == null && tileScreenH < GRASS_BLOCK_MIN_TILE_SCREEN_PX) {
         PixelTileAtlas.sanctuaryGrassBlocks
       } else {
@@ -177,8 +178,12 @@ object SanctuaryWorldRenderer {
         for (cy in startSy..endSy) {
           val dstY = sy(cy * sheetWorldSize).roundToInt()
           for (cx in startSx..endSx) {
+            // Same rotation rule as the per-tile path: at sheet granularity it is what
+            // stops the overview from showing a clean 512 px grid of identical blocks.
+            val useRotated = grassSheetRotated != null &&
+              PixelTileAtlas.sanctuarySheetRotated(cx * 8, cy * 8)
             drawImage(
-              image = grassSheet,
+              image = if (useRotated) grassSheetRotated!! else grassSheet,
               dstOffset = IntOffset(sx(cx * sheetWorldSize).roundToInt(), dstY),
               dstSize = IntSize(cellScreenW + 1, cellScreenH + 1),
               filterQuality = FilterQuality.None,
@@ -217,6 +222,7 @@ object SanctuaryWorldRenderer {
             drawGroundTile(
               grassSheet, grassTiles, tx, ty, hash,
               dstX, dstY, tileScreenW + 1, tileScreenH + 1,
+              rotated = grassSheetRotated,
             )
           }
         }
@@ -358,6 +364,7 @@ object SanctuaryWorldRenderer {
           drawGroundTile(
             PixelTileAtlas.sanctuarySoilSheet, sandTiles, tx, ty, hash,
             dstX, dstY, tileScreenW + 1, tileScreenH + 1,
+            rotated = PixelTileAtlas.sanctuarySoilSheetRotated,
           )
         }
       }
@@ -468,6 +475,7 @@ object SanctuaryWorldRenderer {
           drawGroundTile(
             PixelTileAtlas.sanctuaryCobbleSheet, cobbleTiles, tx, ty, hash,
             dstX, dstY, tileScreenW + 1, tileScreenH + 1,
+            rotated = PixelTileAtlas.sanctuaryCobbleSheetRotated,
           )
         }
       }
@@ -892,6 +900,7 @@ object SanctuaryWorldRenderer {
     clipPath(plazaClip) {
       val tiles = PixelTileAtlas.sanctuaryStoneTiles
       val sheet = PixelTileAtlas.sanctuaryFlagstoneSheet
+      val rotatedSheet = PixelTileAtlas.sanctuaryFlagstoneSheetRotated
       for (ty in 10..28) for (tx in 21..39) {
         val hash = ((tx * 73856093 xor ty * 19349663) and 0x7fffffff)
         drawGroundTile(
@@ -899,6 +908,7 @@ object SanctuaryWorldRenderer {
           sx(tx * 64f).roundToInt(), sy(ty * 64f, 0f).roundToInt(),
           (64 * zoom).roundToInt() + 1,
           (64 * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt() + 1,
+          rotated = rotatedSheet,
         )
       }
     }

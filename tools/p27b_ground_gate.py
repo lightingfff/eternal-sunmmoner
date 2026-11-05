@@ -90,7 +90,57 @@ def row_jump(sheet: Image.Image, y0: int, y1: int) -> float:
                for x in range(sheet.width)) / (sheet.width * 3)
 
 
+def rotation_rule(tx: int, ty: int) -> bool:
+    """Mirror of PixelTileAtlas.sanctuarySheetRotated (32-bit wrap + mask)."""
+    h = (tx * -0x61c88647 + ty * 0x27d4eb2f) & 0xFFFFFFFF
+    h ^= h >> 15
+    h = (h * -0x7A143595) & 0xFFFFFFFF
+    h ^= h >> 13
+    return (h & 3) == 0
+
+
+def composed_ground_is_periodic(sheet: Image.Image) -> tuple[int, int]:
+    """How many tiles match the tile one sheet-period away, in the COMPOSED ground."""
+    from PIL import ImageOps
+    rotated = ImageOps.mirror(sheet.transpose(Image.Transpose.FLIP_TOP_BOTTOM))
+    cells = {(x, y): sheet.crop((x * CELL, y * CELL, (x + 1) * CELL, (y + 1) * CELL))
+             for y in range(GRID) for x in range(GRID)}
+    rot_cells = {(x, y): rotated.crop((x * CELL, y * CELL, (x + 1) * CELL, (y + 1) * CELL))
+                 for y in range(GRID) for x in range(GRID)}
+
+    def tiles_match(tx: int, ty: int, ox: int, oy: int) -> bool:
+        ax, ay = tx & 7, ty & 7
+        bx, by = (tx + ox) & 7, (ty + oy) & 7
+        a = (rot_cells if rotation_rule(tx, ty) else cells)[(ax, ay)]
+        b = (rot_cells if rotation_rule(tx + ox, ty + oy) else cells)[(bx, by)]
+        return a.tobytes() == b.tobytes()
+
+    agreed = total = 0
+    for ty in range(GRID):
+        for tx in range(GRID):
+            total += 1
+            if tiles_match(tx, ty, GRID, GRID):
+                agreed += 1
+    return agreed, total
+
+
+def _self_check() -> None:
+    """Documents why the threshold is 75%: with rotation disabled every tile matches."""
+    sheet = Image.new('RGB', (GRID * CELL, GRID * CELL))
+    global rotation_rule
+    original = rotation_rule
+    try:
+        rotation_rule = lambda tx, ty: False
+        agreed, total = composed_ground_is_periodic(sheet)
+        assert agreed == total, f'self-check failed: {agreed}/{total}'
+    finally:
+        rotation_rule = original
+    print('self-check: with rotation disabled the composed ground is 64/64 periodic, '
+          'so the gate has teeth')
+
+
 def main() -> int:
+    _self_check()
     failures: list[str] = []
     report: dict[str, dict] = {}
     manifest = json.loads(MANIFEST.read_text()) if MANIFEST.is_file() else {}
@@ -137,6 +187,12 @@ def main() -> int:
                                 f'(tolerance +/-{LUMA_TOLERANCE:.0f}); it would read as a patch '
                                 f'pasted onto the ground instead of the ground')
 
+        agreed, total = composed_ground_is_periodic(sheet)
+        if agreed >= total * 0.75:
+            failures.append(
+                f'{family}: composed ground still repeats one sheet-period later '
+                f'({agreed}/{total} tiles identical) -> tile rotation rule is not active')
+
         distinct = len({tuple(round(v, 2) for v in cell) for cell in cells})
         if distinct < GRID * GRID // 2:
             failures.append(f'{family}: only {distinct}/64 distinct cell means; sheet is a pasted block')
@@ -166,6 +222,8 @@ def main() -> int:
             'max_identity_at_4_tiles': round(worst_identity, 3),
             'distinct_cell_means': distinct,
             'luma_stddev': round(spread, 2),
+            'tiles_matching_one_period_later': agreed,
+            'tiles_compared': total,
             'mean_luma': round(mean_luma(sheet), 2),
             'shipped_mean_luma': None if shipped is None else round(mean_luma(shipped), 2),
             'luma_delta_vs_shipped': None if luma_delta is None else round(luma_delta, 2),
@@ -175,7 +233,8 @@ def main() -> int:
             'bytes': path.stat().st_size,
         }
         print(f'{family:10} step1 {step1:6.2f} step4 {step4:6.2f} distinct {distinct:2}/64 '
-              f'wrap {wrap:5.2f} interior_p95 {interior:5.2f}')
+              f'wrap {wrap:5.2f} interior_p95 {interior:5.2f} '
+              f'period-repeat {agreed}/{total}')
 
     summary = ROOT / 'docs/p27b_next/previews/terrain/ground_gate.json'
     summary.parent.mkdir(parents=True, exist_ok=True)

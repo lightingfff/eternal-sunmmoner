@@ -175,6 +175,50 @@ class P27BGroundRepeatTest {
     }
   }
 
+  /**
+   * Debt B, final guard: the raw sheet must STILL be periodic (that is honest - it is a
+   * 512 px mosaic), but the composed ground must not be, because a quarter of the tiles
+   * draw the sheet's 180-degree rotation. If rotation were reverted, the composed map
+   * would match itself at 512 px and this test fails.
+   */
+  @Test
+  fun composedGroundIsNotPeriodicEvenThoughTheSheetIs() {
+    val sheet = asset("sanctuary_p27b_2/terrain/flagstone_mosaic.png")
+    val rotated = run {
+      val matrix = android.graphics.Matrix().apply { setScale(-1f, -1f) }
+      Bitmap.createBitmap(sheet, 0, 0, sheet.width, sheet.height, matrix, false)
+    }
+    // Composed ground: tile at (tx, ty) is the sheet cell, or its rotation per rule.
+    fun composedLuma(tx: Int, ty: Int): Double {
+      val source = if (PixelTileAtlas.sanctuarySheetRotated(tx, ty)) rotated else sheet
+      val cell = PixelTileAtlas.sanctuarySheetCell(tx, ty)
+      var total = 0.0
+      for (y in 0 until 64) {
+        for (x in 0 until 64) {
+          val px = source.getPixel((cell and 7) * 64 + x, (cell shr 3) * 64 + y)
+          total += 0.299 * ((px shr 16) and 0xFF) + 0.587 * ((px shr 8) and 0xFF) +
+            0.114 * (px and 0xFF)
+        }
+      }
+      return total / (64.0 * 64.0)
+    }
+    var agreed = 0
+    var compared = 0
+    for (ty in 0 until 8) {
+      for (tx in 0 until 8) {
+        compared++
+        if (kotlin.math.abs(composedLuma(tx, ty) - composedLuma(tx + 8, ty + 8)) < 0.02) agreed++
+      }
+    }
+    // On a purely periodic map all 64 would agree, because the 8-tile offset is a no-op.
+    assertTrue("ground is still periodic: $agreed/$compared tiles match one period later", agreed < 40)
+    assertTrue(
+      "rotation rule must actually rotate a meaningful share of tiles",
+      (0 until 8).flatMap { ty -> (0 until 8).map { tx -> PixelTileAtlas.sanctuarySheetRotated(tx, ty) } }
+        .count { it } in 8..56,
+    )
+  }
+
   /** Runtime must actually pick the sheet up; a silent fallback would hide the fix. */
   @Test
   fun runtimeBindsSheetAndFallsBackWholeWhenAbsent() {
@@ -182,6 +226,8 @@ class P27BGroundRepeatTest {
     val sheet = PixelTileAtlas.sanctuaryGrassSheet
     assertNotNull("P27B profile must expose the 8x8 grass sheet", sheet)
     assertEquals(512, sheet!!.width)
+    assertNotNull("the rotated companion sheet must exist, or the map is periodic again",
+      PixelTileAtlas.sanctuaryGrassSheetRotated)
     assertEquals(512, PixelTileAtlas.sanctuaryFlagstoneSheet?.height)
     // The old 4x4 family is still installed as the fallback tier, never mixed.
     assertEquals(16, PixelTileAtlas.sanctuaryGrassTiles.size)

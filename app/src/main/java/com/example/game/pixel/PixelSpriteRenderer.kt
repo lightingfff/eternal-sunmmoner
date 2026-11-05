@@ -344,6 +344,7 @@ object PixelSpriteRenderer {
           onRoadCore && roadTiles != null -> drawGroundTile(
             PixelTileAtlas.sanctuaryCobbleSheet, roadTiles, tx, ty, hash,
             dstX, dstY, tileScreenW + 1, tileScreenH + 1,
+            rotated = PixelTileAtlas.sanctuaryCobbleSheetRotated,
           )
           onRoadEdge && roadEdgeTiles != null -> drawImage(
             image = roadEdgeTiles[hash % roadEdgeTiles.size],
@@ -354,6 +355,7 @@ object PixelSpriteRenderer {
           else -> drawGroundTile(
             PixelTileAtlas.sanctuaryGrassSheet, baseTiles, tx, ty, hash,
             dstX, dstY, tileScreenW + 1, tileScreenH + 1,
+            rotated = PixelTileAtlas.sanctuaryGrassSheetRotated,
           )
         }
       }

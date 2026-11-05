@@ -370,6 +370,7 @@ object InteriorWorldRenderer {
               drawGroundTile(
                 PixelTileAtlas.sanctuaryGrassSheet, grassTiles, tx, ty, hash,
                 dstX, dstY, tsW + 1, tsH + 1,
+                rotated = PixelTileAtlas.sanctuaryGrassSheetRotated,
               )
             }
           }

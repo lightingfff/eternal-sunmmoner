@@ -263,6 +263,11 @@ object PixelTileAtlas {
   val sanctuaryFlagstoneSheet: ImageBitmap? get() = groundSheet("flagstone")
   val sanctuaryCobbleSheet: ImageBitmap? get() = groundSheet("cobble")
 
+  val sanctuaryGrassSheetRotated: ImageBitmap? get() = SanctuaryArtAssets.groundSheetMirrored("grass")
+  val sanctuarySoilSheetRotated: ImageBitmap? get() = SanctuaryArtAssets.groundSheetMirrored("soil")
+  val sanctuaryFlagstoneSheetRotated: ImageBitmap? get() = SanctuaryArtAssets.groundSheetMirrored("flagstone")
+  val sanctuaryCobbleSheetRotated: ImageBitmap? get() = SanctuaryArtAssets.groundSheetMirrored("cobble")
+
   val sanctuaryGrassTiles: List<ImageBitmap> get() =
     SanctuaryArtAssets.p27bFamily("grass") ?: SanctuaryArtAssets.tiles("grass", 8) ?: sanctuaryGrassTilesFallback
   private val sanctuaryGrassTilesFallback: List<ImageBitmap> by lazy {
@@ -293,6 +298,22 @@ object PixelTileAtlas {
 
   /** Cell of the 8x8 sheet: true mosaic adjacency, period 8 tiles = 512 world px. */
   fun sanctuarySheetCell(tx: Int, ty: Int): Int = (((ty and 7) shl 3) or (tx and 7))
+
+  /**
+   * True when this world tile draws the 180-degree rotation of the sheet.
+   *
+   * P27B-V5: a single 8x8 sheet is still periodic, so the map repeats every 512 world
+   * px. Rotating some tiles cannot remove the underlying repeat, but it destroys the
+   * *arrangement* repeat: the eye sees new junction geometry instead of the same block
+   * again. Chosen by an integer hash with no allocation and no per-frame cost.
+   */
+  fun sanctuarySheetRotated(tx: Int, ty: Int): Boolean {
+    var h = tx * -0x61c88647 + ty * 0x27d4eb2f
+    h = h xor (h ushr 15)
+    h *= -0x7a143595
+    h = h xor (h ushr 13)
+    return (h and 3) == 0
+  }
 
   /** Optional, brighter limestone restricted to the existing Summoning Hall ground zone. */
   val summoningIvoryTiles: List<ImageBitmap>? get() = SanctuaryArtAssets.p27bFamily("summon_ivory")
@@ -1045,11 +1066,13 @@ fun DrawScope.drawGroundTile(
   dstY: Int,
   dstW: Int,
   dstH: Int,
+  rotated: ImageBitmap? = null,
 ) {
-  if (sheet != null) {
+  val source = if (rotated != null && PixelTileAtlas.sanctuarySheetRotated(tx, ty)) rotated else sheet
+  if (source != null) {
     val cell = PixelTileAtlas.sanctuarySheetCell(tx, ty)
     drawImage(
-      image = sheet,
+      image = source,
       srcOffset = IntOffset((cell and 7) * PixelTileAtlas.TILE_PX, (cell shr 3) * PixelTileAtlas.TILE_PX),
       srcSize = IntSize(PixelTileAtlas.TILE_PX, PixelTileAtlas.TILE_PX),
       dstOffset = IntOffset(dstX, dstY),

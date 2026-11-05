@@ -20,6 +20,7 @@ object SanctuaryArtAssets {
   private val families = mutableMapOf<String, List<ImageBitmap>>()
   private val optionalFamilies = mutableMapOf<String, List<ImageBitmap>?>()
   private val groundSheets = mutableMapOf<String, ImageBitmap?>()
+  private val mirroredSheets = mutableMapOf<String, ImageBitmap?>()
   internal val cachedImageCount get() = images.size
   /** Decoded PNG cache only; generated actor atlases and GPU copies are not included. Sample at 1 Hz. */
   internal val cachedBitmapBytes: Long get() = images.values.sumOf { it.asAndroidBitmap().allocationByteCount.toLong() }
@@ -94,6 +95,40 @@ object SanctuaryArtAssets {
       ?.takeIf { it.width == 512 && it.height == 512 }
     groundSheets[name] = sheet
     return sheet
+  }
+
+  /** Rotated copy of a ground sheet, used to break the sheet's own repeat period.
+   *
+   * The 8x8 sheet is still periodic: the same 512 world-px block recurs. Rather than
+   * paying for a 1024 px sheet (4x the memory, and it needs source art at the correct
+   * stone density which does not exist yet), each world tile picks at random between
+   * the sheet and its 180-degree rotation. The cell art is identical either way, but the
+   * *arrangement* is no longer periodic, so the eye cannot lock onto the lattice.
+   *
+   * Built once per family by a Matrix copy (never inside a draw pass) and negative
+   * cached like every other optional asset.
+   */
+  internal fun groundSheetMirrored(name: String): ImageBitmap? {
+    if (mirroredSheets.containsKey(name)) return mirroredSheets[name]
+    val original = groundSheet(name)
+    if (original == null) {
+      mirroredSheets[name] = null
+      return null
+    }
+    val rotated = try {
+      val src = original.asAndroidBitmap()
+      val matrix = android.graphics.Matrix().apply { setScale(-1f, -1f) }
+      android.graphics.Bitmap
+        .createBitmap(src, 0, 0, src.width, src.height, matrix, false)
+        .asImageBitmap()
+    } catch (e: IllegalArgumentException) {
+      null
+    } catch (e: OutOfMemoryError) {
+      // A cheap-quality device keeps the unmirrored sheet; the map stays correct.
+      null
+    }
+    mirroredSheets[name] = rotated
+    return rotated
   }
 
   internal fun preferredLandmark(name: String, width: Int, height: Int): ImageBitmap? {
