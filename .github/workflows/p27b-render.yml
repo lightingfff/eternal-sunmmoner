@@ -190,12 +190,14 @@ jobs:
           # workflow run on this PR require manual approval ("action_required"), which then
           # shows up as a red gate that nobody started. Commit as the same non-bot account
           # that owns the PR branch so pushes stay inside the normal flow.
-          git config user.name '${EVIDENCE_BOT_NAME}'
-          git config user.email '${EVIDENCE_BOT_EMAIL}'
+          # Double quotes: single quotes would write the literal ${VAR} into the commit
+          # author, which is exactly what happened on 06a45ae.
+          git config user.name "$EVIDENCE_BOT_NAME"
+          git config user.email "$EVIDENCE_BOT_EMAIL"
           if git diff --cached --quiet; then echo 'same renderer images; no commit'; exit 0; fi
           git commit -m "P27B V5: real Robolectric render on ${GITHUB_SHA:0:7}"
           # Do not force push, auto-merge, or update other branches.
-          git push origin HEAD:${EVIDENCE_BRANCH}
+          git push origin HEAD:"$EVIDENCE_BRANCH"
 
       # P27B keeps its PNGs in docs/p27b_next (committed above), so it never needed the
       # artifact store. This summary exists so a red run can be classified in one glance:
