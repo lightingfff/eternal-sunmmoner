@@ -1,6 +1,8 @@
 # CHECKPOINT 1 — sửa lỗi lặp texture 4×4 (debt B)
 
-Trạng thái: **code + asset + gate đã xong, đã commit.** Ảnh evidence từ renderer thật đang chờ CI của nhánh này chạy xong (xem mục 6). Không có tuyên bố "đã sạch" trước khi có ảnh.
+Trạng thái: **code + asset + gate + ảnh renderer thật đã xong, đã commit** (`91563f4`, ảnh bot commit `dca70dc`, CI run `42026395257` PASS).
+
+Kết luận trung thực: **lỗi "lặp khối 4×4" đã bị loại về mặt cấu trúc và đo được; nhưng lỗi "nền còn lặp" CHƯA đóng.** Lý do ở mục 6.2 — đây là chỗ dễ tự lừa nhất nên phải nói rõ.
 
 ## 1. Đo lỗi trước khi sửa (không đoán)
 Cách lấy mẫu cũ: `PixelTileAtlas.sanctuaryTileIndex` → `(ty and 3) shl 2 or (tx and 3)`, tức **torus 4×4 dịch chuyển thuần tuý**. Hệ quả toán học: ảnh lặp với chu kỳ **4 tile = 256 world px**, và vì phép lấy mẫu chỉ tịnh tiến, mọi cấu trúc tần số thấp cũng lặp theo đúng chu kỳ đó.
@@ -73,7 +75,29 @@ Workflow `P27B matched Sanctuary render evidence` giờ chạy trên nhánh này
 
 Ảnh sẽ có sau khi run xong; `docs/p27b_next/runs.json` được cập nhật run id + verdict. **Chưa có ảnh thì chưa kết luận debt B đã đóng** — mới chỉ chứng minh được chu kỳ 4 đã bị loại bằng số đo và bằng gate tự động.
 
+## 6.1. Ảnh thật (CI `42026395257`, SHA `91563f4`)
+- `docs/p27b_next/previews/after/world/` gồm 15 ảnh 1280×720 từ `SanctuaryWorldRenderer` thật (Robolectric native Skia): z0.36 / z0.88 / z1.0 / z1.48, plaza đêm, Gate & Hall ở hour 6/12/18/0, và 2 ảnh cận nhà P03 (debt A).
+- Baseline `docs/p27b/previews/` **được đóng băng**: `git diff e5e04e1 HEAD -- docs/p27b` rỗng. Trước đó workflow đã âm thầm ghi đè thư mục này (đã sửa, có bước `git restore`).
+
+## 6.2. Cái gì đã đo được, cái gì CHƯA
+| Đo | OLD | NEW | Ý nghĩa |
+|---|---|---|---|
+| Ô cách 4 tile có trùng ô gốc? | **có, tuyệt đối** | không (`step4` ≈ `step1`) | lỗi lặp khối 4×4 đã bị loại về cấu trúc |
+| Self-similarity tại lag 256 px (plaza, dải đá trơn) | **+0.15** | **+0.05** | bớt tự giống hơn rõ, nhưng **vẫn > 0** |
+| Self-similarity tại lag 512 px | — (ngoài chu kỳ cũ) | không phải cực đại | chu kỳ đã dời lên 512 px |
+| Mép sheet so với biên trong p95 | — | ≤ p95 + 8 | không tạo lưới ở mép |
+| Mean luma vs atlas cũ | — | grass −0.1, soil −0.3, cobble −0.4, flagstone −2.6 | không bị "sáng hơn nền" |
+
+**Chưa đóng:** một ô 8×8 vẫn lặp sau **512 world px** (≈1024 px màn hình ở zoom 1.0). Cửa sổ plaza hiện rộng ~470 px nên vòng lặp thứ hai chưa lộ trong ảnh, nhưng **trên map lớn hoặc ở zoom 0.36 thì chu kỳ 512 px là thật**. Nói "đã seamless" ở đây là sai. Muốn đóng hẳn cần (a) atlas/splat lớn hơn hẳn ngân sách bộ nhớ hiện tại, hoặc (b) pha hai lớp sample so le phi tuyến — cả hai là thay đổi renderer lớn hơn phạm vi checkpoint này và phải đo lại toàn bộ ma trận ảnh.
+
+## 6.3. Ba lỗi chỉ lộ ra khi xem ảnh thật (ghi để không lặp lại)
+1. Dựng sheet từ nguồn 768 px của P27B → **đá to gấp đôi**. Test vẫn PASS (64 ô phân biệt, mép kín) vì test không biết gì về tỉ lệ.
+2. Heel crossfade 20 px → **dải sáng lặp thành lưới**. Đã thay bằng torus roll không pha trộn (mở sheet ở chỗ nguồn có đường cắt sạch nhất).
+3. Flagstone **sáng hơn atlas cũ 8 luma** → trông như dán lên nền. Đã khoá target luma theo atlas cũ.
+
+Cả ba giờ đều có gate: uniform-sheet check, luma-delta check, và ảnh diff OLD/NEW ở cùng camera.
+
 ## 7. NOT TESTED
-- FPS/thermal trên thiết bị thật (không có máy; sandbox không có JDK/Android SDK).
+- FPS/thermal trên thiết bị thật. Số liệu duy nhất liên quan hiệu năng là số lệnh vẽ đọc từ code: đường overview giảm từ ~16 lệnh block xuống 1 lệnh/world cell; đường per-tile giữ nguyên số lệnh nhưng dùng 1 texture thay vì 16.
 - Cảm nhận thẩm mỹ ở z1.48 trên màn hình thật.
 - Việc 512 px có đủ cho màn hình mật độ cao khi zoom 1.48 hay không (đo bằng ảnh CI, không phải bằng suy luận).
