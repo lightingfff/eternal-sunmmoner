@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import com.example.ui.theme.SanctuaryUi
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas

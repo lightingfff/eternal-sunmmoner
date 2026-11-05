@@ -89,6 +89,7 @@ jobs:
             --tests 'com.example.P27BGroundRepeatTest' \
             --tests 'com.example.P27BStructureContractTest' \
             --tests 'com.example.P27BNightResponseTest' \
+            --tests 'com.example.ui.SanctuaryUiTokenTest' \
             --stacktrace > "$RUNNER_TEMP/p27b-assets.log" 2>&1
           result=$?
           cat "$RUNNER_TEMP/p27b-assets.log"
@@ -163,6 +164,13 @@ jobs:
             cp -f app/build/visual_screenshots/p27b_next/world/*.png "$next/world/"
             cp -f app/build/visual_screenshots/p27b_next/world/camera_props.json "$next/world/"
             git add "$next"
+          fi
+          # UI evidence is produced by P27BUiTest under the p27b folder; V5 publishes it
+          # next to the V5 world frames so one commit carries the whole checkpoint.
+          if [ -d app/build/visual_screenshots/p27b/ui ]; then
+            mkdir -p docs/p27b_next/previews/after/ui
+            cp -f app/build/visual_screenshots/p27b/ui/*.png docs/p27b_next/previews/after/ui/
+            git add docs/p27b_next/previews/after/ui
           fi
           git config user.name 'p27b-render-bot'
           git config user.email 'actions@users.noreply.github.com'
