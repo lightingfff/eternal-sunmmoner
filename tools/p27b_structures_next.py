@@ -75,6 +75,18 @@ DEBT_A_SPECS = {
   'tower_gatehouse':        {'file': 'gate_tower.png',      'size': (96, 136),  'replaces': 'gate_tower'},
 }
 
+# Debt A, third pass: the perimeter curtain wall. This one is a REPEATING TILE, not a
+# sprite - 88x48, tiled along the whole rim. The shipped P03 tile has a measured seam of
+# exactly 0.00 on both axes, so a replacement has to be at least as continuous; a visible
+# vertical cut repeated 40 times around the island reads as a rendering bug.
+WALL_SPEC = {
+  'id': 'curtain_wall',
+  'source': 'retaining_wall.png',
+  'file': 'retaining_wall.png',
+  'size': (88, 48),
+  'replaces': 'retaining_wall',
+}
+
 # Vegetation comes from its own painted sheet: three trees, three inherited canvases.
 TREE_SHEET = 'tree_set_01.png'
 TREE_SPECS = [
@@ -210,6 +222,43 @@ def slice_items(cut: Image.Image) -> list[Image.Image]:
             continue
         items.append(cut.crop((left, rows[0], right, rows[-1] + 1)))
     return items
+
+
+def vertical_seam(image: Image.Image) -> float:
+    """Mean |RGB| difference between the tile's right and left edge columns."""
+    width, height = image.size
+    px = image.load()
+    total = 0
+    pairs = 0
+    for y in range(height):
+        a, b = px[width - 1, y], px[0, y]
+        if a[3] == 0 or b[3] == 0:
+            continue
+        total += abs(a[0] - b[0]) + abs(a[1] - b[1]) + abs(a[2] - b[2])
+        pairs += 1
+    return total / pairs if pairs else 0.0
+
+
+def best_wall_shift(image: Image.Image) -> tuple[int, int]:
+    """Circular shift that puts the most continuous pair of neighbour columns at the seam.
+
+    Rotation is used instead of a cross-fade because this is 1:1 crisp pixel art: fading a
+    band across the joint turns 4-6 columns of sharp blocks into mush, which is more visible
+    than the joint it removes. See tools/tile_seamless.py for the standalone version.
+    """
+    width = image.width
+    px = image.load()
+    best_s, best_cost = 0, None
+    for shift in range(width):
+        cost = 0
+        for y in range(image.height):
+            a, b = px[(shift - 1) % width, y], px[shift % width, y]
+            if a[3] == 0 or b[3] == 0:
+                continue
+            cost += abs(a[0] - b[0]) + abs(a[1] - b[1]) + abs(a[2] - b[2])
+        if best_cost is None or cost < best_cost:
+            best_s, best_cost = shift, cost
+    return best_s, best_cost or 0
 
 
 def luma(image: Image.Image) -> float:
@@ -353,6 +402,46 @@ def main() -> None:
         manifest['assets'].append(record)
         print(f'{name:24} -> {spec["file"]:18} luma {record["mean_luma"]:5.1f} '
               f'(was {record["old_mean_luma"]})')
+
+    # ---- curtain wall tile --------------------------------------------------
+    wall_source = SOURCE / WALL_SPEC['source']
+    if wall_source.is_file():
+        # Full-bleed: a wall tile must own every column, unlike a sprite which keeps air
+        # around it. Then rotate to the least-visible joint; see tools/tile_seamless.py.
+        content = crop_to_content(neutral_background_cutout(Image.open(wall_source)))
+        full = content.resize(WALL_SPEC['size'], Image.Resampling.BOX)
+        full.putalpha(full.getchannel('A').point(lambda v: 255 if v >= 128 else 0))
+        shifted, _ = best_wall_shift(full)
+        width = full.width
+        healed = Image.new('RGBA', full.size, (0, 0, 0, 0))
+        healed.paste(full.crop((shifted, 0, width, full.height)), (0, 0))
+        healed.paste(full.crop((0, 0, shifted, full.height)), (width - shifted, 0))
+        seam_before = vertical_seam(full)
+        seam_after = vertical_seam(healed)
+        out_path = OUT / WALL_SPEC['file']
+        healed.save(out_path, optimize=True)
+        old_path = OLD / f"{WALL_SPEC['replaces']}.png"
+        manifest['assets'].append({
+            'id': WALL_SPEC['id'],
+            'file': f"structures/{WALL_SPEC['file']}",
+            'size': list(healed.size),
+            'replaces': f"sanctuary_p03/{WALL_SPEC['replaces']}",
+            'pivot': [WALL_SPEC['size'][0] // 2, WALL_SPEC['size'][1]],
+            'alpha': 'binary RGBA',
+            'tiling': 'horizontal',
+            'seam_shift_px': shifted,
+            'seam_before': round(seam_before, 2),
+            'seam_after': round(seam_after, 2),
+            'source_path': str(wall_source.relative_to(ROOT)),
+            'source_sha256': hashlib.sha256(wall_source.read_bytes()).hexdigest(),
+            'sha256': hashlib.sha256(out_path.read_bytes()).hexdigest(),
+            'mean_luma': round(luma(healed), 1),
+            'old_mean_luma': round(luma(Image.open(old_path)), 1) if old_path.is_file() else None,
+            'qa_status': 'GAME_CANDIDATE',
+            'visual_qa': 'tiled around the whole perimeter; check at z0.36 and z1.48',
+        })
+        print(f"{WALL_SPEC['id']:20} -> {WALL_SPEC['file']:18} seam {seam_before:5.1f} -> "
+              f"{seam_after:5.1f} (shift {shifted}px)")
 
     # ---- vegetation --------------------------------------------------------
     tree_source = SOURCE / TREE_SHEET

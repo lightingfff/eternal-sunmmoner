@@ -127,8 +127,14 @@ object PixelStructureAtlas {
       ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/wooden_bench.png") ?: woodenBenchFallback
   private val woodenBenchFallback: ImageBitmap by lazy { buildWoodenBench34() }
   val arcaneBookshelfSprite: ImageBitmap by lazy { buildArcaneBookshelf34() }
+  // P27B-V5 CP5 (debt A, last big P03 block): the perimeter curtain wall was the dark
+  // blue-grey P03 slab (luma 75) repeated around an ivory island. Same 88x48 tile, same
+  // tiling, new ivory art; the tile is rotated to its least-visible joint because a
+  // vertical cut repeated ~40 times around the rim reads as a rendering bug.
   val stoneRetainingWallSprite: ImageBitmap get() =
-    SanctuaryArtAssets.assetSafe("sanctuary_p03/retaining_wall.png") ?: stoneRetainingWallFallback
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/retaining_wall.png")
+      ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/retaining_wall.png")
+      ?: stoneRetainingWallFallback
   private val stoneRetainingWallFallback: ImageBitmap by lazy { buildStoneRetainingWall() }
 
   // 3/4 Restaurant Interior Furnishings (Reference 2)

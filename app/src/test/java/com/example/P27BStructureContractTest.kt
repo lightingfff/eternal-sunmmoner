@@ -50,6 +50,8 @@ class P27BStructureContractTest {
     "hero_registry" to (188 to 166),
     "fortress_tower" to (80 to 118),
     "gate_tower" to (96 to 136),
+    // Repeating tile, not a sprite: still the shipped 88x48.
+    "retaining_wall" to (88 to 48),
   )
 
   private fun assetBytes(path: String): ByteArray {
@@ -242,5 +244,31 @@ class P27BStructureContractTest {
     assertEquals(118, PixelStructureAtlas.fortressCornerTowerSprite.height)
     assertEquals(96, PixelStructureAtlas.southernGateTowerSprite.width)
     assertEquals(188, PixelStructureAtlas.heroRegistryStructure.width)
+    assertEquals(88, PixelStructureAtlas.stoneRetainingWallSprite.width)
+  }
+
+  /**
+   * The curtain wall is tiled ~40 times around the rim, so a vertical seam repeats 40
+   * times and reads as a rendering bug. The shipped P03 tile measures 0.00 on both axes;
+   * this keeps the replacement in the same league instead of trusting "it looks fine".
+   */
+  @Test
+  fun curtainWallTileStaysContinuouslyTiled() {
+    val bytes = assetBytes("sanctuary_p27b_2/structures/retaining_wall.png")
+    val png = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)!!
+    var total = 0.0
+    var pairs = 0
+    for (y in 0 until png.height) {
+      val left = png.getPixel(0, y)
+      val right = png.getPixel(png.width - 1, y)
+      if ((left ushr 24) == 0 || (right ushr 24) == 0) continue
+      total += kotlin.math.abs(((left shr 16) and 0xFF) - ((right shr 16) and 0xFF)).toDouble()
+      total += kotlin.math.abs(((left shr 8) and 0xFF) - ((right shr 8) and 0xFF)).toDouble()
+      total += kotlin.math.abs((left and 0xFF) - (right and 0xFF)).toDouble()
+      pairs++
+    }
+    assertTrue("wall edge rows must be opaque (a wall tile owns every column)", pairs >= png.height - 2)
+    val seam = total / pairs
+    assertTrue("wall vertical seam is $seam, above the 14.0 limit", seam < 14.0)
   }
 }

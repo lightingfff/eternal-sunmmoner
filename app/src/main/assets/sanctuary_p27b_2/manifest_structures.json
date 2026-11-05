@@ -340,6 +340,31 @@
       "visual_qa": "needs engine-side review; corner tower repeats around the wall"
     },
     {
+      "id": "curtain_wall",
+      "file": "structures/retaining_wall.png",
+      "size": [
+        88,
+        48
+      ],
+      "replaces": "sanctuary_p03/retaining_wall",
+      "pivot": [
+        44,
+        48
+      ],
+      "alpha": "binary RGBA",
+      "tiling": "horizontal",
+      "seam_shift_px": 84,
+      "seam_before": 36.62,
+      "seam_after": 9.17,
+      "source_path": "art/p27b_sources_next/retaining_wall.png",
+      "source_sha256": "b2ee1593fb1d4439da2bc15cd3acf8627e62e1c755b1c086df495d0e79fdb4bd",
+      "sha256": "923c1e8bbc35440237148138e76a2f2aaa02d6ea799c3b0a7355d04ff513f3ca",
+      "mean_luma": 192.2,
+      "old_mean_luma": 75.4,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "tiled around the whole perimeter; check at z0.36 and z1.48"
+    },
+    {
       "id": "sakura_a",
       "file": "structures/canopy_a.png",
       "size": [
