@@ -11,7 +11,7 @@
     "width": 1280,
     "height": 720,
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "4baa7d156fbce0b9bcd8d5e7d43685c7175345be"
+    "source_sha": "a09e4ca578f0e8595016030694d62f6304317c02"
   },
   {
     "file": "service_noon_z088.png",
@@ -25,7 +25,7 @@
     "width": 1280,
     "height": 720,
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "4baa7d156fbce0b9bcd8d5e7d43685c7175345be"
+    "source_sha": "a09e4ca578f0e8595016030694d62f6304317c02"
   },
   {
     "file": "plaza_noon_z100.png",
@@ -39,7 +39,7 @@
     "width": 1280,
     "height": 720,
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "4baa7d156fbce0b9bcd8d5e7d43685c7175345be"
+    "source_sha": "a09e4ca578f0e8595016030694d62f6304317c02"
   },
   {
     "file": "summon_noon_z148.png",
@@ -53,7 +53,7 @@
     "width": 1280,
     "height": 720,
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "4baa7d156fbce0b9bcd8d5e7d43685c7175345be"
+    "source_sha": "a09e4ca578f0e8595016030694d62f6304317c02"
   },
   {
     "file": "summon_night_z148.png",
@@ -67,7 +67,7 @@
     "width": 1280,
     "height": 720,
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "4baa7d156fbce0b9bcd8d5e7d43685c7175345be"
+    "source_sha": "a09e4ca578f0e8595016030694d62f6304317c02"
   },
   {
     "file": "gate_noon_z148.png",
@@ -81,7 +81,7 @@
     "width": 1280,
     "height": 720,
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "4baa7d156fbce0b9bcd8d5e7d43685c7175345be"
+    "source_sha": "a09e4ca578f0e8595016030694d62f6304317c02"
   },
   {
     "file": "gate_night_z148.png",
@@ -95,6 +95,6 @@
     "width": 1280,
     "height": 720,
     "render_method": "Robolectric native Compose Canvas",
-    "source_sha": "4baa7d156fbce0b9bcd8d5e7d43685c7175345be"
+    "source_sha": "a09e4ca578f0e8595016030694d62f6304317c02"
   }
 ]
