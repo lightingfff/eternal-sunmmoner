@@ -51,7 +51,6 @@ jobs:
           {
             echo "P28 debug — compile errors on ${{ github.sha }}:"
             echo '```'
-            grep -E '^e: |error: ' /tmp/build.log | head -m 60 || true
             grep -E '^e: |error: ' /tmp/build.log | head -60 || echo "(no 'e:'/'error:' lines found — see tail below)"
             echo '--- tail of build log ---'
             tail -30 /tmp/build.log
