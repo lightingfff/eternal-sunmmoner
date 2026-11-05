@@ -14,6 +14,7 @@ on:
       - '.github/render-trigger/**'
       - 'app/src/main/java/com/example/game/pixel/**'
       - 'app/src/main/java/com/example/ui/**'
+      - 'app/src/main/assets/sanctuary_p27b_2/**'
       - 'app/src/test/java/com/example/P27B*Test.kt'
       - 'app/src/test/java/com/example/SanctuaryMaterialTest.kt'
       - 'app/src/test/java/com/example/ui/P27B*Test.kt'
@@ -86,6 +87,7 @@ jobs:
             --tests 'com.example.P27BAssetContractTest' \
             --tests 'com.example.SanctuaryMaterialTest' \
             --tests 'com.example.P27BGroundRepeatTest' \
+            --tests 'com.example.P27BStructureContractTest' \
             --stacktrace > "$RUNNER_TEMP/p27b-assets.log" 2>&1
           result=$?
           cat "$RUNNER_TEMP/p27b-assets.log"
