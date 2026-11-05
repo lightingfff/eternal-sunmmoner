@@ -13,8 +13,6 @@ import com.example.game.pixel.PixelSpriteRenderer.drawSanctuaryZoneFloorRing
 import com.example.game.pixel.PixelStructureAtlas
 import com.example.game.pixel.PixelTileAtlas
 import com.example.game.pixel.SanctuaryArtAssets
-import com.example.game.map.ObliqueCamera
-import com.example.game.map.SanctuaryIslandGeometry
 import com.example.game.pixel.SanctuaryVisualProfile
 import com.example.game.tower.TowerFloorCatalog
 import java.security.MessageDigest
@@ -117,11 +115,13 @@ class P27BAssetContractTest {
     }
   }
 
-  /** The ivory floor must cover exactly the Summon zone, and no other facility's ground. */
-  @Test fun ivoryZoneIsDrawnOnlyUnderTheSummoningHall() {
+  /** Ivory ground must never be painted as a second surface over the authored hall apron. */
+  @Test fun zoneFloorRingStaysGroundNeutral() {
     val context = RuntimeEnvironment.getApplication()
     SanctuaryArtAssets.init(context)
-    requireNotNull(PixelTileAtlas.summoningIvoryTiles) { "P27B ivory family must be shipped" }
+    // Shipped and validated, but deliberately not painted by the zone ring: the hall sprite
+    // already bakes its own limestone apron (see PixelSpriteRenderer history in P27B).
+    requireNotNull(PixelTileAtlas.summoningIvoryTiles) { "P27B ivory family must stay packaged" }
     val width = 1280
     val height = 720
     val zones = TowerFloorCatalog.SANCTUARY_ZONES
@@ -130,62 +130,26 @@ class P27BAssetContractTest {
       val image = android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888)
         .asImageBitmap()
       CanvasDrawScope().draw(Density(1f), LayoutDirection.Ltr, Canvas(image), Size(width.toFloat(), height.toFloat())) {
-        // Camera centred on the Summon zone for both passes so any ivory bleed into the
-        // Gate/training ground would be sampled, not hidden by the viewport.
         zones.filter { it.facility == target }.forEach { zone ->
           drawSanctuaryZoneFloorRing(zone, false, summon.centerX, summon.centerY, 1.48f, 0f)
         }
       }
       return image.asAndroidBitmap()
     }
-    fun ivoryPixels(bmp: android.graphics.Bitmap): Int {
+    fun opaque(bmp: android.graphics.Bitmap): Int {
       val pixels = IntArray(bmp.width * bmp.height)
       bmp.getPixels(pixels, 0, bmp.width, 0, 0, bmp.width, bmp.height)
-      // Ivory limestone is a light, low-chroma neutral; the legacy ring is a blue glow.
-      return pixels.count { p ->
-        val a = p ushr 24
-        if (a == 0) return@count false
-        val r = p shr 16 and 255
-        val g = p shr 8 and 255
-        val b = p and 255
-        r > 180 && g > 175 && b > 160 && kotlin.math.abs(r - b) < 40
-      }
+      return pixels.count { it ushr 24 != 0 }
     }
-    val summonIvory = ivoryPixels(renderOnly(FacilityType.SUMMONING_HALL))
-    assertTrue("Summoning Hall must show an ivory limestone floor", summonIvory > 20_000)
-    assertEquals("no other facility may receive the ivory floor", 0, ivoryPixels(renderOnly(FacilityType.TOWER_GATE)))
-
-    // Regression from the first engine AFTER pass: the zone ellipse is wider than the
-    // island silhouette, so an opaque floor painted over the southern rim/cliff. Any
-    // ivory pixel outside the walkable polygon is a defect, not a styling choice.
-    val floor = renderOnly(FacilityType.SUMMONING_HALL)
-    val camX = summon.centerX
-    val camY = summon.centerY
-    val zoom = 1.48f
-    fun insideIsland(x: Int, y: Int): Boolean {
-      val wx = ObliqueCamera.screenToWorldX(x + 0.5f, camX, zoom, width / 2f)
-      val wy = ObliqueCamera.screenToWorldY(y + 0.5f, camY, zoom, height / 2f)
-      var inside = false
-      val verts = SanctuaryIslandGeometry.POLYGON_VERTICES
-      var j = verts.size - 1
-      for (i in verts.indices) {
-        val (xi, yi) = verts[i]
-        val (xj, yj) = verts[j]
-        if ((yi > wy) != (yj > wy) && wx < (xj - xi) * (wy - yi) / (yj - yi) + xi) inside = !inside
-        j = i
-      }
-      return inside
+    // The ring is translucent glow only. A large opaque footprint would mean a floor layer
+    // came back and is covering the sprite apron / grass again.
+    for (zone in zones) {
+      val filled = opaque(renderOnly(zone.facility))
+      assertTrue("${zone.facility}: zone ring must stay translucent, got $filled opaque px", filled == 0)
+      val buffer = IntArray(width * height)
+      renderOnly(zone.facility).getPixels(buffer, 0, width, 0, 0, width, height)
+      val maxAlpha = buffer.maxOf { it ushr 24 }
+      assertTrue("${zone.facility}: ring alpha stays a glow (max $maxAlpha)", maxAlpha < 200)
     }
-    val pixels = IntArray(floor.width * floor.height)
-    floor.getPixels(pixels, 0, floor.width, 0, 0, floor.width, floor.height)
-    var outside = 0
-    for (y in 0 until floor.height) for (x in 0 until floor.width) {
-      val p = pixels[y * floor.width + x]
-      if (p ushr 24 == 0) continue
-      val r = p shr 16 and 255; val g = p shr 8 and 255; val b = p and 255
-      val ivory = r > 180 && g > 175 && b > 160 && kotlin.math.abs(r - b) < 40
-      if (ivory && !insideIsland(x, y)) outside++
-    }
-    assertEquals("ivory floor must stop at the island silhouette", 0, outside)
   }
 }

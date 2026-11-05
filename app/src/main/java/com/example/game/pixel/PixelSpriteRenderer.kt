@@ -17,13 +17,11 @@ import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.example.data.model.HeroClassType
-import com.example.data.model.FacilityType
 import com.example.data.model.IslandExpansionMilestone
 import com.example.game.map.BiomeTheme
 import com.example.game.map.EnemyArchetype
 import com.example.game.map.ObliqueCamera
 import com.example.game.map.PathSegment
-import com.example.game.map.SanctuaryIslandGeometry
 import com.example.game.map.PropKind
 import com.example.game.map.SanctuaryHouseEntrances
 import com.example.game.map.SanctuaryLight
@@ -455,52 +453,16 @@ object PixelSpriteRenderer {
     val cy = ObliqueCamera.worldToScreenY(zone.centerY, camY, zoom, size.height / 2f)
     val rx = zone.interactRadius * 0.56f * zoom
     val ry = rx * ObliqueCamera.GROUND_ELLIPSE_RATIO
-    val ivory = if (zone.facility == FacilityType.SUMMONING_HALL) PixelTileAtlas.summoningIvoryTiles else null
-    // Court size for the cull box only; the paving itself is tile-aligned (see below).
-    val floorRx = if (ivory != null) zone.interactRadius * 0.72f * zoom else rx
-    val floorRy = floorRx * ObliqueCamera.GROUND_ELLIPSE_RATIO
-    if (cx + floorRx < 0f || cx - floorRx > size.width || cy + floorRy < 0f || cy - floorRy > size.height) return
+    if (cx + rx < 0f || cx - rx > size.width || cy + ry < 0f || cy - ry > size.height) return
 
-    // The hall sprite already contains its own stone apron, so a smooth elliptical ivory
-    // pad drawn under it can only read as a pasted disc: the ellipse edge cuts across the
-    // authored apron. Instead pave whole 64 px world tiles whose centre falls inside the
-    // court, the same vocabulary the plaza/road ground uses. The boundary is then a
-    // tile staircase, not a vector ellipse, and it stays under the sprite like real ground.
-    if (ivory != null) {
-      val courtRadiusWorld = zone.interactRadius * 0.72f
-      val islandPath = Path().apply {
-        SanctuaryIslandGeometry.POLYGON_VERTICES.forEachIndexed { index, (vx, vy) ->
-          val px = ObliqueCamera.worldToScreenX(vx, camX, zoom, size.width / 2f)
-          val py = ObliqueCamera.worldToScreenY(vy, camY, zoom, size.height / 2f)
-          if (index == 0) moveTo(px, py) else lineTo(px, py)
-        }
-        close()
-      }
-      val tileWidth = (64f * zoom).roundToInt() + 1
-      val tileHeight = (64f * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt() + 1
-      val left = ((zone.centerX - courtRadiusWorld) / 64f).toInt()
-      val right = ((zone.centerX + courtRadiusWorld) / 64f).toInt()
-      val top = ((zone.centerY - courtRadiusWorld) / 64f).toInt()
-      val bottom = ((zone.centerY + courtRadiusWorld) / 64f).toInt()
-      // The island polygon still wins: an opaque tile must never paint over the cliff/void.
-      clipPath(islandPath) {
-        for (ty in top..bottom) for (tx in left..right) {
-          val centerX = tx * 64f + 32f
-          val centerY = ty * 64f + 32f
-          val dx = centerX - zone.centerX
-          val dy = centerY - zone.centerY
-          if (dx * dx + dy * dy > courtRadiusWorld * courtRadiusWorld) continue
-          val sx = ObliqueCamera.worldToScreenX(tx * 64f, camX, zoom, size.width / 2f)
-          val sy = ObliqueCamera.worldToScreenY(ty * 64f, camY, zoom, size.height / 2f)
-          drawImage(
-            image = ivory[PixelTileAtlas.sanctuaryTileIndex(ivory, tx, ty, 0)],
-            dstOffset = IntOffset(sx.roundToInt(), sy.roundToInt()),
-            dstSize = IntSize(tileWidth, tileHeight),
-            filterQuality = FilterQuality.None,
-          )
-        }
-      }
-    }
+    // P27B review: the ivory summoning ground is delivered by the hall sprite itself, which
+    // bakes a limestone apron that already covers this zone. Two extra attempts to paint an
+    // ivory ground layer here were rejected on real engine renders:
+    //   * a translucent ellipse pad read as a pasted disc (vector edge over authored apron);
+    //   * world-tile paving spilled past the apron onto grass and the island rim.
+    // An opaque layer under a sprite that already contains the same material can only double
+    // the surface. The `summon_ivory` 4x4 family stays packaged and validated for a future
+    // floor that owns its footprint; it is deliberately not painted here.
 
     val baseColor = Color(zone.colorArgb)
     val glowAlpha = if (isMasterInside) 0.42f else (0.12f + 0.05f * sin(timeSec * 2.4f))
