@@ -136,16 +136,18 @@ class P27BAssetContractTest {
       }
       return image.asAndroidBitmap()
     }
-    fun opaque(bmp: android.graphics.Bitmap): Int {
+    // Fully opaque only: a glow blended onto a transparent canvas has partial alpha, so
+    // counting every non-zero pixel would flag the ring's own antialiasing.
+    fun fullyOpaque(bmp: android.graphics.Bitmap): Int {
       val pixels = IntArray(bmp.width * bmp.height)
       bmp.getPixels(pixels, 0, bmp.width, 0, 0, bmp.width, bmp.height)
-      return pixels.count { it ushr 24 != 0 }
+      return pixels.count { it ushr 24 == 255 }
     }
     // The ring is translucent glow only. A large opaque footprint would mean a floor layer
     // came back and is covering the sprite apron / grass again.
     for (zone in zones) {
-      val filled = opaque(renderOnly(zone.facility))
-      assertTrue("${zone.facility}: zone ring must stay translucent, got $filled opaque px", filled == 0)
+      val filled = fullyOpaque(renderOnly(zone.facility))
+      assertTrue("${zone.facility}: zone ring must stay translucent, got $filled fully opaque px", filled == 0)
       val buffer = IntArray(width * height)
       renderOnly(zone.facility).getPixels(buffer, 0, width, 0, 0, width, height)
       val maxAlpha = buffer.maxOf { it ushr 24 }
