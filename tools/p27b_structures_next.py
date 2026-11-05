@@ -135,10 +135,34 @@ def crop_to_content(image: Image.Image, margin: int = 2) -> Image.Image:
                        min(image.width, right + margin), min(image.height, bottom + margin)))
 
 
-def to_canvas(image: Image.Image, size: tuple[int, int]) -> Image.Image:
-    """Fit the building into the inherited canvas, anchored to the bottom-centre pivot."""
+def foot_padding(path: Path) -> int:
+    """Rows of fully transparent pixels at the bottom of a shipped sprite.
+
+    This is not cosmetic. For trees, `ObliqueSpriteGeometry.drawFootOffset()` IS this
+    number (`bounds(image).bottomPadding * pixelScale`), so a re-cut tree with 0 padding
+    draws 5 px lower than the art was authored against and sinks into the ground. Caught
+    by MapForgeP22ContractTest, which is why the new art must inherit it, not re-invent it.
+    """
+    if not path.is_file():
+        return 0
+    alpha = Image.open(path).convert('RGBA').getchannel('A')
+    width, height = alpha.size
+    px = alpha.load()
+    for y in range(height - 1, -1, -1):
+        if any(px[x, y] > 128 for x in range(width)):
+            return height - 1 - y
+    return height
+
+
+def to_canvas(image: Image.Image, size: tuple[int, int], foot_pad: int = 0) -> Image.Image:
+    """Fit the building into the inherited canvas, anchored to the bottom-centre pivot.
+
+    `foot_pad` keeps the SHIPPED number of transparent rows under the sprite, because the
+    renderer derives the tree foot offset from it (see foot_padding()).
+    """
     content = crop_to_content(image)
-    scale = min(size[0] / content.width, size[1] / content.height)
+    usable_h = max(1, size[1] - foot_pad)
+    scale = min(size[0] / content.width, usable_h / content.height)
     # 0.98 keeps a one-pixel transparent rim so no cut edge sits exactly on the canvas
     # border, which is where the renderer's shadow silhouette would smear.
     target = (max(1, int(content.width * scale * 0.98)),
@@ -148,9 +172,16 @@ def to_canvas(image: Image.Image, size: tuple[int, int]) -> Image.Image:
     resized.putalpha(resized.getchannel('A').point(lambda v: 255 if v >= 128 else 0))
     canvas = Image.new('RGBA', size, (0, 0, 0, 0))
     x = (size[0] - resized.width) // 2
-    y = size[1] - resized.height
+    y = size[1] - foot_pad - resized.height
     canvas.paste(resized, (x, y))
     return canvas
+
+
+def inherited_foot_pad(*candidates: Path) -> int:
+    for candidate in candidates:
+        if candidate.is_file():
+            return foot_padding(candidate)
+    return 0
 
 
 def slice_items(cut: Image.Image) -> list[Image.Image]:
@@ -205,7 +236,7 @@ def main() -> None:
             print(f'skip {name}: no source')
             continue
         cut = neutral_background_cutout(Image.open(source_path))
-        canvas = to_canvas(cut, spec['size'])
+        canvas = to_canvas(cut, spec['size'], inherited_foot_pad(OLD / spec['replaces']))
         out_path = OUT / spec['file']
         canvas.save(out_path, optimize=True)
         old_path = OLD / spec['replaces']
@@ -234,7 +265,7 @@ def main() -> None:
         if len(items) != len(PROP_SPECS):
             raise SystemExit(f'prop sheet: expected {len(PROP_SPECS)} items, sliced {len(items)}')
         for (name, _index, size, replaces), item in zip(PROP_SPECS, items):
-            canvas = to_canvas(item, size)
+            canvas = to_canvas(item, size, inherited_foot_pad(OLD / f'{replaces}.png'))
             out_path = OUT / f'{replaces}.png'
             canvas.save(out_path, optimize=True)
             old_path = OLD / f'{replaces}.png'
@@ -263,7 +294,8 @@ def main() -> None:
         if not source_path.is_file():
             print(f'skip {name}: no source')
             continue
-        canvas = to_canvas(neutral_background_cutout(Image.open(source_path)), spec['size'])
+        canvas = to_canvas(neutral_background_cutout(Image.open(source_path)), spec['size'],
+                           inherited_foot_pad(premium / f'{spec["replaces_premium"]}.png'))
         out_path = OUT / spec['file']
         canvas.save(out_path, optimize=True)
         old_path = premium / f'{spec["replaces_premium"]}.png'
@@ -292,7 +324,9 @@ def main() -> None:
         if not source_path.is_file():
             print(f'skip {name}: no source')
             continue
-        canvas = to_canvas(neutral_background_cutout(Image.open(source_path)), spec['size'])
+        canvas = to_canvas(neutral_background_cutout(Image.open(source_path)), spec['size'],
+                           inherited_foot_pad(premium / f'{spec.get("replaces_premium", "")}.png',
+                                              OLD / f'{spec.get("replaces", "")}.png'))
         out_path = OUT / spec['file']
         canvas.save(out_path, optimize=True)
         if 'replaces_premium' in spec:
@@ -327,7 +361,8 @@ def main() -> None:
         if len(trees) != len(TREE_SPECS):
             raise SystemExit(f'tree sheet: expected {len(TREE_SPECS)} items, sliced {len(trees)}')
         for (name, _index, size, replaces), item in zip(TREE_SPECS, trees):
-            canvas = to_canvas(item, size)
+            # Trees MUST keep the shipped foot padding: it is the draw offset.
+            canvas = to_canvas(item, size, inherited_foot_pad(OLD / f'{replaces}.png'))
             out_path = OUT / f'{replaces}.png'
             canvas.save(out_path, optimize=True)
             old_path = OLD / f'{replaces}.png'

@@ -174,6 +174,32 @@ class P27BStructureContractTest {
     }
   }
 
+  /**
+   * The tree foot padding is not decoration: `ObliqueSpriteGeometry.drawFootOffset()` for a
+   * tree IS `bounds(image).bottomPadding * pixelScale`. The P27B-V5 tree re-cut filled the
+   * bottom rows of the canvas, so every tree drew ~5 px lower and the foot sank into the
+   * ground. It was caught by MapForgeP22ContractTest (bottom 131, expected 126).
+   *
+   * Houses are anchored to their bottom row, so they legitimately have 0 padding; this test
+   * only pins the sprites where the number is load-bearing.
+   */
+  @Test
+  fun vegetationKeepsTheShippedGroundOffset() {
+    val expected = mapOf("canopy_a" to 5, "pine" to 5, "oak" to 1)
+    for ((name, pad) in expected) {
+      val bytes = assetBytes("sanctuary_p27b_2/structures/$name.png")
+      val png = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)!!
+      var lastOpaqueRow = -1
+      for (y in 0 until png.height) {
+        for (x in 0 until png.width) {
+          if ((png.getPixel(x, y) ushr 24) > 128) { lastOpaqueRow = y; break }
+        }
+      }
+      val actual = png.height - 1 - lastOpaqueRow
+      assertEquals("$name must keep the shipped $pad-row ground offset", pad, actual)
+    }
+  }
+
   /** The runtime must actually bind the new art, not silently fall back to P03. */
   @Test
   fun runtimeBindsP27BHousesAndProps() {
