@@ -23,6 +23,7 @@ import com.example.game.map.BiomeTheme
 import com.example.game.map.EnemyArchetype
 import com.example.game.map.ObliqueCamera
 import com.example.game.map.PathSegment
+import com.example.game.map.SanctuaryIslandGeometry
 import com.example.game.map.PropKind
 import com.example.game.map.SanctuaryHouseEntrances
 import com.example.game.map.SanctuaryLight
@@ -455,7 +456,9 @@ object PixelSpriteRenderer {
     val rx = zone.interactRadius * 0.56f * zoom
     val ry = rx * ObliqueCamera.GROUND_ELLIPSE_RATIO
     val ivory = if (zone.facility == FacilityType.SUMMONING_HALL) PixelTileAtlas.summoningIvoryTiles else null
-    val floorRx = if (ivory != null) zone.interactRadius * 0.90f * zoom else rx
+    // 0.62 of the interaction radius matches the authored hall apron better than 0.90:
+    // at 0.90 the pad swallowed the steps, the grass and the island rim shading.
+    val floorRx = if (ivory != null) zone.interactRadius * 0.62f * zoom else rx
     val floorRy = floorRx * ObliqueCamera.GROUND_ELLIPSE_RATIO
     if (cx + floorRx < 0f || cx - floorRx > size.width || cy + floorRy < 0f || cy - floorRy > size.height) return
 
@@ -463,33 +466,44 @@ object PixelSpriteRenderer {
     // summoning zone. This is a *ground* draw before sprites/shadows/actors; it does
     // not change the zone radius, building anchor, collisions or interaction logic.
     if (ivory != null) {
-      val floorRadiusWorld = zone.interactRadius * 0.90f
+      val floorRadiusWorld = zone.interactRadius * 0.62f
       val oval = androidx.compose.ui.geometry.Rect(cx - floorRx, cy - floorRy, cx + floorRx, cy + floorRy)
       val floorPath = Path().apply { addOval(oval) }
-      clipPath(floorPath) {
-        val left = ((zone.centerX - floorRadiusWorld) / 64f).toInt()
-        val right = ((zone.centerX + floorRadiusWorld) / 64f).toInt()
-        val top = ((zone.centerY - floorRadiusWorld) / 64f).toInt()
-        val bottom = ((zone.centerY + floorRadiusWorld) / 64f).toInt()
-        val tileWidth = (64f * zoom).roundToInt() + 1
-        val tileHeight = (64f * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt() + 1
-        for (ty in top..bottom) for (tx in left..right) {
-          val sx = ObliqueCamera.worldToScreenX(tx * 64f, camX, zoom, size.width / 2f)
-          val sy = ObliqueCamera.worldToScreenY(ty * 64f, camY, zoom, size.height / 2f)
-          drawImage(
-            image = ivory[PixelTileAtlas.sanctuaryTileIndex(ivory, tx, ty, 0)],
-            dstOffset = IntOffset(sx.roundToInt(), sy.roundToInt()),
-            dstSize = IntSize(tileWidth, tileHeight),
-            filterQuality = FilterQuality.None,
-          )
+      // The zone ellipse extends past the island silhouette at this camera, and unlike the
+      // old translucent ring an opaque floor tile would paint on top of the cliff drop and
+      // the void. Reuse the walkable island polygon as the outer clip: the floor stops where
+      // the ground stops. Geometry itself (zone radius, anchor) is unchanged.
+      val islandPath = Path().apply {
+        SanctuaryIslandGeometry.POLYGON_VERTICES.forEachIndexed { index, (vx, vy) ->
+          val px = ObliqueCamera.worldToScreenX(vx, camX, zoom, size.width / 2f)
+          val py = ObliqueCamera.worldToScreenY(vy, camY, zoom, size.height / 2f)
+          if (index == 0) moveTo(px, py) else lineTo(px, py)
         }
+        close()
       }
-      drawOval(
-        color = Color(0xFF859AA5).copy(alpha = 0.72f),
-        topLeft = Offset(cx - floorRx, cy - floorRy),
-        size = Size(floorRx * 2f, floorRy * 2f),
-        style = Stroke(width = (3.2f * zoom).coerceAtLeast(1f)),
-      )
+      clipPath(islandPath) {
+        clipPath(floorPath) {
+          val left = ((zone.centerX - floorRadiusWorld) / 64f).toInt()
+          val right = ((zone.centerX + floorRadiusWorld) / 64f).toInt()
+          val top = ((zone.centerY - floorRadiusWorld) / 64f).toInt()
+          val bottom = ((zone.centerY + floorRadiusWorld) / 64f).toInt()
+          val tileWidth = (64f * zoom).roundToInt() + 1
+          val tileHeight = (64f * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt() + 1
+          for (ty in top..bottom) for (tx in left..right) {
+            val sx = ObliqueCamera.worldToScreenX(tx * 64f, camX, zoom, size.width / 2f)
+            val sy = ObliqueCamera.worldToScreenY(ty * 64f, camY, zoom, size.height / 2f)
+            drawImage(
+              image = ivory[PixelTileAtlas.sanctuaryTileIndex(ivory, tx, ty, 0)],
+              dstOffset = IntOffset(sx.roundToInt(), sy.roundToInt()),
+              dstSize = IntSize(tileWidth, tileHeight),
+              filterQuality = FilterQuality.None,
+            )
+          }
+        }
+        // No extra rim stroke: the pad edge is stone-on-grass, and a separate ring read as
+        // a decal outline floating over the terrain. The zone glow ring below still marks
+        // the interaction area exactly as before.
+      }
     }
 
     val baseColor = Color(zone.colorArgb)

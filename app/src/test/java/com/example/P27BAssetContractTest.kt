@@ -13,6 +13,8 @@ import com.example.game.pixel.PixelSpriteRenderer.drawSanctuaryZoneFloorRing
 import com.example.game.pixel.PixelStructureAtlas
 import com.example.game.pixel.PixelTileAtlas
 import com.example.game.pixel.SanctuaryArtAssets
+import com.example.game.map.ObliqueCamera
+import com.example.game.map.SanctuaryIslandGeometry
 import com.example.game.pixel.SanctuaryVisualProfile
 import com.example.game.tower.TowerFloorCatalog
 import java.security.MessageDigest
@@ -152,5 +154,38 @@ class P27BAssetContractTest {
     val summonIvory = ivoryPixels(renderOnly(FacilityType.SUMMONING_HALL))
     assertTrue("Summoning Hall must show an ivory limestone floor", summonIvory > 20_000)
     assertEquals("no other facility may receive the ivory floor", 0, ivoryPixels(renderOnly(FacilityType.TOWER_GATE)))
+
+    // Regression from the first engine AFTER pass: the zone ellipse is wider than the
+    // island silhouette, so an opaque floor painted over the southern rim/cliff. Any
+    // ivory pixel outside the walkable polygon is a defect, not a styling choice.
+    val floor = renderOnly(FacilityType.SUMMONING_HALL)
+    val camX = summon.centerX
+    val camY = summon.centerY
+    val zoom = 1.48f
+    fun insideIsland(x: Int, y: Int): Boolean {
+      val wx = ObliqueCamera.screenToWorldX(x + 0.5f, camX, zoom, width / 2f)
+      val wy = ObliqueCamera.screenToWorldY(y + 0.5f, camY, zoom, height / 2f)
+      var inside = false
+      val verts = SanctuaryIslandGeometry.POLYGON_VERTICES
+      var j = verts.size - 1
+      for (i in verts.indices) {
+        val (xi, yi) = verts[i]
+        val (xj, yj) = verts[j]
+        if ((yi > wy) != (yj > wy) && wx < (xj - xi) * (wy - yi) / (yj - yi) + xi) inside = !inside
+        j = i
+      }
+      return inside
+    }
+    val pixels = IntArray(floor.width * floor.height)
+    floor.getPixels(pixels, 0, floor.width, 0, 0, floor.width, floor.height)
+    var outside = 0
+    for (y in 0 until floor.height) for (x in 0 until floor.width) {
+      val p = pixels[y * floor.width + x]
+      if (p ushr 24 == 0) continue
+      val r = p shr 16 and 255; val g = p shr 8 and 255; val b = p and 255
+      val ivory = r > 180 && g > 175 && b > 160 && kotlin.math.abs(r - b) < 40
+      if (ivory && !insideIsland(x, y)) outside++
+    }
+    assertEquals("ivory floor must stop at the island silhouette", 0, outside)
   }
 }
