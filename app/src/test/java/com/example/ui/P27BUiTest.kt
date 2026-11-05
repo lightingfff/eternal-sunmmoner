@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.Canvas as AndroidCanvas
 import android.view.View
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.test.assertExists
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
