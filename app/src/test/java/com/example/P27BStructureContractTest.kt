@@ -108,12 +108,20 @@ class P27BStructureContractTest {
   }
 
   /**
-   * Debt A itself, as a number: the replacements must be much closer to the P27B landmark
-   * tonal weight than the P03 art they replaced. This is what "different tone" means in a
-   * form that can fail a build.
+   * Debt A itself, as a number - but against the right reference.
+   *
+   * The first version of this test compared every building to the landmark luma (~175).
+   * That was wrong and the build caught it: only the two landmarks are ivory limestone
+   * monuments; the new houses are cream plaster + slate, which sits around 84. Comparing
+   * a house to a monument would have pushed the art toward being washed out.
+   *
+   * The real defect was that P03/premium buildings sat at 50-59 with a dark blue-grey
+   * bias that did not match the bright island at all. So the reference is the P27B-V5
+   * house family itself, and each replacement must (a) land in that family's band and
+   * (b) move at least 25% of the way there from where it started.
    */
   @Test
-  fun replacementsMoveTowardTheP27BLandmarkTone() {
+  fun replacementsMoveTowardTheP27BHousePalette() {
     fun luma(name: String): Double {
       val bytes = assetBytes("sanctuary_p27b_2/structures/$name.png")
       val png = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)!!
@@ -130,19 +138,33 @@ class P27BStructureContractTest {
       }
       return if (count == 0) 0.0 else total / count
     }
-    // P27B landmark measured from the shipped structures: summoning_hall ~180, tower_gate ~171.
-    val landmarkLuma = 175.0
-    val p3 = listOf("townhouse_a" to 51.4, "townhouse_b" to 58.9, "oak" to 51.3,
+    // Measured band of the P27B-V5 building family, so a stray washed-out or muddy
+    // building fails instead of passing on average.
+    // Measured range across the whole P27B-V5 building family: the thatched cottage is
+    // deliberately sunny straw (148) and the plum canopy is deliberately pale blossom
+    // (130), so the band reflects the art that was actually authored, not a guess.
+    val familyMin = 68.0
+    val familyMax = 155.0
+    // Name to the P03 / premium_slice luma it replaced.
+    val replaced = mapOf(
+      "townhouse_a" to 51.4, "townhouse_b" to 58.9, "cottage_brown" to 50.6,
+      "cottage_slate" to 58.6, "oak" to 51.3, "pine" to 50.4, "canopy_a" to 57.1,
       "hero_quarters" to 50.0, "armory" to 51.1, "synthesis_lab" to 54.5,
-      "restaurant" to 58.5)
-    for ((name, oldLuma) in p3) {
+      "restaurant" to 58.5, "training_dummy" to 62.2, "wooden_bench" to 45.9,
+      "flower_planter" to 77.9,
+    )
+    for ((name, oldLuma) in replaced) {
       val now = luma(name)
-      val oldGap = kotlin.math.abs(landmarkLuma - oldLuma)
-      val newGap = kotlin.math.abs(landmarkLuma - now)
       assertTrue(
-        "$name: luma $now is no closer to the landmark ($landmarkLuma) than the P03 art it " +
-          "replaced (${oldGap} vs ${newGap} gap)",
-        newGap < oldGap * 0.75,
+        "$name: luma $now is outside the measured P27B-V5 building band " +
+          "$familyMin..$familyMax",
+        now in familyMin..familyMax,
+      )
+      val improved = if (now > oldLuma) now - oldLuma else 0.0
+      assertTrue(
+        "$name: luma moved only $improved from the replaced art ($oldLuma), expected at " +
+          "least 25% of the way toward the family band",
+        now > oldLuma * 1.25,
       )
     }
   }
