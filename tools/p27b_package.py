@@ -20,21 +20,37 @@ WORK = ROOT/'art/p27b_workbench_v2'
 STRUCT = ROOT/'art/p27b_workbench_4x4/structures'
 ASSET = ROOT/'app/src/main/assets/sanctuary_p27b'
 PREVIEW = ROOT/'docs/p27b/previews/terrain'
+ORIGIN_PREVIEW = ROOT/'art/p27b_sources/preview'
+PREVIEW_SIZE = 768
 
 
 def digest(p: Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()
 
 
+def write_origin_preview(origin: Path) -> str:
+    """The generator originals are multi-MB and not tracked; commit a small JPEG so CI
+    can still verify which image each shipped tile was derived from."""
+    ORIGIN_PREVIEW.mkdir(parents=True, exist_ok=True)
+    target = ORIGIN_PREVIEW/f'{origin.stem}_{PREVIEW_SIZE}.jpg'
+    with Image.open(origin) as image:
+        preview = image.convert('RGB')
+        preview.thumbnail((PREVIEW_SIZE, PREVIEW_SIZE), Image.LANCZOS)
+        preview.save(target, quality=86, optimize=True)
+    return digest(target)
+
+
 def main() -> None:
     families = json.loads((WORK/'manifest_candidates.json').read_text())['families']
     buildings = json.loads((STRUCT/'manifest_candidates.json').read_text())
     entries = []
+    origin_previews: dict[str, str] = {}
     for family, info in families.items():
         cols, rows = info['mosaic_grid']
         assert (cols,rows) == (4,4) and len(info['tiles']) == 16
         origin = ROOT/info['source_file']
         assert digest(origin) == info['source_sha256']
+        origin_previews[info['source_file']] = write_origin_preview(origin)
         for item in info['tiles']:
             f = WORK/item['file']
             with Image.open(f) as im:
@@ -49,6 +65,7 @@ def main() -> None:
                 'mosaic_xy':item['grid_pos'],'world_tile_px':[64,64],
                 'source_type':'original image-tool material sample; BOX mosaic normalization',
                 'source_path':info['source_file'],'source_sha256':info['source_sha256'],
+                'preview_sha256':origin_previews[info['source_file']],
                 'sha256':digest(dest), 'qa_status':'GAME_CANDIDATE',
                 'visual_qa':'5x5 checked offline; engine still required; visible 4x4 repeat',
             })
@@ -59,6 +76,7 @@ def main() -> None:
     for name, info in buildings.items():
         source = ROOT/info['source']
         assert digest(source) == info['source_sha256']
+        origin_previews[info['source']] = write_origin_preview(source)
         f = STRUCT/info['file']
         with Image.open(f) as im:
             assert im.size==tuple(info['size']) and im.mode=='RGBA'
@@ -72,7 +90,8 @@ def main() -> None:
             'pivot':info['pivot'],'focus':info['focus'],
             'world_scale_multiplier':'2 * worldObstacle.scale * zoom (unchanged)',
             'source_type':info['source_type'],'source_path':info['source'],
-            'source_sha256':info['source_sha256'],'sha256':digest(dest),
+            'source_sha256':info['source_sha256'],
+            'preview_sha256':origin_previews[info['source']],'sha256':digest(dest),
             'alpha_bbox':info['bbox_alpha'],'qa_status':'GAME_CANDIDATE',
             'visual_qa':'contact cutout checked; pending renderer pivot/light review',
         })

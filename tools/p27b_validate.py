@@ -16,10 +16,21 @@ from PIL import Image, ImageStat
 FAMILIES = ('grass','soil','flagstone','cobble','summon_ivory')
 STRUCTURES = {'summoning_hall':((268,206),(134,206),(111,176)),
               'tower_gate':((260,224),(130,224),(130,120))}
+# Multi-megabyte generator outputs stay out of Git; a 768 px JPEG preview is committed
+# so the provenance hash is still auditable in CI without a 15 MB blob.
+PREVIEW_SIZE = 768
 
 
 def sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def source_path(root: Path, entry: dict) -> Path:
+    full = root/entry['source_path']
+    if full.is_file():
+        return full
+    stem = Path(entry['source_path']).stem
+    return root/'art/p27b_sources/preview'/f'{stem}_{PREVIEW_SIZE}.jpg'
 
 
 def seam(a: Image.Image, b: Image.Image, axis: str) -> float:
@@ -44,9 +55,16 @@ def validate(root: Path) -> None:
         file = directory/entry['path']
         assert file.resolve().is_relative_to(directory.resolve()), entry['path']
         assert sha(file) == entry['sha256'], f"hash: {entry['id']}"
-        source = root/entry['source_path']
+        source = source_path(root, entry)
         assert source.resolve().is_relative_to((root/'art/p27b_sources').resolve())
-        assert sha(source) == entry['source_sha256'], f"source hash: {entry['id']}"
+        # A committed preview is derived, not the generator output: the sha256 field is
+        # only authoritative for the full-resolution original.
+        if source == root/entry['source_path']:
+            assert sha(source) == entry['source_sha256'], f"source hash: {entry['id']}"
+        else:
+            assert entry.get('preview_sha256') == sha(source), f"preview hash: {entry['id']}"
+            with Image.open(source) as preview:
+                assert max(preview.size) == PREVIEW_SIZE, f"preview size: {entry['id']}"
         assert entry['qa_status'] == 'GAME_CANDIDATE'
         with Image.open(file) as original:
             original.load()
