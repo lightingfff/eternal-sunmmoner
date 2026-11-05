@@ -79,10 +79,24 @@ jobs:
       - name: Assemble Android APK (technical verification only)
         if: ${{ always() && steps.render_world.outcome == 'success' }}
         run: |
-          gradle :app:assembleDebug --stacktrace
+          # app/build.gradle.kts explicitly signs debug with root debug.keystore.
+          # Don't alter signing configs or ship a key; this ephemeral key only verifies compilation.
+          if [ ! -f debug.keystore ]; then
+            keytool -genkeypair -noprompt -keystore debug.keystore -storepass android \
+              -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 \
+              -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+          set +e
+          gradle :app:assembleDebug --stacktrace > "$RUNNER_TEMP/p27b-apk.log" 2>&1
+          result=$?
+          cat "$RUNNER_TEMP/p27b-apk.log"
+          if [ "$result" -ne 0 ]; then
+            python3 tools/p27b_ci_failure.py "$RUNNER_TEMP/p27b-apk.log" app/build/test-results/testDebugUnitTest
+            exit "$result"
+          fi
           test -s app/build/outputs/apk/debug/app-debug.apk
           sha256sum app/build/outputs/apk/debug/app-debug.apk
-          echo "APK compiled on $GITHUB_SHA, artifact QUOTA_BLOCKED; APK not committed" >> "$GITHUB_STEP_SUMMARY"
+          echo "APK compiled on $GITHUB_SHA, artifact QUOTA_BLOCKED; APK not committed (ephemeral debug signature)" >> "$GITHUB_STEP_SUMMARY"
       - name: Commit matched renderer captures to this branch (quota-safe)
         if: ${{ always() && github.event_name == 'push' }}
         run: |

@@ -86,8 +86,16 @@ class P27BUiTest {
     rule.onNodeWithTag("summon_ritual_button").assertIsEnabled()
     capture(view(), "summon_modal_land_800")
     rule.onNodeWithTag("summon_ritual_button").performClick()
+    // AlertDialog uses a Compose transition; the frozen screenshot clock has to
+    // advance before an entering dialog is present in the semantics tree.
+    rule.mainClock.advanceTimeBy(450L)
+    rule.waitForIdle()
     rule.onNodeWithTag("cancel_summon_spend").assertExists().performClick()
+    rule.mainClock.advanceTimeBy(450L)
+    rule.waitForIdle()
     rule.onNodeWithTag("summon_ritual_button").performClick()
+    rule.mainClock.advanceTimeBy(450L)
+    rule.waitForIdle()
     rule.onNodeWithTag("confirm_summon_spend").assertExists()
   }
 
