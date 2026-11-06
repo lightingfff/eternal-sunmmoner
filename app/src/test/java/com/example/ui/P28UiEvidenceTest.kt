@@ -174,6 +174,7 @@ class P28UiEvidenceTest {
     assertEquals("p28_a", toggled)
     rule.onNodeWithTag("inspect_p28_d").assertExists().performClick()
     assertEquals("p28_d", inspected)
-    capture(view(), "hero_management_port_360")
+    // NOTE: Dialog content lives in a separate window, so view.draw() would capture an
+    // empty main view — no screenshot here; semantic assertions above are the evidence.
   }
 }
