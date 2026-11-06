@@ -24,7 +24,9 @@ import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -84,7 +86,7 @@ fun MasterHubScreen(
           horizontalArrangement = Arrangement.SpaceBetween,
         ) {
           Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Icon(Person, contentDescription = null, tint = ESTokens.AntiqueGold, modifier = Modifier.size(28.dp))
+            Icon(Icons.Default.Person, contentDescription = null, tint = ESTokens.AntiqueGold, modifier = Modifier.size(28.dp))
             Column {
               Text(
                 text = profile?.masterName ?: "Master",
@@ -103,7 +105,7 @@ fun MasterHubScreen(
             }
           }
           IconButton(onClick = onClose, modifier = Modifier.size(44.dp).testTag("master_hub_close")) {
-            Icon(Close, contentDescription = "Đóng", tint = ESTokens.IvoryPaper)
+            Icon(Icons.Default.Close, contentDescription = "Đóng", tint = ESTokens.IvoryPaper)
           }
         }
 
@@ -166,7 +168,7 @@ fun MasterHubScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
           ) {
-            Icon(Settings, contentDescription = null, tint = ESTokens.AntiqueGold, modifier = Modifier.size(20.dp))
+            Icon(Icons.Default.Settings, contentDescription = null, tint = ESTokens.AntiqueGold, modifier = Modifier.size(20.dp))
             Text("Cài đặt & tài khoản", color = ESTokens.IvoryPaper, style = MaterialTheme.typography.bodyMedium)
           }
         }

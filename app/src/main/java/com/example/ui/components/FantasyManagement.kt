@@ -47,11 +47,11 @@ val PanelGlass=Color(0xE0121B2E)
     color=FantasySkin.HudGlass,border=BorderStroke(1.dp,Gold.copy(alpha=.55f))) {
     Row(Modifier.padding(horizontal=4.dp),horizontalArrangement=Arrangement.SpaceEvenly,verticalAlignment=Alignment.CenterVertically) {
       for((id,title,icon) in listOf(
-        Triple("heroes","Anh hùng",Groups),
-        Triple("summon","Triệu hồi",AutoAwesome),
-        Triple("team","Đội hình",Group),
-        Triple("tower","Tháp",Castle),
-        Triple("inventory","Túi đồ",Backpack),
+        Triple("heroes","Anh hùng",Icons.Default.Groups),
+        Triple("summon","Triệu hồi",Icons.Default.AutoAwesome),
+        Triple("team","Đội hình",Icons.Default.Group),
+        Triple("tower","Tháp",Icons.Default.Castle),
+        Triple("inventory","Túi đồ",Icons.Default.Backpack),
       )) {
         TextButton({onNavigate(id)},modifier=Modifier.weight(1f).heightIn(min=48.dp).testTag("nav_$id"),contentPadding=PaddingValues(2.dp)) {
           Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(3.dp)) {
@@ -61,7 +61,7 @@ val PanelGlass=Color(0xE0121B2E)
         }
       }
       IconButton({expanded=!expanded},modifier=Modifier.size(40.dp).testTag("nav_expand_toggle")) {
-        Icon(if(expanded) Close else MoreVert,contentDescription="Mở/thu gọn nhãn",tint=Gold,modifier=Modifier.size(18.dp))
+        Icon(if(expanded) Icons.Default.Close else Icons.Default.MoreVert,contentDescription="Mở/thu gọn nhãn",tint=Gold,modifier=Modifier.size(18.dp))
       }
     }
   }
