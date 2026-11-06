@@ -1,0 +1,66 @@
+{
+  "terrain/flagstone_ancient_64.png": {
+    "width": 64,
+    "height": 64,
+    "bit_depth": 8,
+    "color_type": 6,
+    "size_bytes": 2647,
+    "sha256": "04c71c723049c38db2afc2816df72419413c1d99c74c20e54b8a7ac4167600e6"
+  },
+  "terrain/weathered_cobble_64.png": {
+    "width": 64,
+    "height": 64,
+    "bit_depth": 8,
+    "color_type": 6,
+    "size_bytes": 2912,
+    "sha256": "fecf96ec4919be67f8c5d4901b42e3723f1cb046ee0004808920c4bc182fff3d"
+  },
+  "terrain/corrupted_grass_64.png": {
+    "width": 64,
+    "height": 64,
+    "bit_depth": 8,
+    "color_type": 6,
+    "size_bytes": 4454,
+    "sha256": "20de35316b690816173703e2d6c871c26dbd1de27a70516e6f6179858eb7cd98"
+  },
+  "terrain/packed_soil_64.png": {
+    "width": 64,
+    "height": 64,
+    "bit_depth": 8,
+    "color_type": 6,
+    "size_bytes": 4359,
+    "sha256": "47e90c1bdb4d3f9a905911299eacd0d137d86dea91a97e6fe3e2808220acaa19"
+  },
+  "terrain/abyss_verge_64.png": {
+    "width": 64,
+    "height": 64,
+    "bit_depth": 8,
+    "color_type": 6,
+    "size_bytes": 5176,
+    "sha256": "f326eac49931ac752e8327d8155e9a7f95f7017e5380771409b23dd6c3f4872b"
+  },
+  "props/lantern_flame_sheet.png": {
+    "width": 64,
+    "height": 24,
+    "bit_depth": 8,
+    "color_type": 6,
+    "size_bytes": 268,
+    "sha256": "382153c83e89c3cf6e7a648e5a68cfa32131c1b84e0ac0aac9166b6223e2771a"
+  },
+  "vfx/tower_rift_sheet.png": {
+    "width": 1024,
+    "height": 160,
+    "bit_depth": 8,
+    "color_type": 6,
+    "size_bytes": 82853,
+    "sha256": "9e58e0c324e02351df6d5c30a44b0232cdb24d9be788ca7748a7e1e689f39f1b"
+  },
+  "vfx/forge_smoke_sheet.png": {
+    "width": 144,
+    "height": 48,
+    "bit_depth": 8,
+    "color_type": 6,
+    "size_bytes": 4905,
+    "sha256": "06bbf04c98590f337549e96806bbabf45b6da14084464b0ed8945afae619b7b3"
+  }
+}

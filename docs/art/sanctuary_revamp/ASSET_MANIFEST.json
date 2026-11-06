@@ -1,0 +1,245 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Eternal Summoner - Sanctuary Revival Asset Manifest",
+  "version": "1.1.0",
+  "checkpoint": "P31-A2 Real Asset Delivery",
+  "generatedBy": "Google AI Studio (Gemini) - Creative Director & Art Director",
+  "taskReference": "GitHub Issue #44 (P31-A2) in coordination with Issue #39",
+  "targetConsumers": {
+    "arena": "Arena Argent (#45 / P31-B Runtime Integration)",
+    "codex": "OpenAI Codex (#46 / P31-C Event Logic)"
+  },
+  "coordinateSystem": {
+    "camera": "ObliqueCamera",
+    "groundYScale": 0.72,
+    "uprightHeightScale": 1.0,
+    "worldSize": { "width": 3200, "height": 2760 },
+    "pivotConvention": "bottom-center (x = width / 2, y = height)"
+  },
+  "assets": [
+    {
+      "id": "terrain_flagstone_ancient_64",
+      "category": "ground_terrain",
+      "name": "Ancient Carved Flagstone 64x64",
+      "targetPath": "app/src/main/assets/sanctuary_p31/terrain/flagstone_ancient_64.png",
+      "dimensions": { "width": 64, "height": 64 },
+      "alpha": "opaque_rgba",
+      "sizeBytes": 2647,
+      "sha256": "04c71c723049c38db2afc2816df72419413c1d99c74c20e54b8a7ac4167600e6",
+      "pivot": { "x": 32, "y": 64 },
+      "worldAnchors": ["plaza_walkways", "ceremonial_approach", "southern_gate_approach"],
+      "lightingVariants": {
+        "dayLuma": 142,
+        "nightLuma": 58,
+        "nightTint": "#141724"
+      },
+      "performanceFallback": "sanctuary_pack/tiles/tile_stone_1.png",
+      "status": "GENERATED"
+    },
+    {
+      "id": "terrain_weathered_cobble_64",
+      "category": "ground_terrain",
+      "name": "Weathered Dark Cobblestone 64x64",
+      "targetPath": "app/src/main/assets/sanctuary_p31/terrain/weathered_cobble_64.png",
+      "dimensions": { "width": 64, "height": 64 },
+      "alpha": "opaque_rgba",
+      "sizeBytes": 2912,
+      "sha256": "fecf96ec4919be67f8c5d4901b42e3723f1cb046ee0004808920c4bc182fff3d",
+      "pivot": { "x": 32, "y": 64 },
+      "worldAnchors": ["facility_connectors", "residential_lanes", "armory_approach"],
+      "lightingVariants": {
+        "dayLuma": 118,
+        "nightLuma": 46,
+        "nightTint": "#10121C"
+      },
+      "performanceFallback": "sanctuary_p03/cobble_0.png",
+      "status": "GENERATED"
+    },
+    {
+      "id": "terrain_corrupted_grass_64",
+      "category": "ground_terrain",
+      "name": "Corrupted Moss Grass 64x64",
+      "targetPath": "app/src/main/assets/sanctuary_p31/terrain/corrupted_grass_64.png",
+      "dimensions": { "width": 64, "height": 64 },
+      "alpha": "opaque_rgba",
+      "sizeBytes": 4454,
+      "sha256": "20de35316b690816173703e2d6c871c26dbd1de27a70516e6f6179858eb7cd98",
+      "pivot": { "x": 32, "y": 64 },
+      "worldAnchors": ["courtyard_lawns", "tree_verges", "island_interior_meadows"],
+      "lightingVariants": {
+        "dayLuma": 96,
+        "nightLuma": 38,
+        "nightTint": "#0C1210"
+      },
+      "performanceFallback": "sanctuary_p03/grass_0.png",
+      "status": "GENERATED"
+    },
+    {
+      "id": "terrain_packed_soil_64",
+      "category": "ground_terrain",
+      "name": "Compacted Soil & Grit 64x64",
+      "targetPath": "app/src/main/assets/sanctuary_p31/terrain/packed_soil_64.png",
+      "dimensions": { "width": 64, "height": 64 },
+      "alpha": "opaque_rgba",
+      "sizeBytes": 4359,
+      "sha256": "47e90c1bdb4d3f9a905911299eacd0d137d86dea91a97e6fe3e2808220acaa19",
+      "pivot": { "x": 32, "y": 64 },
+      "worldAnchors": ["training_arena_core", "courtyard_service_paths"],
+      "lightingVariants": {
+        "dayLuma": 108,
+        "nightLuma": 42,
+        "nightTint": "#131110"
+      },
+      "performanceFallback": "sanctuary_p03/soil_0.png",
+      "status": "GENERATED"
+    },
+    {
+      "id": "terrain_abyss_verge_64",
+      "category": "ground_terrain",
+      "name": "Abyss Cliff Edge & Fractured Rim 64x64",
+      "targetPath": "app/src/main/assets/sanctuary_p31/terrain/abyss_verge_64.png",
+      "dimensions": { "width": 64, "height": 64 },
+      "alpha": "transparent_rgba_rim_fade",
+      "sizeBytes": 5176,
+      "sha256": "f326eac49931ac752e8327d8155e9a7f95f7017e5380771409b23dd6c3f4872b",
+      "pivot": { "x": 32, "y": 64 },
+      "worldAnchors": ["perimeter_walls_8_vertices", "chasm_overhangs"],
+      "lightingVariants": {
+        "dayLuma": 84,
+        "nightLuma": 32,
+        "nightTint": "#080A12"
+      },
+      "performanceFallback": "sanctuary_p03/verge.png",
+      "status": "GENERATED"
+    },
+    {
+      "id": "prop_lantern_flame_sheet",
+      "category": "animated_vfx",
+      "name": "Amber Sanctuary Street Lantern Flame 4-Frame Sheet",
+      "targetPath": "app/src/main/assets/sanctuary_p31/props/lantern_flame_sheet.png",
+      "dimensions": { "width": 64, "height": 24 },
+      "frameDimensions": { "width": 16, "height": 24 },
+      "frameCount": 4,
+      "animationFps": 4,
+      "alpha": "transparent_rgba",
+      "sizeBytes": 268,
+      "sha256": "382153c83e89c3cf6e7a648e5a68cfa32131c1b84e0ac0aac9166b6223e2771a",
+      "pivot": { "x": 8, "y": 24 },
+      "worldAnchors": [
+        { "x": 1495, "y": 2210 },
+        { "x": 1725, "y": 2210 },
+        { "x": 1940, "y": 1240 },
+        { "x": 1085, "y": 935 }
+      ],
+      "lightingVariants": {
+        "dayActive": false,
+        "nightActive": true,
+        "emissiveRadiusPx": 56,
+        "emissiveColor": "#F59E0B"
+      },
+      "performanceFallback": "sanctuary_p03/street_lantern_0.png",
+      "status": "GENERATED"
+    },
+    {
+      "id": "prop_tower_rift_sheet",
+      "category": "animated_vfx",
+      "name": "Tower Gate Astral Rift Vortex 8-Frame Sheet",
+      "targetPath": "app/src/main/assets/sanctuary_p31/vfx/tower_rift_sheet.png",
+      "dimensions": { "width": 1024, "height": 160 },
+      "frameDimensions": { "width": 128, "height": 160 },
+      "frameCount": 8,
+      "animationFps": 6,
+      "alpha": "transparent_rgba",
+      "sizeBytes": 82853,
+      "sha256": "9e58e0c324e02351df6d5c30a44b0232cdb24d9be788ca7748a7e1e689f39f1b",
+      "pivot": { "x": 64, "y": 140 },
+      "worldAnchor": { "x": 1960, "y": 635, "elevationZ": 215 },
+      "layer": "portal_interior_underlay",
+      "lightingVariants": {
+        "isEmissive": true,
+        "emissiveColor": "#38BDF8",
+        "pulsePeriodSec": 3.2
+      },
+      "performanceFallback": "sanctuary_p27b/structures/tower_gate.png",
+      "status": "GENERATED"
+    },
+    {
+      "id": "prop_forge_smoke_sheet",
+      "category": "animated_vfx",
+      "name": "Restaurant & Forge Chimney Smoke 6-Frame Sheet",
+      "targetPath": "app/src/main/assets/sanctuary_p31/vfx/forge_smoke_sheet.png",
+      "dimensions": { "width": 144, "height": 48 },
+      "frameDimensions": { "width": 24, "height": 48 },
+      "frameCount": 6,
+      "animationFps": 5,
+      "alpha": "transparent_rgba",
+      "sizeBytes": 4905,
+      "sha256": "06bbf04c98590f337549e96806bbabf45b6da14084464b0ed8945afae619b7b3",
+      "pivot": { "x": 12, "y": 48 },
+      "worldAnchor": { "x": 1095, "y": 880, "elevationZ": 86 },
+      "layer": "foreground_atmosphere",
+      "performanceFallback": "none (omitted on LOW tier)",
+      "status": "GENERATED"
+    },
+    {
+      "id": "actor_routine_lyra_idle_wall",
+      "category": "actor_animation",
+      "name": "Lyra Wallside Idle Routine",
+      "targetPath": "sanctuary_p31/actors/lyra_wall_idle_4f.png",
+      "dimensions": { "width": 256, "height": 96 },
+      "frameDimensions": { "width": 64, "height": 96 },
+      "frameCount": 4,
+      "animationFps": 4,
+      "alpha": "transparent_rgba",
+      "pivot": { "x": 32, "y": 94 },
+      "defaultRoutineAnchor": { "x": 1540, "y": 1360 },
+      "performanceFallback": "premium_slice/lyra.png",
+      "status": "PROPOSED"
+    },
+    {
+      "id": "actor_routine_kaelen_guard_post",
+      "category": "actor_animation",
+      "name": "Kaelen Gate Guard Routine",
+      "targetPath": "sanctuary_p31/actors/kaelen_guard_post_4f.png",
+      "dimensions": { "width": 256, "height": 96 },
+      "frameDimensions": { "width": 64, "height": 96 },
+      "frameCount": 4,
+      "animationFps": 4,
+      "alpha": "transparent_rgba",
+      "pivot": { "x": 32, "y": 94 },
+      "defaultRoutineAnchor": { "x": 1880, "y": 740 },
+      "performanceFallback": "premium_slice/kaelen.png",
+      "status": "PROPOSED"
+    },
+    {
+      "id": "ui_master_chip_frame",
+      "category": "ui_component",
+      "name": "Master Compact Reliquary Header Chip",
+      "targetPath": "ui_p31/controls/master_chip_frame.png",
+      "dimensions": { "width": 240, "height": 44 },
+      "nineSliceInsets": { "left": 14, "top": 10, "right": 14, "bottom": 10 },
+      "alpha": "transparent_rgba",
+      "purpose": "Replaces 64dp solid top bar with sleek 36-44dp weathered-iron floating chip",
+      "performanceFallback": "ui_p28/controls/button_secondary.png",
+      "status": "PROPOSED"
+    },
+    {
+      "id": "ui_floating_action_pill",
+      "category": "ui_component",
+      "name": "World-Space Contextual Action Pill",
+      "targetPath": "ui_p31/controls/floating_action_pill.png",
+      "dimensions": { "width": 180, "height": 40 },
+      "nineSliceInsets": { "left": 12, "top": 8, "right": 12, "bottom": 8 },
+      "alpha": "transparent_rgba",
+      "purpose": "Replaces 490dp bottom-right command panel with targeted single action chip",
+      "performanceFallback": "ui_p28/controls/button_primary.png",
+      "status": "PROPOSED"
+    }
+  ],
+  "contactSheet": {
+    "path": "docs/art/sanctuary_revamp/p31_pilot_contact_sheet.png",
+    "dimensions": { "width": 512, "height": 280 },
+    "sizeBytes": 50010,
+    "description": "Visual contact sheet previewing all 8 generated pilot assets at 1x pixel scale on dark slate background"
+  }
+}

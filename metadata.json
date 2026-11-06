@@ -1,6 +1,6 @@
 {
   "name": "Eternal Summoner",
-  "description": "A dark fantasy manhwa-inspired 2D pixel art tower-climbing tactical RPG with autonomous hero AI and Sanctuary management.",
+  "description": "An immersive 2.5D dark fantasy summoning RPG with tower combat and sanctuary management.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
