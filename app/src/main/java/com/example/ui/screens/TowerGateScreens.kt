@@ -80,6 +80,7 @@ import com.example.game.tower.TowerFloorCatalog
 import com.example.ui.SummonerUiState
 import com.example.ui.components.PixelHeroPortraitAvatar
 import com.example.ui.components.ResourcePillBadge
+import com.example.ui.components.p28.ESMiniHeroPortrait
 import com.example.ui.theme.ArcaneViolet
 import com.example.ui.theme.BorderRune
 import com.example.ui.theme.CrimsonBlood
@@ -873,7 +874,8 @@ private fun SquadHeroRosterList(
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-          PixelHeroPortraitAvatar(heroName = hero.name, heroClass = hero.classType, sizeDp = 48.dp)
+          // P28: framed portrait from the ui_p28 card assets (fallback glyph if no authored bust).
+          ESMiniHeroPortrait(heroName = hero.name, heroClass = hero.classType, sizeDp = 48.dp)
 
           Column(modifier = Modifier.weight(1f)) {
             Text(

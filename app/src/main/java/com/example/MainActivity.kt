@@ -43,6 +43,8 @@ import com.example.data.local.LocalGuestSaveManager
 import com.example.ui.GameScreenMode
 import com.example.ui.SummonerViewModel
 import com.example.ui.components.SettingsAndAccountModal
+import com.example.ui.components.p28.ESLoadingOverlay
+import com.example.ui.components.p28.ESLoadingState
 import com.example.ui.screens.AuthGateScreen
 import com.example.ui.screens.FloorSelectionScreen
 import com.example.ui.screens.SanctuaryLobbyScreen
@@ -229,43 +231,18 @@ fun EternalSummonerRootApp() {
   }
 
   if (uiState.isBootstrapping) {
-    Box(
-      modifier = Modifier
-        .fillMaxSize()
-        .background(ObsidianVoid),
-      contentAlignment = Alignment.Center,
-    ) {
-      Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-      ) {
-        CircularProgressIndicator(color = SummonerGold)
-        Spacer(modifier = Modifier.height(14.dp))
-        Text(
-          text = "Đang triệu hồi Thánh Địa (The Sanctuary)...",
-          style = MaterialTheme.typography.titleMedium,
-          color = SummonerGold,
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-          text = if (cloudUser != null) {
-            "Đồng bộ khế ước Google Cloud & đội hình Anh hùng"
-          } else {
-            "Khôi phục Hồ Sơ Khách & dữ liệu Thánh Địa trên thiết bị"
-          },
-          style = MaterialTheme.typography.bodySmall,
-          color = PortalCyan,
-        )
-        if (!isFirebaseReady) {
-          Spacer(modifier = Modifier.height(8.dp))
-          Text(
-            text = "⚡ Chế độ Khách ngoại tuyến — đám mây chưa cấu hình",
-            style = MaterialTheme.typography.labelSmall,
-            color = SummonerGold.copy(alpha = 0.85f),
-          )
-        }
-      }
+    // P28: cinematic loading overlay with the original backdrop/sigil/progress assets.
+    // Stage text is real bootstrap copy; guest/offline mode never claims a server connection.
+    val stage = "Đang triệu hồi Thánh Địa (The Sanctuary)..." + " • " + if (cloudUser != null) {
+      "Đồng bộ khế ước Google Cloud & đội hình Anh hùng"
+    } else {
+      "Khôi phục Hồ Sơ Khách & dữ liệu Thánh Địa trên thiết bị" +
+        if (!isFirebaseReady) " • ⚡ Chế độ Khách ngoại tuyến — đám mây chưa cấu hình" else ""
     }
+    ESLoadingOverlay(
+      state = ESLoadingState.Indeterminate(stage),
+      modifier = Modifier.fillMaxSize(),
+    )
     return
   }
 

@@ -104,6 +104,8 @@ import com.example.game.story.ManhwaStoryData
 import com.example.ui.SummonerUiState
 import com.example.ui.components.CameraZoomControls
 import com.example.ui.components.PixelHeroPortraitAvatar
+import com.example.ui.components.p28.ESNoticeFrame
+import com.example.ui.components.p28.NoticePriority
 import com.example.ui.components.VirtualTouchJoystick
 import com.example.ui.theme.ArcaneViolet
 import com.example.ui.theme.BorderRune
