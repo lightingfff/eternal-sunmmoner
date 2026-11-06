@@ -1,0 +1,7 @@
+tag,left,top,right,bottom
+tower_battle_top_hud,10.0,6.0,350.0,111.0
+battle_order_strip,126.0,576.0,350.0,632.0
+virtual_joystick,10.0,526.0,116.0,632.0
+zoom_in_button,302.0,522.0,350.0,570.0
+zoom_out_button,254.0,522.0,302.0,570.0
+skill_btn_touch_knight,10.0,63.0,134.0,111.0

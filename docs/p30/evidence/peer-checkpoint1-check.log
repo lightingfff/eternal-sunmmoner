@@ -1,0 +1,138 @@
+Picked up JAVA_TOOL_OPTIONS:  -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts=localhost|127.*
+Reusing configuration cache.
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:kspDebugKotlin SKIPPED
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:processDebugGoogleServices UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:generateDebugRFile UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:bundleDebugClassesToCompileJar UP-TO-DATE
+> Task :app:kspDebugUnitTestKotlin SKIPPED
+> Task :app:compileDebugUnitTestKotlin UP-TO-DATE
+> Task :app:mergeDebugNativeLibs UP-TO-DATE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:stripDebugDebugSymbols UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:bundleDebugClassesToRuntimeJar UP-TO-DATE
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :app:packageDebugUnitTestForUnitTest UP-TO-DATE
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:dexBuilderDebug UP-TO-DATE
+> Task :app:processDebugUnitTestManifest UP-TO-DATE
+> Task :app:processDebugUnitTestJavaRes UP-TO-DATE
+> Task :app:generateDebugUnitTestConfig UP-TO-DATE
+> Task :app:mergeProjectDexDebug UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:packageDebug UP-TO-DATE
+> Task :app:assembleDebug UP-TO-DATE
+> Task :app:createDebugApkListingFileRedirect UP-TO-DATE
+
+> Task :app:testDebugUnitTest
+Picked up JAVA_TOOL_OPTIONS:  -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts=localhost|127.*
+
+LostCourierEncounterTest > escortWaitsForARealHeroAndRequiresTheGateAfterCombat PASSED
+
+LostCourierEncounterTest > fearReducesRealStatsAndReassuranceRecoversWithoutRepeatingTheEvent PASSED
+
+LostCourierEncounterTest > authoredEscortRouteHasCollisionClearanceWithoutChangingNavigation PASSED
+
+LostCourierEncounterTest > encounterIsOptInAndPreservesTheExistingFloorMap PASSED
+
+LostCourierEncounterTest > scoutHasACounterWindowAndInterceptionPreventsRealReinforcements PASSED
+
+MasterCommandResponsivenessTest > focusProtectAndHoldPreserveSingleContactDamage PASSED
+
+MasterCommandResponsivenessTest > engineAcceptsRegroupImmediatelyAndExecutesAtTheNextFixedTick PASSED
+
+MasterCommandResponsivenessTest > regroupInterruptsWindupOnNextTickForBasicAndSkillWithoutLateHits PASSED
+
+MasterCommandResponsivenessTest > urgentCancelPreservesRealAttackCostsAcrossWindupContactAndRecovery PASSED
+
+MasterCommandResponsivenessTest > retreatAndMoveToCancelContactAndBeginMovementOnNextTick PASSED
+
+MasterCommandResponsivenessTest > regroupAfterContactKeepsTheHitButNeverEmitsItAgain PASSED
+
+MasterCommandResponsivenessTest > ordinaryHeroObeysRegroupWithoutAnAttackTimeline PASSED
+
+MasterCommandResponsivenessTest > urgentMovementTakesPriorityOverAutomaticEmergencyHealing PASSED
+
+MasterCommandResponsivenessTest > regroupAndMoveToAllowAttacksToFinishAfterArrival PASSED
+
+PremiumSliceCombatTest > contactIsOnceAndIndependentOfStepSize PASSED
+
+PremiumSliceCombatTest > captureIdleWalkAndDefeatFromSimulation PASSED
+
+PremiumSliceCombatTest > kaelenDamageAndShieldAreDeliveredAtAuthoredContacts PASSED
+
+PremiumSliceCombatTest > assetsAndShadowsAreCachedAndFarOffscreenCastersDoNotLoad PASSED
+
+PremiumSliceCombatTest > drawQueueReusesObjectsAndRespondsToMovingActorsAndSceneChanges PASSED
+
+PremiumSliceCombatTest > captureRealCombatSequence PASSED
+
+PremiumSliceCombatTest > retreatCancelsWindupAndUnrelatedKnightsRemainUnchanged PASSED
+
+PremiumSliceCombatTest > goblinContactAndStaleTargetAreSafe PASSED
+
+LostCourierPersistenceRobolectricTest > full old bond retains new memory and permanent flags survive transient churn PASSED
+
+LostCourierPersistenceRobolectricTest > failed atomic write does not claim rescue or alter valid saves and retry succeeds PASSED
+
+LostCourierPersistenceRobolectricTest > failed escort is saved and a later rescue remains available PASSED
+
+LostCourierPersistenceRobolectricTest > rescue unlock and one hero memory survive restart and stale-profile replay PASSED
+
+LostCourierPersistenceRobolectricTest > saved courier service allows crafting with exactly ninety gold PASSED
+
+SceneFrameLoopLifecycleRobolectricTest > stoppedLifecycleAndBlockingModalCancelFramesAndResumeWithoutTimeJump PASSED
+
+ScenePerformanceTest > disabledProbeDoesNoSamplingAndEnablingStartsFresh PASSED
+
+ScenePerformanceTest > samplesAtMostOncePerSecondAndReportsMeasuredCounters PASSED
+
+ScenePerformanceTest > worksAtHighRefreshAndResetsPauseTime PASSED
+
+ScenePerformanceTest > boundedSamplesReportTailAndJankWithoutRetainingPause PASSED
+
+ScenePerformanceTest > balancedHalvesRenderWorkWithoutChangingLogicalTime PASSED
+
+ScenePerformanceTest > fixedSimulationRetainsFractionalFramesAndResetClearsThem PASSED
+
+BattleTouchOwnershipTest > portraitCommandsAndWorldHaveSeparateTouchOwnership PASSED
+
+BattleTouchOwnershipTest > portraitWorldTapBeforeZoom PASSED
+
+BattleTouchOwnershipTest > landscapeCommandsAndWorldHaveSeparateTouchOwnership PASSED
+
+BUILD SUCCESSFUL in 29s
+47 actionable tasks: 1 executed, 46 up-to-date
+Configuration cache entry reused.

@@ -51,33 +51,61 @@ object AutonomousHeroAi {
 
     // The sample's contact frame is also the real damage event. Keep the existing
     // Knight skill values/cooldowns; only its delivery gains a visible windup.
+    val regroupSlot = if (order == TacticalOrder.REGROUP) formationSlotAround(masterX, masterY, hero) else null
+    val moveSlot = if (order == TacticalOrder.MOVE_TO && moveBeacon != null)
+      formationSlotAround(moveBeacon.first, moveBeacon.second, hero) else null
+    val moveArrivalRadius = if (protectedAllyPosition != null) 24f else 95f
+    val repositioning = order == TacticalOrder.RETREAT ||
+      (regroupSlot != null && hypot(regroupSlot.first - hero.x, regroupSlot.second - hero.y) > 52f) ||
+      (moveSlot != null && hypot(moveSlot.first - hero.x, moveSlot.second - hero.y) > moveArrivalRadius)
+    if (repositioning && hero.contactAttack.active) {
+      // Cancel only while actually leaving the attack position. Once at the ordered
+      // slot, normal attacks must be allowed to finish. Keep spent cooldowns and hits.
+      // This policy follows attack state and order; it does not depend on the hero's name.
+      hero.contactAttack.cancel()
+      hero.attackAnim = 0f
+    }
     if (hero.premiumSample && hero.contactAttack.active) {
-      if (order == TacticalOrder.RETREAT) {
-        hero.contactAttack.cancel()
-        hero.attackAnim = 0f
-      } else {
-        hero.isMoving = false
-        if (hero.contactAttack.advance(dt)) {
-          if (hero.contactAttack.skill) {
-            hero.shieldHp = (hero.shieldHp + 65 + hero.skillLevel * 12).coerceAtMost(220)
-            spawnAoE(CombatAoEEffect(hero.x,hero.y,115f,Color(0xFF38BDF8)))
-            val mult = 1.65f + hero.skillLevel * .14f
-            livingEnemies.forEach { enemy ->
-              if (hypot(enemy.x-hero.x,enemy.y-hero.y) <= 120f)
-                dealDamageToEnemy(enemy,(hero.effectiveAttack*mult).toInt(),true)
-            }
-          } else {
-            val enemy = livingEnemies.firstOrNull { it.id == hero.contactAttack.targetId }
-            if (enemy != null && hypot(enemy.x-hero.x,enemy.y-hero.y) <= hero.heroClass.preferredRange+35f)
-              dealDamageToEnemy(enemy,hero.effectiveAttack,false)
+      hero.isMoving = false
+      if (hero.contactAttack.advance(dt)) {
+        if (hero.contactAttack.skill) {
+          hero.shieldHp = (hero.shieldHp + 65 + hero.skillLevel * 12).coerceAtMost(220)
+          spawnAoE(CombatAoEEffect(hero.x,hero.y,115f,Color(0xFF38BDF8)))
+          val mult = 1.65f + hero.skillLevel * .14f
+          livingEnemies.forEach { enemy ->
+            if (hypot(enemy.x-hero.x,enemy.y-hero.y) <= 120f)
+              dealDamageToEnemy(enemy,(hero.effectiveAttack*mult).toInt(),true)
           }
+        } else {
+          val enemy = livingEnemies.firstOrNull { it.id == hero.contactAttack.targetId }
+          if (enemy != null && hypot(enemy.x-hero.x,enemy.y-hero.y) <= hero.heroClass.preferredRange+35f)
+            dealDamageToEnemy(enemy,hero.effectiveAttack,false)
         }
-        hero.attackAnim = hero.contactAttack.progress
+      }
+      hero.attackAnim = hero.contactAttack.progress
+      return
+    }
+
+    // Urgent movement takes precedence over optional healing and autonomous combat.
+    if (order == TacticalOrder.RETREAT) {
+      hero.aiIntentLabelVi = "Rút lui chiến thuật"
+      val safeX = (masterX - 110f).coerceAtLeast(mapLayout.wallMargin + 40f)
+      val safeY = masterY + formationOffsetY(hero.formationIndex)
+      moveTowards(hero, safeX, safeY, hero.effectiveSpeed * 1.24f, dt, mapLayout)
+      return
+    }
+
+    if (order == TacticalOrder.REGROUP) {
+      val formPos = regroupSlot!!
+      val distToSlot = hypot(formPos.first - hero.x, formPos.second - hero.y)
+      if (distToSlot > 52f) {
+        hero.aiIntentLabelVi = "Tập hợp quanh Master"
+        moveTowards(hero, formPos.first, formPos.second, hero.effectiveSpeed * 1.18f, dt, mapLayout)
         return
       }
     }
 
-    // 1. Priest Emergency Ally Heal Priority (Ally Awareness)
+    // Automatic emergency healing remains available after urgent positioning.
     if (hero.heroClass == HeroClassType.PRIEST && hero.skillCooldown <= 0f) {
       val woundedAlly = livingAllies.minByOrNull { it.hp.toFloat() / it.maxHp.toFloat() }
       if (woundedAlly != null && woundedAlly.hp < woundedAlly.maxHp * 0.80f) {
@@ -98,33 +126,13 @@ object AutonomousHeroAi {
       }
     }
 
-    // 2. Handle Strict Non-Combat Movement Orders (RETREAT / REGROUP)
-    if (order == TacticalOrder.RETREAT) {
-      hero.aiIntentLabelVi = "Rút lui chiến thuật"
-      val safeX = (masterX - 110f).coerceAtLeast(mapLayout.wallMargin + 40f)
-      val safeY = masterY + formationOffsetY(hero.formationIndex)
-      moveTowards(hero, safeX, safeY, hero.effectiveSpeed * 1.24f, dt, mapLayout)
-      return
-    }
-
-    if (order == TacticalOrder.REGROUP) {
-      val formPos = formationSlotAround(masterX, masterY, hero)
-      val distToSlot = hypot(formPos.first - hero.x, formPos.second - hero.y)
-      if (distToSlot > 52f) {
-        hero.aiIntentLabelVi = "Tập hợp quanh Master"
-        moveTowards(hero, formPos.first, formPos.second, hero.effectiveSpeed * 1.18f, dt, mapLayout)
-        return
-      }
-    }
-
     // 3. Move-To Beacon Priority if far from beacon
     if (order == TacticalOrder.MOVE_TO && moveBeacon != null) {
-      val slot = formationSlotAround(moveBeacon.first, moveBeacon.second, hero)
+      val slot = moveSlot!!
       val distBeacon = hypot(slot.first - hero.x, slot.second - hero.y)
       // Escort telegraphs need a precise dodge; the normal loose formation stop
       // radius can leave the frontline inside a clearly avoided danger circle.
-      val arrivalRadius = if (protectedAllyPosition != null) 24f else 95f
-      if (distBeacon > arrivalRadius) {
+      if (distBeacon > moveArrivalRadius) {
         hero.aiIntentLabelVi = "Tiến tới điểm chỉ định"
         moveTowards(hero, slot.first, slot.second, hero.effectiveSpeed * 1.12f, dt, mapLayout)
         return
