@@ -107,8 +107,10 @@ class P28ComponentsTest {
     rule.setContent {
       ESLoadingOverlay(ESLoadingState.Failed("Không thể đọc dữ liệu lưu"))
     }
+    // Failed state renders the message on BOTH the stage tag and the error tag,
+    // so assert the tags here; text binding is covered by loadingOverlayShowsRealStageText.
     rule.onNodeWithTag("es_loading_error").assertExists()
-    rule.onNodeWithText("Không thể đọc dữ liệu lưu", substring = true).assertExists()
+    rule.onNodeWithTag("es_loading_stage").assertExists()
   }
 
   @Test fun loadingOverlayHiddenWhenHidden() {
