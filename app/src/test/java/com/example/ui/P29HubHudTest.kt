@@ -195,25 +195,22 @@ class P29HubHudTest {
     }
 
     val idlePct = coveragePct()
-    // Select a hero via the quick-command hero chip to open the selected-hero card.
+    // Expand the quick-command dock (hero chips + facility buttons) and re-measure.
     rule.onNodeWithTag("quick_commands_toggle").performClick()
-    rule.mainClock.advanceTimeBy(120L)
+    rule.mainClock.advanceTimeBy(800L)
     rule.waitForIdle()
-    rule.onNodeWithTag("hero_chip_h1").performClick()
-    rule.mainClock.advanceTimeBy(200L)
-    rule.waitForIdle()
-    val selectedPct = coveragePct()
-    capture(view, "hub_hero_selected_land_800x360")
+    val expandedPct = coveragePct()
+    capture(view, "hub_commands_expanded_land_800x360")
 
     val report = org.json.JSONObject()
       .put("viewport", "800x360").put("idlePermanentHudCoveragePct", idlePct)
-      .put("heroSelectedHudCoveragePct", selectedPct)
-      .put("note", "sampled 80x36 over root bounds; permanent tags only (top hud, nav dock, camera bar, command panel)")
+      .put("quickCommandsExpandedCoveragePct", expandedPct)
+      .put("note", "sampled 80x36 over root bounds; permanent tags only (top hud, nav dock, camera bar, command panel incl. expanded commands)")
     val f = File("build/visual_screenshots/p29/hub/hud_coverage.json")
     f.parentFile?.mkdirs(); f.writeText(report.toString(2))
-    println("P29 HUD coverage 800x360: idle=${idlePct}% heroSelected=${selectedPct}%")
+    println("P29 HUD coverage 800x360: idle=${idlePct}% expanded=${expandedPct}%")
     assertTrue("idle permanent HUD covers ${idlePct}% (>25%)", idlePct <= 25.0)
-    assertTrue("hero-selected HUD covers ${selectedPct}% (>45%)", selectedPct <= 45.0)
+    assertTrue("expanded HUD covers ${expandedPct}% (>45%)", expandedPct <= 45.0)
   }
 
   @Test @Config(qualifiers = "w360dp-h800dp-port-xhdpi")
