@@ -260,6 +260,7 @@ fun SanctuaryLobbyScreen(
   val insideRestaurantState = activeInteriorState == FacilityType.RESTAURANT
   var showQuickCommands by remember { mutableStateOf(false) }
   var showMasterHub by remember { mutableStateOf(false) }
+  var cameraExpanded by remember { mutableStateOf(false) }
   var managementMode by remember { mutableStateOf<String?>(null) }
   var promptedFacility by remember { mutableStateOf<FacilityType?>(null) }
   var inspectingHeroId by remember { mutableStateOf<String?>(null) }
@@ -962,13 +963,23 @@ fun SanctuaryLobbyScreen(
       // Bottom-Left: Free Camera Quick Control Suite
       Surface(
         shape = RoundedCornerShape(14.dp),
-        color = FantasySkin.Panel.copy(alpha = 0.94f),
+        color = FantasySkin.HudGlass,
         border = BorderStroke(1.dp, SummonerGold.copy(alpha = 0.60f)),
         modifier = Modifier
           .align(Alignment.BottomStart)
           .padding(bottom=54.dp)
           .testTag("camera_controls_bar"),
       ) {
+        // P29: camera tools are COLLAPSED by default — one toggle button keeps the idle
+        // viewport clear; expanding reveals all five tools (tags preserved).
+        if (!cameraExpanded) {
+          IconButton(
+            onClick = { cameraExpanded = true },
+            modifier = Modifier.size(cameraIconSize).testTag("camera_controls_toggle"),
+          ) {
+            Icon(Icons.Default.CenterFocusStrong, contentDescription = "Mở công cụ camera", tint = PortalCyan, modifier = Modifier.size(cameraIconInner))
+          }
+        } else {
         Row(
           modifier = Modifier.padding(horizontal = if (isNarrowScreen) 3.dp else 6.dp, vertical = 3.dp),
           verticalAlignment = Alignment.CenterVertically,
@@ -1030,6 +1041,7 @@ fun SanctuaryLobbyScreen(
           ) {
             Icon(Icons.Default.Castle, contentDescription = "Đến Cổng Tháp", tint = EmeraldVitality, modifier = Modifier.size(cameraIconInner))
           }
+        }
         }
       }
 
