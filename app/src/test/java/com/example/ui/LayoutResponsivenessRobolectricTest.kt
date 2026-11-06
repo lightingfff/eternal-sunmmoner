@@ -669,7 +669,11 @@ class LayoutResponsivenessRobolectricTest {
     composeTestRule.waitForIdle()
     hostView?.let { saveViewScreenshot(it, "$artifactDir/sanctuary_34_exterior.png") }
 
-    // Toggle camera_reset_button to frame the FULL 8-sided Floating Sanctuary Island Overview!
+    // P29: camera tools are collapsed by default — expand via the toggle first,
+    // then toggle camera_reset_button to frame the FULL island overview.
+    composeTestRule.onNodeWithTag("camera_controls_toggle").performClick()
+    composeTestRule.mainClock.advanceTimeBy(200L)
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("camera_reset_button").performClick()
     composeTestRule.mainClock.advanceTimeBy(160L)
     composeTestRule.waitForIdle()
