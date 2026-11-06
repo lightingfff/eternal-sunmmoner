@@ -1,0 +1,108 @@
+Picked up JAVA_TOOL_OPTIONS:  -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts=localhost|127.*
+Reusing configuration cache.
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:kspDebugKotlin SKIPPED
+> Task :app:processDebugGoogleServices UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:generateDebugRFile UP-TO-DATE
+> Task :app:processDebugUnitTestManifest UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:packageDebugUnitTestForUnitTest UP-TO-DATE
+> Task :app:generateDebugUnitTestConfig UP-TO-DATE
+> Task :app:compileDebugKotlin
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:742:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:810:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:823:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:829:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:835:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:842:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:849:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:857:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:864:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:870:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:876:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:882:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:888:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:894:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:900:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:907:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:918:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:923:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:928:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:933:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:942:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:947:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:952:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:966:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:971:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:976:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:981:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:986:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:1004:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:1022:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:1027:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:1041:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:1047:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:1053:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:1060:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:1066:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:1071:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:1076:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:1081:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:1136:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:1159:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/game/pixel/PixelSpriteRenderer.kt:1187:27 'fun DrawScope.drawDirectionalShadow34(cx: Float, footY: Float, halfW: Float, halfH: Float, alpha: Float = ...): Unit' is deprecated. Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.
+w: file:///workspace/issue43-master-commands/app/src/main/java/com/example/ui/screens/HeroProfileModal.kt:178:28 Condition is always 'true'.
+
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:bundleDebugClassesToRuntimeJar
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:kspDebugUnitTestKotlin SKIPPED
+> Task :app:compileDebugUnitTestKotlin
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processDebugUnitTestJavaRes UP-TO-DATE
+
+> Task :app:testDebugUnitTest
+Picked up JAVA_TOOL_OPTIONS:  -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts=localhost|127.*
+
+BattleTouchOwnershipTest > portraitCommandsAndWorldHaveSeparateTouchOwnership FAILED
+    java.lang.AssertionError at BattleTouchOwnershipTest.kt:75
+
+BattleTouchOwnershipTest > landscapeCommandsAndWorldHaveSeparateTouchOwnership SKIPPED
+
+2 tests completed, 1 failed, 1 skipped
+
+> Task :app:testDebugUnitTest FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:testDebugUnitTest'.
+> There were failing tests. See the report at: file:///workspace/issue43-master-commands/app/build/reports/tests/testDebugUnitTest/index.html
+
+* Try:
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 1m 4s
+31 actionable tasks: 5 executed, 26 up-to-date
+Configuration cache entry reused.
