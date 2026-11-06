@@ -211,6 +211,11 @@ jobs:
           fi
           # P28-D building foundation evidence (multi-zoom day/night + perf probe)
           # produced by P28DRenderTest lands in docs/visual-evidence/p28d/world.
+          if [ -d app/build/visual_screenshots/p29/hub ]; then
+            mkdir -p docs/visual-evidence/p29/hub
+            cp -f app/build/visual_screenshots/p29/hub/*.png docs/visual-evidence/p29/hub/
+            git add docs/visual-evidence/p29/hub
+          fi
           if [ -d app/build/visual_screenshots/p28d/world ]; then
             mkdir -p docs/visual-evidence/p28d/world
             cp -f app/build/visual_screenshots/p28d/world/*.png docs/visual-evidence/p28d/world/

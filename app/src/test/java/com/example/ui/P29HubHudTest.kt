@@ -7,6 +7,11 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.view.View
+import androidx.compose.ui.platform.LocalView
+import java.io.File
 import com.example.data.model.HeroClassType
 import com.example.data.model.HeroRecord
 import com.example.data.model.MasterProfile
@@ -56,6 +61,18 @@ class P29HubHudTest {
   private fun rectCovers(rect: Rect, x: Float, y: Float): Boolean =
     x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
 
+  private fun capture(view: View?, name: String) {
+    rule.mainClock.advanceTimeBy(200L)
+    rule.waitForIdle()
+    requireNotNull(view)
+    val bmp = Bitmap.createBitmap(view.width.coerceAtLeast(1), view.height.coerceAtLeast(1), Bitmap.Config.ARGB_8888)
+    view.draw(Canvas(bmp))
+    val path = File("build/visual_screenshots/p29/hub/$name.png")
+    path.parentFile?.mkdirs()
+    path.outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
+    require(path.length() > 10_000) { "$name: empty screenshot" }
+  }
+
   @Test fun navDockCollapsedByDefaultAndAllNavTagsFire() {
     var navigated: String? = null
     rule.setContent { SanctuaryManagementNav(onNavigate = { navigated = it }) }
@@ -99,7 +116,9 @@ class P29HubHudTest {
   @Test @Config(qualifiers = "w800dp-h360dp-land-xhdpi")
   fun idleLandscapeHudDoesNotCoverCenter() {
     rule.mainClock.autoAdvance = false
+    var view: View? = null
     rule.setContent {
+      view = LocalView.current
       EternalSummonerTheme {
         SanctuaryLobbyScreen(
           state = sampleState(),
@@ -131,9 +150,40 @@ class P29HubHudTest {
     assertFalse("command panel covers center", rectCovers(commandPanel, cx, cy))
     // Master page opens only from the chip.
     rule.onNodeWithTag("master_hub_screen").assertDoesNotExist()
+    capture(view, "hub_idle_land_800x360")
     rule.onNodeWithTag("master_chip").performClick()
     rule.mainClock.advanceTimeBy(120L)
     rule.waitForIdle()
     rule.onNodeWithTag("master_hub_screen").assertExists()
+    capture(view, "master_hub_land_800x360")
+  }
+
+  @Test @Config(qualifiers = "w360dp-h800dp-port-xhdpi")
+  fun idlePortraitHudStaysCompact() {
+    rule.mainClock.autoAdvance = false
+    var view: View? = null
+    rule.setContent {
+      view = LocalView.current
+      EternalSummonerTheme {
+        SanctuaryLobbyScreen(
+          state = sampleState(),
+          onOpenFacility = {}, onCloseFacility = {}, onSummonHero = {},
+          onTrainHero = { _, _ -> }, onEquipItem = { _, _ -> }, onSynthesizeGear = {},
+          onEnhanceGear = {}, onRecoverHero = { _, _ -> }, onHostMeal = {},
+          onToggleSquad = {}, onCompletePrologue = {}, onSignOut = {}, onOpenSettings = {},
+        )
+      }
+    }
+    rule.mainClock.advanceTimeBy(200L)
+    rule.waitForIdle()
+    val root = rule.onRoot().fetchSemanticsNode().boundsInRoot
+    val cx = (root.left + root.right) / 2f
+    val cy = (root.top + root.bottom) / 2f
+    val topHud = rule.onNodeWithTag("sanctuary_top_hud").fetchSemanticsNode().boundsInRoot
+    val nav = rule.onNodeWithTag("management_navigation").fetchSemanticsNode().boundsInRoot
+    assertTrue("portrait top HUD too tall", topHud.height <= root.height * 0.18f)
+    assertFalse("portrait top HUD covers center", rectCovers(topHud, cx, cy))
+    assertFalse("portrait nav covers center", rectCovers(nav, cx, cy))
+    capture(view, "hub_idle_port_360x800")
   }
 }
