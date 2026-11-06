@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Backpack
 import androidx.compose.material.icons.filled.Castle
 import androidx.compose.material.icons.filled.Close
@@ -85,7 +84,7 @@ fun MasterHubScreen(
           horizontalArrangement = Arrangement.SpaceBetween,
         ) {
           Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Icon(Icons.Default.Person, contentDescription = null, tint = ESTokens.AntiqueGold, modifier = Modifier.size(28.dp))
+            Icon(Person, contentDescription = null, tint = ESTokens.AntiqueGold, modifier = Modifier.size(28.dp))
             Column {
               Text(
                 text = profile?.masterName ?: "Master",
@@ -104,7 +103,7 @@ fun MasterHubScreen(
             }
           }
           IconButton(onClick = onClose, modifier = Modifier.size(44.dp).testTag("master_hub_close")) {
-            Icon(Icons.Default.Close, contentDescription = "Đóng", tint = ESTokens.IvoryPaper)
+            Icon(Close, contentDescription = "Đóng", tint = ESTokens.IvoryPaper)
           }
         }
 
@@ -124,11 +123,11 @@ fun MasterHubScreen(
 
         Text("Điều hướng nhanh", color = ESTokens.AntiqueGold, style = MaterialTheme.typography.labelMedium)
         val shortcuts = listOf(
-          Triple("heroes", "Anh hùng", Icons.Default.Groups),
-          Triple("team", "Đội hình", Icons.Default.Group),
-          Triple("summon", "Triệu hồi", Icons.Default.AutoAwesome),
-          Triple("tower", "Tháp", Icons.Default.Castle),
-          Triple("inventory", "Túi đồ", Icons.Default.Backpack),
+          Triple("heroes", "Anh hùng", Groups),
+          Triple("team", "Đội hình", Group),
+          Triple("summon", "Triệu hồi", AutoAwesome),
+          Triple("tower", "Tháp", Castle),
+          Triple("inventory", "Túi đồ", Backpack),
         )
         for ((id, label, icon) in shortcuts) {
           Surface(
@@ -167,7 +166,7 @@ fun MasterHubScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
           ) {
-            Icon(Icons.Default.Settings, contentDescription = null, tint = ESTokens.AntiqueGold, modifier = Modifier.size(20.dp))
+            Icon(Settings, contentDescription = null, tint = ESTokens.AntiqueGold, modifier = Modifier.size(20.dp))
             Text("Cài đặt & tài khoản", color = ESTokens.IvoryPaper, style = MaterialTheme.typography.bodyMedium)
           }
         }
