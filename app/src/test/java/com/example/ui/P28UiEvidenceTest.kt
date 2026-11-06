@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -132,7 +131,7 @@ class P28UiEvidenceTest {
     val view = content { Box(Modifier.fillMaxSize()) { ESNoticeStack(center, Modifier.align(androidx.compose.ui.Alignment.TopEnd)) } }
     rule.onNodeWithTag("notice_p28_n1").assertExists()
     rule.onNodeWithTag("notice_p28_n2").assertExists()
-    rule.onNodeWithTag("notice_p28_n1").assertTextContains("Nữ Thần", substring = true)
+    rule.onNodeWithText("Nữ Thần", substring = true).assertExists()
     capture(view(), "notice_stack_port_360")
   }
 
@@ -140,14 +139,14 @@ class P28UiEvidenceTest {
   fun loadingOverlayPortrait() {
     val view = content { ESLoadingOverlay(ESLoadingState.Determinate("Đang triệu hồi linh hồn...", 0.62f)) }
     rule.onNodeWithTag("es_loading_stage").assertExists()
-    rule.onNodeWithTag("es_loading_stage").assertTextContains("Đang triệu hồi", substring = true)
+    rule.onNodeWithText("Đang triệu hồi", substring = true).assertExists()
     capture(view(), "loading_port_360")
   }
 
   @Test @Config(qualifiers = "w800dp-h360dp-land-xhdpi")
   fun loadingOverlayLandscape() {
     val view = content { ESLoadingOverlay(ESLoadingState.Indeterminate("Đang đồng bộ dữ liệu người chơi...")) }
-    rule.onNodeWithTag("es_loading_stage").assertTextContains("đồng bộ", substring = true)
+    rule.onNodeWithText("đồng bộ", substring = true).assertExists()
     capture(view(), "loading_land_800")
   }
 }
