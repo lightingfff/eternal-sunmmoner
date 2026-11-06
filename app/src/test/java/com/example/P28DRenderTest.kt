@@ -1,6 +1,7 @@
 package com.example
 
 import android.graphics.Bitmap
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.asAndroidBitmap
@@ -43,11 +44,11 @@ class P28DRenderTest {
   private val width = 1280
   private val height = 720
 
-  private fun renderFrame(x: Float, y: Float, zoom: Float, hour: Float, weather: WorldWeather = WorldWeather.CLEAR): Bitmap {
+  private fun renderFrame(x: Float, y: Float, zoom: Float, hour: Float, weather: WorldWeather = WorldWeather.CLEAR): ImageBitmap {
     WorldEnvironment.debugOverride(hour, weather)
     WorldEnvironment.update(50000)
     val layout = SanctuaryLobbyEngine().mapLayout
-    val image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).asImageBitmap()
     CanvasDrawScope().draw(Density(1f), LayoutDirection.Ltr, Canvas(image), Size(width.toFloat(), height.toFloat())) {
       drawSanctuaryFloatingWorld(x, y, zoom, 0f, layout.paths)
       TowerFloorCatalog.SANCTUARY_ZONES.forEach { zone ->
@@ -67,7 +68,7 @@ class P28DRenderTest {
   }
 
   private fun capture(name: String, x: Float, y: Float, zoom: Float, hour: Float) {
-    val bmp = renderFrame(x, y, zoom, hour)
+    val bmp = renderFrame(x, y, zoom, hour).asAndroidBitmap()
     val file = File(outDir, "$name.png")
     file.parentFile?.mkdirs()
     file.outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
