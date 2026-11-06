@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import com.example.data.model.HeroClassType
 import com.example.data.model.HeroRecord
 import com.example.data.model.MasterProfile
@@ -89,7 +90,7 @@ class P29HubHudTest {
     rule.onNodeWithText("14850", substring = true).assertExists() // real gold from profile
     rule.onNodeWithTag("master_hub_nav_tower").performClick()
     assertEquals("tower", navigated)
-    rule.onNodeWithTag("master_hub_nav_settings").performClick()
+    rule.onNodeWithTag("master_hub_nav_settings").performScrollTo().performClick()
     assertTrue(settingsOpened)
     rule.onNodeWithTag("master_hub_close").performClick()
     assertTrue(closed)
