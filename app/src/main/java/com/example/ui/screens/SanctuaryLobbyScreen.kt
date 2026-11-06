@@ -884,7 +884,7 @@ fun SanctuaryLobbyScreen(
         shape = RoundedCornerShape(12.dp),
         color = FantasySkin.HudGlass,
         border = BorderStroke(1.dp, SummonerGold.copy(alpha = 0.45f)),
-        modifier = Modifier.align(Alignment.Start),
+        modifier = Modifier.align(Alignment.Start).testTag("top_hud_chip_row"),
       ) {
         Row(Modifier.padding(horizontal=8.dp,vertical=2.dp).horizontalScroll(rememberScrollState()),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(6.dp)) {
           Surface(

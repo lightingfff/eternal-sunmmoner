@@ -182,7 +182,9 @@ class P29HubHudTest {
 
     fun coveragePct(): Double {
       val root = rule.onRoot().fetchSemanticsNode().boundsInRoot
-      val rects = listOf("sanctuary_top_hud", "management_navigation", "camera_controls_bar", "hero_command_panel")
+      // Measure VISIBLE chrome pixels: the actual chip row (not the transparent full-width
+      // container), the nav dock, the (collapsed) camera toggle and the command panel.
+      val rects = listOf("top_hud_chip_row", "management_navigation", "camera_controls_bar", "hero_command_panel")
         .map { rule.onNodeWithTag(it).fetchSemanticsNode().boundsInRoot }
       val gx = 80; val gy = 36
       var covered = 0
@@ -209,7 +211,7 @@ class P29HubHudTest {
     val f = File("build/visual_screenshots/p29/hub/hud_coverage.json")
     f.parentFile?.mkdirs(); f.writeText(report.toString(2))
     println("P29 HUD coverage 800x360: idle=${idlePct}% expanded=${expandedPct}%")
-    assertTrue("idle permanent HUD covers ${idlePct}% (>26%)", idlePct <= 26.0)
+    assertTrue("idle HUD chrome covers ${idlePct}% (>15%)", idlePct <= 15.0)
     assertTrue("expanded HUD covers ${expandedPct}% (>45%)", expandedPct <= 45.0)
   }
 
