@@ -131,6 +131,16 @@ jobs:
           cat "$RUNNER_TEMP/p27b-ui.log"
           if [ "$result" -ne 0 ]; then python3 tools/p27b_ci_failure.py "$RUNNER_TEMP/p27b-ui.log" app/build/test-results/testDebugUnitTest; fi
           exit "$result"
+      - name: P28 Astral Reliquary UI screenshots (hero card, party grid, notices, loading)
+        id: render_p28_ui
+        if: ${{ always() && steps.render_world.outcome == 'success' }}
+        run: |
+          set +e
+          gradle :app:testDebugUnitTest --tests 'com.example.ui.P28UiEvidenceTest' --stacktrace > "$RUNNER_TEMP/p28-ui.log" 2>&1
+          result=$?
+          cat "$RUNNER_TEMP/p28-ui.log"
+          if [ "$result" -ne 0 ]; then python3 tools/p27b_ci_failure.py "$RUNNER_TEMP/p28-ui.log" app/build/test-results/testDebugUnitTest; fi
+          exit "$result"
       - name: Assemble Android APK (technical verification only)
         id: apk
         if: ${{ always() && steps.render_world.outcome == 'success' }}
