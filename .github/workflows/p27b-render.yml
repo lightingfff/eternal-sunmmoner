@@ -25,6 +25,7 @@ on:
       - 'app/src/test/java/com/example/SanctuaryMaterialTest.kt'
       - 'app/src/test/java/com/example/ui/P27B*Test.kt'
       - 'app/src/test/java/com/example/ui/P28*Test.kt'
+      - 'app/src/test/java/com/example/ui/P29*Test.kt'
       - 'app/src/test/java/com/example/P28*Test.kt'
   pull_request:
     branches: [main]
@@ -40,6 +41,7 @@ on:
       - 'app/src/test/java/com/example/SanctuaryMaterialTest.kt'
       - 'app/src/test/java/com/example/ui/P27B*Test.kt'
       - 'app/src/test/java/com/example/ui/P28*Test.kt'
+      - 'app/src/test/java/com/example/ui/P29*Test.kt'
       - 'app/src/test/java/com/example/P28*Test.kt'
   workflow_dispatch:
 
@@ -140,7 +142,7 @@ jobs:
         if: ${{ always() && steps.render_world.outcome == 'success' }}
         run: |
           set +e
-          gradle :app:testDebugUnitTest --tests 'com.example.ui.P28UiEvidenceTest' --tests 'com.example.ui.P28ComponentsTest' --tests 'com.example.P28DRenderTest' --stacktrace > "$RUNNER_TEMP/p28-ui.log" 2>&1
+          gradle :app:testDebugUnitTest --tests 'com.example.ui.P28UiEvidenceTest' --tests 'com.example.ui.P28ComponentsTest' --tests 'com.example.P28DRenderTest' --tests 'com.example.ui.P29HubHudTest' --tests 'com.example.ui.LayoutResponsivenessRobolectricTest' --stacktrace > "$RUNNER_TEMP/p28-ui.log" 2>&1
           result=$?
           cat "$RUNNER_TEMP/p28-ui.log"
           if [ "$result" -ne 0 ]; then python3 tools/p27b_ci_failure.py "$RUNNER_TEMP/p28-ui.log" app/build/test-results/testDebugUnitTest; fi

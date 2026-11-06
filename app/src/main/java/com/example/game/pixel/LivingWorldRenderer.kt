@@ -36,8 +36,11 @@ object LivingWorldRenderer {
   fun DrawScope.drawWeather(camX: Float,camY: Float,zoom: Float,foreground: Boolean) {
     val weather=WorldEnvironment.weather;val time=WorldEnvironment.elapsedSeconds
     val layer=if(foreground) 1 else 0
-    if(weather.rain>.01f) {
-      val count=(if(foreground) 90 else 60)
+    // P29 perf: rain streak count scales with the quality tier (REDUCED halves fill-rate;
+    // BALANCED keeps the authored density; OFF is handled by callers/quality gates).
+    val tierScale=when(DepthPresentation.quality){DepthPresentation.Quality.OFF->0f;DepthPresentation.Quality.REDUCED->0.5f;else->1f}
+    if(weather.rain>.01f&&tierScale>0f) {
+      val count=((if(foreground) 90 else 60)*tierScale).toInt().coerceAtLeast(8)
       for(i in 0 until count) {
         // World-anchored repeating volume: camera motion changes parallax; time is not frame-integrated.
         val x=((i*127.13f+layer*43-camX*zoom*(.65f+layer*.35f)-time*(28+layer*12))%size.width+size.width)%size.width
@@ -46,7 +49,7 @@ object LivingWorldRenderer {
         drawLine(Color(0xffb4d0dc).copy(alpha=weather.rain*(if(foreground) .26f else .13f)),Offset(x,y),Offset(x-4f,y+10f+layer*6),strokeWidth=if(foreground) 1.2f else 1f)
       }
     }
-    if(weather.fog>.01f) {
+    if(weather.fog>.01f&&tierScale>0.5f) {
       for(i in 0..3) {
         val drift=sin(time*.022f+i*1.7f)*size.width*.18f
         val x=size.width*(.12f+i*.28f)+drift-camX*zoom*.06f

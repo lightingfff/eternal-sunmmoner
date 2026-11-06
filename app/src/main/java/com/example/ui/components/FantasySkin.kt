@@ -22,6 +22,9 @@ object FantasySkin {
   // worst case, i.e. legible over ANY pixel the lobby can put behind it.
   // Enforced by SanctuaryHudContrastTest.
   val Panel=Color(0xE0141D2A)
+  // P29: permanent HUD chrome must let the world read through — 70% glass, used only
+  // for small idle chips/docks (modals keep the denser Panel). Contrast enforced by tests.
+  val HudGlass=Color(0xB3141D2A)
   val Gold=Color(0xffc6b27f)
   @Composable fun buttonColors(containerColor: Color=Panel,contentColor: Color=Gold,
     disabledContainerColor: Color=Color(0xff242a30),disabledContentColor: Color=Color(0xff80868d)): ButtonColors {

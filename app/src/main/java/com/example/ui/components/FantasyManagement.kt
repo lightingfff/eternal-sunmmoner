@@ -38,9 +38,12 @@ val PanelGlass=Color(0xE0121B2E)
   }
 }
 @Composable fun SanctuaryManagementNav(onNavigate: (String)->Unit,modifier: Modifier=Modifier) {
-  FantasyPanel(modifier.testTag("management_navigation")) {
-    Row(Modifier.fillMaxWidth().padding(horizontal=4.dp),horizontalArrangement=Arrangement.SpaceEvenly) {
-      // P26: framed tabs with icons read like a real game nav, not a debug strip.
+  // P29: idle bottom bar is a compact ICON DOCK (labels hidden until the player expands it),
+  // on translucent HudGlass so the world stays visible. All nav_<id> tags preserved.
+  var expanded by remember { mutableStateOf(false) }
+  Surface(modifier.testTag("management_navigation"),shape=RoundedCornerShape(12.dp),
+    color=FantasySkin.HudGlass,border=BorderStroke(1.dp,Gold.copy(alpha=.55f))) {
+    Row(Modifier.padding(horizontal=4.dp),horizontalArrangement=Arrangement.SpaceEvenly,verticalAlignment=Alignment.CenterVertically) {
       for((id,title,icon) in listOf(
         Triple("heroes","Anh hùng",Icons.Default.Groups),
         Triple("summon","Triệu hồi",Icons.Default.AutoAwesome),
@@ -49,11 +52,14 @@ val PanelGlass=Color(0xE0121B2E)
         Triple("inventory","Túi đồ",Icons.Default.Backpack),
       )) {
         TextButton({onNavigate(id)},modifier=Modifier.weight(1f).heightIn(min=48.dp).testTag("nav_$id"),contentPadding=PaddingValues(2.dp)) {
-          Column(horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(1.dp)) {
+          Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(3.dp)) {
             Icon(icon,contentDescription=null,tint=Gold,modifier=Modifier.size(18.dp))
-            Text(title,color=Gold,maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.labelSmall)
+            if (expanded) Text(title,color=Gold,maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.labelSmall)
           }
         }
+      }
+      IconButton({expanded=!expanded},modifier=Modifier.size(40.dp).testTag("nav_expand_toggle")) {
+        Icon(if(expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,contentDescription="Mở/thu gọn nhãn",tint=Gold,modifier=Modifier.size(18.dp))
       }
     }
   }
