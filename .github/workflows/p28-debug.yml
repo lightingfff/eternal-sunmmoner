@@ -29,20 +29,8 @@ jobs:
             echo "P28-C debug — errors on $(git rev-parse --short HEAD):"
             echo '```'
             grep -E '^e: |error: |FAILED|What went wrong' /tmp/build.log | head -40 || echo "(no errors found)"
-            echo '--- test result xml failures ---'
-            for f in app/build/test-results/testDebugUnitTest/TEST-*.xml; do
-              python3 - "$f" <<'PYEOF'
-import sys, xml.etree.ElementTree as ET
-try:
-    root = ET.parse(sys.argv[1]).getroot()
-    for case in root.iter('testcase'):
-        fail = case.find('failure') or case.find('error')
-        if fail is not None:
-            print(f"{sys.argv[1].split('TEST-')[1]}: {case.get('name')}: {(fail.get('message') or (fail.text or ''))[:600]}")
-except Exception as e:
-    pass
-PYEOF
-            done || true
+            echo '--- junit failure messages ---'
+            grep -h -A2 '<failure' app/build/test-results/testDebugUnitTest/TEST-*.xml 2>/dev/null | head -40 || true
             echo '--- tail ---'
             grep -E 'BUILD|PASSED|FAILED' /tmp/build.log | tail -15
             echo '```'
