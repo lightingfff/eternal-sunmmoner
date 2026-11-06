@@ -1,9 +1,10 @@
 # P28 — REAL IMPLEMENTATION HANDOFF (PHẦN 15)
 
 ## Branch / HEAD SHA / PR URL
-- Branch session: `arena/b5e7a601-eternal-sunmmoner`, HEAD `c264c21` (chỉ xóa workflow debug tạm sau merge).
-- Code P28 nằm trong merge commit `0ccc5d4` (PR #36, code commit `8d8c8c7`).
-- PR: https://github.com/lightingfff/eternal-sunmmoner/pull/36 — state MERGED (merged 2026-11-06T04:12:16Z, merge commit `0ccc5d4`). Agent không tự merge.
+- Branch session: `arena/b5e7a601-eternal-sunmmoner`, HEAD `c55cee3` (P28-C: UI render evidence + test fixes).
+- Code P28 gốc nằm trong merge commit `0ccc5d4` (PR #36, code commit `8d8c8c7`).
+- PR #36: https://github.com/lightingfff/eternal-sunmmoner/pull/36 — MERGED 2026-11-06T04:12:16Z (agent không tự merge).
+- PR #37 (P28-C evidence): https://github.com/lightingfff/eternal-sunmmoner/pull/37 — mở, chưa merge; CI xanh trên `c55cee3`.
 
 ## Components created/changed (actual files)
 - `app/src/main/java/com/example/ui/components/p28/ESP28Assets.kt` — design tokens "Astral Reliquary" + resolver đọc `manifest.json`, decode/cache qua `SanctuaryArtAssets`, `resetForTest()`.
@@ -32,8 +33,9 @@
 - Hub/Summon/UI consistency: **DONE** (cùng token "Astral Reliquary" cho hub/management/battle; summon giữ nguyên hành vi).
 
 ## Functional/Compose tests
-- `P28ComponentsTest` (5 test: manifest/decode/alpha, fallback null, NoticeCenter, loading states, hero card binding): PASS — debug run 42130967618 `BUILD SUCCESSFUL`, không có test FAILED.
-- CI trên `8d8c8c7`: P27B render evidence run 42130974137 success; Lyra render evidence run 42130974091 success.
+- `P28ComponentsTest` (7 test sau P28-C: manifest/decode/alpha, fallback null, NoticeCenter, 3 loading states, hero card binding) + `P28UiEvidenceTest` (5 screenshot test): 12/12 PASS — debug run 42167228477 `BUILD SUCCESSFUL` trên `da18766`.
+- Lưu ý trung thực: ở PR #36 test P28 chưa từng chạy trong CI thật (filter sai package trong workflow debug); phát hiện và sửa ở PR #37 (setContent chỉ 1 lần/test; assert bằng onNodeWithText).
+- CI thật trên `c55cee3` (PR #37): Build APK run 42167869825 success; P27B render evidence run 42167869790 success (bao gồm step P28 UI screenshots).
 
 ## Android assembleDebug
 - **PASS** — run 42130974083 ("Build Eternal Summoner APK") trên `8d8c8c7`; và run 42161097575 PASS trên merge commit `0ccc5d4` của main.
