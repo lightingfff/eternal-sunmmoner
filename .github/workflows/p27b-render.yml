@@ -214,6 +214,7 @@ jobs:
           if [ -d app/build/visual_screenshots/p29/hub ]; then
             mkdir -p docs/visual-evidence/p29/hub
             cp -f app/build/visual_screenshots/p29/hub/*.png docs/visual-evidence/p29/hub/
+            [ -f app/build/visual_screenshots/p29/hub/hud_coverage.json ] && cp -f app/build/visual_screenshots/p29/hub/hud_coverage.json docs/visual-evidence/p29/hub/
             git add docs/visual-evidence/p29/hub
           fi
           if [ -d app/build/visual_screenshots/p28d/world ]; then

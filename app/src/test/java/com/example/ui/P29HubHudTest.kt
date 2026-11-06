@@ -158,6 +158,64 @@ class P29HubHudTest {
     capture(view, "master_hub_land_800x360")
   }
 
+
+  /** Gemini review follow-up: MEASURED pixel coverage of permanent HUD chrome at
+   *  800x360, idle and with a hero selected. Writes hud_coverage.json as evidence. */
+  @Test @Config(qualifiers = "w800dp-h360dp-land-xhdpi")
+  fun hudCoverageMeasured800x360() {
+    rule.mainClock.autoAdvance = false
+    var view: View? = null
+    rule.setContent {
+      view = LocalView.current
+      EternalSummonerTheme {
+        SanctuaryLobbyScreen(
+          state = sampleState(),
+          onOpenFacility = {}, onCloseFacility = {}, onSummonHero = {},
+          onTrainHero = { _, _ -> }, onEquipItem = { _, _ -> }, onSynthesizeGear = {},
+          onEnhanceGear = {}, onRecoverHero = { _, _ -> }, onHostMeal = {},
+          onToggleSquad = {}, onCompletePrologue = {}, onSignOut = {}, onOpenSettings = {},
+        )
+      }
+    }
+    rule.mainClock.advanceTimeBy(200L)
+    rule.waitForIdle()
+
+    fun coveragePct(): Double {
+      val root = rule.onRoot().fetchSemanticsNode().boundsInRoot
+      val rects = listOf("sanctuary_top_hud", "management_navigation", "camera_controls_bar", "hero_command_panel")
+        .map { rule.onNodeWithTag(it).fetchSemanticsNode().boundsInRoot }
+      val gx = 80; val gy = 36
+      var covered = 0
+      for (i in 0 until gx) for (j in 0 until gy) {
+        val x = root.left + (i + 0.5f) * root.width / gx
+        val y = root.top + (j + 0.5f) * root.height / gy
+        if (rects.any { rectCovers(it, x, y) }) covered++
+      }
+      return covered * 100.0 / (gx * gy)
+    }
+
+    val idlePct = coveragePct()
+    // Select a hero via the quick-command hero chip to open the selected-hero card.
+    rule.onNodeWithTag("quick_commands_toggle").performClick()
+    rule.mainClock.advanceTimeBy(120L)
+    rule.waitForIdle()
+    rule.onNodeWithTag("hero_chip_h1").performClick()
+    rule.mainClock.advanceTimeBy(200L)
+    rule.waitForIdle()
+    val selectedPct = coveragePct()
+    capture(view, "hub_hero_selected_land_800x360")
+
+    val report = org.json.JSONObject()
+      .put("viewport", "800x360").put("idlePermanentHudCoveragePct", idlePct)
+      .put("heroSelectedHudCoveragePct", selectedPct)
+      .put("note", "sampled 80x36 over root bounds; permanent tags only (top hud, nav dock, camera bar, command panel)")
+    val f = File("build/visual_screenshots/p29/hub/hud_coverage.json")
+    f.parentFile?.mkdirs(); f.writeText(report.toString(2))
+    println("P29 HUD coverage 800x360: idle=${idlePct}% heroSelected=${selectedPct}%")
+    assertTrue("idle permanent HUD covers ${idlePct}% (>25%)", idlePct <= 25.0)
+    assertTrue("hero-selected HUD covers ${selectedPct}% (>45%)", selectedPct <= 45.0)
+  }
+
   @Test @Config(qualifiers = "w360dp-h800dp-port-xhdpi")
   fun idlePortraitHudStaysCompact() {
     rule.mainClock.autoAdvance = false
