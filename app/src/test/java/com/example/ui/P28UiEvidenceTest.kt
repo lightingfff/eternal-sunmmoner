@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.assertTextContains
@@ -59,16 +60,16 @@ class P28UiEvidenceTest {
   }
 
   private fun hero(id: String, name: String, rarity: Int, clazz: HeroClassType) = HeroRecord(
-    id = id, name = name, heroClass = clazz.name, rarity = rarity, level = 6,
+    id = id, name = name, heroClass = clazz.name, rarity = rarity, level = 6L,
     personality = PersonalityType.CYNICAL.name,
   )
 
   private val roster = listOf(
-    hero("p28_a", "Aaron Delcut", 2, HeroClassType.WARRIOR),
+    hero("p28_a", "Aaron Delcut", 2, HeroClassType.KNIGHT),
     hero("p28_b", "Han Islat", 2, HeroClassType.ASSASSIN),
     hero("p28_c", "Jenna Cirai", 2, HeroClassType.ARCHER),
     hero("p28_d", "Eouka Rivel Strasburg", 3, HeroClassType.MAGE),
-    hero("p28_e", "Edis Gallen", 3, HeroClassType.HEALER),
+    hero("p28_e", "Edis Gallen", 3, HeroClassType.PRIEST),
   )
 
   private fun capture(view: View?, name: String) {
