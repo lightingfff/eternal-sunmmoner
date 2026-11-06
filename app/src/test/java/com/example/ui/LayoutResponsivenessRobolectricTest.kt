@@ -742,6 +742,9 @@ class LayoutResponsivenessRobolectricTest {
       }
     }
     composeTestRule.mainClock.advanceTimeBy(160L)
+    composeTestRule.onNodeWithTag("camera_controls_toggle").performClick()
+    composeTestRule.mainClock.advanceTimeBy(200L)
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("camera_reset_button").performClick()
     composeTestRule.mainClock.advanceTimeBy(160L)
     composeTestRule.waitForIdle()
