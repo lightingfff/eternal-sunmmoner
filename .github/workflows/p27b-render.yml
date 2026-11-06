@@ -168,7 +168,7 @@ jobs:
           sha256sum app/build/outputs/apk/debug/app-debug.apk
           echo "APK compiled on $GITHUB_SHA, artifact QUOTA_BLOCKED; APK not committed (ephemeral debug signature)" >> "$GITHUB_STEP_SUMMARY"
       - name: Commit matched renderer captures to this branch (quota-safe)
-        if: ${{ always() && github.event_name == 'push' }}
+        if: ${{ always() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
         env:
           EVIDENCE_BRANCH: ${{ github.ref_name }}
           # Not a secret: a fixed author identity for automated evidence commits.
@@ -206,6 +206,14 @@ jobs:
             mkdir -p docs/visual-evidence/p28/ui
             cp -f app/build/visual_screenshots/p28/ui/*.png docs/visual-evidence/p28/ui/
             git add docs/visual-evidence/p28/ui
+          fi
+          # P28-D building foundation evidence (multi-zoom day/night + perf probe)
+          # produced by P28DRenderTest lands in docs/visual-evidence/p28d/world.
+          if [ -d app/build/visual_screenshots/p28d/world ]; then
+            mkdir -p docs/visual-evidence/p28d/world
+            cp -f app/build/visual_screenshots/p28d/world/*.png docs/visual-evidence/p28d/world/
+            [ -f app/build/visual_screenshots/p28d/world/perf_probe.json ] && cp -f app/build/visual_screenshots/p28d/world/perf_probe.json docs/visual-evidence/p28d/world/
+            git add docs/visual-evidence/p28d/world
           fi
           # Identity matters: committing as github-actions[bot] makes every subsequent
           # workflow run on this PR require manual approval ("action_required"), which then
