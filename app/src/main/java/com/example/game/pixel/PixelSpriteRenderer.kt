@@ -506,6 +506,81 @@ object PixelSpriteRenderer {
     )
   }
 
+  /** P28D building kinds that need a real stone foundation (móng nhà / chân tường / bậc thềm). */
+  private val BUILDING_KINDS: Set<PropKind> = setOf(
+    PropKind.FACILITY_SUMMONING_HALL, PropKind.FACILITY_HERO_REGISTRY, PropKind.FACILITY_TRAINING_GROUND,
+    PropKind.FACILITY_ARMORY, PropKind.FACILITY_SYNTHESIS_LAB, PropKind.FACILITY_HERO_QUARTERS,
+    PropKind.FACILITY_RESTAURANT, PropKind.FLOOR_VISTA_ARCH,
+    PropKind.MEDIEVAL_TOWNHOUSE_A, PropKind.MEDIEVAL_TOWNHOUSE_B,
+    PropKind.SANCTUARY_COTTAGE_BROWN, PropKind.SANCTUARY_COTTAGE_SLATE,
+    PropKind.FORTRESS_CORNER_TOWER, PropKind.SOUTHERN_GATE_TOWER,
+  )
+
+  /**
+   * P28D: real foundation for building props, drawn BEFORE the facade sprite so the
+   * building sits IN the ground instead of looking pasted on top of it.
+   * - contact grounding: footprint-shaped parallelogram (never an ellipse decal),
+   * - stone plinth (móng nhà) sized from the obstacle's authored footprint when present,
+   *   otherwise from the sprite's visible base width,
+   * - front wall-base band + top edge line (chân tường),
+   * - 3 entrance steps centered on the front edge (bậc thềm).
+   */
+  private fun DrawScope.drawStructureFoundation(
+    obs: WorldObstacle,
+    bitmap: ImageBitmap,
+    cx: Float,
+    cy: Float,
+    s: Float,
+  ) {
+    if (obs.propKind !in BUILDING_KINDS) return
+    val spriteScale = 2.0f * s
+    val hw = (if (obs.footprintHalfW > 0f) obs.footprintHalfW * s
+              else bitmap.width * spriteScale * 0.34f).coerceAtLeast(10f * s)
+    val hd = (if (obs.footprintDepthNorth > 0f) obs.footprintDepthNorth * s * ObliqueCamera.OBLIQUE_Y_SCALE
+              else hw * 0.42f).coerceAtLeast(4f * s)
+    val fy = cy + 6f * s
+    val shadowA = (0.55f * com.example.game.world.WorldEnvironment.lighting.shadowStrength).coerceIn(0f, 0.55f)
+    // Grounding contact: footprint-shaped parallelogram slightly larger than the plinth.
+    drawPath(
+      Path().apply {
+        moveTo(cx - hw * 1.08f, fy + 3.5f * s); lineTo(cx + hw * 1.08f, fy + 3.5f * s)
+        lineTo(cx + hw, fy - hd); lineTo(cx - hw, fy - hd); close()
+      },
+      Color(0xFF060A12).copy(alpha = shadowA),
+    )
+    // Plinth top face (foreshortened stone slab).
+    drawPath(
+      Path().apply {
+        moveTo(cx - hw, fy); lineTo(cx + hw, fy)
+        lineTo(cx + hw, fy - hd); lineTo(cx - hw, fy - hd); close()
+      },
+      Color(0xFF3A4150),
+    )
+    // Front face band = wall base; lighter line marks where facade meets plinth.
+    val faceH = 7f * s
+    drawPath(
+      Path().apply {
+        moveTo(cx - hw, fy); lineTo(cx + hw, fy)
+        lineTo(cx + hw, fy + faceH); lineTo(cx - hw, fy + faceH); close()
+      },
+      Color(0xFF262C38),
+    )
+    drawLine(Color(0xFF5A6474), Offset(cx - hw, fy), Offset(cx + hw, fy), 1.6f * s)
+    // Entrance steps descending toward the viewer, centered on the front edge.
+    val stepW = hw * 0.36f
+    for (k in 0 until 3) {
+      val w = stepW * (1f - k * 0.16f)
+      val y0 = fy + faceH + (2 - k) * 3.2f * s
+      drawPath(
+        Path().apply {
+          moveTo(cx - w, y0); lineTo(cx + w, y0)
+          lineTo(cx + w, y0 + 3.2f * s); lineTo(cx - w, y0 + 3.2f * s); close()
+        },
+        if (k % 2 == 0) Color(0xFF424A5A) else Color(0xFF39404E),
+      )
+    }
+  }
+
   private fun DrawScope.drawCrispUpperCanopyPortion(
     bmp: ImageBitmap,
     cx: Float,
@@ -733,6 +808,7 @@ object PixelSpriteRenderer {
 
       PropKind.FACILITY_SUMMONING_HALL -> {
         if (legacyShadow) drawDirectionalShadow34(cx + 12f * s, cy - 8f * s, 238f * s, 44f * s, alpha = 0.32f)
+        drawStructureFoundation(obs, PixelStructureAtlas.summoningHallStructure, cx, cy, s)
         drawCrispSprite(PixelStructureAtlas.summoningHallStructure, cx, cy + 6f * s, 2.0f * s)
         // Gentle azure starlight motes over the classical amphitheatre summoning stage
         for (w in 0..3) {
@@ -745,23 +821,27 @@ object PixelSpriteRenderer {
 
       PropKind.FACILITY_HERO_REGISTRY -> {
         if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 168f * s, 30f * s, alpha = 0.34f)
+        drawStructureFoundation(obs, PixelStructureAtlas.heroRegistryStructure, cx, cy, s)
         drawCrispSprite(PixelStructureAtlas.heroRegistryStructure, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.FACILITY_TRAINING_GROUND -> {
         if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 176f * s, 32f * s, alpha = 0.34f)
+        drawStructureFoundation(obs, PixelStructureAtlas.trainingGroundStructure, cx, cy, s)
         drawCrispSprite(PixelStructureAtlas.trainingGroundStructure, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.FACILITY_ARMORY -> {
         if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 174f * s, 30f * s, alpha = 0.34f)
         drawForeshortenedGlow(cx + 6f * s, cy + 8f * s, 72f * s, Color(0xFFFB923C).copy(alpha = 0.18f))
+        drawStructureFoundation(obs, PixelStructureAtlas.armoryStructure, cx, cy, s)
         drawCrispSprite(PixelStructureAtlas.armoryStructure, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.FACILITY_SYNTHESIS_LAB -> {
         if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 172f * s, 30f * s, alpha = 0.34f)
         drawForeshortenedGlow(cx, cy + 6f * s, 68f * s, Color(0xFF34D399).copy(alpha = 0.15f))
+        drawStructureFoundation(obs, PixelStructureAtlas.synthesisLabStructure, cx, cy, s)
         drawCrispSprite(PixelStructureAtlas.synthesisLabStructure, cx, cy + 6f * s, 2.0f * s)
       }
 
@@ -769,47 +849,56 @@ object PixelSpriteRenderer {
         if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 182f * s, 32f * s, alpha = 0.34f)
         // Warm cozy residential interior window & doorway glow on ground!
         drawForeshortenedGlow(cx, cy + 10f * s, 76f * s, Color(0xFFFDE68A).copy(alpha = 0.22f))
+        drawStructureFoundation(obs, PixelStructureAtlas.heroQuartersStructure, cx, cy, s)
         drawCrispSprite(PixelStructureAtlas.heroQuartersStructure, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.FACILITY_RESTAURANT -> {
         if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 188f * s, 32f * s, alpha = 0.34f)
         drawForeshortenedGlow(cx, cy + 10f * s, 82f * s, Color(0xFFFBBF24).copy(alpha = 0.24f))
+        drawStructureFoundation(obs, PixelStructureAtlas.restaurantStructure, cx, cy, s)
         drawCrispSprite(PixelStructureAtlas.restaurantStructure, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.FLOOR_VISTA_ARCH -> {
         if (legacyShadow) drawDirectionalShadow34(cx + 6f * s, cy - 4f * s, 138f * s, 24f * s, alpha = 0.32f)
+        drawStructureFoundation(obs, PixelStructureAtlas.floorVistaArchStructure, cx, cy, s)
         drawCrispSprite(PixelStructureAtlas.floorVistaArchStructure, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.MEDIEVAL_TOWNHOUSE_A -> {
         if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 134f * s, 25f * s, alpha = 0.34f)
+        drawStructureFoundation(obs, PixelStructureAtlas.medievalTownhouseA, cx, cy, s)
         drawCrispSprite(PixelStructureAtlas.medievalTownhouseA, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.MEDIEVAL_TOWNHOUSE_B -> {
         if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 126f * s, 24f * s, alpha = 0.34f)
+        drawStructureFoundation(obs, PixelStructureAtlas.medievalTownhouseB, cx, cy, s)
         drawCrispSprite(PixelStructureAtlas.medievalTownhouseB, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.SANCTUARY_COTTAGE_BROWN -> {
         if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 114f * s, 22f * s, alpha = 0.34f)
+        drawStructureFoundation(obs, PixelStructureAtlas.sanctuaryCottageBrown, cx, cy, s)
         drawCrispSprite(PixelStructureAtlas.sanctuaryCottageBrown, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.SANCTUARY_COTTAGE_SLATE -> {
         if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy - 4f * s, 114f * s, 22f * s, alpha = 0.34f)
+        drawStructureFoundation(obs, PixelStructureAtlas.sanctuaryCottageSlate, cx, cy, s)
         drawCrispSprite(PixelStructureAtlas.sanctuaryCottageSlate, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.FORTRESS_CORNER_TOWER -> {
         if (legacyShadow) drawDirectionalShadow34(cx + 6f * s, cy, 48f * s, 14f * s, alpha = 0.36f)
+        drawStructureFoundation(obs, PixelStructureAtlas.fortressCornerTowerSprite, cx, cy, s)
         drawCrispSprite(PixelStructureAtlas.fortressCornerTowerSprite, cx, cy + 6f * s, 2.0f * s)
       }
 
       PropKind.SOUTHERN_GATE_TOWER -> {
         if (legacyShadow) drawDirectionalShadow34(cx + 8f * s, cy, 58f * s, 16f * s, alpha = 0.40f)
+        drawStructureFoundation(obs, PixelStructureAtlas.southernGateTowerSprite, cx, cy, s)
         drawCrispSprite(PixelStructureAtlas.southernGateTowerSprite, cx, cy + 8f * s, 2.0f * s)
       }
 

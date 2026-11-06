@@ -194,3 +194,26 @@ fun ESNoticeStack(
     }
   }
 }
+
+/**
+ * P28D: single in-flow banner driven by a REAL game event string (summon result, save
+ * status, expedition outcome). Uses the same Astral Reliquary notice frame as the
+ * battle/stack notices so every transient message shares one visual language.
+ */
+@Composable
+fun ESBannerNotice(
+  text: String,
+  modifier: Modifier = Modifier,
+  priority: NoticePriority = NoticePriority.INFO,
+) {
+  ESNoticeFrame(priority = priority, modifier = modifier) {
+    Text(
+      text,
+      color = ESTokens.IvoryPaper,
+      style = MaterialTheme.typography.labelMedium,
+      maxLines = 2,
+      overflow = TextOverflow.Ellipsis,
+      modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+    )
+  }
+}
