@@ -93,19 +93,25 @@ class P28ComponentsTest {
     assertTrue(center.notices.none { it.stableId == "c" })
   }
 
-  @Test fun loadingOverlayRendersRealStageTextAndErrorState() {
+  // NOTE: this Compose test version forbids calling setContent twice per test,
+  // so each loading state gets its own @Test (and its own compose rule).
+  @Test fun loadingOverlayShowsRealStageText() {
     rule.setContent {
       ESLoadingOverlay(ESLoadingState.Indeterminate("Đang nạp bản đồ Tháp..."))
     }
     rule.onNodeWithTag("es_loading_stage").assertExists()
     rule.onNodeWithText("Đang nạp bản đồ Tháp", substring = true).assertExists()
+  }
 
+  @Test fun loadingOverlayShowsErrorState() {
     rule.setContent {
       ESLoadingOverlay(ESLoadingState.Failed("Không thể đọc dữ liệu lưu"))
     }
     rule.onNodeWithTag("es_loading_error").assertExists()
     rule.onNodeWithText("Không thể đọc dữ liệu lưu", substring = true).assertExists()
+  }
 
+  @Test fun loadingOverlayHiddenWhenHidden() {
     rule.setContent { ESLoadingOverlay(ESLoadingState.Hidden) }
     rule.onNodeWithTag("es_loading_stage").assertDoesNotExist()
   }
