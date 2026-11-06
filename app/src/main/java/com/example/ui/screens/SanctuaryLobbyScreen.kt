@@ -885,7 +885,7 @@ fun SanctuaryLobbyScreen(
         border = BorderStroke(1.dp, SummonerGold.copy(alpha = 0.45f)),
         modifier = Modifier.align(Alignment.Start),
       ) {
-        Row(Modifier.padding(horizontal=8.dp,vertical=2.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(6.dp)) {
+        Row(Modifier.padding(horizontal=8.dp,vertical=2.dp).horizontalScroll(rememberScrollState()),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(6.dp)) {
           Surface(
             shape = RoundedCornerShape(10.dp),
             color = FantasySkin.HudGlass.copy(alpha=0.9f),
@@ -897,8 +897,12 @@ fun SanctuaryLobbyScreen(
               Text("Lv.${profile?.masterLevel ?: 1} • ${profile?.masterName ?: "Master"}",color=SummonerGold,maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.labelSmall)
             }
           }
-          ResourcePillBadge("Vàng",profile?.gold ?: 0L,SummonerGold)
-          if(!isNarrowScreen) ResourcePillBadge("Hồn",profile?.soulShards ?: 0L,SanctuaryUi.violetOnDark)
+          // P29: on narrow screens resource pills live in MasterHubScreen instead,
+          // so the idle top chip row never squeezes the icon buttons to zero width.
+          if(!isNarrowScreen) {
+            ResourcePillBadge("Vàng",profile?.gold ?: 0L,SummonerGold)
+            ResourcePillBadge("Hồn",profile?.soulShards ?: 0L,SanctuaryUi.violetOnDark)
+          }
           IconButton({showChronicleModal=true},Modifier.size(40.dp).testTag("quick_notifications_button")) {Icon(Icons.Default.Notifications,"Nhật ký",tint=RuneSilver)}
           IconButton(onOpenSettings,Modifier.size(40.dp).testTag("open_settings_button")) {Icon(Icons.Default.Settings,"Cài đặt",tint=RuneSilver)}
           IconButton({showPauseMapModal=true},Modifier.size(40.dp).testTag("pause_game_button")) {Icon(Icons.Default.Pause,"Bản đồ",tint=SummonerGold)}
