@@ -99,4 +99,37 @@ class MasterCommandResponsivenessTest {
     }
   }
 
+  @Test fun urgentCancelPreservesRealAttackCostsAcrossWindupContactAndRecovery() {
+    val dt = 1f / 60f
+    for (skill in listOf(false, true)) for (phase in listOf("windup", "contact", "recovery")) {
+      for (order in listOf(TacticalOrder.REGROUP, TacticalOrder.RETREAT, TacticalOrder.MOVE_TO)) {
+        val h = hero(); val e = enemy(); var hits = 0
+        h.attackCooldown = 0f
+        h.skillCooldown = if (skill) 0f else 100f
+        // Start through the real AI, so cooldowns are charged by executeCombatActions.
+        tick(h, e, TacticalOrder.HOLD_POSITION) { hits++ }
+        assertTrue(h.contactAttack.active)
+        assertEquals(skill, h.contactAttack.skill)
+        val beforeContact = if (skill) 17 else 13
+        repeat(beforeContact) { tick(h, e, TacticalOrder.HOLD_POSITION) { hits++ } }
+        if (phase != "windup") tick(h, e, TacticalOrder.HOLD_POSITION) { hits++ }
+        if (phase == "recovery") repeat(3) { tick(h, e, TacticalOrder.HOLD_POSITION) { hits++ } }
+        val expectedHits = if (phase == "windup") 0 else 1
+        assertEquals("$skill/$phase before cancel", expectedHits, hits)
+        val attackCost = h.attackCooldown; val skillCost = h.skillCooldown; val shield = h.shieldHp
+        tick(h, e, order) { hits++ }
+        assertFalse(h.contactAttack.active)
+        assertTrue(h.isMoving)
+        assertEquals("Cancel must not refund or recharge basic cooldown", (attackCost-dt).coerceAtLeast(0f), h.attackCooldown, .0001f)
+        assertEquals("Cancel must not refund or recharge skill cooldown", (skillCost-dt).coerceAtLeast(0f), h.skillCooldown, .0001f)
+        assertEquals("No delayed or duplicate contact", expectedHits, hits)
+        assertEquals("Already delivered shield survives", shield, h.shieldHp)
+        // No targets after departure: let the old contact deadline pass without a new attack.
+        e.hp = 0
+        repeat(45) { tick(h, e, order) { hits++ } }
+        assertEquals(expectedHits, hits)
+      }
+    }
+  }
+
 }
