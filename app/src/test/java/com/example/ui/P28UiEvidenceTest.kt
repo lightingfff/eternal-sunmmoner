@@ -59,17 +59,17 @@ class P28UiEvidenceTest {
     ESP28Assets.resetForTest()
   }
 
-  private fun hero(id: String, name: String, rarity: Int, clazz: HeroClassType) = HeroRecord(
+  private fun hero(id: String, name: String, rarity: Long, clazz: HeroClassType) = HeroRecord(
     id = id, name = name, heroClass = clazz.name, rarity = rarity, level = 6L,
     personality = PersonalityType.CYNICAL.name,
   )
 
   private val roster = listOf(
-    hero("p28_a", "Aaron Delcut", 2, HeroClassType.KNIGHT),
-    hero("p28_b", "Han Islat", 2, HeroClassType.ASSASSIN),
-    hero("p28_c", "Jenna Cirai", 2, HeroClassType.ARCHER),
-    hero("p28_d", "Eouka Rivel Strasburg", 3, HeroClassType.MAGE),
-    hero("p28_e", "Edis Gallen", 3, HeroClassType.PRIEST),
+    hero("p28_a", "Aaron Delcut", 2L, HeroClassType.KNIGHT),
+    hero("p28_b", "Han Islat", 2L, HeroClassType.ASSASSIN),
+    hero("p28_c", "Jenna Cirai", 2L, HeroClassType.ARCHER),
+    hero("p28_d", "Eouka Rivel Strasburg", 3L, HeroClassType.MAGE),
+    hero("p28_e", "Edis Gallen", 3L, HeroClassType.PRIEST),
   )
 
   private fun capture(view: View?, name: String) {
