@@ -153,7 +153,8 @@ class P28UiEvidenceTest {
     rule.onNodeWithText("đồng bộ", substring = true).assertExists()
     capture(view(), "loading_land_800")
   }
-}
+
+
 
   @Test @Config(qualifiers = "w360dp-h640dp-port-xhdpi")
   fun heroManagementDialogWiresRealHeroCardsAndCallbacks() {
