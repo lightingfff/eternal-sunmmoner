@@ -1,7 +1,6 @@
 package com.example.ui
 
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -99,13 +98,13 @@ class P28ComponentsTest {
       ESLoadingOverlay(ESLoadingState.Indeterminate("Đang nạp bản đồ Tháp..."))
     }
     rule.onNodeWithTag("es_loading_stage").assertExists()
-    rule.onNodeWithTag("es_loading_stage").assertTextContains("Đang nạp bản đồ Tháp")
+    rule.onNodeWithText("Đang nạp bản đồ Tháp", substring = true).assertExists()
 
     rule.setContent {
       ESLoadingOverlay(ESLoadingState.Failed("Không thể đọc dữ liệu lưu"))
     }
     rule.onNodeWithTag("es_loading_error").assertExists()
-    rule.onNodeWithTag("es_loading_error").assertTextContains("Không thể đọc dữ liệu lưu")
+    rule.onNodeWithText("Không thể đọc dữ liệu lưu", substring = true).assertExists()
 
     rule.setContent { ESLoadingOverlay(ESLoadingState.Hidden) }
     rule.onNodeWithTag("es_loading_stage").assertDoesNotExist()

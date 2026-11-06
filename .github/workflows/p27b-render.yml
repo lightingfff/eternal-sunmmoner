@@ -138,7 +138,7 @@ jobs:
         if: ${{ always() && steps.render_world.outcome == 'success' }}
         run: |
           set +e
-          gradle :app:testDebugUnitTest --tests 'com.example.ui.P28UiEvidenceTest' --stacktrace > "$RUNNER_TEMP/p28-ui.log" 2>&1
+          gradle :app:testDebugUnitTest --tests 'com.example.ui.P28UiEvidenceTest' --tests 'com.example.ui.P28ComponentsTest' --stacktrace > "$RUNNER_TEMP/p28-ui.log" 2>&1
           result=$?
           cat "$RUNNER_TEMP/p28-ui.log"
           if [ "$result" -ne 0 ]; then python3 tools/p27b_ci_failure.py "$RUNNER_TEMP/p28-ui.log" app/build/test-results/testDebugUnitTest; fi
