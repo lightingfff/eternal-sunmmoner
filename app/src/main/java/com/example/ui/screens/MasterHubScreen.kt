@@ -125,11 +125,11 @@ fun MasterHubScreen(
 
         Text("Điều hướng nhanh", color = ESTokens.AntiqueGold, style = MaterialTheme.typography.labelMedium)
         val shortcuts = listOf(
-          Triple("heroes", "Anh hùng", Groups),
-          Triple("team", "Đội hình", Group),
-          Triple("summon", "Triệu hồi", AutoAwesome),
-          Triple("tower", "Tháp", Castle),
-          Triple("inventory", "Túi đồ", Backpack),
+          Triple("heroes", "Anh hùng", Icons.Default.Groups),
+          Triple("team", "Đội hình", Icons.Default.Group),
+          Triple("summon", "Triệu hồi", Icons.Default.AutoAwesome),
+          Triple("tower", "Tháp", Icons.Default.Castle),
+          Triple("inventory", "Túi đồ", Icons.Default.Backpack),
         )
         for ((id, label, icon) in shortcuts) {
           Surface(
