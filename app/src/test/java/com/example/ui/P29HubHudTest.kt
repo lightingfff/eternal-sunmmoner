@@ -3,6 +3,7 @@ package com.example.ui
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.example.data.model.HeroClassType
@@ -10,6 +11,7 @@ import com.example.data.model.HeroRecord
 import com.example.data.model.MasterProfile
 import com.example.data.model.PersonalityType
 import com.example.ui.components.SanctuaryManagementNav
+import com.example.ui.theme.EternalSummonerTheme
 import com.example.ui.screens.MasterHubScreen
 import com.example.ui.screens.SanctuaryLobbyScreen
 import org.junit.Assert.assertEquals
