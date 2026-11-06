@@ -57,6 +57,7 @@ import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.Settings
 import com.example.ui.components.FantasyButton as Button
 import com.example.ui.components.FantasySkin
+import com.example.ui.components.p28.ESBannerNotice
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import com.example.game.lobby.HeroTaskType
@@ -920,22 +921,11 @@ fun SanctuaryLobbyScreen(
       }
 
       if (state.bannerFeedback != null) {
-        Surface(
-          shape = RoundedCornerShape(10.dp),
-          color = Color(0xEE1E1638),
-          modifier = Modifier
-            .align(Alignment.CenterHorizontally)
-            .border(1.dp, SummonerGold, RoundedCornerShape(10.dp)),
-        ) {
-          Text(
-            text = state.bannerFeedback,
-            style = MaterialTheme.typography.labelMedium,
-            color = SummonerGold,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-          )
-        }
+        // P28D: real event banner on the Astral Reliquary notice frame.
+        ESBannerNotice(
+          text = state.bannerFeedback!!,
+          modifier = Modifier.align(Alignment.CenterHorizontally),
+        )
       }
     }
 

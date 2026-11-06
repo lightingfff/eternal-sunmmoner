@@ -16,7 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import com.example.data.model.HeroClassType
 import com.example.data.model.HeroRecord
@@ -27,11 +29,13 @@ import com.example.ui.components.p28.ESLoadingOverlay
 import com.example.ui.components.p28.ESLoadingState
 import com.example.ui.components.p28.ESMiniHeroPortrait
 import com.example.ui.components.p28.ESNoticeStack
+import com.example.ui.components.HeroManagementDialog
 import com.example.ui.components.p28.ESP28Assets
 import com.example.ui.components.p28.GameNoticeUi
 import com.example.ui.components.p28.NoticeCenter
 import com.example.ui.components.p28.NoticePriority
 import java.io.File
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -148,5 +152,29 @@ class P28UiEvidenceTest {
     val view = content { ESLoadingOverlay(ESLoadingState.Indeterminate("Đang đồng bộ dữ liệu người chơi...")) }
     rule.onNodeWithText("đồng bộ", substring = true).assertExists()
     capture(view(), "loading_land_800")
+  }
+
+
+
+  @Test @Config(qualifiers = "w360dp-h640dp-port-xhdpi")
+  fun heroManagementDialogWiresRealHeroCardsAndCallbacks() {
+    var inspected: String? = null
+    var toggled: String? = null
+    val heroes = listOf(roster[0], roster[3])
+    val view = content {
+      HeroManagementDialog(
+        heroes = heroes, teamMode = true, busy = false,
+        onClose = {}, onInspect = { inspected = it.id }, onToggle = { toggled = it.id },
+      )
+    }
+    rule.onNodeWithTag("hero_management_dialog").assertExists()
+    rule.onNodeWithTag("hero_card_p28_a").assertExists()
+    rule.onNodeWithTag("hero_card_p28_d").assertExists()
+    rule.onNodeWithTag("assign_p28_a").assertExists().performClick()
+    assertEquals("p28_a", toggled)
+    rule.onNodeWithTag("inspect_p28_d").assertExists().performClick()
+    assertEquals("p28_d", inspected)
+    // NOTE: Dialog content lives in a separate window, so view.draw() would capture an
+    // empty main view — no screenshot here; semantic assertions above are the evidence.
   }
 }

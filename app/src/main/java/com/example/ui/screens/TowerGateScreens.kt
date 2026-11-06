@@ -80,7 +80,9 @@ import com.example.game.tower.TowerFloorCatalog
 import com.example.ui.SummonerUiState
 import com.example.ui.components.PixelHeroPortraitAvatar
 import com.example.ui.components.ResourcePillBadge
-import com.example.ui.components.p28.ESMiniHeroPortrait
+import com.example.ui.components.p28.ESBannerNotice
+import com.example.ui.components.p28.NoticePriority
+import com.example.ui.components.p28.ESHeroCard
 import com.example.ui.theme.ArcaneViolet
 import com.example.ui.theme.BorderRune
 import com.example.ui.theme.CrimsonBlood
@@ -633,13 +635,8 @@ fun SquadPreparationScreen(
 
       if (state.bannerFeedback != null) {
         Spacer(modifier = Modifier.height(6.dp))
-        Text(
-          text = state.bannerFeedback,
-          style = MaterialTheme.typography.labelMedium,
-          color = WarningAmber,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-        )
+        // P28D: real event banner on the Astral Reliquary notice frame.
+        ESBannerNotice(text = state.bannerFeedback!!, priority = NoticePriority.TACTICAL)
       }
 
       Spacer(modifier = Modifier.height(8.dp))
@@ -874,8 +871,14 @@ private fun SquadHeroRosterList(
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-          // P28: framed portrait from the ui_p28 card assets (fallback glyph if no authored bust).
-          ESMiniHeroPortrait(heroName = hero.name, heroClass = hero.classType, sizeDp = 48.dp)
+          // P28D: full Astral Reliquary hero card bound to the real HeroRecord
+          // (tap = toggle squad, same as the row/button; tags preserved).
+          ESHeroCard(
+            hero = hero,
+            selected = selected,
+            onClick = { onToggleHero(hero) },
+            modifier = Modifier.width(84.dp).testTag("prep_card_${hero.id}"),
+          )
 
           Column(modifier = Modifier.weight(1f)) {
             Text(

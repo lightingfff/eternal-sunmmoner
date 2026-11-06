@@ -1027,12 +1027,10 @@ fun TowerBattleScreen(
       ) {
         val feedbackMsg = combatEngine.commandFeedback
         if (feedbackMsg != null && combatEngine.stage == MissionStage.IN_PROGRESS) {
-          Surface(
-            shape = RoundedCornerShape(10.dp),
-            color = Color(0xEA121829),
-            modifier = Modifier
-              .border(1.dp, PortalCyan.copy(alpha = 0.7f), RoundedCornerShape(10.dp))
-              .testTag("tactical_command_feedback_pill"),
+          // P28D: tactical command feedback on the P28 notice frame (tag preserved).
+          ESNoticeFrame(
+            priority = NoticePriority.TACTICAL,
+            modifier = Modifier.testTag("tactical_command_feedback_pill"),
           ) {
             Text(
               text = feedbackMsg,
@@ -1040,7 +1038,7 @@ fun TowerBattleScreen(
               color = SummonerGold,
               maxLines = 1,
               overflow = TextOverflow.Ellipsis,
-              modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+              modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
             )
           }
         }

@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.data.model.HeroRecord
-import com.example.ui.components.p28.ESMiniHeroPortrait
+import com.example.ui.components.p28.ESHeroCard
 
 private val Gold=Color(0xffbda46d)
 /** P26: dark glass instead of opaque ink — the world stays visible behind panels.
@@ -81,7 +81,7 @@ val PanelGlass=Color(0xE0121B2E)
             FantasyPanel(Modifier.fillMaxWidth()) {
               Column(Modifier.padding(10.dp)) {
                 Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)) {
-                  ESMiniHeroPortrait(heroName=hero.name,heroClass=hero.classType,sizeDp=42.dp)
+                  ESHeroCard(hero=hero,selected=hero.inActiveSquad,onClick={onInspect(hero)},modifier=Modifier.width(76.dp).testTag("hero_card_${hero.id}"))
                   Column(Modifier.weight(1f)) {
                     Text("${hero.name} • Lv.${hero.level}",color=Color(0xffece5d5),maxLines=1,overflow=TextOverflow.Ellipsis)
                     Text("${"★".repeat(hero.rarity.toInt().coerceIn(1,6))} • ${hero.classType.labelVi}",color=Gold,style=MaterialTheme.typography.labelSmall)
