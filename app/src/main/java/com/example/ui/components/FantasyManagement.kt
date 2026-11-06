@@ -59,7 +59,7 @@ val PanelGlass=Color(0xE0121B2E)
         }
       }
       IconButton({expanded=!expanded},modifier=Modifier.size(40.dp).testTag("nav_expand_toggle")) {
-        Icon(if(expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,contentDescription="Mở/thu gọn nhãn",tint=Gold,modifier=Modifier.size(18.dp))
+        Icon(if(expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,contentDescription="Mở/thu gọn nhãn",tint=Gold,modifier=Modifier.size(18.dp))
       }
     }
   }
