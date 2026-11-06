@@ -24,6 +24,7 @@ on:
       - 'app/src/test/java/com/example/P27B*Test.kt'
       - 'app/src/test/java/com/example/SanctuaryMaterialTest.kt'
       - 'app/src/test/java/com/example/ui/P27B*Test.kt'
+      - 'app/src/test/java/com/example/ui/P28*Test.kt'
   pull_request:
     branches: [main]
     paths:
@@ -37,6 +38,7 @@ on:
       - 'app/src/test/java/com/example/P27B*Test.kt'
       - 'app/src/test/java/com/example/SanctuaryMaterialTest.kt'
       - 'app/src/test/java/com/example/ui/P27B*Test.kt'
+      - 'app/src/test/java/com/example/ui/P28*Test.kt'
   workflow_dispatch:
 
 permissions:
@@ -131,6 +133,16 @@ jobs:
           cat "$RUNNER_TEMP/p27b-ui.log"
           if [ "$result" -ne 0 ]; then python3 tools/p27b_ci_failure.py "$RUNNER_TEMP/p27b-ui.log" app/build/test-results/testDebugUnitTest; fi
           exit "$result"
+      - name: P28 Astral Reliquary UI screenshots (hero card, party grid, notices, loading)
+        id: render_p28_ui
+        if: ${{ always() && steps.render_world.outcome == 'success' }}
+        run: |
+          set +e
+          gradle :app:testDebugUnitTest --tests 'com.example.ui.P28UiEvidenceTest' --tests 'com.example.ui.P28ComponentsTest' --stacktrace > "$RUNNER_TEMP/p28-ui.log" 2>&1
+          result=$?
+          cat "$RUNNER_TEMP/p28-ui.log"
+          if [ "$result" -ne 0 ]; then python3 tools/p27b_ci_failure.py "$RUNNER_TEMP/p28-ui.log" app/build/test-results/testDebugUnitTest; fi
+          exit "$result"
       - name: Assemble Android APK (technical verification only)
         id: apk
         if: ${{ always() && steps.render_world.outcome == 'success' }}
@@ -185,6 +197,13 @@ jobs:
             mkdir -p docs/p27b_next/previews/after/ui
             cp -f app/build/visual_screenshots/p27b/ui/*.png docs/p27b_next/previews/after/ui/
             git add docs/p27b_next/previews/after/ui
+          fi
+          # P28 Astral Reliquary UI evidence (hero card / party grid / notices / loading)
+          # produced by P28UiEvidenceTest lands in docs/visual-evidence/p28/ui.
+          if [ -d app/build/visual_screenshots/p28/ui ]; then
+            mkdir -p docs/visual-evidence/p28/ui
+            cp -f app/build/visual_screenshots/p28/ui/*.png docs/visual-evidence/p28/ui/
+            git add docs/visual-evidence/p28/ui
           fi
           # Identity matters: committing as github-actions[bot] makes every subsequent
           # workflow run on this PR require manual approval ("action_required"), which then
