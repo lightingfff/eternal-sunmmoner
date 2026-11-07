@@ -138,8 +138,8 @@ class P29HubHudTest {
     rule.mainClock.advanceTimeBy(120L)
     rule.waitForIdle()
     rule.onNodeWithTag("master_hub_screen").assertExists()
-    owner?.onBackPressedDispatcher?.onBackPressed()
-    rule.mainClock.advanceTimeBy(120L)
+    rule.runOnIdle { owner?.onBackPressedDispatcher?.onBackPressed() }
+    rule.mainClock.advanceTimeBy(200L)
     rule.waitForIdle()
     rule.onNodeWithTag("master_hub_screen").assertDoesNotExist()
   }
