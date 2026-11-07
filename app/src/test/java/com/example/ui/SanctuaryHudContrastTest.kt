@@ -38,7 +38,7 @@ class SanctuaryHudContrastTest {
     // P29 / Peer Review R4: compact HudGlass chips composite over the worst-case ivory highlight.
     // SummonerGold (0xFFFFD700) on HudGlass (0xB3141D2A) over worstBackdrop must meet WCAG AA (>= 4.5:1).
     val behind = effective(FantasySkin.HudGlass)
-    val ratio = contrastRatio(SummonerGold, behind)
+    val ratio = SanctuaryUi.contrastRatio(SummonerGold, behind)
     assertTrue("SummonerGold over HudGlass must be >= 4.5:1, got $ratio", ratio >= 4.5)
   }
 
