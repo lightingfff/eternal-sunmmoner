@@ -1,10 +1,10 @@
 {
   "note": "Robolectric CPU render, indicative only — NOT a device FPS measurement",
   "frames": 12,
-  "avgMs": 22.166666666666668,
-  "p95Ms": 25,
-  "minMs": 18,
-  "maxMs": 25,
+  "avgMs": 37.916666666666664,
+  "p95Ms": 42,
+  "minMs": 30,
+  "maxMs": 42,
   "zoom": 0.88,
   "viewport": "1280x720",
   "hour": 12

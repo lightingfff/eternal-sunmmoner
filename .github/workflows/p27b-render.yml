@@ -25,6 +25,7 @@ on:
       - 'app/src/test/java/com/example/SanctuaryMaterialTest.kt'
       - 'app/src/test/java/com/example/ui/P27B*Test.kt'
       - 'app/src/test/java/com/example/ui/P28*Test.kt'
+      - 'app/src/test/java/com/example/ui/P29*Test.kt'
       - 'app/src/test/java/com/example/P28*Test.kt'
   pull_request:
     branches: [main]
@@ -40,6 +41,7 @@ on:
       - 'app/src/test/java/com/example/SanctuaryMaterialTest.kt'
       - 'app/src/test/java/com/example/ui/P27B*Test.kt'
       - 'app/src/test/java/com/example/ui/P28*Test.kt'
+      - 'app/src/test/java/com/example/ui/P29*Test.kt'
       - 'app/src/test/java/com/example/P28*Test.kt'
   workflow_dispatch:
 
@@ -140,7 +142,7 @@ jobs:
         if: ${{ always() && steps.render_world.outcome == 'success' }}
         run: |
           set +e
-          gradle :app:testDebugUnitTest --tests 'com.example.ui.P28UiEvidenceTest' --tests 'com.example.ui.P28ComponentsTest' --tests 'com.example.P28DRenderTest' --stacktrace > "$RUNNER_TEMP/p28-ui.log" 2>&1
+          gradle :app:testDebugUnitTest --tests 'com.example.ui.P28UiEvidenceTest' --tests 'com.example.ui.P28ComponentsTest' --tests 'com.example.P28DRenderTest' --tests 'com.example.ui.P29HubHudTest' --tests 'com.example.ui.LayoutResponsivenessRobolectricTest' --stacktrace > "$RUNNER_TEMP/p28-ui.log" 2>&1
           result=$?
           cat "$RUNNER_TEMP/p28-ui.log"
           if [ "$result" -ne 0 ]; then python3 tools/p27b_ci_failure.py "$RUNNER_TEMP/p28-ui.log" app/build/test-results/testDebugUnitTest; fi
@@ -209,6 +211,12 @@ jobs:
           fi
           # P28-D building foundation evidence (multi-zoom day/night + perf probe)
           # produced by P28DRenderTest lands in docs/visual-evidence/p28d/world.
+          if [ -d app/build/visual_screenshots/p29/hub ]; then
+            mkdir -p docs/visual-evidence/p29/hub
+            cp -f app/build/visual_screenshots/p29/hub/*.png docs/visual-evidence/p29/hub/
+            [ -f app/build/visual_screenshots/p29/hub/hud_coverage.json ] && cp -f app/build/visual_screenshots/p29/hub/hud_coverage.json docs/visual-evidence/p29/hub/
+            git add docs/visual-evidence/p29/hub
+          fi
           if [ -d app/build/visual_screenshots/p28d/world ]; then
             mkdir -p docs/visual-evidence/p28d/world
             cp -f app/build/visual_screenshots/p28d/world/*.png docs/visual-evidence/p28d/world/

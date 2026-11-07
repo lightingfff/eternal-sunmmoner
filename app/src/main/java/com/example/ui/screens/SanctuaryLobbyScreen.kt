@@ -259,6 +259,8 @@ fun SanctuaryLobbyScreen(
   val insideInterior = activeInteriorState != null
   val insideRestaurantState = activeInteriorState == FacilityType.RESTAURANT
   var showQuickCommands by remember { mutableStateOf(false) }
+  var showMasterHub by remember { mutableStateOf(false) }
+  var cameraExpanded by remember { mutableStateOf(false) }
   var managementMode by remember { mutableStateOf<String?>(null) }
   var promptedFacility by remember { mutableStateOf<FacilityType?>(null) }
   var inspectingHeroId by remember { mutableStateOf<String?>(null) }
@@ -875,18 +877,36 @@ fun SanctuaryLobbyScreen(
         else -> "Tầng ${profile?.highestClearedFloor ?: 0}"
       }
 
-      com.example.ui.components.FantasyPanel(Modifier.fillMaxWidth()) {
-        Row(Modifier.padding(horizontal=10.dp,vertical=2.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-          PixelHeroPortraitAvatar(heroClass=HeroClassType.MAGE,sizeDp=28.dp)
-          Column(Modifier.weight(1f)) {
-            Text("Lv.${profile?.masterLevel ?: 1} • ${profile?.masterName ?: "Master"}",color=SummonerGold,maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.labelMedium)
-            Text("Mục tiêu: chinh phục tầng ${(profile?.highestClearedFloor ?: 0)+1}",color=RuneSilver,style=MaterialTheme.typography.labelSmall,maxLines=1)
+      // P29: the permanent top bar is now a COMPACT CHIP ROW on translucent HudGlass —
+      // it no longer spans the full width as a black rectangle. Tap the master chip to
+      // open the dedicated MasterHubScreen (user-opened modal, allowed to use a scrim).
+      Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = FantasySkin.HudGlass,
+        border = BorderStroke(1.dp, SummonerGold.copy(alpha = 0.45f)),
+        modifier = Modifier.align(Alignment.Start).testTag("top_hud_chip_row"),
+      ) {
+        Row(Modifier.padding(horizontal=8.dp,vertical=2.dp).horizontalScroll(rememberScrollState()),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(6.dp)) {
+          Surface(
+            shape = RoundedCornerShape(10.dp),
+            color = FantasySkin.HudGlass.copy(alpha=0.9f),
+            border = BorderStroke(1.dp, SummonerGold.copy(alpha=.5f)),
+            modifier = Modifier.testTag("master_chip").clickable { showMasterHub = true },
+          ) {
+            Row(Modifier.padding(horizontal=6.dp,vertical=2.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(4.dp)) {
+              PixelHeroPortraitAvatar(heroClass=HeroClassType.MAGE,sizeDp=22.dp)
+              Text("Lv.${profile?.masterLevel ?: 1} • ${profile?.masterName ?: "Master"}",color=SummonerGold,maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.labelSmall)
+            }
           }
-          ResourcePillBadge("Vàng",profile?.gold ?: 0L,SummonerGold)
-          if(!isNarrowScreen) ResourcePillBadge("Hồn",profile?.soulShards ?: 0L,SanctuaryUi.violetOnDark)
-          IconButton({showChronicleModal=true},Modifier.size(48.dp).testTag("quick_notifications_button")) {Icon(Icons.Default.Notifications,"Nhật ký",tint=RuneSilver)}
-          IconButton(onOpenSettings,Modifier.size(48.dp).testTag("open_settings_button")) {Icon(Icons.Default.Settings,"Cài đặt",tint=RuneSilver)}
-          IconButton({showPauseMapModal=true},Modifier.size(48.dp).testTag("pause_game_button")) {Icon(Icons.Default.Pause,"Bản đồ",tint=SummonerGold)}
+          // P29: on narrow screens resource pills live in MasterHubScreen instead,
+          // so the idle top chip row never squeezes the icon buttons to zero width.
+          if(!isNarrowScreen) {
+            ResourcePillBadge("Vàng",profile?.gold ?: 0L,SummonerGold)
+            ResourcePillBadge("Hồn",profile?.soulShards ?: 0L,SanctuaryUi.violetOnDark)
+          }
+          IconButton({showChronicleModal=true},Modifier.size(40.dp).testTag("quick_notifications_button")) {Icon(Icons.Default.Notifications,"Nhật ký",tint=RuneSilver)}
+          IconButton(onOpenSettings,Modifier.size(40.dp).testTag("open_settings_button")) {Icon(Icons.Default.Settings,"Cài đặt",tint=RuneSilver)}
+          IconButton({showPauseMapModal=true},Modifier.size(40.dp).testTag("pause_game_button")) {Icon(Icons.Default.Pause,"Bản đồ",tint=SummonerGold)}
         }
       }
 
@@ -943,13 +963,23 @@ fun SanctuaryLobbyScreen(
       // Bottom-Left: Free Camera Quick Control Suite
       Surface(
         shape = RoundedCornerShape(14.dp),
-        color = FantasySkin.Panel.copy(alpha = 0.94f),
+        color = FantasySkin.HudGlass,
         border = BorderStroke(1.dp, SummonerGold.copy(alpha = 0.60f)),
         modifier = Modifier
           .align(Alignment.BottomStart)
           .padding(bottom=54.dp)
           .testTag("camera_controls_bar"),
       ) {
+        // P29: camera tools are COLLAPSED by default — one toggle button keeps the idle
+        // viewport clear; expanding reveals all five tools (tags preserved).
+        if (!cameraExpanded) {
+          IconButton(
+            onClick = { cameraExpanded = true },
+            modifier = Modifier.size(cameraIconSize).testTag("camera_controls_toggle"),
+          ) {
+            Icon(Icons.Default.CenterFocusStrong, contentDescription = "Mở công cụ camera", tint = PortalCyan, modifier = Modifier.size(cameraIconInner))
+          }
+        } else {
         Row(
           modifier = Modifier.padding(horizontal = if (isNarrowScreen) 3.dp else 6.dp, vertical = 3.dp),
           verticalAlignment = Alignment.CenterVertically,
@@ -1012,6 +1042,7 @@ fun SanctuaryLobbyScreen(
             Icon(Icons.Default.Castle, contentDescription = "Đến Cổng Tháp", tint = EmeraldVitality, modifier = Modifier.size(cameraIconInner))
           }
         }
+        }
       }
 
       // Bottom-Right: Contextual Facility Prompt, Compact Hero Card & Quick Action Bar
@@ -1019,7 +1050,7 @@ fun SanctuaryLobbyScreen(
         modifier = Modifier
           .align(Alignment.BottomEnd)
           .padding(bottom=54.dp)
-          .padding(start = if (isNarrowScreen) 168.dp else 184.dp)
+          .padding(start = if (isNarrowScreen) 8.dp else 184.dp)
           .widthIn(max = maxPanelWidth)
           .testTag("hero_command_panel"),
         horizontalAlignment = Alignment.End,
@@ -1237,6 +1268,25 @@ fun SanctuaryLobbyScreen(
     if(managementMode!=null) com.example.ui.components.HeroManagementDialog(
       heroes=state.heroes,teamMode=managementMode=="team",busy=state.isBusyAction,equipment=state.equipment,
       onClose={managementMode=null},onInspect={managementMode=null;inspectingHeroId=it.id},onToggle=onToggleSquad)
+
+    // P29: user-opened Master management page (only when the master chip is tapped).
+    if (showMasterHub) {
+      MasterHubScreen(
+        state = state,
+        onNavigate = { destination ->
+          showMasterHub = false
+          managementMode = null
+          when (destination) {
+            "heroes", "team" -> managementMode = destination
+            "summon" -> onOpenFacility(FacilityType.SUMMONING_HALL)
+            "tower" -> onOpenFacility(FacilityType.TOWER_GATE)
+            "inventory" -> onOpenFacility(FacilityType.ARMORY)
+          }
+        },
+        onOpenSettings = { showMasterHub = false; onOpenSettings() },
+        onClose = { showMasterHub = false },
+      )
+    }
 
     // 4. Active Sanctuary Facility Modal
     val openFacility = state.activeFacilityModal
