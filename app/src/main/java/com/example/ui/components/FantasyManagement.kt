@@ -24,7 +24,7 @@ import androidx.compose.ui.window.Dialog
 import com.example.data.model.HeroRecord
 import com.example.ui.components.p28.ESHeroCard
 
-private val Gold=Color(0xffbda46d)
+private val Gold=Color(0xFFFFD700)
 /** P26: dark glass instead of opaque ink — the world stays visible behind panels.
  *  P27B-V5 CP5: 0xB8 (72%) failed the same measurement as [FantasySkin.Panel]; raised to
  *  88% so panel text keeps >= 4.5:1 over the brightest terrain. */
@@ -55,7 +55,7 @@ val PanelGlass=Color(0xE0121B2E)
       )) {
         TextButton({onNavigate(id)},modifier=Modifier.weight(1f).heightIn(min=48.dp).testTag("nav_$id"),contentPadding=PaddingValues(2.dp)) {
           Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(3.dp)) {
-            Icon(icon,contentDescription=null,tint=Gold,modifier=Modifier.size(18.dp))
+            Icon(icon,contentDescription=if (!expanded) title else null,tint=Gold,modifier=Modifier.size(18.dp))
             if (expanded) Text(title,color=Gold,maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.labelSmall)
           }
         }
