@@ -117,12 +117,14 @@ class P29HubHudTest {
 
   @Test
   fun masterModalDismissedByAndroidBack() {
+    rule.mainClock.autoAdvance = false
     var owner: androidx.activity.OnBackPressedDispatcherOwner? = null
     rule.setContent {
       owner = androidx.activity.compose.LocalOnBackPressedDispatcherOwner.current
       EternalSummonerTheme {
         SanctuaryLobbyScreen(
           state = sampleState(),
+          sceneActive = false,
           onOpenFacility = {}, onCloseFacility = {}, onSummonHero = {},
           onTrainHero = { _, _ -> }, onEquipItem = { _, _ -> }, onSynthesizeGear = {},
           onEnhanceGear = {}, onRecoverHero = { _, _ -> }, onHostMeal = {},
@@ -130,18 +132,26 @@ class P29HubHudTest {
         )
       }
     }
+    rule.mainClock.advanceTimeBy(200L)
+    rule.waitForIdle()
     rule.onNodeWithTag("master_chip").performClick()
+    rule.mainClock.advanceTimeBy(120L)
+    rule.waitForIdle()
     rule.onNodeWithTag("master_hub_screen").assertExists()
-    rule.runOnIdle { owner?.onBackPressedDispatcher?.onBackPressed() }
+    owner?.onBackPressedDispatcher?.onBackPressed()
+    rule.mainClock.advanceTimeBy(120L)
+    rule.waitForIdle()
     rule.onNodeWithTag("master_hub_screen").assertDoesNotExist()
   }
 
   @Test
   fun collapsedNavHasAccessibleDestinationNames() {
+    rule.mainClock.autoAdvance = false
     rule.setContent {
       EternalSummonerTheme {
         SanctuaryLobbyScreen(
           state = sampleState(),
+          sceneActive = false,
           onOpenFacility = {}, onCloseFacility = {}, onSummonHero = {},
           onTrainHero = { _, _ -> }, onEquipItem = { _, _ -> }, onSynthesizeGear = {},
           onEnhanceGear = {}, onRecoverHero = { _, _ -> }, onHostMeal = {},
@@ -149,6 +159,8 @@ class P29HubHudTest {
         )
       }
     }
+    rule.mainClock.advanceTimeBy(200L)
+    rule.waitForIdle()
     val node = rule.onNodeWithTag("nav_heroes").fetchSemanticsNode()
     val desc = node.config.getOrElse(androidx.compose.ui.semantics.SemanticsProperties.ContentDescription) { emptyList() }
     val text = node.config.getOrElse(androidx.compose.ui.semantics.SemanticsProperties.Text) { emptyList() }
