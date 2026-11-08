@@ -1,0 +1,109 @@
+name: Auto Agent Dispatcher (Simulation & Dry-Run)
+
+on:
+  issues:
+    types: [labeled, opened]
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'Issue number to dispatch'
+        required: false
+        type: string
+      dry_run:
+        description: 'Dry run mode (true/false)'
+        required: true
+        default: 'true'
+        type: boolean
+
+permissions:
+  contents: read
+  issues: write
+  pull_requests: write
+
+concurrency:
+  group: agent-dispatcher-${{ github.event.issue.number || github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  dispatch_issue:
+    name: Issue Dispatch & Lock Check
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'ai:ready'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Agent Dispatcher Simulator
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue_number }}
+          ISSUE_TITLE: ${{ github.event.issue.title || 'Manual Dispatch' }}
+          ISSUE_BODY: ${{ github.event.issue.body || '' }}
+          DRY_RUN: ${{ inputs.dry_run || 'true' }}
+        run: |
+          python3 -c "
+          import os, json
+          from tools.dispatcher.agent_dispatcher import run_dispatcher
+
+          issue_num = int(os.environ.get('ISSUE_NUMBER') or 0)
+          title = os.environ.get('ISSUE_TITLE', '')
+          body = os.environ.get('ISSUE_BODY', '')
+          dry_run = os.environ.get('DRY_RUN', 'true').lower() == 'true'
+
+          print(f'=== AUTO AGENT DISPATCHER: ISSUE #{issue_num} ===')
+          print(f'Title: {title}')
+          print(f'Dry Run: {dry_run}')
+
+          res = run_dispatcher(issue_num, title, body, base_sha='HEAD', dry_run=dry_run)
+          print('\n[DISPATCH RESULT]:')
+          print(json.dumps(res, indent=2, ensure_ascii=False))
+
+          if res.get('status') == 'UNASSIGNED':
+              print('Warning: Issue has no valid A01-A12 / Argon / Codex role pattern.')
+          "
+
+  pr_dual_review_audit:
+    name: PR Dual Review Router (Argon + Codex + A09)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Route PR Reviews
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python3 -c "
+          import os, json, subprocess
+          from tools.dispatcher.agent_dispatcher import generate_pr_review_dispatch
+
+          pr_num = int(os.environ.get('PR_NUMBER', 0))
+          head_sha = os.environ.get('HEAD_SHA', 'HEAD')
+
+          # Get changed files
+          try:
+              changed = subprocess.check_output(['git', 'diff', '--name-only', 'origin/main...HEAD']).decode('utf-8').splitlines()
+          except Exception:
+              changed = []
+
+          plan = generate_pr_review_dispatch(pr_num, head_sha, changed)
+          print(f'=== DUAL-LEAD REVIEW ROUTING FOR PR #{pr_num} ===')
+          print(json.dumps(plan, indent=2, ensure_ascii=False))
+          print('\nRule: No self-merge. Reviewers comment [ARGON_REVIEW], [CODEX_REVIEW], [QA_REVIEW]. Owner merges.')
+          "
