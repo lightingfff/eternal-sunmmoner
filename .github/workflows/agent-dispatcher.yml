@@ -1,4 +1,4 @@
-name: Auto Agent Dispatcher (Simulation & Dry-Run)
+name: Auto Agent Dispatcher
 
 on:
   workflow_dispatch:
@@ -11,8 +11,8 @@ on:
       dry_run:
         description: 'Dry run mode'
         required: true
-        default: true
-        type: boolean
+        default: 'true'
+        type: string
   issues:
     types: [labeled, opened]
   pull_request:
@@ -24,7 +24,7 @@ permissions:
   pull_requests: write
 
 concurrency:
-  group: "agent-dispatcher-${{ github.event.issue.number || github.event.pull_request.number || github.run_id }}"
+  group: dispatcher-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -47,7 +47,7 @@ jobs:
   dispatch_issue:
     name: Issue Dispatch & Lock Check
     needs: test_dispatcher_engine
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'ai:ready'))
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'issues'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -61,19 +61,35 @@ jobs:
       - name: Run Agent Dispatcher Simulator
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_NUMBER: ${{ github.event.issue.number || github.event.inputs.issue_number || '0' }}
-          ISSUE_TITLE: ${{ github.event.issue.title || 'Manual Workflow Dispatch' }}
-          ISSUE_BODY: ${{ github.event.issue.body || '' }}
-          DRY_RUN: ${{ github.event.inputs.dry_run || 'true' }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_PATH: ${{ github.event_path }}
         run: |
           python3 -c "
           import os, json
           from tools.dispatcher.agent_dispatcher import run_dispatcher
 
-          issue_num = int(os.environ.get('ISSUE_NUMBER') or 0)
-          title = os.environ.get('ISSUE_TITLE', '')
-          body = os.environ.get('ISSUE_BODY', '')
-          dry_run = str(os.environ.get('DRY_RUN', 'true')).lower() == 'true'
+          event_name = os.environ.get('EVENT_NAME', '')
+          event_path = os.environ.get('EVENT_PATH', '')
+
+          event_data = {}
+          if event_path and os.path.exists(event_path):
+              with open(event_path) as f:
+                  event_data = json.load(f)
+
+          issue_data = event_data.get('issue', {})
+          inputs_data = event_data.get('inputs', {})
+
+          issue_num = issue_data.get('number') or int(inputs_data.get('issue_number') or 0)
+          title = issue_data.get('title') or 'Manual Workflow Dispatch'
+          body = issue_data.get('body') or ''
+          labels = [l.get('name') for l in issue_data.get('labels', [])]
+
+          dry_run = str(inputs_data.get('dry_run', 'true')).lower() == 'true'
+
+          # For issues events, only process if 'ai:ready' label is present
+          if event_name == 'issues' and 'ai:ready' not in labels:
+              print(f'Issue #{issue_num} does not have ai:ready label (labels: {labels}). Skipping dispatch.')
+              exit(0)
 
           print(f'=== AUTO AGENT DISPATCHER: ISSUE #{issue_num} ===')
           print(f'Title: {title}')
@@ -111,15 +127,21 @@ jobs:
 
       - name: Route PR Reviews
         env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          EVENT_PATH: ${{ github.event_path }}
         run: |
           python3 -c "
           import os, json, subprocess
           from tools.dispatcher.agent_dispatcher import generate_pr_review_dispatch
 
-          pr_num = int(os.environ.get('PR_NUMBER', 0))
-          head_sha = os.environ.get('HEAD_SHA', 'HEAD')
+          event_path = os.environ.get('EVENT_PATH', '')
+          event_data = {}
+          if event_path and os.path.exists(event_path):
+              with open(event_path) as f:
+                  event_data = json.load(f)
+
+          pr_data = event_data.get('pull_request', {})
+          pr_num = pr_data.get('number', 0)
+          head_sha = pr_data.get('head', {}).get('sha', 'HEAD')
 
           try:
               changed = subprocess.check_output(['git', 'diff', '--name-only', 'origin/main...HEAD']).decode('utf-8').splitlines()
