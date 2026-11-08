@@ -292,6 +292,40 @@ object PixelTileAtlas {
     (0 until 6).map { variant -> SanctuaryMaterials.stone(variant, large = false) }
   }
 
+  // Explicit world-material selectors keep the legacy P27B API/4x4 contract intact.
+  // Only SanctuaryWorldRenderer opts into V2; other scenes retain their old materials.
+  internal val worldGrassTiles: List<ImageBitmap> get() = SanctuaryArtAssets.argonGround("grass") ?: sanctuaryGrassTiles
+  internal val worldGrassSheet: ImageBitmap? get() = SanctuaryArtAssets.argonSheet("grass") ?: sanctuaryGrassSheet
+  internal val worldGrassSheetRotated: ImageBitmap? get() = if (SanctuaryArtAssets.argonSheet("grass") != null) null else sanctuaryGrassSheetRotated
+  internal val worldSandTiles: List<ImageBitmap> get() = SanctuaryArtAssets.argonGround("soil") ?: sanctuarySandTiles
+  internal val worldSoilSheet: ImageBitmap? get() = SanctuaryArtAssets.argonSheet("soil") ?: sanctuarySoilSheet
+  internal val worldSoilSheetRotated: ImageBitmap? get() = if (SanctuaryArtAssets.argonSheet("soil") != null) null else sanctuarySoilSheetRotated
+  internal val worldStoneTiles: List<ImageBitmap> get() = SanctuaryArtAssets.argonGround("flagstone") ?: sanctuaryStoneTiles
+  internal val worldFlagstoneSheet: ImageBitmap? get() = SanctuaryArtAssets.argonSheet("flagstone") ?: sanctuaryFlagstoneSheet
+  internal val worldFlagstoneSheetRotated: ImageBitmap? get() = if (SanctuaryArtAssets.argonSheet("flagstone") != null) null else sanctuaryFlagstoneSheetRotated
+  internal val worldCausewayTiles: List<ImageBitmap> get() = SanctuaryArtAssets.argonGround("cobble") ?: sanctuaryCausewayTiles
+  internal val worldCobbleSheet: ImageBitmap? get() = SanctuaryArtAssets.argonSheet("cobble") ?: sanctuaryCobbleSheet
+  internal val worldCobbleSheetRotated: ImageBitmap? get() = if (SanctuaryArtAssets.argonSheet("cobble") != null) null else sanctuaryCobbleSheetRotated
+
+  /** Inclusive manifest rectangles [0..19],[20..43],[44..63] -> exclusive edges.
+   * Fixed nine blits, never repeat the complete island-shaped source tile. Ground Y only.
+   */
+  internal fun DrawScope.drawArgonTransition(left: Float, top: Float, width: Float, height: Float, zoom: Float) {
+    val image = SanctuaryArtAssets.argon("batch_01_terrain/terrain_grass_stone_transition_64.png") ?: return
+    val edgeX = minOf(20f * zoom, width / 2f)
+    val edgeY = minOf(20f * zoom * ObliqueCamera.OBLIQUE_Y_SCALE, height / 2f)
+    val source = intArrayOf(0, 20, 44, 64)
+    val xs = intArrayOf(left.roundToInt(), (left+edgeX).roundToInt(), (left+width-edgeX).roundToInt(), (left+width).roundToInt())
+    val ys = intArrayOf(top.roundToInt(), (top+edgeY).roundToInt(), (top+height-edgeY).roundToInt(), (top+height).roundToInt())
+    for (y in 0..2) for (x in 0..2) {
+      val w = xs[x+1]-xs[x]; val h = ys[y+1]-ys[y]
+      if (w <= 0 || h <= 0) continue
+      drawImage(image, srcOffset=IntOffset(source[x],source[y]),
+        srcSize=IntSize(source[x+1]-source[x],source[y+1]-source[y]),
+        dstOffset=IntOffset(xs[x],ys[y]), dstSize=IntSize(w,h), filterQuality=FilterQuality.None)
+    }
+  }
+
   /** A matching 4×4 mosaic must use coordinate adjacency, not the old independent hash. */
   fun sanctuaryTileIndex(tiles: List<ImageBitmap>, tx: Int, ty: Int, legacyHash: Int): Int =
     if (tiles.size == 16) (((ty and 3) shl 2) or (tx and 3)) else legacyHash % tiles.size

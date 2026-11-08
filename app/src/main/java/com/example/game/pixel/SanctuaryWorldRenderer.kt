@@ -159,8 +159,8 @@ object SanctuaryWorldRenderer {
       // down is the same sampling that squashing 16 tiles individually performs, so the
       // pixels are equivalent, the draw count is lower than the old 4x4 block path, and
       // the repeat period stays the same as the gameplay path (no zoom-dependent lattice).
-      val grassSheet = PixelTileAtlas.sanctuaryGrassSheet
-      val grassSheetRotated = PixelTileAtlas.sanctuaryGrassSheetRotated
+      val grassSheet = PixelTileAtlas.worldGrassSheet
+      val grassSheetRotated = PixelTileAtlas.worldGrassSheetRotated
       val grassBlocks = if (grassSheet == null && tileScreenH < GRASS_BLOCK_MIN_TILE_SCREEN_PX) {
         PixelTileAtlas.sanctuaryGrassBlocks
       } else {
@@ -212,7 +212,7 @@ object SanctuaryWorldRenderer {
           }
         }
       } else {
-        val grassTiles = PixelTileAtlas.sanctuaryGrassTiles
+        val grassTiles = PixelTileAtlas.worldGrassTiles
         for (ty in startTy..endTy) {
           val wy = ty * worldTileSize
           val dstY = sy(wy).roundToInt()
@@ -254,6 +254,26 @@ object SanctuaryWorldRenderer {
         tileScreenW = tileScreenW,
         tileScreenH = tileScreenH,
       )
+
+      // Existing Tower approach ground only; no new path, collider or interaction anchor.
+      // Nine-slice transition outer grass / inner stone, fixed nine draws (not a tiled island).
+      with(PixelTileAtlas) {
+        drawArgonTransition(sx(1820f), sy(660f), 280f*zoom,
+          180f*ObliqueCamera.OBLIQUE_Y_SCALE*zoom, zoom)
+      }
+
+      SanctuaryArtAssets.argon("batch_01_terrain/terrain_tower_gate_runic_stone_64.png")?.let { rune ->
+        // Keep within the existing approach footprint and leave its nine-slice curb visible.
+        val approach = Path().apply {
+          moveTo(sx(1840f),sy(680f)); lineTo(sx(2080f),sy(680f))
+          lineTo(sx(2080f),sy(820f)); lineTo(sx(1840f),sy(820f)); close()
+        }
+        clipPath(approach) {
+          for (y in 0..2) for (x in 0..3) drawImage(rune,
+            dstOffset=IntOffset(sx(1840f+x*64f).roundToInt(),sy(680f+y*64f).roundToInt()),
+            dstSize=IntSize(tileScreenW+1,tileScreenH+1),filterQuality=FilterQuality.None)
+        }
+      }
 
       // 3E. Monumental Central Circular White Stone Plaza, 4 Pastel Elemental Runes & Grand SE Staircase
       with(PremiumSliceRenderer) { drawSmithyVerge(camX,camY,zoom) }
@@ -352,7 +372,7 @@ object SanctuaryWorldRenderer {
     drawPath(outerGrassRim, Color(0xFF2A3D2B))
     drawPath(midSandLip, Color(0xFF4A3D2E))
 
-    val sandTiles = PixelTileAtlas.sanctuarySandTiles
+    val sandTiles = PixelTileAtlas.worldSandTiles
     clipPath(innerSandCore) {
       val worldTileSize = 64f
       for (ty in 23..33) {
@@ -363,9 +383,9 @@ object SanctuaryWorldRenderer {
           val dstX = sx(wx).roundToInt()
           val hash = ((tx * 49297) xor (ty * 91813)) and 0x7FFFFFFF
           drawGroundTile(
-            PixelTileAtlas.sanctuarySoilSheet, sandTiles, tx, ty, hash,
+            PixelTileAtlas.worldSoilSheet, sandTiles, tx, ty, hash,
             dstX, dstY, tileScreenW + 1, tileScreenH + 1,
-            rotated = PixelTileAtlas.sanctuarySoilSheetRotated,
+            rotated = PixelTileAtlas.worldSoilSheetRotated,
           )
         }
       }
@@ -455,7 +475,7 @@ object SanctuaryWorldRenderer {
     drawPath(curbPaleLimestone, Color(0xFF3A3D4A))
 
     // Pixel-art grey cobblestone interior clipped smoothly inside the road network
-    val cobbleTiles = PixelTileAtlas.sanctuaryCausewayTiles
+    val cobbleTiles = PixelTileAtlas.worldCausewayTiles
     clipPath(cobbleInterior) {
       val worldTileSize = 64f
       val rStartTx = startTx.coerceAtLeast(6)
@@ -474,9 +494,9 @@ object SanctuaryWorldRenderer {
           val dstX = sx(wx).roundToInt()
           val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
           drawGroundTile(
-            PixelTileAtlas.sanctuaryCobbleSheet, cobbleTiles, tx, ty, hash,
+            PixelTileAtlas.worldCobbleSheet, cobbleTiles, tx, ty, hash,
             dstX, dstY, tileScreenW + 1, tileScreenH + 1,
-            rotated = PixelTileAtlas.sanctuaryCobbleSheetRotated,
+            rotated = PixelTileAtlas.worldCobbleSheetRotated,
           )
         }
       }
@@ -899,9 +919,9 @@ object SanctuaryWorldRenderer {
 
     val plazaClip = Path().apply { addOval(androidx.compose.ui.geometry.Rect(cx-rx*0.95f,cy-ry*0.95f,cx+rx*0.95f,cy+ry*0.95f)) }
     clipPath(plazaClip) {
-      val tiles = PixelTileAtlas.sanctuaryStoneTiles
-      val sheet = PixelTileAtlas.sanctuaryFlagstoneSheet
-      val rotatedSheet = PixelTileAtlas.sanctuaryFlagstoneSheetRotated
+      val tiles = PixelTileAtlas.worldStoneTiles
+      val sheet = PixelTileAtlas.worldFlagstoneSheet
+      val rotatedSheet = PixelTileAtlas.worldFlagstoneSheetRotated
       for (ty in 10..28) for (tx in 21..39) {
         val hash = ((tx * 73856093 xor ty * 19349663) and 0x7fffffff)
         drawGroundTile(
