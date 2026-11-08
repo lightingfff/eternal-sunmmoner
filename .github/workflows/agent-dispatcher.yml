@@ -13,10 +13,15 @@ on:
         required: true
         default: 'true'
         type: string
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tools/dispatcher/**'
+      - '.github/workflows/agent-dispatcher.yml'
+      - 'docs/agents/**'
   issues:
     types: [labeled, opened]
-  pull_request:
-    types: [opened, synchronize, ready_for_review]
 
 permissions:
   contents: read
