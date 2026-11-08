@@ -47,3 +47,19 @@ EVIDENCE: ... | REQUIRED FIX: ...
 
 ## Hard rules
 No auto-merge; owner alone chooses when to merge. No direct main writes, no `git reset --hard`, `git clean`, force push, or secrets in issues. No fake CI/pixel measurements. Screenshots from mocked fixtures must be marked as such. GitHub issue comments DO NOT launch agents, assign repo permissions, or guarantee a race-free lock. Read repo/PR live, ignore stale status in old comments. Existing GitHub ruleset protects main; do not loosen protections for task convenience.
+
+## Co-lead work and dual review (2026-11-08)
+
+**Arena A01** is the technical lead; **Argon** is a creative/production co-lead, without changing A01–A12 IDs and without implied runtime/permissions. Argon implementation needs its own issue `ARGON-WORK-###` marked READY, exact file ownership, `[CLAIM]` with actual session/login and its own branch; role A08 still audits assets and A03 integrates renderer. A01 coordinates interfaces.
+
+Every substantive PR gets parallel **READ-ONLY** `[ARGON_REVIEW]`, `[CODEX_REVIEW]`, and `[QA_REVIEW]` from A09. Each comment includes PR URL, HEAD SHA, critical severity, evidence/repro, tests required, and a truthful ACCESS/NOT TESTED declaration. After reviewers finish, coordinator posts `[FIX_PLAN]` with list of defects, exact files, **only one corrective writer per file**, and fix order. Fix in one writer's branch, or isolated patch from assigned reviewer applied serially by integrator. **Never co-edit/push the same PR branch concurrently**; reviewer who becomes author cannot self-approve. Repeat both reviews on updated SHA. See [DUAL_LEAD_WORKFLOW.md](DUAL_LEAD_WORKFLOW.md).
+
+Example `[FIX_PLAN]`:
+```md
+[FIX_PLAN] PR: #NN | HEAD SHA: <sha> | ROUND: 1/3
+BLOCKERS: <P0/P1 findings & review links>
+OWNERS: <path-a> -> <single authorized writer>; <path-b> -> <single writer>
+SEQUENCE: <fix order and integration checkpoints>
+RETEST: <commands/art evidence>
+REVIEW AGAIN: Argon + Codex + A09 on new SHA
+```
