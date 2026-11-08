@@ -19,10 +19,10 @@
         "height": 64,
         "bit_depth": 8,
         "color_type": 6,
-        "size_bytes": 3678,
-        "sha256": "882b6b3f3028e28a6a0cabceed753cc78500bdf17e4fd7d6806710c27fd96cb1",
+        "size_bytes": 8331,
+        "sha256": "7061c0a1f3e497536ef9a23d4f0bfd14e04d94e87def6453bcf55145dc8dd335",
         "ihdr_crc32": "0xaa6971de",
-        "idat_crc32": "0x3410d207",
+        "idat_crc32": "0xfca67b9c",
         "crc_valid": true,
         "bbox": [
           0,
@@ -30,7 +30,7 @@
           63,
           63
         ],
-        "mean_luma": 43.09,
+        "mean_luma": 43.19,
         "alpha_stats": {
           "opaque_255": 4096,
           "semi_1_254": 0,
@@ -48,8 +48,8 @@
         "fps": 0,
         "seamless_4x4_metrics": {
           "periodic_mod64": true,
-          "mean_lr_boundary_delta_rgb": 4.52,
-          "mean_tb_boundary_delta_rgb": 3.03,
+          "mean_lr_boundary_delta_rgb": 1.51,
+          "mean_tb_boundary_delta_rgb": 2.01,
           "seamless_verdict": "PASS"
         },
         "provenance": "Original Argon v2 procedural pixel synthesis (modulo-64 periodic oblique generator)"
@@ -59,10 +59,10 @@
         "height": 64,
         "bit_depth": 8,
         "color_type": 6,
-        "size_bytes": 3891,
-        "sha256": "0ada6311a939878956a0152b1434ec90c240c0c5df1ce44c1063532fd4175013",
+        "size_bytes": 8049,
+        "sha256": "fac3d8e0949fa54feecd35d13b517ec32bf50e42949b3aaa8f5e7c1e865ead61",
         "ihdr_crc32": "0xaa6971de",
-        "idat_crc32": "0xe3f365e9",
+        "idat_crc32": "0xf048b71a",
         "crc_valid": true,
         "bbox": [
           0,
@@ -70,7 +70,7 @@
           63,
           63
         ],
-        "mean_luma": 43.14,
+        "mean_luma": 43.26,
         "alpha_stats": {
           "opaque_255": 4096,
           "semi_1_254": 0,
@@ -88,8 +88,8 @@
         "fps": 0,
         "seamless_4x4_metrics": {
           "periodic_mod64": true,
-          "mean_lr_boundary_delta_rgb": 3.24,
-          "mean_tb_boundary_delta_rgb": 2.66,
+          "mean_lr_boundary_delta_rgb": 0.97,
+          "mean_tb_boundary_delta_rgb": 1.34,
           "seamless_verdict": "PASS"
         },
         "provenance": "Original Argon v2 procedural pixel synthesis (modulo-64 periodic oblique generator)"
@@ -99,10 +99,10 @@
         "height": 64,
         "bit_depth": 8,
         "color_type": 6,
-        "size_bytes": 4106,
-        "sha256": "8616a6899cfe0347e5b82cb3fa7d4b75f175614295eb894e091d8a26592d4295",
+        "size_bytes": 7755,
+        "sha256": "d05d485850453f96bc1c9dcc6c9b49a86ab6b992ff9f684a535c2e613fe3e368",
         "ihdr_crc32": "0xaa6971de",
-        "idat_crc32": "0x341f7459",
+        "idat_crc32": "0x1a9dda62",
         "crc_valid": true,
         "bbox": [
           0,
@@ -110,7 +110,7 @@
           63,
           63
         ],
-        "mean_luma": 43.04,
+        "mean_luma": 43.14,
         "alpha_stats": {
           "opaque_255": 4096,
           "semi_1_254": 0,
@@ -128,8 +128,8 @@
         "fps": 0,
         "seamless_4x4_metrics": {
           "periodic_mod64": true,
-          "mean_lr_boundary_delta_rgb": 5.45,
-          "mean_tb_boundary_delta_rgb": 8.94,
+          "mean_lr_boundary_delta_rgb": 0.97,
+          "mean_tb_boundary_delta_rgb": 0.97,
           "seamless_verdict": "PASS"
         },
         "provenance": "Original Argon v2 procedural pixel synthesis (modulo-64 periodic oblique generator)"
@@ -219,10 +219,10 @@
         "height": 64,
         "bit_depth": 8,
         "color_type": 6,
-        "size_bytes": 3633,
-        "sha256": "5ea9cd385196573281ad1081d06008c8e2985c35906f8826083688e3c05373cc",
+        "size_bytes": 7963,
+        "sha256": "eaf7b8104ce2773402031428bc993ba05641c16c33f33689d819e6c591f9948d",
         "ihdr_crc32": "0xaa6971de",
-        "idat_crc32": "0xa48d4fe7",
+        "idat_crc32": "0xeab1792b",
         "crc_valid": true,
         "bbox": [
           0,
@@ -230,7 +230,7 @@
           63,
           63
         ],
-        "mean_luma": 44.81,
+        "mean_luma": 44.8,
         "alpha_stats": {
           "opaque_255": 4096,
           "semi_1_254": 0,
@@ -248,8 +248,8 @@
         "fps": 0,
         "seamless_4x4_metrics": {
           "periodic_mod64": true,
-          "mean_lr_boundary_delta_rgb": 5.2,
-          "mean_tb_boundary_delta_rgb": 5.79,
+          "mean_lr_boundary_delta_rgb": 1.4,
+          "mean_tb_boundary_delta_rgb": 1.24,
           "seamless_verdict": "PASS"
         },
         "provenance": "Original Argon v2 procedural pixel synthesis (modulo-64 periodic oblique generator)"
@@ -259,10 +259,10 @@
         "height": 64,
         "bit_depth": 8,
         "color_type": 6,
-        "size_bytes": 3071,
-        "sha256": "42f28457c539cb3675d8fe957bbe807e3ccb47d6e7cacbc6782105062e636984",
+        "size_bytes": 8574,
+        "sha256": "9019f323e0d0175e090b16357602f9dc03aaf521ce9193a5ff9e86ac56dcaf62",
         "ihdr_crc32": "0xaa6971de",
-        "idat_crc32": "0x0dd8925d",
+        "idat_crc32": "0x1c95e518",
         "crc_valid": true,
         "bbox": [
           0,
@@ -270,7 +270,7 @@
           63,
           63
         ],
-        "mean_luma": 43.77,
+        "mean_luma": 44.22,
         "alpha_stats": {
           "opaque_255": 4096,
           "semi_1_254": 0,
@@ -288,8 +288,8 @@
         "fps": 0,
         "seamless_4x4_metrics": {
           "periodic_mod64": true,
-          "mean_lr_boundary_delta_rgb": 10.15,
-          "mean_tb_boundary_delta_rgb": 9.23,
+          "mean_lr_boundary_delta_rgb": 0.81,
+          "mean_tb_boundary_delta_rgb": 1.62,
           "seamless_verdict": "PASS"
         },
         "provenance": "Original Argon v2 procedural pixel synthesis (modulo-64 periodic oblique generator)"
@@ -299,10 +299,10 @@
         "height": 64,
         "bit_depth": 8,
         "color_type": 6,
-        "size_bytes": 4416,
-        "sha256": "b05ad98be76606b2abc670badd1c4e17869841c7a1489985b98a6dfd8e38fa8e",
+        "size_bytes": 7979,
+        "sha256": "bf9d0c0c52385a6145439d6d3cca9cbbf799f56a05bf0fe50d807fc55405561c",
         "ihdr_crc32": "0xaa6971de",
-        "idat_crc32": "0x5486ad27",
+        "idat_crc32": "0xfb0d8515",
         "crc_valid": true,
         "bbox": [
           0,
@@ -310,7 +310,7 @@
           63,
           63
         ],
-        "mean_luma": 51.97,
+        "mean_luma": 48.94,
         "alpha_stats": {
           "opaque_255": 4096,
           "semi_1_254": 0,
@@ -328,11 +328,72 @@
         "fps": 0,
         "seamless_4x4_metrics": {
           "periodic_mod64": true,
-          "mean_lr_boundary_delta_rgb": 9.87,
-          "mean_tb_boundary_delta_rgb": 13.9,
+          "mean_lr_boundary_delta_rgb": 1.51,
+          "mean_tb_boundary_delta_rgb": 2.01,
           "seamless_verdict": "PASS"
         },
-        "provenance": "Original Argon v2 procedural pixel synthesis (modulo-64 periodic oblique generator)"
+        "provenance": "Original Argon v2 procedural pixel synthesis (modulo-64 periodic oblique generator)",
+        "adjacency_interface": {
+          "type": "9_SLICE_DIRECTIONAL_CURB_AND_CORNER_KIT",
+          "slices": {
+            "NW_corner": [
+              0,
+              0,
+              19,
+              19
+            ],
+            "N_curb": [
+              20,
+              0,
+              43,
+              19
+            ],
+            "NE_corner": [
+              44,
+              0,
+              63,
+              19
+            ],
+            "W_curb": [
+              0,
+              20,
+              19,
+              43
+            ],
+            "center_flagstone_core": [
+              20,
+              20,
+              43,
+              43
+            ],
+            "E_curb": [
+              44,
+              20,
+              63,
+              43
+            ],
+            "SW_corner": [
+              0,
+              44,
+              19,
+              63
+            ],
+            "S_curb": [
+              20,
+              44,
+              43,
+              63
+            ],
+            "SE_corner": [
+              44,
+              44,
+              63,
+              63
+            ]
+          },
+          "outer_perimeter_matches": "terrain_forest_grass_v1_64 (0.0 RGB delta)",
+          "inner_core_matches": "terrain_mossy_flagstone_v1_64 (0.0 RGB delta)"
+        }
       }
     ],
     "batch_02_foliage_props": [
@@ -765,22 +826,22 @@
         "height": 64,
         "bit_depth": 8,
         "color_type": 6,
-        "size_bytes": 8641,
-        "sha256": "9901049c8a136e7155eba12ea8086838441544c289326d31fb11a4bd737901e5",
+        "size_bytes": 2987,
+        "sha256": "ba159b3b35e1d21f24a2c675b880a0672f2f9bcd52dcccf868aca41bd994e660",
         "ihdr_crc32": "0x6cbfcfbf",
-        "idat_crc32": "0x26db2da8",
+        "idat_crc32": "0x25176c15",
         "crc_valid": true,
         "bbox": [
-          8,
-          0,
-          507,
-          63
+          12,
+          14,
+          499,
+          50
         ],
-        "mean_luma": 118.11,
+        "mean_luma": 136.03,
         "alpha_stats": {
-          "opaque_255": 1630,
-          "semi_1_254": 15940,
-          "transparent_0": 15198,
+          "opaque_255": 1328,
+          "semi_1_254": 4070,
+          "transparent_0": 27370,
           "total": 32768
         },
         "id": "vfx_tower_gate_portal_swirl_8f",
@@ -797,24 +858,74 @@
         },
         "frame_verification": {
           "active_pixels_per_frame": [
-            2191,
-            2192,
-            2194,
-            2198,
-            2196,
-            2199,
-            2201,
-            2199
+            664,
+            674,
+            670,
+            689,
+            677,
+            678,
+            673,
+            673
           ],
           "unique_frame_hashes_16": [
-            "92f64c5cf8c674ae",
-            "137152c31324c1c2",
-            "4deadc0e731c3e41",
-            "00554b8ab3d57139",
-            "02d8947e711ea68b",
-            "18aec4e014df24f0",
-            "a99abb383dafc13b",
-            "ae44e0426dfc803b"
+            "88d6a36bfea65ac4",
+            "8e93f9617627761a",
+            "0e88e18d3e9b7e27",
+            "86298bf77e20e04b",
+            "b4ba070379fad1c5",
+            "df03f23fc7e5490c",
+            "1fa49756022afaad",
+            "016bb7525efd61dc"
+          ],
+          "frame_alpha_bounds_inclusive": [
+            [
+              12,
+              15,
+              50,
+              46
+            ],
+            [
+              14,
+              14,
+              51,
+              48
+            ],
+            [
+              14,
+              16,
+              50,
+              50
+            ],
+            [
+              13,
+              16,
+              48,
+              50
+            ],
+            [
+              12,
+              15,
+              50,
+              48
+            ],
+            [
+              15,
+              15,
+              52,
+              47
+            ],
+            [
+              14,
+              18,
+              52,
+              48
+            ],
+            [
+              12,
+              16,
+              51,
+              48
+            ]
           ],
           "unique_frames_verified": true
         },
