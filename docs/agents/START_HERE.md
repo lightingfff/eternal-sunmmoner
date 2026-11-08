@@ -13,3 +13,7 @@
 No GitHub comment itself starts or wakes up an agent. The owner must launch/configure each agent; an optional external automation can later poll GitHub, with explicit setup and credentials. A skill teaches workflow; it is not training model weights.
 
 **Permanent project constraints:** Offline Android Kotlin/Jetpack Compose Canvas; 2.5D oblique ground Y-scale 0.72; Sanctuary island/plaza/building placements, collision, paths, anchors, Master off-map commander and save compatibility preserved. First Tower floor meadow. No fake scenery as a single screenshot, no visual downgrade without evidence.
+
+## Optional Gemini 4 Argon High advisory (not another agent)
+
+Gemini 4 Argon High may help with complex design, codebase/PR reasoning, cross-role impact analysis and grounded visual critique. **It has no Axx role, file ownership, CLAIM privileges or merge authority.** Use only the checkpoint rules and paste-ready prompt in [GEMINI4_ARGON_ADVISORY.md](GEMINI4_ARGON_ADVISORY.md). A01 directs the work; A09 remains independent QA; Codex remains required for core combat/save/event changes. GitHub/App/AI Studio access is capability-dependent; no implied API entitlement or background polling.
