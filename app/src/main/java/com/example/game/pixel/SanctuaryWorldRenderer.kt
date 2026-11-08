@@ -159,8 +159,8 @@ object SanctuaryWorldRenderer {
       // down is the same sampling that squashing 16 tiles individually performs, so the
       // pixels are equivalent, the draw count is lower than the old 4x4 block path, and
       // the repeat period stays the same as the gameplay path (no zoom-dependent lattice).
-      val grassSheet = PixelTileAtlas.sanctuaryGrassSheet
-      val grassSheetRotated = PixelTileAtlas.sanctuaryGrassSheetRotated
+      val grassSheet = PixelTileAtlas.worldGrassSheet
+      val grassSheetRotated = PixelTileAtlas.worldGrassSheetRotated
       val grassBlocks = if (grassSheet == null && tileScreenH < GRASS_BLOCK_MIN_TILE_SCREEN_PX) {
         PixelTileAtlas.sanctuaryGrassBlocks
       } else {
@@ -212,7 +212,7 @@ object SanctuaryWorldRenderer {
           }
         }
       } else {
-        val grassTiles = PixelTileAtlas.sanctuaryGrassTiles
+        val grassTiles = PixelTileAtlas.worldGrassTiles
         for (ty in startTy..endTy) {
           val wy = ty * worldTileSize
           val dstY = sy(wy).roundToInt()
@@ -372,7 +372,7 @@ object SanctuaryWorldRenderer {
     drawPath(outerGrassRim, Color(0xFF2A3D2B))
     drawPath(midSandLip, Color(0xFF4A3D2E))
 
-    val sandTiles = PixelTileAtlas.sanctuarySandTiles
+    val sandTiles = PixelTileAtlas.worldSandTiles
     clipPath(innerSandCore) {
       val worldTileSize = 64f
       for (ty in 23..33) {
@@ -383,9 +383,9 @@ object SanctuaryWorldRenderer {
           val dstX = sx(wx).roundToInt()
           val hash = ((tx * 49297) xor (ty * 91813)) and 0x7FFFFFFF
           drawGroundTile(
-            PixelTileAtlas.sanctuarySoilSheet, sandTiles, tx, ty, hash,
+            PixelTileAtlas.worldSoilSheet, sandTiles, tx, ty, hash,
             dstX, dstY, tileScreenW + 1, tileScreenH + 1,
-            rotated = PixelTileAtlas.sanctuarySoilSheetRotated,
+            rotated = PixelTileAtlas.worldSoilSheetRotated,
           )
         }
       }
@@ -475,7 +475,7 @@ object SanctuaryWorldRenderer {
     drawPath(curbPaleLimestone, Color(0xFF3A3D4A))
 
     // Pixel-art grey cobblestone interior clipped smoothly inside the road network
-    val cobbleTiles = PixelTileAtlas.sanctuaryCausewayTiles
+    val cobbleTiles = PixelTileAtlas.worldCausewayTiles
     clipPath(cobbleInterior) {
       val worldTileSize = 64f
       val rStartTx = startTx.coerceAtLeast(6)
@@ -494,9 +494,9 @@ object SanctuaryWorldRenderer {
           val dstX = sx(wx).roundToInt()
           val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
           drawGroundTile(
-            PixelTileAtlas.sanctuaryCobbleSheet, cobbleTiles, tx, ty, hash,
+            PixelTileAtlas.worldCobbleSheet, cobbleTiles, tx, ty, hash,
             dstX, dstY, tileScreenW + 1, tileScreenH + 1,
-            rotated = PixelTileAtlas.sanctuaryCobbleSheetRotated,
+            rotated = PixelTileAtlas.worldCobbleSheetRotated,
           )
         }
       }
@@ -919,9 +919,9 @@ object SanctuaryWorldRenderer {
 
     val plazaClip = Path().apply { addOval(androidx.compose.ui.geometry.Rect(cx-rx*0.95f,cy-ry*0.95f,cx+rx*0.95f,cy+ry*0.95f)) }
     clipPath(plazaClip) {
-      val tiles = PixelTileAtlas.sanctuaryStoneTiles
-      val sheet = PixelTileAtlas.sanctuaryFlagstoneSheet
-      val rotatedSheet = PixelTileAtlas.sanctuaryFlagstoneSheetRotated
+      val tiles = PixelTileAtlas.worldStoneTiles
+      val sheet = PixelTileAtlas.worldFlagstoneSheet
+      val rotatedSheet = PixelTileAtlas.worldFlagstoneSheetRotated
       for (ty in 10..28) for (tx in 21..39) {
         val hash = ((tx * 73856093 xor ty * 19349663) and 0x7fffffff)
         drawGroundTile(

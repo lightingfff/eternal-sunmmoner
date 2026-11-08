@@ -83,3 +83,15 @@ roof. Registration remains provisional until actual engine captures. All 20 PNG
 chunk CRC/IEND and zlib IDAT inflation checked locally; tools/validate_assets.py
 returned PASS with existing preview-bloat, google-services-missing and duplicate
 basename warnings. These do not establish APK/runtime quality.
+
+## Round 2 — real CI regression / corrective selector boundary
+
+APK build PASS on `36c0df8`: run 42492024059. P27B regression run 42492024008
+failed `adjacentMosaicIndicesAndOverviewUseTheSameWorldCoords` (expected16,
+actual3), per check-run annotation 128766305929. Engine captures were skipped.
+Root cause: replacing the public legacy tile family broke its 4×4 contract.
+Correction: retain legacy P27B getters and add explicit world* material getters
+used only by SanctuaryWorldRenderer, preserving legacy family/block tests and
+fallback. No legacy test edits. Must rerun new SHA; previous APK PASS does not
+prove new-head success. Full logs endpoint blocked by outbound host policy;
+GitHub check annotations provided exact assertion. No runtime images available.

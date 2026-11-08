@@ -125,13 +125,13 @@ class SanctuaryArgonV2RenderTest {
     SanctuaryArtAssets.init(RuntimeEnvironment.getApplication())
     SanctuaryArtAssets.argonEnabled = true
     try {
-      val sheet = com.example.game.pixel.PixelTileAtlas.sanctuaryGrassSheet
+      val sheet = com.example.game.pixel.PixelTileAtlas.worldGrassSheet
       org.junit.Assert.assertNotNull(sheet)
       org.junit.Assert.assertEquals(512, sheet!!.width)
       val pine = com.example.game.pixel.PixelStructureAtlas.spiritPineSprite
       val bytes = SanctuaryArtAssets.cachedBitmapBytes
       repeat(100) {
-        org.junit.Assert.assertSame(sheet, com.example.game.pixel.PixelTileAtlas.sanctuaryGrassSheet)
+        org.junit.Assert.assertSame(sheet, com.example.game.pixel.PixelTileAtlas.worldGrassSheet)
         org.junit.Assert.assertSame(pine, com.example.game.pixel.PixelStructureAtlas.spiritPineSprite)
       }
       org.junit.Assert.assertEquals(bytes, SanctuaryArtAssets.cachedBitmapBytes)

@@ -256,41 +256,56 @@ object PixelTileAtlas {
   // P27B-V5: the 8x8 sheet wins over the 4x4 cell family. Order is
   // sheet -> P27B 4x4 cells -> P03 PNG -> procedural, and each tier is whole,
   // never a mixed atlas.
-  private fun groundSheet(name: String): ImageBitmap? = SanctuaryArtAssets.argonSheet(name) ?: SanctuaryArtAssets.groundSheet(name)
+  private fun groundSheet(name: String): ImageBitmap? = SanctuaryArtAssets.groundSheet(name)
 
   val sanctuaryGrassSheet: ImageBitmap? get() = groundSheet("grass")
   val sanctuarySoilSheet: ImageBitmap? get() = groundSheet("soil")
   val sanctuaryFlagstoneSheet: ImageBitmap? get() = groundSheet("flagstone")
   val sanctuaryCobbleSheet: ImageBitmap? get() = groundSheet("cobble")
 
-  val sanctuaryGrassSheetRotated: ImageBitmap? get() = if (SanctuaryArtAssets.argonSheet("grass") != null) null else SanctuaryArtAssets.groundSheetMirrored("grass")
-  val sanctuarySoilSheetRotated: ImageBitmap? get() = if (SanctuaryArtAssets.argonSheet("soil") != null) null else SanctuaryArtAssets.groundSheetMirrored("soil")
-  val sanctuaryFlagstoneSheetRotated: ImageBitmap? get() = if (SanctuaryArtAssets.argonSheet("flagstone") != null) null else SanctuaryArtAssets.groundSheetMirrored("flagstone")
-  val sanctuaryCobbleSheetRotated: ImageBitmap? get() = if (SanctuaryArtAssets.argonSheet("cobble") != null) null else SanctuaryArtAssets.groundSheetMirrored("cobble")
+  val sanctuaryGrassSheetRotated: ImageBitmap? get() = SanctuaryArtAssets.groundSheetMirrored("grass")
+  val sanctuarySoilSheetRotated: ImageBitmap? get() = SanctuaryArtAssets.groundSheetMirrored("soil")
+  val sanctuaryFlagstoneSheetRotated: ImageBitmap? get() = SanctuaryArtAssets.groundSheetMirrored("flagstone")
+  val sanctuaryCobbleSheetRotated: ImageBitmap? get() = SanctuaryArtAssets.groundSheetMirrored("cobble")
 
   val sanctuaryGrassTiles: List<ImageBitmap> get() =
-    SanctuaryArtAssets.argonGround("grass") ?: SanctuaryArtAssets.p27bFamily("grass") ?: SanctuaryArtAssets.tiles("grass", 8) ?: sanctuaryGrassTilesFallback
+    SanctuaryArtAssets.p27bFamily("grass") ?: SanctuaryArtAssets.tiles("grass", 8) ?: sanctuaryGrassTilesFallback
   private val sanctuaryGrassTilesFallback: List<ImageBitmap> by lazy {
     (0 until 8).map { variant -> SanctuaryMaterials.grass(variant) }
   }
 
   val sanctuarySandTiles: List<ImageBitmap> get() =
-    SanctuaryArtAssets.argonGround("soil") ?: SanctuaryArtAssets.p27bFamily("soil") ?: SanctuaryArtAssets.tiles("soil", 6) ?: sanctuarySandTilesFallback
+    SanctuaryArtAssets.p27bFamily("soil") ?: SanctuaryArtAssets.tiles("soil", 6) ?: sanctuarySandTilesFallback
   private val sanctuarySandTilesFallback: List<ImageBitmap> by lazy {
     (0 until 6).map { variant -> SanctuaryMaterials.soil(variant) }
   }
 
   val sanctuaryStoneTiles: List<ImageBitmap> get() =
-    SanctuaryArtAssets.argonGround("flagstone") ?: SanctuaryArtAssets.p27bFamily("flagstone") ?: SanctuaryArtAssets.tiles("flagstone", 8) ?: sanctuaryStoneTilesFallback
+    SanctuaryArtAssets.p27bFamily("flagstone") ?: SanctuaryArtAssets.tiles("flagstone", 8) ?: sanctuaryStoneTilesFallback
   private val sanctuaryStoneTilesFallback: List<ImageBitmap> by lazy {
     (0 until 8).map { variant -> SanctuaryMaterials.stone(variant, large = true) }
   }
 
   val sanctuaryCausewayTiles: List<ImageBitmap> get() =
-    SanctuaryArtAssets.argonGround("cobble") ?: SanctuaryArtAssets.p27bFamily("cobble") ?: SanctuaryArtAssets.tiles("cobble", 6) ?: sanctuaryCausewayTilesFallback
+    SanctuaryArtAssets.p27bFamily("cobble") ?: SanctuaryArtAssets.tiles("cobble", 6) ?: sanctuaryCausewayTilesFallback
   private val sanctuaryCausewayTilesFallback: List<ImageBitmap> by lazy {
     (0 until 6).map { variant -> SanctuaryMaterials.stone(variant, large = false) }
   }
+
+  // Explicit world-material selectors keep the legacy P27B API/4x4 contract intact.
+  // Only SanctuaryWorldRenderer opts into V2; other scenes retain their old materials.
+  internal val worldGrassTiles: List<ImageBitmap> get() = SanctuaryArtAssets.argonGround("grass") ?: sanctuaryGrassTiles
+  internal val worldGrassSheet: ImageBitmap? get() = SanctuaryArtAssets.argonSheet("grass") ?: sanctuaryGrassSheet
+  internal val worldGrassSheetRotated: ImageBitmap? get() = if (SanctuaryArtAssets.argonSheet("grass") != null) null else sanctuaryGrassSheetRotated
+  internal val worldSandTiles: List<ImageBitmap> get() = SanctuaryArtAssets.argonGround("soil") ?: sanctuarySandTiles
+  internal val worldSoilSheet: ImageBitmap? get() = SanctuaryArtAssets.argonSheet("soil") ?: sanctuarySoilSheet
+  internal val worldSoilSheetRotated: ImageBitmap? get() = if (SanctuaryArtAssets.argonSheet("soil") != null) null else sanctuarySoilSheetRotated
+  internal val worldStoneTiles: List<ImageBitmap> get() = SanctuaryArtAssets.argonGround("flagstone") ?: sanctuaryStoneTiles
+  internal val worldFlagstoneSheet: ImageBitmap? get() = SanctuaryArtAssets.argonSheet("flagstone") ?: sanctuaryFlagstoneSheet
+  internal val worldFlagstoneSheetRotated: ImageBitmap? get() = if (SanctuaryArtAssets.argonSheet("flagstone") != null) null else sanctuaryFlagstoneSheetRotated
+  internal val worldCausewayTiles: List<ImageBitmap> get() = SanctuaryArtAssets.argonGround("cobble") ?: sanctuaryCausewayTiles
+  internal val worldCobbleSheet: ImageBitmap? get() = SanctuaryArtAssets.argonSheet("cobble") ?: sanctuaryCobbleSheet
+  internal val worldCobbleSheetRotated: ImageBitmap? get() = if (SanctuaryArtAssets.argonSheet("cobble") != null) null else sanctuaryCobbleSheetRotated
 
   /** Inclusive manifest rectangles [0..19],[20..43],[44..63] -> exclusive edges.
    * Fixed nine blits, never repeat the complete island-shaped source tile. Ground Y only.
