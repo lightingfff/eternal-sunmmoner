@@ -18,3 +18,20 @@
 | ES-A12-001 | A12 Audio & SFX Designer | Audit audio pipeline; lập cue sheet cho Tower Floor1 (ambient, monster alert, impact, rescue result) và mapping events đề xuất. | READY (audit/spec only) | Check live main/PR status |
 
 **Codex reserved task:** PR #47 critical combat review, #46 typed guest event/persistence review; no extra Codex work for routine polish. Existing #39, #41, #43, #44, #45, #46 and PR #28/#47/#50 remain references; no new issue overrides them.
+
+## Live first-ticket links (created with PR #51)
+
+- **A01 Arena Argent / Technical Director:** [Issue #52 — ES-A01-001](https://github.com/lightingfff/eternal-sunmmoner/issues/52)
+- **A02 Android Build & CI:** [Issue #53 — ES-A02-001](https://github.com/lightingfff/eternal-sunmmoner/issues/53)
+- **A03 Graphics / 2.5D Renderer:** [Issue #54 — ES-A03-001](https://github.com/lightingfff/eternal-sunmmoner/issues/54)
+- **A04 HUD & UI/UX:** [Issue #55 — ES-A04-001](https://github.com/lightingfff/eternal-sunmmoner/issues/55)
+- **A05 Tower Level Design:** [Issue #56 — ES-A05-001](https://github.com/lightingfff/eternal-sunmmoner/issues/56)
+- **A06 Monster AI Tactics:** [Issue #57 — ES-A06-001](https://github.com/lightingfff/eternal-sunmmoner/issues/57)
+- **A07 Hero Identity & Story:** [Issue #58 — ES-A07-001](https://github.com/lightingfff/eternal-sunmmoner/issues/58)
+- **A08 Pixel Art & VFX:** [Issue #59 — ES-A08-001](https://github.com/lightingfff/eternal-sunmmoner/issues/59)
+- **A09 Independent QA:** [Issue #60 — ES-A09-001](https://github.com/lightingfff/eternal-sunmmoner/issues/60)
+- **A10 Android Performance:** [Issue #61 — ES-A10-001](https://github.com/lightingfff/eternal-sunmmoner/issues/61)
+- **A11 Gameplay Systems:** [Issue #62 — ES-A11-001](https://github.com/lightingfff/eternal-sunmmoner/issues/62)
+- **A12 Audio & SFX:** [Issue #63 — ES-A12-001](https://github.com/lightingfff/eternal-sunmmoner/issues/63)
+
+**Bootstrap dependency:** merge [governance PR #51](https://github.com/lightingfff/eternal-sunmmoner/pull/51) first, then launch/connect the actual agents. A08 Issue #59 remains BLOCKED until P31-A3 ZIP/bundle is really supplied; do not claim local Gemini completion as a remote asset. Other ticket statuses allow at most scoped **read-only audit/spec** until separate production authorization is given.
