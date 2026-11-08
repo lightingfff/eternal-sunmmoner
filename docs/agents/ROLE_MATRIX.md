@@ -20,3 +20,22 @@
 **Critical files:** `LocalGuestSaveManager.kt`, `SummonerViewModel.kt` event settlement, `AutonomousHeroAi.kt`, `ContactAttackTimeline.kt`, shared camera/map/renderer/Gradle files: single writer only, with approval and explicit handoff. Domain directory globs are NOT automatic authorization: a TASK must enumerate exact files. A03/A08/A10 overlap = choose sole owner for that task; A01 does serial integration. Any cross-role change requires separate issue or explicit approval before editing.
 
 **Kickoff order**: A01+A09 review PR #50; A02 CI audit; A08 import/verify Gemini P31-A3 *only when archive supplied*; Codex handles PR #47; A03,A04 hold integration until #50 and art acceptance. A05–A07,A11,A12 may independently draft limited read-only designs/specs.
+
+## Direct skill & task links (GitHub v1)
+
+These role-specific skill paths are exact. Agents must use the task issue's latest live status (not older snapshots).
+
+| Role | Exact skill file | First task issue |
+|---|---|---|
+| A01 Arena Argent / Technical Director | [SKILL.md](../../.agents/skills/es-a01-technical-director/SKILL.md) | [ES-A01-001](https://github.com/lightingfff/eternal-sunmmoner/issues/52) |
+| A02 Android Build & CI | [SKILL.md](../../.agents/skills/es-a02-android-build/SKILL.md) | [ES-A02-001](https://github.com/lightingfff/eternal-sunmmoner/issues/53) |
+| A03 Graphics / 2.5D Renderer | [SKILL.md](../../.agents/skills/es-a03-graphics-renderer/SKILL.md) | [ES-A03-001](https://github.com/lightingfff/eternal-sunmmoner/issues/54) |
+| A04 HUD & UI/UX | [SKILL.md](../../.agents/skills/es-a04-ui-ux/SKILL.md) | [ES-A04-001](https://github.com/lightingfff/eternal-sunmmoner/issues/55) |
+| A05 Tower Level Design | [SKILL.md](../../.agents/skills/es-a05-tower-level-designer/SKILL.md) | [ES-A05-001](https://github.com/lightingfff/eternal-sunmmoner/issues/56) |
+| A06 Monster AI Tactics | [SKILL.md](../../.agents/skills/es-a06-monster-ai-designer/SKILL.md) | [ES-A06-001](https://github.com/lightingfff/eternal-sunmmoner/issues/57) |
+| A07 Hero Identity & Story | [SKILL.md](../../.agents/skills/es-a07-hero-narrative/SKILL.md) | [ES-A07-001](https://github.com/lightingfff/eternal-sunmmoner/issues/58) |
+| A08 Pixel Art & VFX | [SKILL.md](../../.agents/skills/es-a08-pixel-art-vfx/SKILL.md) | [ES-A08-001](https://github.com/lightingfff/eternal-sunmmoner/issues/59) |
+| A09 Independent QA | [SKILL.md](../../.agents/skills/es-a09-regression-qa/SKILL.md) | [ES-A09-001](https://github.com/lightingfff/eternal-sunmmoner/issues/60) |
+| A10 Android Performance | [SKILL.md](../../.agents/skills/es-a10-android-performance/SKILL.md) | [ES-A10-001](https://github.com/lightingfff/eternal-sunmmoner/issues/61) |
+| A11 Gameplay Systems | [SKILL.md](../../.agents/skills/es-a11-gameplay-systems/SKILL.md) | [ES-A11-001](https://github.com/lightingfff/eternal-sunmmoner/issues/62) |
+| A12 Audio & SFX | [SKILL.md](../../.agents/skills/es-a12-audio-sound/SKILL.md) | [ES-A12-001](https://github.com/lightingfff/eternal-sunmmoner/issues/63) |
