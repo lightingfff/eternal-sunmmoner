@@ -1,6 +1,8 @@
 package com.example.game.pixel
 
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import kotlin.math.sin
 import kotlin.random.Random
 
@@ -9,6 +11,62 @@ import kotlin.random.Random
  * architecture, 3/4 furniture with visible legs/depth, street lanterns, and multi-layered trees.
  */
 object PixelStructureAtlas {
+
+  private data class Detail(val path: String, val pivotX: Int, val pivotY: Int, val dx: Int, val dy: Int)
+  private val detailCache = mutableMapOf<Pair<String, ImageBitmap>, ImageBitmap>()
+  private val replacementCache = mutableMapOf<Pair<String, ImageBitmap>, ImageBitmap>()
+  private fun foliage(id: String, base: ImageBitmap): ImageBitmap {
+    val art = SanctuaryArtAssets.argon("batch_02_foliage_props/$id.png") ?: return base
+    return replacementCache.getOrPut(id to base) {
+      // Keep the existing sprite canvas, thus renderer scale/culling/footprint contracts.
+      val bitmap = android.graphics.Bitmap.createBitmap(base.width, base.height, android.graphics.Bitmap.Config.ARGB_8888)
+      val paint = android.graphics.Paint().apply { isFilterBitmap = false; isAntiAlias = false }
+      val authoredPivotY = when(id) {
+        "foliage_ancient_pine_96x128" -> 122
+        "foliage_dorm_blossom_clump_64x48" -> 42
+        else -> 56
+      }
+      val scale = minOf(base.width.toFloat()/art.width,base.height.toFloat()/art.height)
+      val left = (base.width-art.width*scale)/2f
+      val foot = ObliqueSpriteGeometry.bounds(base).bottom.toFloat()
+      val top = foot-authoredPivotY*scale
+      android.graphics.Canvas(bitmap).drawBitmap(art.asAndroidBitmap(), null,
+        android.graphics.RectF(left,top,left+art.width*scale,top+art.height*scale), paint)
+      bitmap.asImageBitmap()
+    }
+  }
+  private val architectureDetails: Map<String,List<Detail>> =
+    listOf("quarters","restaurant","armory","summon","gate").associateWith(::detailsFor)
+  private fun detailsFor(id: String): List<Detail> {
+    val roof = Detail("arch_black_slate_roof_moss_96x64",48,58,0,-92)
+    val window = Detail("arch_warm_stained_window_frame_48x64",24,52,-46,-54)
+    val door = Detail("arch_ancient_timber_bronze_door_64x80",32,75,0,-6)
+    val frieze = Detail("arch_dorm_carved_timber_frieze_96x32",48,27,0,-68)
+    return when(id) {
+      "quarters" -> listOf(roof,window,window.copy(dx=46),door,frieze)
+      "restaurant" -> listOf(roof,window,window.copy(dx=46),door)
+      "armory" -> listOf(door,frieze)
+      "summon" -> listOf(Detail("arch_summoning_hall_pedestal_trim_96x48",48,41,0,-4))
+      "gate" -> listOf(Detail("arch_tower_gate_buttress_pillar_64x128",32,121,-74,-4),Detail("arch_tower_gate_buttress_pillar_64x128",32,121,74,-4))
+      else -> emptyList()
+    }
+  }
+  private fun detailed(id: String, base: ImageBitmap): ImageBitmap {
+    if (!SanctuaryArtAssets.argonEnabled) return base
+    val details = architectureDetails[id] ?: return base
+    if (details.none { SanctuaryArtAssets.argon("batch_03_architecture_details/${it.path}.png") != null }) return base
+    return detailCache.getOrPut(id to base) {
+      val bitmap = base.asAndroidBitmap().copy(android.graphics.Bitmap.Config.ARGB_8888,true)
+      val canvas = android.graphics.Canvas(bitmap)
+      val paint = android.graphics.Paint().apply { isFilterBitmap=false; isAntiAlias=false }
+      for (d in details) {
+        val art = SanctuaryArtAssets.argon("batch_03_architecture_details/${d.path}.png") ?: continue
+        canvas.drawBitmap(art.asAndroidBitmap(),base.width/2f+d.dx-d.pivotX,base.height.toFloat()+d.dy-d.pivotY,paint)
+      }
+      bitmap.asImageBitmap()
+    }
+  }
+
 
   // Sanctuary 3/4 Landmark Facilities.
   //
@@ -21,31 +79,37 @@ object PixelStructureAtlas {
   // P27B: PNG-first, exact old canvas/foot pivot. If optional art is absent or
   // malformed, fall back to the unchanged P21 PNG (then procedural). The projected
   // shadow gets the same selected ImageBitmap, so its silhouette cache remains valid.
-  val towerGateMonument: ImageBitmap get() =
+  val towerGateMonument: ImageBitmap get() = detailed("gate",
     SanctuaryArtAssets.preferredLandmark("tower_gate", 260, 224) ?: towerGateMonumentFallback
+  )
   private val towerGateMonumentFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildTowerGateMonument() }
-  val summoningHallStructure: ImageBitmap get() =
+  val summoningHallStructure: ImageBitmap get() = detailed("summon",
     SanctuaryArtAssets.preferredLandmark("summoning_hall", 268, 206) ?: summoningHallFallback
+  )
   private val summoningHallFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildSummoningHall() }
   val heroRegistryStructure: ImageBitmap get() =
     SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/hero_registry.png")
       ?: SanctuaryArtAssets.assetSafe("premium_slice/hero_registry.png") ?: heroRegistryFallback
   private val heroRegistryFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildHeroRegistryHall() }
   val trainingGroundStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildTrainingGround() }
-  val armoryStructure: ImageBitmap get() = SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/armory.png")
+  val armoryStructure: ImageBitmap get() = detailed("armory",
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/armory.png")
       ?: SanctuaryArtAssets.assetSafe("premium_slice/armory.png") ?: armoryFallback
+  )
   private val armoryFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildArmory() }
   val synthesisLabStructure: ImageBitmap get() =
     SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/synthesis_lab.png")
       ?: SanctuaryArtAssets.assetSafe("premium_slice/synthesis_lab.png") ?: synthesisLabFallback
   private val synthesisLabFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildSynthesisLab() }
-  val heroQuartersStructure: ImageBitmap get() =
+  val heroQuartersStructure: ImageBitmap get() = detailed("quarters",
     SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/hero_quarters.png")
       ?: SanctuaryArtAssets.assetSafe("premium_slice/hero_quarters.png") ?: heroQuartersFallback
+  )
   private val heroQuartersFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildHeroQuarters() }
-  val restaurantStructure: ImageBitmap get() =
+  val restaurantStructure: ImageBitmap get() = detailed("restaurant",
     SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/restaurant.png")
       ?: SanctuaryArtAssets.assetSafe("premium_slice/restaurant.png") ?: restaurantFallback
+  )
   private val restaurantFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildRestaurantExterior() }
   val floorVistaArchStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildFloorVistaArch() }
 
@@ -97,8 +161,9 @@ object PixelStructureAtlas {
   private val sakuraTreeSpriteBFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(1, 96, 114) }
   val cypressConiferSprite: ImageBitmap get() = SanctuaryArtAssets.image("cypress") ?: cypressConiferSpriteFallback
   private val cypressConiferSpriteFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(2, 48, 88) }
-  val gardenHedgeBushSprite: ImageBitmap get() =
+  val gardenHedgeBushSprite: ImageBitmap get() = foliage("foliage_moss_flower_bush_64x64",
     SanctuaryArtAssets.assetSafe("sanctuary_p03/hedge_bush.png") ?: gardenHedgeBushFallback
+  )
   private val gardenHedgeBushFallback: ImageBitmap by lazy { SanctuaryVegetation.shrub() }
   val trainingStrikingPostSprite: ImageBitmap get() =
     SanctuaryArtAssets.assetSafe("sanctuary_p03/striking_post.png") ?: trainingStrikingPostFallback
@@ -150,14 +215,16 @@ object PixelStructureAtlas {
   val oakTreeSprite: ImageBitmap get() = SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/oak.png")
       ?: SanctuaryArtAssets.image("oak") ?: oakTreeSpriteFallback
   private val oakTreeSpriteFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(0, 112, 136) }
-  val spiritPineSprite: ImageBitmap get() =
+  val spiritPineSprite: ImageBitmap get() = foliage("foliage_ancient_pine_96x128",
     SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/pine.png")
       ?: SanctuaryArtAssets.image("pine") ?: spiritPineSpriteFallback
+  )
   private val spiritPineSpriteFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(2, 96, 128) }
   val mysticPlumTreeSprite: ImageBitmap get() = SanctuaryArtAssets.image("twisted") ?: mysticPlumTreeSpriteFallback
   private val mysticPlumTreeSpriteFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(3, 112, 132) }
-  val forestBushSprite: ImageBitmap get() =
+  val forestBushSprite: ImageBitmap get() = foliage("foliage_ashen_violet_shrub_64x64",
     SanctuaryArtAssets.assetSafe("sanctuary_p03/forest_bush.png") ?: forestBushFallback
+  )
   private val forestBushFallback: ImageBitmap by lazy { SanctuaryVegetation.shrub() }
   val ruinArchSprite: ImageBitmap get() =
     SanctuaryArtAssets.assetSafe("sanctuary_p03/ruin_arch.png") ?: ruinArchFallback
@@ -168,8 +235,9 @@ object PixelStructureAtlas {
   // P23 props that have no procedural builder: the planter and the training yard set are
   // PNG-only, and every caller keeps its previous Canvas path as the fallback (`?: null`).
   val flowerPlanterSprite: ImageBitmap?
-    get() = SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/flower_planter.png")
-      ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/flower_planter.png")
+    get() = (SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/flower_planter.png")
+      ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/flower_planter.png"))
+      ?.let { foliage("foliage_dorm_blossom_clump_64x48", it) }
   val trainingDummySprite: ImageBitmap?
     get() = SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/training_dummy.png")
       ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/training_dummy.png")

@@ -256,40 +256,59 @@ object PixelTileAtlas {
   // P27B-V5: the 8x8 sheet wins over the 4x4 cell family. Order is
   // sheet -> P27B 4x4 cells -> P03 PNG -> procedural, and each tier is whole,
   // never a mixed atlas.
-  private fun groundSheet(name: String): ImageBitmap? = SanctuaryArtAssets.groundSheet(name)
+  private fun groundSheet(name: String): ImageBitmap? = SanctuaryArtAssets.argonSheet(name) ?: SanctuaryArtAssets.groundSheet(name)
 
   val sanctuaryGrassSheet: ImageBitmap? get() = groundSheet("grass")
   val sanctuarySoilSheet: ImageBitmap? get() = groundSheet("soil")
   val sanctuaryFlagstoneSheet: ImageBitmap? get() = groundSheet("flagstone")
   val sanctuaryCobbleSheet: ImageBitmap? get() = groundSheet("cobble")
 
-  val sanctuaryGrassSheetRotated: ImageBitmap? get() = SanctuaryArtAssets.groundSheetMirrored("grass")
-  val sanctuarySoilSheetRotated: ImageBitmap? get() = SanctuaryArtAssets.groundSheetMirrored("soil")
-  val sanctuaryFlagstoneSheetRotated: ImageBitmap? get() = SanctuaryArtAssets.groundSheetMirrored("flagstone")
-  val sanctuaryCobbleSheetRotated: ImageBitmap? get() = SanctuaryArtAssets.groundSheetMirrored("cobble")
+  val sanctuaryGrassSheetRotated: ImageBitmap? get() = if (SanctuaryArtAssets.argonSheet("grass") != null) null else SanctuaryArtAssets.groundSheetMirrored("grass")
+  val sanctuarySoilSheetRotated: ImageBitmap? get() = if (SanctuaryArtAssets.argonSheet("soil") != null) null else SanctuaryArtAssets.groundSheetMirrored("soil")
+  val sanctuaryFlagstoneSheetRotated: ImageBitmap? get() = if (SanctuaryArtAssets.argonSheet("flagstone") != null) null else SanctuaryArtAssets.groundSheetMirrored("flagstone")
+  val sanctuaryCobbleSheetRotated: ImageBitmap? get() = if (SanctuaryArtAssets.argonSheet("cobble") != null) null else SanctuaryArtAssets.groundSheetMirrored("cobble")
 
   val sanctuaryGrassTiles: List<ImageBitmap> get() =
-    SanctuaryArtAssets.p27bFamily("grass") ?: SanctuaryArtAssets.tiles("grass", 8) ?: sanctuaryGrassTilesFallback
+    SanctuaryArtAssets.argonGround("grass") ?: SanctuaryArtAssets.p27bFamily("grass") ?: SanctuaryArtAssets.tiles("grass", 8) ?: sanctuaryGrassTilesFallback
   private val sanctuaryGrassTilesFallback: List<ImageBitmap> by lazy {
     (0 until 8).map { variant -> SanctuaryMaterials.grass(variant) }
   }
 
   val sanctuarySandTiles: List<ImageBitmap> get() =
-    SanctuaryArtAssets.p27bFamily("soil") ?: SanctuaryArtAssets.tiles("soil", 6) ?: sanctuarySandTilesFallback
+    SanctuaryArtAssets.argonGround("soil") ?: SanctuaryArtAssets.p27bFamily("soil") ?: SanctuaryArtAssets.tiles("soil", 6) ?: sanctuarySandTilesFallback
   private val sanctuarySandTilesFallback: List<ImageBitmap> by lazy {
     (0 until 6).map { variant -> SanctuaryMaterials.soil(variant) }
   }
 
   val sanctuaryStoneTiles: List<ImageBitmap> get() =
-    SanctuaryArtAssets.p27bFamily("flagstone") ?: SanctuaryArtAssets.tiles("flagstone", 8) ?: sanctuaryStoneTilesFallback
+    SanctuaryArtAssets.argonGround("flagstone") ?: SanctuaryArtAssets.p27bFamily("flagstone") ?: SanctuaryArtAssets.tiles("flagstone", 8) ?: sanctuaryStoneTilesFallback
   private val sanctuaryStoneTilesFallback: List<ImageBitmap> by lazy {
     (0 until 8).map { variant -> SanctuaryMaterials.stone(variant, large = true) }
   }
 
   val sanctuaryCausewayTiles: List<ImageBitmap> get() =
-    SanctuaryArtAssets.p27bFamily("cobble") ?: SanctuaryArtAssets.tiles("cobble", 6) ?: sanctuaryCausewayTilesFallback
+    SanctuaryArtAssets.argonGround("cobble") ?: SanctuaryArtAssets.p27bFamily("cobble") ?: SanctuaryArtAssets.tiles("cobble", 6) ?: sanctuaryCausewayTilesFallback
   private val sanctuaryCausewayTilesFallback: List<ImageBitmap> by lazy {
     (0 until 6).map { variant -> SanctuaryMaterials.stone(variant, large = false) }
+  }
+
+  /** Inclusive manifest rectangles [0..19],[20..43],[44..63] -> exclusive edges.
+   * Fixed nine blits, never repeat the complete island-shaped source tile. Ground Y only.
+   */
+  internal fun DrawScope.drawArgonTransition(left: Float, top: Float, width: Float, height: Float, zoom: Float) {
+    val image = SanctuaryArtAssets.argon("batch_01_terrain/terrain_grass_stone_transition_64.png") ?: return
+    val edgeX = minOf(20f * zoom, width / 2f)
+    val edgeY = minOf(20f * zoom * ObliqueCamera.OBLIQUE_Y_SCALE, height / 2f)
+    val source = intArrayOf(0, 20, 44, 64)
+    val xs = intArrayOf(left.roundToInt(), (left+edgeX).roundToInt(), (left+width-edgeX).roundToInt(), (left+width).roundToInt())
+    val ys = intArrayOf(top.roundToInt(), (top+edgeY).roundToInt(), (top+height-edgeY).roundToInt(), (top+height).roundToInt())
+    for (y in 0..2) for (x in 0..2) {
+      val w = xs[x+1]-xs[x]; val h = ys[y+1]-ys[y]
+      if (w <= 0 || h <= 0) continue
+      drawImage(image, srcOffset=IntOffset(source[x],source[y]),
+        srcSize=IntSize(source[x+1]-source[x],source[y+1]-source[y]),
+        dstOffset=IntOffset(xs[x],ys[y]), dstSize=IntSize(w,h), filterQuality=FilterQuality.None)
+    }
   }
 
   /** A matching 4×4 mosaic must use coordinate adjacency, not the old independent hash. */

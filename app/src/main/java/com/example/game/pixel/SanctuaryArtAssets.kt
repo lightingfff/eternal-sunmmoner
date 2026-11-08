@@ -15,6 +15,61 @@ object SanctuaryArtAssets {
   // back to the shipped P03/P21 PNG. Never mutate this at draw time or stale 4×4 grass
   // blocks/shadow masks would survive a profile change; use a fresh process for QA.
   val visualProfile = SanctuaryVisualProfile.P27B
+
+  internal var argonEnabled = true // test-only baseline selector; production defaults to V2.
+  private var argonLoaded = false
+  private val argonImages = mutableMapOf<String, ImageBitmap?>()
+  private val argonSheets = mutableMapOf<String, ImageBitmap>()
+  private val argonSpecs = mapOf(
+    "batch_01_terrain/terrain_forest_grass_v1_64.png" to (64 to 64),
+    "batch_01_terrain/terrain_forest_grass_v2_64.png" to (64 to 64),
+    "batch_01_terrain/terrain_forest_grass_v3_64.png" to (64 to 64),
+    "batch_01_terrain/terrain_mossy_flagstone_v1_64.png" to (64 to 64),
+    "batch_01_terrain/terrain_mossy_flagstone_v2_64.png" to (64 to 64),
+    "batch_01_terrain/terrain_compacted_earth_64.png" to (64 to 64),
+    "batch_01_terrain/terrain_tower_gate_runic_stone_64.png" to (64 to 64),
+    "batch_01_terrain/terrain_grass_stone_transition_64.png" to (64 to 64),
+    "batch_02_foliage_props/foliage_ancient_pine_96x128.png" to (96 to 128),
+    "batch_02_foliage_props/foliage_moss_flower_bush_64x64.png" to (64 to 64),
+    "batch_02_foliage_props/foliage_ashen_violet_shrub_64x64.png" to (64 to 64),
+    "batch_02_foliage_props/foliage_dorm_blossom_clump_64x48.png" to (64 to 48),
+    "batch_02_foliage_props/prop_wall_ivy_drape_64x96.png" to (64 to 96),
+    "batch_02_foliage_props/prop_wooden_bronze_wayfinder_64x96.png" to (64 to 96),
+    "batch_03_architecture_details/arch_black_slate_roof_moss_96x64.png" to (96 to 64),
+    "batch_03_architecture_details/arch_ancient_timber_bronze_door_64x80.png" to (64 to 80),
+    "batch_03_architecture_details/arch_summoning_hall_pedestal_trim_96x48.png" to (96 to 48),
+    "batch_03_architecture_details/arch_warm_stained_window_frame_48x64.png" to (48 to 64),
+    "batch_03_architecture_details/arch_tower_gate_buttress_pillar_64x128.png" to (64 to 128),
+    "batch_03_architecture_details/arch_dorm_carved_timber_frieze_96x32.png" to (96 to 32)
+  )
+  internal fun argon(path: String): ImageBitmap? = if (argonEnabled) argonImages[path] else null
+  internal fun argonGround(name: String): List<ImageBitmap>? {
+    if (!argonEnabled || !argonLoaded) return null
+    return argonFamilies[name]
+  }
+  private val argonFamilies = mutableMapOf<String, List<ImageBitmap>>()
+  internal fun argonSheet(name: String): ImageBitmap? = if (argonEnabled) argonSheets[name] else null
+  private fun buildArgonGroundSheets() {
+    val names = mapOf(
+      "grass" to listOf("terrain_forest_grass_v1_64", "terrain_forest_grass_v2_64", "terrain_forest_grass_v3_64"),
+      "soil" to listOf("terrain_compacted_earth_64"),
+      "flagstone" to listOf("terrain_mossy_flagstone_v1_64", "terrain_mossy_flagstone_v2_64"),
+      "cobble" to listOf("terrain_mossy_flagstone_v1_64", "terrain_mossy_flagstone_v2_64")
+    )
+    for ((family, ids) in names) {
+      val tiles = ids.mapNotNull { argonImages["batch_01_terrain/$it.png"] }
+      if (tiles.size != ids.size) continue // family-level fallback, no mixed missing variants.
+      argonFamilies[family] = tiles
+      val bitmap = android.graphics.Bitmap.createBitmap(512, 512, android.graphics.Bitmap.Config.ARGB_8888)
+      val canvas = android.graphics.Canvas(bitmap)
+      for (y in 0 until 8) for (x in 0 until 8) {
+        val hash = ((x * 73856093) xor (y * 19349663)) and Int.MAX_VALUE
+        canvas.drawBitmap(tiles[hash % tiles.size].asAndroidBitmap(), x * 64f, y * 64f, null)
+      }
+      argonSheets[family] = bitmap.asImageBitmap()
+    }
+  }
+
   private var context: Context? = null
   private val images = mutableMapOf<String, ImageBitmap>()
   private val families = mutableMapOf<String, List<ImageBitmap>>()
@@ -24,7 +79,18 @@ object SanctuaryArtAssets {
   internal val cachedImageCount get() = images.size
   /** Decoded PNG cache only; generated actor atlases and GPU copies are not included. Sample at 1 Hz. */
   internal val cachedBitmapBytes: Long get() = images.values.sumOf { it.asAndroidBitmap().allocationByteCount.toLong() }
-  fun init(context: Context) { this.context = context.applicationContext }
+  fun init(context: Context) {
+    this.context = context.applicationContext
+    if (!argonLoaded) {
+      // Only the A08/A01 whitelist. Decode once at initialization, never in draw getters.
+      argonSpecs.forEach { (path, size) ->
+        argonImages[path] = assetSafe("sanctuary_argon_v2/$path")
+          ?.takeIf { it.width == size.first && it.height == size.second }
+      }
+      argonLoaded = true
+      buildArgonGroundSheets()
+    }
+  }
   fun image(id: String): ImageBitmap? = asset("sanctuary_p03/$id.png")
   internal fun textAsset(path: String): String? = context?.assets?.open(path)?.bufferedReader()?.use { it.readText() }
   internal fun asset(path: String): ImageBitmap? {

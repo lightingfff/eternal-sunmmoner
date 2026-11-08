@@ -255,6 +255,26 @@ object SanctuaryWorldRenderer {
         tileScreenH = tileScreenH,
       )
 
+      // Existing Tower approach ground only; no new path, collider or interaction anchor.
+      // Nine-slice transition outer grass / inner stone, fixed nine draws (not a tiled island).
+      with(PixelTileAtlas) {
+        drawArgonTransition(sx(1820f), sy(660f), 280f*zoom,
+          180f*ObliqueCamera.OBLIQUE_Y_SCALE*zoom, zoom)
+      }
+
+      SanctuaryArtAssets.argon("batch_01_terrain/terrain_tower_gate_runic_stone_64.png")?.let { rune ->
+        // Keep within the existing approach footprint and leave its nine-slice curb visible.
+        val approach = Path().apply {
+          moveTo(sx(1840f),sy(680f)); lineTo(sx(2080f),sy(680f))
+          lineTo(sx(2080f),sy(820f)); lineTo(sx(1840f),sy(820f)); close()
+        }
+        clipPath(approach) {
+          for (y in 0..2) for (x in 0..3) drawImage(rune,
+            dstOffset=IntOffset(sx(1840f+x*64f).roundToInt(),sy(680f+y*64f).roundToInt()),
+            dstSize=IntSize(tileScreenW+1,tileScreenH+1),filterQuality=FilterQuality.None)
+        }
+      }
+
       // 3E. Monumental Central Circular White Stone Plaza, 4 Pastel Elemental Runes & Grand SE Staircase
       with(PremiumSliceRenderer) { drawSmithyVerge(camX,camY,zoom) }
       drawCentralCircularWhitePlaza(::sx, ::sy, zoom, timeSec)
