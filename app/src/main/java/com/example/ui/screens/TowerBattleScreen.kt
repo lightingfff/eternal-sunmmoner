@@ -252,6 +252,16 @@ fun TowerBattleScreen(
   var animTimeSec by remember { mutableFloatStateOf(0f) }
   var hudRevision by remember { mutableIntStateOf(0) }
   var topHudHeightPx by remember { mutableIntStateOf(0) }
+  // Commands are user events: acknowledge them now, independently of the periodic
+  // simulation HUD sample. Draw invalidation stays confined to the battlefield.
+  fun acknowledgeBattleInput(action: () -> Unit) {
+    action()
+    hudRevision++
+    frameTick++
+  }
+  fun dispatchOrder(order: TacticalOrder) = acknowledgeBattleInput { combatEngine.issueTacticalOrder(order) }
+  fun dispatchSkill(heroId: String) = acknowledgeBattleInput { combatEngine.triggerHeroManualSkill(heroId) }
+
   val hudElapsed = remember { floatArrayOf(0f) }
   val visibleDrawables = remember { intArrayOf(0) }
   val lastProbeSample = remember { longArrayOf(0L) }
@@ -340,14 +350,14 @@ fun TowerBattleScreen(
           Key.S, Key.DirectionDown -> { keyDown = down; true }
           Key.A, Key.DirectionLeft -> { keyLeft = down; true }
           Key.D, Key.DirectionRight -> { keyRight = down; true }
-          Key.One -> { if (down) combatEngine.issueTacticalOrder(TacticalOrder.FOLLOW); true }
-          Key.Two -> { if (down) combatEngine.issueTacticalOrder(TacticalOrder.HOLD_POSITION); true }
-          Key.Three -> { if (down) combatEngine.issueTacticalOrder(TacticalOrder.ATTACK_TARGET); true }
-          Key.Four -> { if (down) combatEngine.issueTacticalOrder(TacticalOrder.FOCUS_FIRE); true }
-          Key.Five -> { if (down) combatEngine.issueTacticalOrder(TacticalOrder.PROTECT_ALLY); true }
-          Key.Six -> { if (down) combatEngine.issueTacticalOrder(TacticalOrder.REGROUP); true }
-          Key.Seven -> { if (down) combatEngine.issueTacticalOrder(TacticalOrder.RETREAT); true }
-          Key.Eight -> { if (down) combatEngine.issueTacticalOrder(TacticalOrder.MOVE_TO); true }
+          Key.One -> { if (down) dispatchOrder(TacticalOrder.FOLLOW); true }
+          Key.Two -> { if (down) dispatchOrder(TacticalOrder.HOLD_POSITION); true }
+          Key.Three -> { if (down) dispatchOrder(TacticalOrder.ATTACK_TARGET); true }
+          Key.Four -> { if (down) dispatchOrder(TacticalOrder.FOCUS_FIRE); true }
+          Key.Five -> { if (down) dispatchOrder(TacticalOrder.PROTECT_ALLY); true }
+          Key.Six -> { if (down) dispatchOrder(TacticalOrder.REGROUP); true }
+          Key.Seven -> { if (down) dispatchOrder(TacticalOrder.RETREAT); true }
+          Key.Eight -> { if (down) dispatchOrder(TacticalOrder.MOVE_TO); true }
           else -> false
         }
       },
@@ -412,7 +422,7 @@ fun TowerBattleScreen(
             val (camX, camY) = computeBattleCam(halfW, halfH)
             val worldX = ObliqueCamera.screenToWorldX(tapOffset.x, camX, zoom, halfW)
             val worldY = ObliqueCamera.screenToWorldY(tapOffset.y, camY, zoom, halfH)
-            combatEngine.onBattlefieldTapped(worldX, worldY)
+            acknowledgeBattleInput { combatEngine.onBattlefieldTapped(worldX, worldY) }
           }
         },
     ) {
@@ -821,7 +831,7 @@ fun TowerBattleScreen(
           if (isWideScreen) {
             SquadSkillHorizontalBar(
               heroes = combatEngine.heroes,
-              onTriggerSkill = combatEngine::triggerHeroManualSkill,
+              onTriggerSkill = ::dispatchSkill,
               modifier = Modifier.weight(1.62f),
             )
           }
@@ -910,7 +920,7 @@ fun TowerBattleScreen(
         if (!isWideScreen) {
           SquadSkillHorizontalBar(
             heroes = combatEngine.heroes,
-            onTriggerSkill = combatEngine::triggerHeroManualSkill,
+            onTriggerSkill = ::dispatchSkill,
             modifier = Modifier.fillMaxWidth(),
           )
         }
@@ -1051,6 +1061,7 @@ fun TowerBattleScreen(
 
         Row(
           modifier = Modifier
+            .testTag("battle_order_strip")
             .horizontalScroll(rememberScrollState())
             .background(ObsidianVoid.copy(alpha = 0.86f), RoundedCornerShape(12.dp))
             .border(1.dp, SummonerGold.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
@@ -1070,7 +1081,7 @@ fun TowerBattleScreen(
                   RoundedCornerShape(9.dp),
                 )
                 .testTag("order_${order.name.lowercase()}")
-                .clickable { combatEngine.issueTacticalOrder(order) },
+                .clickable { dispatchOrder(order) },
             ) {
               Column(
                 modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp),

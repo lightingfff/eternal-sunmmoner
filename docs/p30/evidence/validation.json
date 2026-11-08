@@ -1,0 +1,62 @@
+{
+  "code_sha": "b2e4a2682aecf7870ca190c5d62863b7e97853f8",
+  "baseline": "d9c330fe768a789e57ad634dc597ae1256e663fd",
+  "environment": "local cloud JDK21 Gradle9.3.1 Android36.1; native Robolectric; no physical device",
+  "totals": {
+    "tests": 36,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "suites": [
+    {
+      "suite": "com.example.LostCourierEncounterTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.example.MasterCommandResponsivenessTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.example.PremiumSliceCombatTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.example.data.LostCourierPersistenceRobolectricTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.example.performance.SceneFrameLoopLifecycleRobolectricTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.example.performance.ScenePerformanceTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.example.ui.BattleTouchOwnershipTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "code_sha": "b2e4a2682aecf7870ca190c5d62863b7e97853f8",
+  "bytes": 39181490,
+  "sha256": "05527c34d88cb3f2f63fd3567096c4541e2410192ae8b122f2237e2291d0b5eb",
+  "signature": "apksigner verify: v2=true, 1 signer"
+}

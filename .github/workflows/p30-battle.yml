@@ -1,0 +1,63 @@
+name: P30 battle commands and touch ownership
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/src/main/java/com/example/game/ai/**'
+      - 'app/src/main/java/com/example/game/combat/**'
+      - 'app/src/main/java/com/example/ui/screens/TowerBattleScreen.kt'
+      - 'app/src/test/java/com/example/MasterCommandResponsivenessTest.kt'
+      - 'app/src/test/java/com/example/ui/BattleTouchOwnershipTest.kt'
+      - '.github/workflows/p30-battle.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  battle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install Android packages
+        run: |
+          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager | head -n 1)
+          test -n "$SDKMANAGER"
+          set +o pipefail
+          yes | "$SDKMANAGER" --licenses
+          license_status=${PIPESTATUS[1]}
+          set -o pipefail
+          test "$license_status" -eq 0
+          "$SDKMANAGER" --install 'platform-tools' 'platforms;android-36.1' 'build-tools;36.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.3.1'
+      - name: Prepare debug-only build resources
+        run: |
+          keytool -genkeypair -noprompt -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+          mkdir -p app/src/debug/res/values
+          cat > app/src/debug/res/values/google_services_placeholder.xml <<'XML'
+          <resources><string name="default_web_client_id" translatable="false">debug-placeholder.apps.googleusercontent.com</string></resources>
+          XML
+      - name: Compile, build and verify battle regressions
+        run: |
+          gradle :app:compileDebugUnitTestKotlin :app:assembleDebug :app:testDebugUnitTest --console=plain \
+            --tests 'com.example.MasterCommandResponsivenessTest' \
+            --tests 'com.example.ui.BattleTouchOwnershipTest' \
+            --tests 'com.example.PremiumSliceCombatTest' \
+            --tests 'com.example.LostCourierEncounterTest' \
+            --tests 'com.example.data.LostCourierPersistenceRobolectricTest' \
+            --tests 'com.example.performance.ScenePerformanceTest' \
+            --tests 'com.example.performance.SceneFrameLoopLifecycleRobolectricTest'
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify app/build/outputs/apk/debug/app-debug.apk
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p30-battle-evidence
+          path: |
+            app/build/test-results/
+            app/build/reports/tests/
+            app/build/visual_screenshots/p30/
+            app/build/outputs/apk/debug/app-debug.apk

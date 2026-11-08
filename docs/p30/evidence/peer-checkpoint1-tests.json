@@ -1,0 +1,12 @@
+{
+  "sourceBaseline": "cd57e752412c5d1743f4812cd1825cc2493ae894",
+  "counts": {
+    "tests": 37,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "addedCase": "urgentCancelPreservesRealAttackCostsAcrossWindupContactAndRecovery",
+  "matrixCombinations": 18,
+  "device": "NOT TESTED"
+}
