@@ -12,7 +12,7 @@ import kotlin.random.Random
  */
 object PixelStructureAtlas {
 
-  private data class Detail(val path: String, val pivotX: Int, val pivotY: Int, val dx: Int, val dy: Int)
+  private data class Detail(val path: String, val pivotX: Int, val pivotY: Int, val dx: Int, val dy: Int, val scale: Float = .5f)
   private val detailCache = mutableMapOf<Pair<String, ImageBitmap>, ImageBitmap>()
   private val replacementCache = mutableMapOf<Pair<String, ImageBitmap>, ImageBitmap>()
   private fun foliage(id: String, base: ImageBitmap): ImageBitmap {
@@ -43,8 +43,8 @@ object PixelStructureAtlas {
     val door = Detail("arch_ancient_timber_bronze_door_64x80",32,75,0,-6)
     val frieze = Detail("arch_dorm_carved_timber_frieze_96x32",48,27,0,-68)
     return when(id) {
-      "quarters" -> listOf(roof,window,window.copy(dx=46),door,frieze)
-      "restaurant" -> listOf(roof,window,window.copy(dx=46),door)
+      "quarters" -> listOf(roof.copy(dx=-34),roof.copy(dx=34),window,window.copy(dx=46),door,frieze)
+      "restaurant" -> listOf(roof.copy(dx=-34),roof.copy(dx=34),window,window.copy(dx=46),door)
       "armory" -> listOf(door,frieze)
       "summon" -> listOf(Detail("arch_summoning_hall_pedestal_trim_96x48",48,41,0,-4))
       "gate" -> listOf(Detail("arch_tower_gate_buttress_pillar_64x128",32,121,-74,-4),Detail("arch_tower_gate_buttress_pillar_64x128",32,121,74,-4))
@@ -61,7 +61,10 @@ object PixelStructureAtlas {
       val paint = android.graphics.Paint().apply { isFilterBitmap=false; isAntiAlias=false }
       for (d in details) {
         val art = SanctuaryArtAssets.argon("batch_03_architecture_details/${d.path}.png") ?: continue
-        canvas.drawBitmap(art.asAndroidBitmap(),base.width/2f+d.dx-d.pivotX,base.height.toFloat()+d.dy-d.pivotY,paint)
+        val left = base.width/2f+d.dx-d.pivotX*d.scale
+        val top = base.height.toFloat()+d.dy-d.pivotY*d.scale
+        canvas.drawBitmap(art.asAndroidBitmap(),null,
+          android.graphics.RectF(left,top,left+art.width*d.scale,top+art.height*d.scale),paint)
       }
       bitmap.asImageBitmap()
     }

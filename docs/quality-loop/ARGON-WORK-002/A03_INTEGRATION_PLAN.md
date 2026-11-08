@@ -72,3 +72,14 @@ pivot/visible feet and shadow agreement require real scene review.
 
 Review requests: A10 #79, A09 #80, Argon and Codex on exact head SHA. No merge;
 any corrective work follows serialized one-writer FIX_PLAN, max three rounds.
+
+## Round 1 static critique / targeted fix
+
+Inspected actual source PNG hero_quarters and new door in the file viewer (asset
+inspection, NOT game evidence). A full 64×80 overlay would cover too much of the
+existing detailed facade. Reduced architectural modules to nearest-neighbor .5
+local pixel scale and paired roof accents rather than painting one large central
+roof. Registration remains provisional until actual engine captures. All 20 PNG
+chunk CRC/IEND and zlib IDAT inflation checked locally; tools/validate_assets.py
+returned PASS with existing preview-bloat, google-services-missing and duplicate
+basename warnings. These do not establish APK/runtime quality.
