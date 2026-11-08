@@ -240,6 +240,18 @@ RESULT: PASS
 
 Script kiểm tra là công cụ tạm trong phiên (không nằm trong PR) để không mở rộng phạm vi file được giao. Người review có thể chạy lại bằng bất kỳ script đếm ký tự nào.
 
+### 10.1 Kiểm tra trích dẫn `file:dòng` (bổ sung sau self-review, commit `6f2a46c`)
+
+Mọi mẫu `TênFile.kt:<dòng>-<dòng>` trong `docs/gameplay/**` được đối chiếu tự động với source thật:
+
+```
+$ python3 - <<'PY'   # quét regex + kiểm tra dải dòng nằm trong file
+... 
+BAD COUNT 0        # 32 lần trích dẫn (25 dải dòng khác nhau) hợp lệ, 0 ngoài phạm vi file
+```
+
+Trong lần soát này phát hiện và sửa **10 trích dẫn lệch dòng**: `LostCourierEncounter.kt:116-127 → :113-124`, `:123 → :118`, `LocalGuestSaveManager.kt:1168-1173 → :1169-1173`, `:1144-1147 → :1144-1145`, `:1124-1125 → :1124-1126`, `:260-310 → :262-326`, `FirestoreModels.kt:71-113 → :71-112`, `SummonerRepository.kt:1114-1116 → :1113-1117`, `TowerCombatEngine.kt:256-276 → :256-273`, `:121-130 → :121-126`. Không có kết luận thiết kế nào thay đổi — chỉ số dòng.
+
 ## 11. NOT TESTED / giới hạn trung thực
 - **NOT TESTED:** render thật của thoại trong HUD Android, thời lượng đọc thực tế, va chạm bố cục với `CourierMissionHud` ở 800×360 và portrait.
 - **NOT TESTED:** cảm nhận người chơi thật (không có playtest 5–10 phút trong phiên này).
