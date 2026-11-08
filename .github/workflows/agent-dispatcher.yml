@@ -1,0 +1,160 @@
+name: Auto Agent Dispatcher
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'Issue number to dispatch'
+        required: false
+        type: string
+        default: '0'
+      dry_run:
+        description: 'Dry run mode'
+        required: true
+        default: 'true'
+        type: string
+  issues:
+    types: [labeled, opened]
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tools/dispatcher/**'
+      - '.github/workflows/agent-dispatcher.yml'
+      - 'docs/agents/**'
+
+permissions:
+  contents: write
+  actions: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: dispatcher-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test_dispatcher_engine:
+    name: Run Dispatcher Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Unit Tests
+        run: |
+          PYTHONPATH=. python3 tools/dispatcher/test_agent_dispatcher.py
+
+  dispatch_issue:
+    name: Issue Dispatch & Lock Check
+    needs: test_dispatcher_engine
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'ai:ready'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Agent Dispatcher Simulator
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_PATH: ${{ github.event_path }}
+        run: |
+          python3 -c "
+          import os, json
+          from tools.dispatcher.agent_dispatcher import run_dispatcher, fetch_live_issue
+
+          event_path = os.environ.get('EVENT_PATH', '')
+          event_data = {}
+          if event_path and os.path.exists(event_path):
+              with open(event_path) as f:
+                  event_data = json.load(f)
+
+          inputs_data = event_data.get('inputs', {})
+          issue_data = event_data.get('issue', {})
+
+          issue_num = issue_data.get('number') or int(inputs_data.get('issue_number') or 0)
+          dry_run = str(inputs_data.get('dry_run', 'true')).lower() == 'true'
+
+          title = issue_data.get('title')
+          body = issue_data.get('body')
+
+          # If triggered via workflow_dispatch with issue_num, fetch live from GitHub
+          if not title and issue_num > 0:
+              live_issue = fetch_live_issue(issue_num)
+              if live_issue:
+                  title = live_issue.get('title')
+                  body = live_issue.get('body')
+
+          print(f'=== AUTO AGENT DISPATCHER (LIVE GITHUB API) ===')
+          print(f'Issue: #{issue_num}')
+          print(f'Title: {title}')
+          print(f'Dry Run: {dry_run}')
+
+          res = run_dispatcher(
+              issue_number=issue_num,
+              issue_title=title or 'Unspecified Issue',
+              issue_body=body or '',
+              base_sha='HEAD',
+              dry_run=dry_run
+          )
+          print('\n[DISPATCH RESULT]:')
+          print(json.dumps(res, indent=2, ensure_ascii=False))
+
+          if res.get('verdict') == 'BLOCKED':
+              print(f'NOTICE: Dispatch BLOCKED — {res.get(\"reason\")}')
+          "
+
+  pr_dual_review_audit:
+    name: PR Dual Review Router (Argon + Codex + A09)
+    needs: test_dispatcher_engine
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Route PR Reviews
+        env:
+          EVENT_PATH: ${{ github.event_path }}
+        run: |
+          python3 -c "
+          import os, json, subprocess
+          from tools.dispatcher.agent_dispatcher import generate_pr_review_dispatch
+
+          event_path = os.environ.get('EVENT_PATH', '')
+          event_data = {}
+          if event_path and os.path.exists(event_path):
+              with open(event_path) as f:
+                  event_data = json.load(f)
+
+          pr_data = event_data.get('pull_request', {})
+          pr_num = pr_data.get('number', 0)
+          head_sha = pr_data.get('head', {}).get('sha', 'HEAD')
+
+          try:
+              changed = subprocess.check_output(['git', 'diff', '--name-only', 'origin/main...HEAD']).decode('utf-8').splitlines()
+          except Exception:
+              changed = []
+
+          plan = generate_pr_review_dispatch(pr_num, head_sha, changed)
+          print(f'=== DUAL-LEAD REVIEW ROUTING FOR PR #{pr_num} ===')
+          print(json.dumps(plan, indent=2, ensure_ascii=False))
+          print('\nRule: No self-merge. Reviewers comment [ARGON_REVIEW], [CODEX_REVIEW], [QA_REVIEW]. Owner merges.')
+          "
