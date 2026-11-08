@@ -1,9 +1,9 @@
 ---
 name: Agent task ticket
-a bout: Structured work order for one ETERNAL SUMMONER agent role
+about: Structured work order for one ETERNAL SUMMONER agent role
 ---
 
-<!-- Replace the placeholders and correct the 'about' frontmatter typo before using this template if GitHub reports it invalid. -->
+<!-- Replace the placeholders with task-specific data. -->
 # TASK: ES-Axx-NNN — Short title
 
 STATE: BACKLOG (must be changed to READY by coordinator/owner before execution)
