@@ -30,24 +30,24 @@
 | Cơ chế | Bằng chứng trong repo (baseline `bdff6f9`) | Số liệu/ngữ nghĩa **thật** | Hệ quả cho thiết kế A07 |
 |---|---|---|---|
 | Sợ hãi (fear) | `app/src/main/java/com/example/game/combat/CombatEntities.kt:40-42` | `fearSecondsRemaining`; khi > 0: sát thương ×0.8, tốc độ ×0.85 | Không được hứa hẹn hiệu ứng khác (né, bỏ chạy, mất lệnh) |
-| Gán sợ | `LostCourierEncounter.kt:56-57, 116-127` | Khi trinh sát xuất hiện (`courier.x >= 1320`), **đúng một** anh hùng "non" bị sợ **10s**. `noviceId` = hero có `level <= 3` hoặc `morale < 50`, ưu tiên level thấp nhất, hòa thì Kaelen | Câu thoại sợ hãi phải đọc được **cho cả 3 hero**, không chỉ Kaelen |
+| Gán sợ | `LostCourierEncounter.kt:56-57` (chọn `noviceId`), `LostCourierEncounter.kt:113-124` (gán sợ) | Khi trinh sát xuất hiện (`courier.x >= 1320`), **đúng một** anh hùng "non" bị sợ **10s**. `noviceId` = hero có `level <= 3` hoặc `morale < 50`, ưu tiên level thấp nhất, hòa thì Kaelen | Câu thoại sợ hãi phải đọc được **cho cả 3 hero**, không chỉ Kaelen |
 | Cách Master giảm sợ | `LostCourierEncounter.kt:86-91` | Tốc độ giảm sợ: `PROTECT_ALLY` ×2, `REGROUP` ×2.5, mọi lệnh khác ×1 | Đây là **cơ chế dạy người chơi** tốt nhất; thoại nên chỉ thẳng vào nó |
-| Nhánh truy kích | `TowerCombatEngine.kt:256-276` | `CourierOrder.INTERCEPT` → đặt `TacticalOrder.ATTACK_TARGET`; **mất** bọc lót 40% cho người đưa thư | Xung đột thật: cứu người đưa thư vs chặn tù và. Thoại phải nói rõ giá của lựa chọn |
+| Nhánh truy kích | `TowerCombatEngine.kt:256-273` | `CourierOrder.INTERCEPT` → đặt `TacticalOrder.ATTACK_TARGET`; **mất** bọc lót 40% cho người đưa thư | Xung đột thật: cứu người đưa thư vs chặn tù và. Thoại phải nói rõ giá của lựa chọn |
 | Nhãn HUD sợ | `TowerCombatEngine.kt:568`; `TowerBattleScreen.kt:892-893` | `"Lo sợ • -20% sát thương / -15% tốc độ"`, `"<Tên>: Sợ Ns (-20% lực đánh/-15% tốc độ)"` | Thoại của A07 **không được lặp** chuỗi này; HUD đã lo phần số |
-| Sĩ khí khi kết toán | `LocalGuestSaveManager.kt:1119, 1168-1173` (và bản Firestore `SummonerRepository.kt:1114-1116`) | Thắng −6 (sàn `max(20, moraleFloor)`), rút lui −10 (sàn `max(25, moraleFloor)`), thua −22 (sàn `moraleFloor`); `moraleFloor` = 15, hoặc 30 nếu mở East Garden | Kết cục A/B **không tự đặt số mới**; mô tả cảm xúc phải khớp mức phạt có sẵn |
+| Sĩ khí khi kết toán | `LocalGuestSaveManager.kt:1119` (moraleFloor), `:1169-1173` (trừ sĩ khí); bản Firestore: `SummonerRepository.kt:1113-1117` | Thắng −6 (sàn `max(20, moraleFloor)`), rút lui −10 (sàn `max(25, moraleFloor)`), thua −22 (sàn `moraleFloor`); `moraleFloor` = 15, hoặc 30 nếu mở East Garden | Kết cục A/B **không tự đặt số mới**; mô tả cảm xúc phải khớp mức phạt có sẵn |
 | Ngưỡng hiển thị sĩ khí | `HeroProfileModal.kt:598-603` | `morale >= 85` → Emerald; ngược lại Amber | Band nội dung: ≥85 "vững", 50–84 "chao đảo", <50 "rạn" (khớp `noviceId`) |
 | Ký ức đồng đội | `LostCourierProgression.kt` | `FLAG_RESCUED="COURIER_RESCUED"`, `FLAG_FAILED="COURIER_FAILED"`, `RESCUE_MEMORY` (58 ký tự), `rememberRescue()` **cắt cứng 200 ký tự**, chỉ ghi khi `isFirstRescue` | Ngân sách ký ức: thêm ≤ **141** ký tự khi nối vào `bondSummary` có sẵn |
-| Ai nhận ký ức | `LocalGuestSaveManager.kt:1144-1147`; `TowerBattleScreen.kt:1333` | `courierMemoryHeroId` (UI truyền `lostCourier.frightenedHeroId`) nếu thuộc đội, nếu không thì hero đầu tiên của đội | **Người từng sợ là người giữ ký ức** — trục thiết kế trung tâm của tài liệu này |
+| Ai nhận ký ức | `LocalGuestSaveManager.kt:1144-1145`; `TowerBattleScreen.kt:1333` | `courierMemoryHeroId` (UI truyền `lostCourier.frightenedHeroId`) nếu thuộc đội, nếu không thì hero đầu tiên của đội | **Người từng sợ là người giữ ký ức** — trục thiết kế trung tâm của tài liệu này |
 | Kết cục | `data/model/CourierOutcome.kt` | Chỉ `RESCUED` / `FAILED` | Không có kết cục thứ ba; không thêm enum |
 | Hiển thị kết cục | `TowerBattleScreen.kt:1369-1373` | 1 dòng text cho RESCUED ("lò rèn 90 vàng, ký ức đã lưu") và FAILED ("có thể trở lại Tầng 1") | Nội dung mới phải **bổ sung**, không mâu thuẫn câu đang có |
 
-**Kết luận audit:** mission cứu người đưa thư Tầng 1 **đang tồn tại và có thể chạm tới** trên `main` (`TowerBattleScreen.kt:219` bật `enableLostCourier` cho Tầng 1; `TowerCombatEngine.kt:121-130` khởi tạo encounter và đặt mặc định `PROTECT_ALLY`). Vì vậy A07 viết nội dung cho **hệ thống thật**, nhưng **không sửa** nó.
+**Kết luận audit:** mission cứu người đưa thư Tầng 1 **đang tồn tại và có thể chạm tới** trên `main` (`TowerBattleScreen.kt:219` bật `enableLostCourier` cho Tầng 1; `TowerCombatEngine.kt:121-126` khởi tạo encounter và đặt mặc định `PROTECT_ALLY`). Vì vậy A07 viết nội dung cho **hệ thống thật**, nhưng **không sửa** nó.
 
 ---
 
 ## 2. Ba anh hùng khởi đầu — giọng điệu khóa cứng
 
-Dữ liệu lấy từ `LocalGuestSaveManager.kt:260-310` (guest offline) và `FirestoreModels.kt:71-113` (`PersonalityType`), thoại tham chiếu từ `ManhwaStoryData.kt`.
+Dữ liệu lấy từ `LocalGuestSaveManager.kt:262-326` (guest offline) và `FirestoreModels.kt:71-112` (`PersonalityType`), thoại tham chiếu từ `ManhwaStoryData.kt`.
 
 | Mã | Hero | Chức danh (canonical) | `personality` | Câu mẫu tính cách (đã có trong repo) | Giọng A07 được phép viết |
 |---|---|---|---|---|---|
@@ -150,7 +150,7 @@ Thay hằng số chung bằng **ba biến thể theo hero**, chọn theo `HeroRe
 | Thời lượng | 2.5s hoặc tới khi trinh sát chết / tù và vang |
 | Lời thoại | Hắn chạy nhanh hơn tôi tưởng. Bắn hạ trước tiếng tù và thứ ba — hoặc cả cánh đồng này sẽ biết chúng ta ở đây. |
 | Ký tự | 109 |
-| Ràng buộc số | "tiếng tù và thứ ba" phải **khớp** cửa sổ cảnh báo hiện có (`scoutWarningRemaining = 9f` tại `LostCourierEncounter.kt:123`, tức 3s cảnh báo + 6s gọi viện). Nếu A11 đổi cửa sổ, câu này **phải** được sửa — ghi rõ trong ticket |
+| Ràng buộc số | "tiếng tù và thứ ba" phải **khớp** cửa sổ cảnh báo hiện có (`scoutWarningRemaining = 9f` tại `LostCourierEncounter.kt:118`, tức 3s cảnh báo + 6s gọi viện). Nếu A11 đổi cửa sổ, câu này **phải** được sửa — ghi rõ trong ticket |
 | Điều cấm | Không mô tả Lyra bỏ vị trí khi chưa có lệnh; không hứa "chắc chắn chặn được" |
 
 ### HR-F1-03 — Vesper: "ký ức thuộc về người đã sợ"

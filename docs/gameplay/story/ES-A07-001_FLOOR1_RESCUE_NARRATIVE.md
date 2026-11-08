@@ -19,8 +19,8 @@ Không phải ý tưởng trừu tượng. Trên `main` tại baseline:
 | Phase | `enum class CourierPhase { CLEAR_PATH, ESCORT, SCOUT_ALARM, GATE_GUARD, RESCUED, FAILED }` | 4 phase chơi + 2 phase kết thúc |
 | Kích hoạt | `TowerCombatEngine.kt:121` (`enableLostCourier && floorNumber == 1`) và `TowerBattleScreen.kt:219` | Tầng 1 luôn bật |
 | Kết cục | `data/model/CourierOutcome.kt` | `RESCUED` / `FAILED` |
-| Kết toán | `LocalGuestSaveManager.kt:1124-1125` | Chỉ `RESCUED` khi `floorNumber == 1 && victory`, ngược lại là `FAILED` |
-| HUD | `ui/components/CourierMissionHud.kt` (gọi ở `TowerBattleScreen.kt:898-901`) | 2 nút Bảo Vệ / Chặn Trinh Sát |
+| Kết toán | `LocalGuestSaveManager.kt:1124-1126` | Chỉ `RESCUED` khi `floorNumber == 1 && victory`, ngược lại là `FAILED` |
+| HUD | `ui/components/CourierMissionHud.kt` (gọi ở `TowerBattleScreen.kt:897-903`) | 2 nút Bảo Vệ / Chặn Trinh Sát |
 | Dòng kết cục | `TowerBattleScreen.kt:1369-1373` | 1 câu cho mỗi kết cục |
 
 Vì vậy tài liệu này viết cho **ui/flow đang tồn tại**, và giữ đúng luật: không kết cục thứ ba, không phase mới, không lưu mới.
@@ -30,7 +30,7 @@ Vì vậy tài liệu này viết cho **ui/flow đang tồn tại**, và giữ �
 ## 2. Nhân vật
 
 ### 2.1 Ba anh hùng (canonical, không đổi tên/chức danh)
-Lấy từ `LocalGuestSaveManager.kt:260-310` và `ManhwaStoryData.kt`:
+Lấy từ `LocalGuestSaveManager.kt:262-326` và `ManhwaStoryData.kt`:
 
 - **Kaelen** — *Khiên Thép Tiền Phong* — Knight, `STOIC`.
 - **Lyra** — *Mắt Ưng Gió Đêm* — Archer, `CYNICAL`.
