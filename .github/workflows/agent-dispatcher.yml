@@ -1,21 +1,22 @@
 name: Auto Agent Dispatcher (Simulation & Dry-Run)
 
 on:
-  issues:
-    types: [labeled, opened]
-  pull_request:
-    types: [opened, synchronize, ready_for_review]
   workflow_dispatch:
     inputs:
       issue_number:
         description: 'Issue number to dispatch'
         required: false
         type: string
+        default: '0'
       dry_run:
         description: 'Dry run mode'
         required: true
         default: true
         type: boolean
+  issues:
+    types: [labeled, opened]
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
 
 permissions:
   contents: read
@@ -23,7 +24,7 @@ permissions:
   pull_requests: write
 
 concurrency:
-  group: agent-dispatcher-${{ github.event.issue.number || github.event.pull_request.number || github.run_id }}
+  group: "agent-dispatcher-${{ github.event.issue.number || github.event.pull_request.number || github.run_id }}"
   cancel-in-progress: false
 
 jobs:
@@ -60,10 +61,10 @@ jobs:
       - name: Run Agent Dispatcher Simulator
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue_number }}
-          ISSUE_TITLE: ${{ github.event.issue.title || 'Manual Dispatch' }}
+          ISSUE_NUMBER: ${{ github.event.issue.number || github.event.inputs.issue_number || '0' }}
+          ISSUE_TITLE: ${{ github.event.issue.title || 'Manual Workflow Dispatch' }}
           ISSUE_BODY: ${{ github.event.issue.body || '' }}
-          DRY_RUN: ${{ inputs.dry_run }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'true' }}
         run: |
           python3 -c "
           import os, json
@@ -72,7 +73,7 @@ jobs:
           issue_num = int(os.environ.get('ISSUE_NUMBER') or 0)
           title = os.environ.get('ISSUE_TITLE', '')
           body = os.environ.get('ISSUE_BODY', '')
-          dry_run = os.environ.get('DRY_RUN', 'true').lower() == 'true'
+          dry_run = str(os.environ.get('DRY_RUN', 'true')).lower() == 'true'
 
           print(f'=== AUTO AGENT DISPATCHER: ISSUE #{issue_num} ===')
           print(f'Title: {title}')
