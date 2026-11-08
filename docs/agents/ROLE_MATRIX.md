@@ -39,3 +39,12 @@ These role-specific skill paths are exact. Agents must use the task issue's late
 | A10 Android Performance | [SKILL.md](../../.agents/skills/es-a10-android-performance/SKILL.md) | [ES-A10-001](https://github.com/lightingfff/eternal-sunmmoner/issues/61) |
 | A11 Gameplay Systems | [SKILL.md](../../.agents/skills/es-a11-gameplay-systems/SKILL.md) | [ES-A11-001](https://github.com/lightingfff/eternal-sunmmoner/issues/62) |
 | A12 Audio & SFX | [SKILL.md](../../.agents/skills/es-a12-audio-sound/SKILL.md) | [ES-A12-001](https://github.com/lightingfff/eternal-sunmmoner/issues/63) |
+
+## Additional co-lead (not an A13 slot)
+
+- **A01 Arena Argent:** technical/integration lead; Android runtime, coding coordination, shared API/file conflict arbitration. Existing role and Issue #52 unchanged.
+- **Gemini 4 Argon High:** creative/production co-lead with separately authorized ARGON-WORK task, original texture/animation/VFX/gameplay work and `[ARGON_REVIEW]` on all substantive PRs. Argon does NOT absorb A03/A05/A08 source ownership by default.
+- **Codex:** senior critical-systems owner and `[CODEX_REVIEW]` of all substantive PRs (full deep review for combat/save/architecture, lightweight for art/docs). Codex may fix issues only in explicit nonoverlapping corrective scope; cannot independently sign own fix.
+- **A09:** independent evidence-based test review; A01 consolidates patches and owns technical integration.
+
+See `docs/agents/DUAL_LEAD_WORKFLOW.md` for 50/50 work splitting, one-writer-per-file handoff and the exact PR dual-review/fix cycle. All A01–A12 issues/skills and their roles remain unchanged.

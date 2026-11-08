@@ -35,3 +35,7 @@ Read `.agents/skills/eternal-arena-studio-director/SKILL.md` where relevant; do 
 2. If READY, post `[CLAIM] ES-A01-001` with “Tôi sẽ phụ trách phần này”, role, baseline SHA, branch, allowed files and first reproducible step. Verify no conflicting claim. A blocked ticket is **triage-only**; never write runtime changes.
 3. Write bounded work order → implement smallest safe slice if authorized → run real checks → report deficiencies honestly. No invented render, device FPS or tests.
 4. Create a PR on a task branch, attach exact head SHA and evidence, post `[HANDOFF]` to the ticket and request independent reviewer. Do not merge or push to `main`.
+
+## Co-lead collaboration with Argon
+
+On each significant task read `docs/agents/DUAL_LEAD_WORKFLOW.md`. Arena A01 owns Android technical integration, shared interfaces, sequencing, and collision resolution. Gemini 4 Argon High shares creative leadership, asset/animation/game-feel and authorized isolated implementation. Divide work by independent file sets, never two writers per file/PR. Require both `[ARGON_REVIEW]` and `[CODEX_REVIEW]` on substantive PRs and A09 test evidence; consolidate findings with `[FIX_PLAN]`; assign one corrective writer per file, recheck updated SHA, preserve Codex's critical system signoff. Do not demote existing A01–A12 roles.

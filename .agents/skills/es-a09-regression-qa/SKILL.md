@@ -32,3 +32,7 @@ A01 + Codex (P1); reviewer independent.
 2. If READY, post `[CLAIM] ES-A09-001` with “Tôi sẽ phụ trách phần này”, role, baseline SHA, branch, allowed files and first reproducible step. Verify no conflicting claim. A blocked ticket is **triage-only**; never write runtime changes.
 3. Write bounded work order → implement smallest safe slice if authorized → run real checks → report deficiencies honestly. No invented render, device FPS or tests.
 4. Create a PR on a task branch, attach exact head SHA and evidence, post `[HANDOFF]` to the ticket and request independent reviewer. Do not merge or push to `main`.
+
+## Dual review test gate
+
+All substantive PRs must receive independent `[ARGON_REVIEW]`, `[CODEX_REVIEW]`, and your `[QA_REVIEW]` on the same exact SHA. Report actual test command + outcome, visual evidence class, missing phone hardware metrics as NOT TESTED. After a `[FIX_PLAN]` is implemented by one writer per file, rerun impacted checks on new SHA. Never allow the author to act as their own independent reviewer, or treat model review as CI passing.

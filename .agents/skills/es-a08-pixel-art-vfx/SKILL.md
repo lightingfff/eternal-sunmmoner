@@ -35,3 +35,7 @@ Read `.agents/skills/ai-game-spritesheets/SKILL.md` where relevant; do not dupli
 2. If READY, post `[CLAIM] ES-A08-001` with “Tôi sẽ phụ trách phần này”, role, baseline SHA, branch, allowed files and first reproducible step. Verify no conflicting claim. A blocked ticket is **triage-only**; never write runtime changes.
 3. Write bounded work order → implement smallest safe slice if authorized → run real checks → report deficiencies honestly. No invented render, device FPS or tests.
 4. Create a PR on a task branch, attach exact head SHA and evidence, post `[HANDOFF]` to the ticket and request independent reviewer. Do not merge or push to `main`.
+
+## Argon original asset handoff
+
+Gemini 4 Argon High is now creative/production co-lead, **not** the prior Gemini local-only delivery session. Argon may author new original pixel PNG/atlases/VFX in a distinct ARGON-WORK ticket and branch. A08 still owns asset verification, manifest contract, provenance, legacy P31-A3 handoff gate and engine readiness. Never overwrite the 8 verified main PNGs or claim missing 12-asset Gemini ZIP as delivered. Require hash/bytes/alpha/frame grid/CRC/tile seams/pivots and true engine preview; A03/A01 handle renderer runtime. Argon + Codex + A09 reviews happen on the same PR head SHA; authors do not self-approve.
