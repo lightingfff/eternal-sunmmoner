@@ -149,83 +149,21 @@ object SanctuaryWorldRenderer {
       val startTy = ((minWy / worldTileSize).toInt() - 1).coerceAtLeast(4)
       val endTy = ((maxWy / worldTileSize).toInt() + 1).coerceAtMost(38)
 
-      // 3A. Seamless Sunlit Anime Grass Lawn Base Across Entire Island.
-      // At overview zoom a grass tile is only ~12-24 px tall, so sixteen tiles are replaced
-      // by one pre-composed 4x4 block with the same authored art. That drops the terrain
-      // draw-command count by ~85% exactly where the island-wide camera used to stall.
-      // From gameplay zoom up the per-tile path stays in charge and the art is untouched.
-      // P27B-V5: when the 8x8 sheet is present the overview path draws the WHOLE sheet
-      // once per world cell instead of sixteen squashed tiles. Zooming a 512 px texture
-      // down is the same sampling that squashing 16 tiles individually performs, so the
-      // pixels are equivalent, the draw count is lower than the old 4x4 block path, and
-      // the repeat period stays the same as the gameplay path (no zoom-dependent lattice).
-      val grassSheet = PixelTileAtlas.sanctuaryGrassSheet
-      val grassSheetRotated = PixelTileAtlas.sanctuaryGrassSheetRotated
-      val grassBlocks = if (grassSheet == null && tileScreenH < GRASS_BLOCK_MIN_TILE_SCREEN_PX) {
-        PixelTileAtlas.sanctuaryGrassBlocks
-      } else {
-        emptyList()
-      }
-      if (grassSheet != null && tileScreenH < GRASS_BLOCK_MIN_TILE_SCREEN_PX) {
-        val sheetWorldSize = (PixelTileAtlas.TILE_PX * 8).toFloat()
-        val cellScreenW = (sheetWorldSize * zoom).roundToInt().coerceAtLeast(2)
-        val cellScreenH = (sheetWorldSize * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt().coerceAtLeast(2)
-        // floorDiv, not "/": tile coordinates are negative west/north of the origin and
-        // truncating division would shift the sheet one world cell at the map edge.
-        val startSx = (startTx * PixelTileAtlas.TILE_PX).floorDiv(512)
-        val endSx = (endTx * PixelTileAtlas.TILE_PX).floorDiv(512)
-        val startSy = (startTy * PixelTileAtlas.TILE_PX).floorDiv(512)
-        val endSy = (endTy * PixelTileAtlas.TILE_PX).floorDiv(512)
-        for (cy in startSy..endSy) {
-          val dstY = sy(cy * sheetWorldSize).roundToInt()
-          for (cx in startSx..endSx) {
-            // Same rotation rule as the per-tile path: at sheet granularity it is what
-            // stops the overview from showing a clean 512 px grid of identical blocks.
-            val useRotated = grassSheetRotated != null &&
-              PixelTileAtlas.sanctuarySheetRotated(cx * 8, cy * 8)
-            drawImage(
-              image = if (useRotated) grassSheetRotated!! else grassSheet,
-              dstOffset = IntOffset(sx(cx * sheetWorldSize).roundToInt(), dstY),
-              dstSize = IntSize(cellScreenW + 1, cellScreenH + 1),
-              filterQuality = FilterQuality.None,
-            )
-          }
-        }
-      } else if (grassBlocks.isNotEmpty()) {
-        val blockWorldSize = PixelTileAtlas.GRASS_BLOCK_WORLD_SIZE.toFloat()
-        val blockScreenW = (blockWorldSize * zoom).roundToInt().coerceAtLeast(2)
-        val blockScreenH = (blockWorldSize * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt().coerceAtLeast(2)
-        val startBx = startTx / PixelTileAtlas.GRASS_BLOCK_TILES
-        val endBx = endTx / PixelTileAtlas.GRASS_BLOCK_TILES
-        val startBy = startTy / PixelTileAtlas.GRASS_BLOCK_TILES
-        val endBy = endTy / PixelTileAtlas.GRASS_BLOCK_TILES
-        for (by in startBy..endBy) {
-          val dstY = sy(by * blockWorldSize).roundToInt()
-          for (bx in startBx..endBx) {
-            val hash = ((bx * 73856093) xor (by * 19349663)) and 0x7FFFFFFF
-            drawImage(
-              image = grassBlocks[hash % grassBlocks.size],
-              dstOffset = IntOffset(sx(bx * blockWorldSize).roundToInt(), dstY),
-              dstSize = IntSize(blockScreenW + 1, blockScreenH + 1),
-              filterQuality = FilterQuality.None,
-            )
-          }
-        }
-      } else {
-        val grassTiles = PixelTileAtlas.sanctuaryGrassTiles
-        for (ty in startTy..endTy) {
-          val wy = ty * worldTileSize
-          val dstY = sy(wy).roundToInt()
-          for (tx in startTx..endTx) {
-            val wx = tx * worldTileSize
-            val dstX = sx(wx).roundToInt()
-            val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
-            drawGroundTile(
-              grassSheet, grassTiles, tx, ty, hash,
-              dstX, dstY, tileScreenW + 1, tileScreenH + 1,
-              rotated = grassSheetRotated,
-            )
-          }
+      // 3A. 128x128 Ultra-Detailed HD-2D Fantasy Sunlit Emerald-Moss Grass Lawn Across Entire Island
+      val hdGrassTiles = FantasyHd128Atlas.hdSanctuaryGrassTiles
+      for (ty in startTy..endTy) {
+        val wy = ty * worldTileSize
+        val dstY = sy(wy).roundToInt()
+        for (tx in startTx..endTx) {
+          val wx = tx * worldTileSize
+          val dstX = sx(wx).roundToInt()
+          val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
+          drawImage(
+            image = hdGrassTiles[hash % hdGrassTiles.size],
+            dstOffset = IntOffset(dstX, dstY),
+            dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
+            filterQuality = FilterQuality.None,
+          )
         }
       }
 
@@ -261,6 +199,11 @@ object SanctuaryWorldRenderer {
 
       // 3F. Dark Fantasy Ambient Occlusion - soft contact shadows under walls, plaza rim, gate
       drawSanctuaryAmbientOcclusion(::sx, ::sy, zoom)
+
+      // 3G. HD-2D Shader Ground Sun Pools, Cloud Drift Shadows & Stone/Runic Specular Reflections
+      with(SanctuarySunlightSystem) {
+        drawGroundSunPoolsAndSpecularity(camX, camY, zoom, timeSec)
+      }
     }
 
     // 4. Southern Main Gate Raised Stone Courtyard, Flanking Angled Stairs & Dual Wooden Drawbridges
@@ -281,8 +224,10 @@ object SanctuaryWorldRenderer {
       )
     }
 
-    // 7. Time-of-day sky rays (warm gold sunbeams by day, cool moonlight at night)
-    drawSkyRays()
+    // 7. World-Anchored HD-2D Volumetric Sun Shafts & Floating Golden Motes
+    with(SanctuarySunlightSystem) {
+      drawVolumetricSunShaftsAndMotes(camX, camY, zoom, timeSec)
+    }
 
     // 8. Local Light Glows - warm amber from gate braziers + cold rune light on plaza
     drawSanctuaryLocalLights(::sx, ::sy, zoom, timeSec)
@@ -352,7 +297,7 @@ object SanctuaryWorldRenderer {
     drawPath(outerGrassRim, Color(0xFF2A3D2B))
     drawPath(midSandLip, Color(0xFF4A3D2E))
 
-    val sandTiles = PixelTileAtlas.sanctuarySandTiles
+    val sandTiles = FantasyHd128Atlas.hdSanctuarySandTiles
     clipPath(innerSandCore) {
       val worldTileSize = 64f
       for (ty in 23..33) {
@@ -362,10 +307,11 @@ object SanctuaryWorldRenderer {
           val wx = tx * worldTileSize
           val dstX = sx(wx).roundToInt()
           val hash = ((tx * 49297) xor (ty * 91813)) and 0x7FFFFFFF
-          drawGroundTile(
-            PixelTileAtlas.sanctuarySoilSheet, sandTiles, tx, ty, hash,
-            dstX, dstY, tileScreenW + 1, tileScreenH + 1,
-            rotated = PixelTileAtlas.sanctuarySoilSheetRotated,
+          drawImage(
+            image = sandTiles[hash % sandTiles.size],
+            dstOffset = IntOffset(dstX, dstY),
+            dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
+            filterQuality = FilterQuality.None,
           )
         }
       }
@@ -373,7 +319,7 @@ object SanctuaryWorldRenderer {
     // Ground-only transition band: embedded rock at the soil rim, tuft silhouettes intrude inward.
     clipPath(outerGrassRim) {
       clipPath(innerSandCore, androidx.compose.ui.graphics.ClipOp.Difference) {
-        drawMaterialBand(PixelTileAtlas.sanctuaryGravelTiles, sx, sy, zoom, 6..21, 23..33)
+        drawMaterialBand(FantasyHd128Atlas.hdSanctuaryGravelTiles, sx, sy, zoom, 6..21, 23..33)
       }
     }
     SanctuaryArtAssets.image("verge")?.let { fringe ->
@@ -454,8 +400,8 @@ object SanctuaryWorldRenderer {
     drawPath(curbOuterShadow, Color(0xFF1E2028))
     drawPath(curbPaleLimestone, Color(0xFF3A3D4A))
 
-    // Pixel-art grey cobblestone interior clipped smoothly inside the road network
-    val cobbleTiles = PixelTileAtlas.sanctuaryCausewayTiles
+    // 128x128 HD-2D Fantasy cobblestone interior clipped smoothly inside the road network
+    val cobbleTiles = FantasyHd128Atlas.hdSanctuaryCausewayTiles
     clipPath(cobbleInterior) {
       val worldTileSize = 64f
       val rStartTx = startTx.coerceAtLeast(6)
@@ -468,15 +414,14 @@ object SanctuaryWorldRenderer {
         for (tx in rStartTx..rEndTx) {
           val wx = tx * worldTileSize
           if (wx > 2460f) continue
-          // Skip tiles whose whole square is outside the road instead of submitting a
-          // drawImage that the clip path discards. Same pixels, far fewer commands.
           if (!SanctuaryRoadCoverage.mayContainRoad(paths, tx, ty)) continue
           val dstX = sx(wx).roundToInt()
           val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
-          drawGroundTile(
-            PixelTileAtlas.sanctuaryCobbleSheet, cobbleTiles, tx, ty, hash,
-            dstX, dstY, tileScreenW + 1, tileScreenH + 1,
-            rotated = PixelTileAtlas.sanctuaryCobbleSheetRotated,
+          drawImage(
+            image = cobbleTiles[hash % cobbleTiles.size],
+            dstOffset = IntOffset(dstX, dstY),
+            dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
+            filterQuality = FilterQuality.None,
           )
         }
       }
@@ -899,19 +844,29 @@ object SanctuaryWorldRenderer {
 
     val plazaClip = Path().apply { addOval(androidx.compose.ui.geometry.Rect(cx-rx*0.95f,cy-ry*0.95f,cx+rx*0.95f,cy+ry*0.95f)) }
     clipPath(plazaClip) {
-      val tiles = PixelTileAtlas.sanctuaryStoneTiles
-      val sheet = PixelTileAtlas.sanctuaryFlagstoneSheet
-      val rotatedSheet = PixelTileAtlas.sanctuaryFlagstoneSheetRotated
+      val tiles = FantasyHd128Atlas.hdSanctuaryStoneTiles
+      val tw = (64 * zoom).roundToInt() + 1
+      val th = (64 * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt() + 1
       for (ty in 10..28) for (tx in 21..39) {
         val hash = ((tx * 73856093 xor ty * 19349663) and 0x7fffffff)
-        drawGroundTile(
-          sheet, tiles, tx, ty, hash,
-          sx(tx * 64f).roundToInt(), sy(ty * 64f, 0f).roundToInt(),
-          (64 * zoom).roundToInt() + 1,
-          (64 * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt() + 1,
-          rotated = rotatedSheet,
+        drawImage(
+          image = tiles[hash % tiles.size],
+          dstOffset = IntOffset(sx(tx * 64f).roundToInt(), sy(ty * 64f, 0f).roundToInt()),
+          dstSize = IntSize(tw, th),
+          filterQuality = FilterQuality.None,
         )
       }
+      // HD-128 Central Astrolabe Sunburst Medallion
+      val medallion = FantasyHd128Atlas.hdPlazaCenterMedallion
+      val medW = (448f * zoom).roundToInt().coerceAtLeast(8)
+      val medH = (304f * zoom).roundToInt().coerceAtLeast(8)
+      drawImage(
+        image = medallion,
+        dstOffset = IntOffset((cx - medW / 2f).roundToInt(), (cy - medH / 2f).roundToInt()),
+        dstSize = IntSize(medW, medH),
+        alpha = 0.88f,
+        filterQuality = FilterQuality.None,
+      )
     }
 
     // 2. Concentric Carved Alabaster Rings

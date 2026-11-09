@@ -350,62 +350,23 @@ object HdrLightResponse {
 
   /** Roof/edge highlight hue answers differently per material. */
   private fun highlightTint(material: Material): Color = when (material) {
-    Material.STONE -> Color(0xffdce8f5.toInt())
-    Material.WOOD -> Color(0xffffd8a0.toInt())
-    Material.METAL -> Color(0xfff0f8ff.toInt())
-    Material.ROOF -> Color(0xffc9d6e8.toInt())
-    Material.FOLIAGE -> Color(0xffb8d8a8.toInt())
-    Material.CRYSTAL -> Color(0xffc4b5fd.toInt())
+    Material.STONE -> Color(0xFFFFF5D6.toInt())
+    Material.WOOD -> Color(0xFFFFDF9E.toInt())
+    Material.METAL -> Color(0xFFF0F9FF.toInt())
+    Material.ROOF -> Color(0xFFFFEAB3.toInt())
+    Material.FOLIAGE -> Color(0xFFD9F99D.toInt())
+    Material.CRYSTAL -> Color(0xFFDDD6FE.toInt())
   }
 
   private fun keyStrength(material: Material): Float = when (material) {
-    Material.STONE -> .155f
-    Material.WOOD -> .125f
-    Material.METAL -> .205f
-    Material.ROOF -> .175f
-    Material.FOLIAGE -> .100f
-    Material.CRYSTAL -> .190f
+    Material.STONE -> .175f
+    Material.WOOD -> .145f
+    Material.METAL -> .225f
+    Material.ROOF -> .195f
+    Material.FOLIAGE -> .120f
+    Material.CRYSTAL -> .210f
   }
 
-  /**
-   * P24 round-2 fix for "glow but still flat": grade the ACTUAL cached alpha silhouette
-   * of the building (the same Path used for projected shadows), with a diagonal
-   * key-light gradient. One cached path + one gradient drawPath per building, culled
-   * offscreen and BALANCED-only. This is a local tone map on the architecture itself,
-   * not a fullscreen pass, not a blur and not a sticker rectangle: roof, front and side
-   * planes gain separate values while pixel art stays sharp.
-   */
-  /**
-   * P27B-V5 checkpoint 3 (debt C): a building must ABSORB moonlight, not wear it.
-   *
-   * Measured before this code: at 00:00 the Gate facade was still 124 luma against a
-   * 160 noon value, while the global grade only applies flat navy over everything. The
-   * result reads as a photo pasted on a night scene, because bright ivory stone was
-   * being darkened by exactly the same amount as dark grass.
-   *
-   * This stamp uses the sprite's own cached silhouette and scales its density by the
-   * sprite's measured mean brightness, so pale limestone loses far more moonlight than
-   * a dark roof does. Emissive windows are drawn AFTER this pass, so they keep their
-   * glow instead of being dimmed with the wall.
-   */
-  /**
-   * Night response for GEOMETRY drawn in code rather than from a sprite.
-   *
-   * The perimeter ring (`SanctuaryWorldRenderer.drawFortressWall` and its two siblings) is
-   * one continuous fill per segment, so it never passes through drawNightAbsorption(). After
-   * the ring was repainted to ivory limestone that omission became visible in every night
-   * frame: the sky and grass went night-blue while the walls behind stayed bright, i.e. the
-   * exact "pasted on" look debt C was about, back on 3 of the 4 wall segments.
-   *
-   * Same rule and the same curve as the sprite path: a pale limestone face absorbs more than
-   * a dark roof. One extra path fill per segment (4 segments per frame), not a fullscreen pass.
-   *
-   * Measured effect (pixel-diff of `gate_night_z148` between `c7ffdc0` and `38645e3`,
-   * 2026-11-05): only 4046 of 1280x720 px change (0.44% of the frame), on the two wall
-   * segments visible in that camera, luma -8.7% there (164.6 -> 150.3). The southern wall
-   * sits outside that camera's view, so its calls change no pixel in that shot. Do not
-   * quote larger percentages for this pass.
-   */
   fun DrawScope.drawGeometryNightAbsorption(path: Path, baseLuma: Float) =
     drawGeometryNightAbsorptionImpl({ drawPath(path, it) }, baseLuma)
 
@@ -442,14 +403,10 @@ object HdrLightResponse {
     if (cx + halfW < 0f || cx - halfW > size.width ||
       baseY + ps * 2f < 0f || baseY - bounds.visibleHeight * ps > size.height
     ) return
-    // Pale stone absorbs more; a dark roof is already close to the night value.
     val pale = ((meanLuma(bmp) - 60f) / 120f).coerceIn(0f, 1f)
     val alpha = (night * (0.16f + 0.26f * pale)).coerceAtMost(.34f)
     if (alpha <= 0f) return
     val shape = SanctuaryEnvironmentShadows.silhouette(bmp)
-    // The silhouette Path lives in sprite-local units, so it is drawn through the same
-    // transform the volume grade uses. Color is a value class, so copy(alpha=) allocates
-    // nothing: this stays one drawPath per building per frame.
     withTransform({
       translate(cx, baseY)
       scale(ps, -ps, Offset.Zero)
@@ -493,8 +450,6 @@ object HdrLightResponse {
     val bmp = SanctuaryEnvironmentShadows.sprite(obs) ?: return
     val ps = ObliqueSpriteGeometry.pixelScale(obs.propKind) * s
     val bounds = ObliqueSpriteGeometry.bounds(bmp)
-    // Screen y of the bottom opaque sprite row. The silhouette Path uses y = 0 there
-    // and grows upward, so the canvas needs a negative Y scale to line it up.
     val footY = cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, bmp) * s
     val baseY = footY - (bounds.bottomPadding + 1f) * ps
     val halfW = bmp.width * ps * .5f
@@ -504,34 +459,23 @@ object HdrLightResponse {
     ) return
 
     val material = spec?.material ?: materialFor(obs.propKind)
-    // A whole-island 0.36 read must not get the same punch as a 1.48 closeup.
     val zoomFactor = (s / .88f).coerceIn(.55f, 1.10f)
     val key = keyStrength(material) * zoomFactor
-    // Night/rain lift only the LOCAL grade, capped so shadows never get crushed.
     val exposure = exposureBalance().coerceAtMost(1.30f)
     val roof = highlightTint(material)
-    val keyCol = Color(0xffe8e0c8.toInt()) // unified key light = SanctuaryLight colour
-    // Mean-neutral, contrast-expanding tone curve. Round 2 proved a bright-dominant
-    // ramp raises mean ~10% ("washed"); the shade side must be ~3x the highlight side
-    // because blending toward near-white moves luminance much further than blending
-    // toward deep navy. Highlights pop, shadows deepen but keep their detail.
-    // Direction is vertically biased so ROOF -> FRONT -> FOUNDATION separate, with a
-    // residual NW->SE tilt for the left/right plane.
+    val keyCol = Color(0xFFFFF2CC.toInt()) // Warm golden-champagne NW solar key light
     val brush = Brush.linearGradient(
-      0f to roof.copy(alpha = (key * .80f * exposure).coerceAtMost(.20f)),
-      .30f to keyCol.copy(alpha = (key * .52f * exposure).coerceAtMost(.14f)),
-      .44f to Color.Transparent,
-      1f to Color(0xff0a1220.toInt()).copy(alpha = (key * 2.60f * exposure).coerceAtMost(.42f)),
-      start = Offset(-bmp.width * .30f, bounds.visibleHeight.toFloat()),
-      end = Offset(bmp.width * .30f, 0f),
+      0f to roof.copy(alpha = (key * .95f * exposure).coerceAtMost(.24f)),
+      .34f to keyCol.copy(alpha = (key * .62f * exposure).coerceAtMost(.16f)),
+      .52f to Color.Transparent,
+      1f to Color(0xFF0B1326.toInt()).copy(alpha = (key * 1.95f * exposure).coerceAtMost(.32f)),
+      start = Offset(-bmp.width * .32f, bounds.visibleHeight.toFloat()),
+      end = Offset(bmp.width * .32f, 0f),
     )
-    // A second, purely horizontal pass on the SAME cached silhouette gives a real
-    // front/side plane break (right third reads as the shaded return wall). Two
-    // drawPath calls per building, still no per-frame bitmap and no fullscreen pass.
     val sideBrush = Brush.linearGradient(
       0f to Color.Transparent,
-      .48f to Color.Transparent,
-      1f to Color(0xff0a1220.toInt()).copy(alpha = (key * 1.55f * exposure).coerceAtMost(.28f)),
+      .52f to Color.Transparent,
+      1f to Color(0xFF0B1326.toInt()).copy(alpha = (key * 1.35f * exposure).coerceAtMost(.24f)),
       start = Offset(-bmp.width / 2f, 0f),
       end = Offset(bmp.width / 2f, 0f),
     )

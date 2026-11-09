@@ -329,23 +329,31 @@ object PixelCharacterAtlas {
     c.hLine(cx + rightLegDx - 2, legY + 4 + rightLegLift, 4, bootHi)
 
     // 3. Sculpted 3/4 Torso Armor / Tapered Coat + Sleeves + Pauldrons (Zero boxy rectangle look!)
-    // Flared lower coat hem / armored tassets
+    // Flared lower coat hem / armored tassets with gold trim hem
     c.fillRect(cx - 7, torsoY + 10, 15, 6, tunicShade)
     c.fillRect(cx - 6, torsoY + 10, 6, 5, tunicMain)
     c.fillRect(cx + 2, torsoY + 10, 6, 5, tunicMain)
-    // Tapered waist & sculpted chest
+    c.hLine(cx - 6, torsoY + 15, 13, trimAccent)
+    // Embroidered center tabard sash
+    c.fillRect(cx - 1, torsoY + 10, 3, 6, capeMain)
+    c.vLine(cx, torsoY + 10, 6, trimAccent)
+    // Tapered waist & sculpted chest with NMM specular breastplate crest
     c.fillRect(cx - 5, torsoY + 2, 11, 9, tunicShade)
     c.fillRect(cx - 4, torsoY + 2, 9, 8, tunicMain)
     c.fillRect(cx - 3, torsoY + 2, 4, 7, tunicHi)
+    c.set(cx - 2, torsoY + 3, 0xFFFFFFFF.toInt())
     // Back arm & sleeve
     c.fillRect(cx - 8, torsoY + 2, 3, 8, tunicShade)
     c.fillRect(cx - 8, torsoY + 9, 2, 2, skinShade)
-    // Leather belt & gold buckle
+    // Leather belt & ornate gold buckle
     c.fillRect(cx - 5, torsoY + 9, 11, 2, 0xFF3B2314.toInt())
-    c.fillRect(cx, torsoY + 9, 3, 2, 0xFFF5B841.toInt())
-    // Rounded 3/4 Shoulder Pauldrons & Collar Trim
+    c.fillRect(cx - 1, torsoY + 9, 4, 2, 0xFFF5B841.toInt())
+    c.set(cx, torsoY + 9, 0xFFFFFBEB.toInt())
+    // Rounded 3/4 Shoulder Pauldrons & Collar Trim with Specular Rim
     c.fillEllipse(cx - 5, torsoY + 2, 3, 2, trimAccent)
+    c.set(cx - 6, torsoY + 1, 0xFFFFFBEB.toInt())
     c.fillEllipse(cx + 5, torsoY + 2, 3, 2, trimAccent)
+    c.set(cx + 4, torsoY + 1, 0xFFFFFBEB.toInt())
     c.hLine(cx - 4, torsoY + 1, 9, 0xFFFFFBEB.toInt())
     c.vLine(cx + 1, torsoY + 3, 6, trimAccent)
 
@@ -364,9 +372,10 @@ object PixelCharacterAtlas {
     c.fillCircle(cx, headY + 8, 6, skinShade)
     if (!backView) {
       c.fillCircle(cx + 1, headY + 8, 5, skin)
-      // Crisp 2x3 expressive anime/manhwa pixel eyes facing 3/4 right!
+      // Crisp 2x3 expressive anime/fantasy pixel eyes facing 3/4 right with luminous iris!
       c.fillRect(cx, headY + 8, 2, 3, 0xFFFFFFFF.toInt())
       c.fillRect(cx + 1, headY + 8, 1, 3, eyeColor)
+      c.set(cx, headY + 8, 0xFFFFFFFF.toInt())
       c.fillRect(cx + 4, headY + 8, 2, 3, 0xFFFFFFFF.toInt())
       c.fillRect(cx + 5, headY + 8, 1, 3, eyeColor)
       c.set(cx + 3, headY + 11, skinShade)
