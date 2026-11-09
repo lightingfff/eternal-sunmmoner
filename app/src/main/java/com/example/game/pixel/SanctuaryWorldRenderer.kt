@@ -179,7 +179,14 @@ object SanctuaryWorldRenderer {
       // 3C. Landscaped Residential Courtyard Dirt Paths, Hedge Maze & Low Stone Garden Borders
       drawResidentialGardenCourtyards(::sx, ::sy, zoom)
 
-      // 3D. Smooth Continuous Curbed Grey-Cobblestone Road Network (zero jagged stair-steps!)
+      // 3C-2. Eastern Sakura Reflection Pond & Lotus Stepping-Stone Terrace + Northern Tower Gate Starlight Forecourt
+      drawEasternSakuraLotusGarden(::sx, ::sy, zoom, timeSec)
+      drawNorthernTowerGateForecourt(::sx, ::sy, zoom, timeSec)
+
+      // 3C-3. Celestial Crystal River, Sacred Spring & Animated Koi/Caustics (drawn before roads/bridges so bridges span over water!)
+      drawCelestialRiverChannel(::sx, ::sy, zoom, timeSec)
+
+      // 3D. Smooth Continuous Curbed Grey-Cobblestone Road Network + Royal Crimson-Gold Processional Carpet Runners
       drawCurbedCobblestoneRoadNetwork(
         paths = paths,
         sx = ::sx,
@@ -192,19 +199,23 @@ object SanctuaryWorldRenderer {
         tileScreenW = tileScreenW,
         tileScreenH = tileScreenH,
       )
+      drawArchedMarbleFootbridges(::sx, ::sy, zoom)
 
-      // 3E. Monumental Central Circular White Stone Plaza, 4 Pastel Elemental Runes & Grand SE Staircase
+      // 3E. Monumental Central Circular White Stone Plaza, 4 Pastel Elemental Runes, Central Astral Fountain & Grand SE Staircase
       with(PremiumSliceRenderer) { drawSmithyVerge(camX,camY,zoom) }
       drawCentralCircularWhitePlaza(::sx, ::sy, zoom, timeSec)
 
-      // 3F. Dark Fantasy Ambient Occlusion - soft contact shadows under walls, plaza rim, gate
+      // 3F. Dark Fantasy Ambient Occlusion - deep contact shadows under walls, plaza rim, river banks, gate
       drawSanctuaryAmbientOcclusion(::sx, ::sy, zoom)
 
-      // 3G. HD-2D Shader Ground Sun Pools, Cloud Drift Shadows & Stone/Runic Specular Reflections
+      // 3G. HD-2D Shader Ground Sun Pools, Cloud Drift Shadows, Dappled Canopy Gobos & Specular Reflections
       with(SanctuarySunlightSystem) {
         drawGroundSunPoolsAndSpecularity(camX, camY, zoom, timeSec)
       }
     }
+
+    // 3H. Twin Cliffside Cascading Waterfalls & Rising Prism Mist on the Southern Cliff Drop-off
+    drawSouthernCliffWaterfalls(::sx, ::sy, zoom, timeSec)
 
     // 4. Southern Main Gate Raised Stone Courtyard, Flanking Angled Stairs & Dual Wooden Drawbridges
     drawSouthernMainGateAndBridges(::sx, ::sy, zoom)
@@ -824,6 +835,278 @@ object SanctuaryWorldRenderer {
     drawLowGardenWall(1255f, 965f, 1268f, 1292f)
   }
 
+  private fun DrawScope.drawEasternSakuraLotusGarden(
+    sx: (Float) -> Float,
+    sy: (Float, Float) -> Float,
+    zoom: Float,
+    timeSec: Float,
+  ) {
+    // Eastern Sacred Sakura Reflection Pond & Lotus Terrace (x=2595, y=1320)
+    val pondCx = sx(2595f)
+    val pondCy = sy(1320f, 0f)
+    val rx = 185f * zoom
+    val ry = 132f * zoom * ObliqueCamera.OBLIQUE_Y_SCALE
+    if (pondCx + rx < -40f || pondCx - rx > size.width + 40f || pondCy + ry < -40f || pondCy - ry > size.height + 40f) return
+
+    // Carved white-marble reflection basin curb & gold inlay
+    drawOval(Color(0xFF172234), Offset(pondCx - rx * 1.12f, pondCy - ry * 1.10f + 4f * zoom), Size(rx * 2.24f, ry * 2.20f))
+    drawOval(Color(0xFFE5DFD3), Offset(pondCx - rx * 1.08f, pondCy - ry * 1.08f), Size(rx * 2.16f, ry * 2.16f))
+    drawOval(Color(0xFFD4AF37), Offset(pondCx - rx * 1.02f, pondCy - ry * 1.02f), Size(rx * 2.04f, ry * 2.04f), style = Stroke(width = 2.0f * zoom))
+
+    // Deep crystal-sapphire & turquoise water fill
+    drawOval(
+      brush = Brush.radialGradient(
+        colors = listOf(Color(0xFF0EA5E9), Color(0xFF0284C7), Color(0xFF0F294A)),
+        center = Offset(pondCx - rx * 0.15f, pondCy - ry * 0.15f),
+        radius = rx.coerceAtLeast(10f),
+      ),
+      topLeft = Offset(pondCx - rx, pondCy - ry),
+      size = Size(rx * 2f, ry * 2f),
+    )
+
+    // Animated water ripples, floating lotus lilypads, and swimming golden koi
+    for (r in 0..2) {
+      val phase = ((timeSec * 0.45f + r * 0.33f) % 1f)
+      val rrx = rx * (0.25f + phase * 0.65f)
+      val rry = ry * (0.25f + phase * 0.65f)
+      drawOval(
+        color = Color(0xFFBAE6FD).copy(alpha = (1f - phase) * 0.42f),
+        topLeft = Offset(pondCx - rrx, pondCy - rry),
+        size = Size(rrx * 2f, rry * 2f),
+        style = Stroke(width = (1.4f * zoom).coerceAtLeast(0.8f)),
+      )
+    }
+
+    // 5 Emerald lilypads with glowing pink sakura lotus blossoms
+    val lilyOffsets = listOf(-0.48f to -0.25f, 0.42f to -0.32f, -0.32f to 0.38f, 0.36f to 0.34f, 0.05f to -0.08f)
+    lilyOffsets.forEachIndexed { idx, (dx, dy) ->
+      val lx = pondCx + dx * rx + sin(timeSec * 1.2f + idx) * 2.5f * zoom
+      val ly = pondCy + dy * ry
+      val padRx = 14f * zoom
+      val padRy = 10f * zoom
+      drawOval(Color(0xFF15803D), Offset(lx - padRx, ly - padRy), Size(padRx * 2f, padRy * 2f))
+      drawOval(Color(0xFF4ADE80), Offset(lx - padRx * 0.75f, ly - padRy * 0.75f), Size(padRx * 1.5f, padRy * 1.5f))
+      // Blooming lotus flower
+      drawCircle(Color(0xFFF472B6), radius = 5.2f * zoom, center = Offset(lx, ly - 1.5f * zoom))
+      drawCircle(Color(0xFFFBCFE8), radius = 3.2f * zoom, center = Offset(lx, ly - 2.0f * zoom))
+      drawCircle(Color(0xFFFEF08A), radius = 1.6f * zoom, center = Offset(lx, ly - 2.0f * zoom))
+    }
+
+    // 3 Swimming Golden Koi fish
+    for (k in 0..2) {
+      val ang = timeSec * (0.85f + k * 0.22f) + k * 2.1f
+      val kx = pondCx + cos(ang) * rx * (0.35f + k * 0.14f)
+      val ky = pondCy + sin(ang) * ry * (0.35f + k * 0.14f)
+      drawOval(Color(0xFFFB923C), Offset(kx - 5.5f * zoom, ky - 2.8f * zoom), Size(11f * zoom, 5.6f * zoom))
+      drawCircle(Color(0xFFFFFBEB), radius = 2.2f * zoom, center = Offset(kx + 2f * zoom, ky))
+    }
+  }
+
+  private fun DrawScope.drawNorthernTowerGateForecourt(
+    sx: (Float) -> Float,
+    sy: (Float, Float) -> Float,
+    zoom: Float,
+    timeSec: Float,
+  ) {
+    // Grand Obsidian & Starlight Zodiac Forecourt at the foot of the Tower Gate (x=1960, y=645)
+    val fCx = sx(1960f)
+    val fCy = sy(645f, 0f)
+    val rx = 245f * zoom
+    val ry = 165f * zoom * ObliqueCamera.OBLIQUE_Y_SCALE
+    if (fCx + rx < -40f || fCx - rx > size.width + 40f || fCy + ry < -40f || fCy - ry > size.height + 40f) return
+
+    val pulse = 0.80f + 0.20f * sin(timeSec * 2.6f)
+    drawOval(Color(0xFF0D1326), Offset(fCx - rx * 1.04f, fCy - ry * 1.04f + 4f * zoom), Size(rx * 2.08f, ry * 2.08f))
+    drawOval(Color(0xFF1E293B), Offset(fCx - rx, fCy - ry), Size(rx * 2f, ry * 2f))
+    drawOval(Color(0xFFD4AF37), Offset(fCx - rx * 0.96f, fCy - ry * 0.96f), Size(rx * 1.92f, ry * 1.92f), style = Stroke(width = 2.2f * zoom))
+    drawOval(Color(0xFF38BDF8).copy(alpha = 0.72f * pulse), Offset(fCx - rx * 0.76f, fCy - ry * 0.76f), Size(rx * 1.52f, ry * 1.52f), style = Stroke(width = 1.8f * zoom))
+    drawOval(Color(0xFFA78BFA).copy(alpha = 0.58f * pulse), Offset(fCx - rx * 0.52f, fCy - ry * 0.52f), Size(rx * 1.04f, ry * 1.04f), style = Stroke(width = 1.4f * zoom))
+
+    // 8 Starlight constellation spokes radiating from the portal forecourt
+    for (i in 0 until 8) {
+      val a = i * (Math.PI / 4.0)
+      val c = cos(a).toFloat()
+      val s = sin(a).toFloat()
+      drawLine(
+        color = Color(0xFF38BDF8).copy(alpha = 0.45f * pulse),
+        start = Offset(fCx + c * rx * 0.25f, fCy + s * ry * 0.25f),
+        end = Offset(fCx + c * rx * 0.92f, fCy + s * ry * 0.92f),
+        strokeWidth = (1.5f * zoom).coerceAtLeast(0.8f),
+      )
+    }
+  }
+
+  private fun DrawScope.drawCelestialRiverChannel(
+    sx: (Float) -> Float,
+    sy: (Float, Float) -> Float,
+    zoom: Float,
+    timeSec: Float,
+  ) {
+    // Celestial Mana River winding from the Eastern Sacred Spring around the Plaza crescent down to the Southern Cliff Waterfalls
+    val riverSpine = listOf(
+      2595f to 1320f,
+      2480f to 980f,
+      2210f to 785f,
+      1750f to 760f,
+      1475f to 995f,
+      1455f to 1340f,
+      1505f to 1720f,
+      1335f to 2060f,
+      1315f to 2375f,
+    )
+    val eastBranch = listOf(
+      1505f to 1720f,
+      1760f to 1980f,
+      1895f to 2375f,
+    )
+
+    fun drawWaterBranch(pts: List<Pair<Float, Float>>, widthWorld: Float) {
+      for (i in 0 until pts.size - 1) {
+        val (x0, y0) = pts[i]
+        val (x1, y1) = pts[i + 1]
+        val p0 = Offset(sx(x0), sy(y0, 0f))
+        val p1 = Offset(sx(x1), sy(y1, 0f))
+        val wPx = widthWorld * zoom
+        // Carved stone canal banks + deep shadow lip
+        drawLine(Color(0xFF141E30), p0, p1, strokeWidth = wPx * 1.32f, cap = androidx.compose.ui.graphics.StrokeCap.Round)
+        drawLine(Color(0xFFD6CFC2), p0, p1, strokeWidth = wPx * 1.18f, cap = androidx.compose.ui.graphics.StrokeCap.Round)
+        // Deep sapphire outer water
+        drawLine(Color(0xFF0369A1), p0, p1, strokeWidth = wPx * 0.96f, cap = androidx.compose.ui.graphics.StrokeCap.Round)
+        // Luminous turquoise-cyan inner current
+        drawLine(Color(0xFF0EA5E9), p0, p1, strokeWidth = wPx * 0.68f, cap = androidx.compose.ui.graphics.StrokeCap.Round)
+        // Animated shimmering water caustics along the channel
+        for (m in 0..3) {
+          val t = ((timeSec * 0.38f + m * 0.25f + i * 0.17f) % 1f)
+          val mx = p0.x + (p1.x - p0.x) * t
+          val my = p0.y + (p1.y - p0.y) * t
+          drawOval(
+            color = Color(0xFFE0F2FE).copy(alpha = 0.55f),
+            topLeft = Offset(mx - 8f * zoom, my - 3.5f * zoom),
+            size = Size(16f * zoom, 7f * zoom),
+          )
+        }
+      }
+    }
+
+    drawWaterBranch(riverSpine, 56f)
+    drawWaterBranch(eastBranch, 48f)
+  }
+
+  private fun DrawScope.drawArchedMarbleFootbridges(
+    sx: (Float) -> Float,
+    sy: (Float, Float) -> Float,
+    zoom: Float,
+  ) {
+    // Sculpted 2.5D Arched White-Marble & Gold-Filigree Stone Footbridges where avenues cross the Celestial River
+    val bridges = listOf(
+      Triple(1455f, 1340f, true),  // Mid-West Avenue Bridge
+      Triple(1505f, 1720f, false), // Southern Spine Bridge
+      Triple(1545f, 825f, false),  // Northern Spine Bridge
+    )
+    bridges.forEach { (bxWorld, byWorld, horizontal) ->
+      val cx = sx(bxWorld)
+      val cy = sy(byWorld, 0f)
+      val bridgeW = (if (horizontal) 96f else 112f) * zoom
+      val bridgeH = (if (horizontal) 62f else 54f) * zoom
+      if (cx + bridgeW < -20f || cx - bridgeW > size.width + 20f) return@forEach
+
+      // Bridge shadow on water
+      drawRoundRect(
+        color = Color(0x88040B18),
+        topLeft = Offset(cx - bridgeW * 0.54f, cy - bridgeH * 0.46f + 6f * zoom),
+        size = Size(bridgeW * 1.08f, bridgeH * 0.96f),
+        cornerRadius = androidx.compose.ui.geometry.CornerRadius(10f * zoom, 10f * zoom),
+      )
+      // Ivory marble deck
+      drawRoundRect(
+        color = Color(0xFFEAE3D2),
+        topLeft = Offset(cx - bridgeW * 0.50f, cy - bridgeH * 0.50f),
+        size = Size(bridgeW, bridgeH),
+        cornerRadius = androidx.compose.ui.geometry.CornerRadius(8f * zoom, 8f * zoom),
+      )
+      // Royal crimson & gold carpet runner over bridge center
+      drawRoundRect(
+        color = Color(0xFF991B1B),
+        topLeft = Offset(cx - bridgeW * 0.34f, cy - bridgeH * 0.34f),
+        size = Size(bridgeW * 0.68f, bridgeH * 0.68f),
+        cornerRadius = androidx.compose.ui.geometry.CornerRadius(4f * zoom, 4f * zoom),
+      )
+      drawRoundRect(
+        color = Color(0xFFF5B841),
+        topLeft = Offset(cx - bridgeW * 0.50f, cy - bridgeH * 0.50f),
+        size = Size(bridgeW, bridgeH),
+        cornerRadius = androidx.compose.ui.geometry.CornerRadius(8f * zoom, 8f * zoom),
+        style = Stroke(width = 2.2f * zoom),
+      )
+      // Corner marble newel posts with golden orbs
+      for (dx in listOf(-0.48f, 0.48f)) {
+        for (dy in listOf(-0.48f, 0.48f)) {
+          val px = cx + bridgeW * dx
+          val py = cy + bridgeH * dy
+          drawRect(Color(0xFFD6CFC2), Offset(px - 4.5f * zoom, py - 9f * zoom), Size(9f * zoom, 12f * zoom))
+          drawCircle(Color(0xFFFBBF24), radius = 3.6f * zoom, center = Offset(px, py - 10f * zoom))
+        }
+      }
+    }
+  }
+
+  private fun DrawScope.drawSouthernCliffWaterfalls(
+    sx: (Float) -> Float,
+    sy: (Float, Float) -> Float,
+    zoom: Float,
+    timeSec: Float,
+  ) {
+    // Twin Cascading Crystal Waterfalls plunging off the Southern Cliff at x=1315 and x=1895
+    val fallSpots = listOf(1315f to 2372f, 1895f to 2372f)
+    fallSpots.forEachIndexed { idx, (fxWorld, fyWorld) ->
+      val cx = sx(fxWorld)
+      val topY = sy(fyWorld, 0f)
+      val fallW = 46f * zoom
+      val fallH = 225f * zoom
+      if (cx + fallW < -40f || cx - fallW > size.width + 40f || topY > size.height + 40f) return@forEachIndexed
+
+      // Deep sapphire waterfall body
+      drawRect(
+        brush = Brush.verticalGradient(
+          colors = listOf(Color(0xFF38BDF8), Color(0xFF0284C7), Color(0x440EA5E9), Color.Transparent),
+          startY = topY,
+          endY = topY + fallH,
+        ),
+        topLeft = Offset(cx - fallW * 0.5f, topY),
+        size = Size(fallW, fallH),
+      )
+      // Animated white-water foam ribbons cascading downward
+      for (s in 0..5) {
+        val dropFrac = ((timeSec * 0.85f + s * 0.17f + idx * 0.3f) % 1f)
+        val syFoam = topY + dropFrac * fallH * 0.88f
+        val sxOff = (s - 2.5f) * 6.5f * zoom
+        drawLine(
+          color = Color(0xFFE0F2FE).copy(alpha = (1f - dropFrac) * 0.82f),
+          start = Offset(cx + sxOff, syFoam),
+          end = Offset(cx + sxOff, syFoam + 26f * zoom),
+          strokeWidth = 3.2f * zoom,
+          cap = androidx.compose.ui.graphics.StrokeCap.Round,
+        )
+      }
+      // Top crest foam lip & bottom rising mist cloud
+      drawOval(
+        color = Color(0xFFF0F9FF).copy(alpha = 0.88f),
+        topLeft = Offset(cx - fallW * 0.62f, topY - 6f * zoom),
+        size = Size(fallW * 1.24f, 14f * zoom),
+      )
+      val mistPulse = 0.85f + 0.15f * sin(timeSec * 2.2f + idx)
+      drawOval(
+        brush = Brush.radialGradient(
+          colors = listOf(Color(0x66E0F2FE), Color(0x2838BDF8), Color.Transparent),
+          center = Offset(cx, topY + fallH * 0.78f),
+          radius = (fallW * 1.6f * mistPulse).coerceAtLeast(8f),
+        ),
+        topLeft = Offset(cx - fallW * 1.6f, topY + fallH * 0.55f),
+        size = Size(fallW * 3.2f, fallW * 1.5f),
+      )
+    }
+  }
+
   private fun DrawScope.drawCentralCircularWhitePlaza(
     sx: (Float) -> Float,
     sy: (Float, Float) -> Float,
@@ -837,10 +1120,31 @@ object SanctuaryWorldRenderer {
 
     if (cx + rx < -60f || cx - rx > size.width + 60f || cy + ry < -60f || cy - ry > size.height + 60f) return
 
-    // 1. Stepped Outer Limestone Curb & Drop Shadow
-    drawOval(Color(0xFF1E2028), Offset(cx - rx * 1.02f, cy - ry * 1.01f + 6f * zoom), Size(rx * 2.04f, ry * 2.02f))
-    drawOval(Color(0xFF3A3D4A), Offset(cx - rx * 1.01f, cy - ry * 1.01f), Size(rx * 2.02f, ry * 2.02f))
-    drawOval(Color(0xFF4A4D5E), Offset(cx - rx * 0.96f, cy - ry * 0.96f), Size(rx * 1.92f, ry * 1.92f))
+    // 0. Royal Crimson & Gold Ceremonial Processional Carpet Runners leading to the Plaza
+    val northCarpet = Path().apply {
+      moveTo(sx(1912f), sy(640f, 0f))
+      lineTo(sx(1968f), sy(640f, 0f))
+      lineTo(sx(1972f), sy(940f, 0f))
+      lineTo(sx(1908f), sy(940f, 0f))
+      close()
+    }
+    drawPath(northCarpet, Color(0xFF881337))
+    drawPath(northCarpet, Color(0xFFF5B841), style = Stroke(width = 2.0f * zoom))
+
+    val southCarpet = Path().apply {
+      moveTo(sx(1576f), sy(1735f, 0f))
+      lineTo(sx(1636f), sy(1735f, 0f))
+      lineTo(sx(1642f), sy(2210f, 0f))
+      lineTo(sx(1572f), sy(2210f, 0f))
+      close()
+    }
+    drawPath(southCarpet, Color(0xFF881337))
+    drawPath(southCarpet, Color(0xFFF5B841), style = Stroke(width = 2.0f * zoom))
+
+    // 1. Stepped Outer Limestone & Royal Gold Curb + Deep Drop Shadow
+    drawOval(Color(0xFF0A1020), Offset(cx - rx * 1.03f, cy - ry * 1.02f + 8f * zoom), Size(rx * 2.06f, ry * 2.04f))
+    drawOval(Color(0xFFD6CFC2), Offset(cx - rx * 1.01f, cy - ry * 1.01f), Size(rx * 2.02f, ry * 2.02f))
+    drawOval(Color(0xFFEAE3D2), Offset(cx - rx * 0.96f, cy - ry * 0.96f), Size(rx * 1.92f, ry * 1.92f))
 
     val plazaClip = Path().apply { addOval(androidx.compose.ui.geometry.Rect(cx-rx*0.95f,cy-ry*0.95f,cx+rx*0.95f,cy+ry*0.95f)) }
     clipPath(plazaClip) {
@@ -858,65 +1162,100 @@ object SanctuaryWorldRenderer {
       }
       // HD-128 Central Astrolabe Sunburst Medallion
       val medallion = FantasyHd128Atlas.hdPlazaCenterMedallion
-      val medW = (448f * zoom).roundToInt().coerceAtLeast(8)
-      val medH = (304f * zoom).roundToInt().coerceAtLeast(8)
+      val medW = (456f * zoom).roundToInt().coerceAtLeast(8)
+      val medH = (310f * zoom).roundToInt().coerceAtLeast(8)
       drawImage(
         image = medallion,
         dstOffset = IntOffset((cx - medW / 2f).roundToInt(), (cy - medH / 2f).roundToInt()),
         dstSize = IntSize(medW, medH),
-        alpha = 0.88f,
+        alpha = 0.92f,
         filterQuality = FilterQuality.None,
       )
     }
 
-    // 2. Concentric Carved Alabaster Rings
+    // 2. Concentric Carved Royal Alabaster, Sapphire Lapis & Gold-Filigree Mosaic Rings
     val ringFractions = listOf(1.01f, 0.95f, 0.72f, 0.62f, 0.44f, 0.34f, 0.22f)
-    drawOval(Color(0xFF2E3142).copy(alpha = 0.38f), Offset(cx - rx * 0.72f, cy - ry * 0.72f), Size(rx * 1.44f, ry * 1.44f))
-    drawOval(Color(0xFF3A3D4A).copy(alpha = 0.38f), Offset(cx - rx * 0.62f, cy - ry * 0.62f), Size(rx * 1.24f, ry * 1.24f))
-    drawOval(Color(0xFF353845).copy(alpha = 0.38f), Offset(cx - rx * 0.34f, cy - ry * 0.34f), Size(rx * 0.68f, ry * 0.68f))
-    drawOval(Color(0xFF40445A).copy(alpha = 0.38f), Offset(cx - rx * 0.22f, cy - ry * 0.22f), Size(rx * 0.44f, ry * 0.44f))
+    drawOval(Color(0xFF1E3A8A).copy(alpha = 0.22f), Offset(cx - rx * 0.72f, cy - ry * 0.72f), Size(rx * 1.44f, ry * 1.44f))
+    drawOval(Color(0xFFFef3c7).copy(alpha = 0.20f), Offset(cx - rx * 0.62f, cy - ry * 0.62f), Size(rx * 1.24f, ry * 1.24f))
+    drawOval(Color(0xFF0284C7).copy(alpha = 0.24f), Offset(cx - rx * 0.34f, cy - ry * 0.34f), Size(rx * 0.68f, ry * 0.68f))
+    drawOval(Color(0xFFFDE68A).copy(alpha = 0.30f), Offset(cx - rx * 0.22f, cy - ry * 0.22f), Size(rx * 0.44f, ry * 0.44f))
 
-    // Radial Stone Joints (16 divisions across outer & mid bands)
+    // Radial Gold-Inlaid Stone Joints (16 divisions across outer & mid bands)
     for (i in 0 until 16) {
       val ang = i * (Math.PI * 2.0 / 16.0)
       val cA = cos(ang).toFloat()
       val sA = sin(ang).toFloat()
       drawLine(
-        color = Color(0xFF2A2D3A),
+        color = if (i % 2 == 0) Color(0xFFD4AF37).copy(alpha = 0.62f) else Color(0xFF64748B).copy(alpha = 0.45f),
         start = Offset(cx + cA * rx * 0.22f, cy + sA * ry * 0.22f),
         end = Offset(cx + cA * rx * 0.95f, cy + sA * ry * 0.95f),
-        strokeWidth = (1.3f * zoom).coerceAtLeast(0.8f),
+        strokeWidth = (1.5f * zoom).coerceAtLeast(0.8f),
       )
     }
 
     ringFractions.forEachIndexed { idx, frac ->
       drawOval(
-        color = if (idx == 0) Color(0xFF1E2028) else Color(0xFF3A3D4A),
+        color = when (idx) {
+          0 -> Color(0xFF1E293B)
+          1, 3, 5 -> Color(0xFFD4AF37).copy(alpha = 0.82f)
+          else -> Color(0xFF38BDF8).copy(alpha = 0.55f)
+        },
         topLeft = Offset(cx - rx * frac, cy - ry * frac),
         size = Size(rx * frac * 2f, ry * frac * 2f),
-        style = Stroke(width = (if (idx <= 1) 2.2f else 1.5f) * zoom),
+        style = Stroke(width = (if (idx <= 1) 2.4f else 1.7f) * zoom),
       )
     }
 
-    // 3. Subtle Central Astrolabe Energy Core Pulse & Four Inlaid Pastel Elemental Magic Rune Circles
+    // 3. Sculpted 2.5D Central Astral Fountain Basin & Floating Crystal Sundial Core + Four Elemental Rune Circles
     val pulse = 0.78f + 0.22f * sin(timeSec * 2.4f)
+    val hoverY = sin(timeSec * 2.8f) * 4.5f * zoom
+    // Fountain marble basin rim & glowing azure water pool
     drawOval(
-      color = Color(0xFFBAE6FD).copy(alpha = 0.28f * pulse),
-      topLeft = Offset(cx - rx * 0.16f, cy - ry * 0.16f),
-      size = Size(rx * 0.32f, ry * 0.32f),
+      color = Color(0xFF0F172A).copy(alpha = 0.55f),
+      topLeft = Offset(cx - rx * 0.155f, cy - ry * 0.150f + 4f * zoom),
+      size = Size(rx * 0.31f, ry * 0.30f),
     )
     drawOval(
-      color = Color(0xFFF5B841).copy(alpha = 0.62f * pulse),
-      topLeft = Offset(cx - rx * 0.11f, cy - ry * 0.11f),
-      size = Size(rx * 0.22f, ry * 0.22f),
-      style = Stroke(width = 1.6f * zoom),
+      color = Color(0xFFEAE3D2),
+      topLeft = Offset(cx - rx * 0.15f, cy - ry * 0.15f),
+      size = Size(rx * 0.30f, ry * 0.30f),
     )
+    drawOval(
+      brush = Brush.radialGradient(
+        colors = listOf(Color(0xFF7DD3FC), Color(0xFF0284C7), Color(0xFF1E3A8A)),
+        center = Offset(cx, cy),
+        radius = (rx * 0.13f).coerceAtLeast(6f),
+      ),
+      topLeft = Offset(cx - rx * 0.13f, cy - ry * 0.13f),
+      size = Size(rx * 0.26f, ry * 0.26f),
+    )
+    drawOval(
+      color = Color(0xFFF5B841),
+      topLeft = Offset(cx - rx * 0.15f, cy - ry * 0.15f),
+      size = Size(rx * 0.30f, ry * 0.30f),
+      style = Stroke(width = 2.2f * zoom),
+    )
+    // Floating 3D Astral Crystal Spire rising from the center of the fountain
+    val crystalBaseY = cy - 4f * zoom + hoverY
+    val crystalTopY = cy - 44f * zoom + hoverY
+    val crystalW = 14f * zoom
+    val crystalPath = Path().apply {
+      moveTo(cx, crystalTopY)
+      lineTo(cx + crystalW, crystalBaseY - 14f * zoom)
+      lineTo(cx, crystalBaseY)
+      lineTo(cx - crystalW, crystalBaseY - 14f * zoom)
+      close()
+    }
+    drawPath(crystalPath, Color(0xFF38BDF8).copy(alpha = 0.90f))
+    drawPath(crystalPath, Color(0xFFE0F2FE), style = Stroke(width = 1.6f * zoom))
+    drawCircle(Color(0xFFFFFBEB).copy(alpha = pulse), radius = 4.5f * zoom, center = Offset(cx, crystalTopY + 12f * zoom))
+
     data class ElementalRune(val dxFrac: Float, val dyFrac: Float, val outerCol: Color, val innerCol: Color)
     val runes = listOf(
       ElementalRune(0f, -0.78f, Color(0xFFF472B6), Color(0xFFFCE7F3)), // North: Sakura Rose
       ElementalRune(-0.78f, 0f, Color(0xFFEAB308), Color(0xFFFEF9C3)), // West: Solar Gold
       ElementalRune(0.78f, 0f, Color(0xFFF59E0B), Color(0xFFFEF3C7)),  // East: Amber Star
-      ElementalRune(0f, 0.78f, Color(0xFF818CF8), Color(0xFFE0E7FF)),  // South: Astral Azure
+      ElementalRune(0f, 0.78f, Color(0xFF38BDF8), Color(0xFFE0F2FE)),  // South: Astral Azure
     )
 
     val runeRx = rx * 0.145f
@@ -925,35 +1264,35 @@ object SanctuaryWorldRenderer {
       val rCx = cx + r.dxFrac * rx
       val rCy = cy + r.dyFrac * ry
       drawOval(
-        color = r.innerCol.copy(alpha = 0.85f * pulse),
+        color = r.innerCol.copy(alpha = 0.88f * pulse),
         topLeft = Offset(rCx - runeRx, rCy - runeRy),
         size = Size(runeRx * 2f, runeRy * 2f),
       )
       drawOval(
-        color = r.outerCol.copy(alpha = 0.85f),
+        color = r.outerCol.copy(alpha = 0.92f),
         topLeft = Offset(rCx - runeRx, rCy - runeRy),
         size = Size(runeRx * 2f, runeRy * 2f),
-        style = Stroke(width = 2.2f * zoom),
+        style = Stroke(width = 2.4f * zoom),
       )
       drawOval(
-        color = r.outerCol.copy(alpha = 0.72f),
+        color = r.outerCol.copy(alpha = 0.78f),
         topLeft = Offset(rCx - runeRx * 0.65f, rCy - runeRy * 0.65f),
         size = Size(runeRx * 1.30f, runeRy * 1.30f),
-        style = Stroke(width = 1.4f * zoom),
+        style = Stroke(width = 1.5f * zoom),
       )
       for (k in 0 until 6) {
         val a1 = k * (Math.PI / 3.0)
         val a2 = (k + 2) * (Math.PI / 3.0)
         drawLine(
-          color = r.outerCol.copy(alpha = 0.65f),
+          color = r.outerCol.copy(alpha = 0.72f),
           start = Offset(rCx + cos(a1).toFloat() * runeRx * 0.65f, rCy + sin(a1).toFloat() * runeRy * 0.65f),
           end = Offset(rCx + cos(a2).toFloat() * runeRx * 0.65f, rCy + sin(a2).toFloat() * runeRy * 0.65f),
-          strokeWidth = (1.1f * zoom).coerceAtLeast(0.7f),
+          strokeWidth = (1.2f * zoom).coerceAtLeast(0.7f),
         )
       }
     }
 
-    // 4. Grand Diagonal 8-Step Stone Staircase Linking SE Plaza Rim -> Classical Amphitheatre Stage
+    // 4. Grand Diagonal 8-Step Royal Marble & Carpeted Staircase Linking SE Plaza Rim -> Classical Amphitheatre Stage
     val stairSteps = 8
     for (s in 0 until stairSteps) {
       val t0 = s.toFloat() / stairSteps
@@ -973,12 +1312,14 @@ object SanctuaryWorldRenderer {
         lineTo(sx(lx1), sy(ly1, 0f))
         close()
       }
-      drawPath(stepPath, if (s % 2 == 0) Color(0xFF4A4D5E) else Color(0xFF3A3D4A))
-      drawLine(Color(0xFF757065), Offset(sx(lx1), sy(ly1, 0f)), Offset(sx(rx1), sy(ry1, 0f)), strokeWidth = (1.5f * zoom).coerceAtLeast(0.9f))
+      drawPath(stepPath, if (s % 2 == 0) Color(0xFFD6CFC2) else Color(0xFFBDB5A6))
+      drawLine(Color(0xFF5C5449), Offset(sx(lx1), sy(ly1, 0f)), Offset(sx(rx1), sy(ry1, 0f)), strokeWidth = (1.6f * zoom).coerceAtLeast(0.9f))
     }
-    // Sloped stone cheek balustrades flanking the grand plaza-to-amphitheatre steps
-    drawLine(Color(0xFFDFDBD0), Offset(sx(2112f), sy(1688f, 10f)), Offset(sx(2258f), sy(1836f, 4f)), strokeWidth = 5.5f * zoom)
-    drawLine(Color(0xFFDFDBD0), Offset(sx(2258f), sy(1572f, 10f)), Offset(sx(2402f), sy(1720f, 4f)), strokeWidth = 5.5f * zoom)
+    // Sloped stone cheek balustrades with golden trim flanking the grand plaza-to-amphitheatre steps
+    drawLine(Color(0xFFEAE3D2), Offset(sx(2112f), sy(1688f, 10f)), Offset(sx(2258f), sy(1836f, 4f)), strokeWidth = 6.0f * zoom)
+    drawLine(Color(0xFFEAE3D2), Offset(sx(2258f), sy(1572f, 10f)), Offset(sx(2402f), sy(1720f, 4f)), strokeWidth = 6.0f * zoom)
+    drawLine(Color(0xFFD4AF37), Offset(sx(2112f), sy(1688f, 12f)), Offset(sx(2258f), sy(1836f, 6f)), strokeWidth = 2.0f * zoom)
+    drawLine(Color(0xFFD4AF37), Offset(sx(2258f), sy(1572f, 12f)), Offset(sx(2402f), sy(1720f, 6f)), strokeWidth = 2.0f * zoom)
   }
 
   private fun DrawScope.drawSouthernMainGateAndBridges(
@@ -1391,30 +1732,38 @@ object SanctuaryWorldRenderer {
     zoom: Float,
   ) {
     with(SanctuaryDarkFantasyShaders) {
-      // AO under northern fortress wall (long dark strip) + stone crevice
+      // Deep AO under northern fortress wall + stone crevice
       val nL = sx(980f)
       val nR = sx(2240f)
       val nT = sy(340f, 0f)
-      drawRect(Color(0xFF0A0C14).copy(alpha = 0.22f), Offset(nL, nT + 8f*zoom), Size(nR-nL, 18f*zoom))
-      drawStoneCreviceAO(cx = (nL+nR)/2, cy = nT+9f*zoom, rx=(nR-nL)*0.45f, ry=6f*zoom, alpha=0.14f)
-      // AO around plaza outer rim (dark ring + crevice between stones)
+      drawRect(Color(0xFF060A14).copy(alpha = 0.38f), Offset(nL, nT + 6f*zoom), Size(nR-nL, 24f*zoom))
+      drawStoneCreviceAO(cx = (nL+nR)/2, cy = nT+9f*zoom, rx=(nR-nL)*0.45f, ry=8f*zoom, alpha=0.26f)
+      // Deep AO ring around plaza outer rim
       val pCx = sx(SanctuaryIslandGeometry.PLAZA_CENTER_X)
       val pCy = sy(SanctuaryIslandGeometry.PLAZA_CENTER_Y, 0f)
       val rx = SanctuaryIslandGeometry.PLAZA_RADIUS * zoom
       val ry = rx * ObliqueCamera.OBLIQUE_Y_SCALE
-      drawOval(Color(0xFF0A0C14).copy(alpha = 0.18f), Offset(pCx - rx*1.04f, pCy - ry*1.04f), Size(rx*2.08f, ry*2.08f))
-      drawOval(Color.Transparent, Offset(pCx - rx*0.98f, pCy - ry*0.98f), Size(rx*1.96f, ry*1.96f))
+      drawOval(
+        color = Color(0xFF060A14).copy(alpha = 0.32f),
+        topLeft = Offset(pCx - rx*1.03f, pCy - ry*1.03f),
+        size = Size(rx*2.06f, ry*2.06f),
+        style = Stroke(width = 7f * zoom),
+      )
       // AO under southern gate platform
       val gL = sx(1380f); val gR = sx(1840f); val gB = sy(2390f, 0f)
-      drawOval(Color(0xFF0A0C14).copy(alpha = 0.20f), Offset(gL - 10f*zoom, gB - 6f*zoom), Size((gR-gL)+20f*zoom, 22f*zoom))
-      // Building foot AO — Tower Gate, Summoning Hall, Dorms etc.
-      drawBuildingAO(sx(1960f)-40f*zoom, sy(635f,0f)-6f*zoom, 80f*zoom, 14f*zoom, alpha=0.18f)
-      drawBuildingAO(sx(2380f)-50f*zoom, sy(1930f,0f)-6f*zoom, 90f*zoom, 12f*zoom, alpha=0.16f)
-      // Tree canopy AO — oak/pine clusters produce subtle darkening under foliage mass
-      drawTreeCanopyAO(sx(750f), sy(920f,0f), 28f*zoom, 10f*zoom, alpha=0.16f)
-      drawTreeCanopyAO(sx(1280f), sy(640f,0f), 22f*zoom, 8f*zoom, alpha=0.14f)
+      drawOval(Color(0xFF060A14).copy(alpha = 0.36f), Offset(gL - 12f*zoom, gB - 6f*zoom), Size((gR-gL)+24f*zoom, 26f*zoom))
+      // Building foot AO — Tower Gate, Summoning Hall, Dorms, Armory, Synthesis, Restaurant
+      drawBuildingAO(sx(1960f)-50f*zoom, sy(635f,0f)-6f*zoom, 100f*zoom, 18f*zoom, alpha=0.32f)
+      drawBuildingAO(sx(2380f)-60f*zoom, sy(1930f,0f)-6f*zoom, 120f*zoom, 16f*zoom, alpha=0.30f)
+      drawBuildingAO(sx(1105f)-42f*zoom, sy(955f,0f)-5f*zoom, 84f*zoom, 14f*zoom, alpha=0.28f)
+      drawBuildingAO(sx(995f)-42f*zoom, sy(685f,0f)-5f*zoom, 84f*zoom, 14f*zoom, alpha=0.28f)
+      drawBuildingAO(sx(825f)-42f*zoom, sy(820f,0f)-5f*zoom, 84f*zoom, 14f*zoom, alpha=0.28f)
+      // Tree canopy AO — oak/pine/sakura clusters produce rich darkening under foliage mass
+      drawTreeCanopyAO(sx(750f), sy(920f,0f), 34f*zoom, 12f*zoom, alpha=0.28f)
+      drawTreeCanopyAO(sx(1280f), sy(640f,0f), 28f*zoom, 10f*zoom, alpha=0.26f)
+      drawTreeCanopyAO(sx(2645f), sy(890f,0f), 36f*zoom, 13f*zoom, alpha=0.28f)
       // Dithered shadow transition for dark stone near plaza staircase
-      drawDitheredShadow(sx(2180f), sy(1760f,0f), 60f*zoom, 18f*zoom, alpha=0.10f)
+      drawDitheredShadow(sx(2180f), sy(1760f,0f), 68f*zoom, 22f*zoom, alpha=0.22f)
     }
   }
 

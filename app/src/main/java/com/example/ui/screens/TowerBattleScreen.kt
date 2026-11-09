@@ -679,10 +679,17 @@ fun TowerBattleScreen(
           if (placedHeroPillRects.none { it.overlaps(rect) }) {
             placedHeroPillRects += rect
             drawRoundRect(
-              color = Color(0xBB090712),
+              color = Color(0x92102038),
               topLeft = rect.topLeft,
               size = rect.size,
-              cornerRadius = CornerRadius(5f, 5f),
+              cornerRadius = CornerRadius(6f, 6f),
+            )
+            drawRoundRect(
+              color = PortalCyan.copy(alpha = 0.58f),
+              topLeft = rect.topLeft,
+              size = rect.size,
+              cornerRadius = CornerRadius(6f, 6f),
+              style = Stroke(width = 1f),
             )
             drawText(measured, topLeft = Offset(clampedLeft + 5f, hy))
           }
@@ -700,7 +707,7 @@ fun TowerBattleScreen(
             style = TextStyle(color = badgeColor, fontSize = 9.5.sp, fontWeight = FontWeight.Bold),
           )
           drawRoundRect(
-            color = Color(0xCC0D1322),
+            color = Color(0x9E12243E),
             topLeft = Offset(nx - measured.size.width / 2f - 6f, ny - 2f),
             size = Size(measured.size.width + 12f, measured.size.height + 4f),
             cornerRadius = CornerRadius(6f, 6f),
@@ -718,7 +725,7 @@ fun TowerBattleScreen(
             style = TextStyle(color = Color(0xFFFDA4AF), fontSize = 11.sp, fontWeight = FontWeight.ExtraBold),
           )
           drawRoundRect(
-            color = Color(0xDD1E0912),
+            color = Color(0xB82A0E1B),
             topLeft = Offset(bx - measured.size.width / 2f - 6f, by - 3f),
             size = Size(measured.size.width + 12f, measured.size.height + 6f),
             cornerRadius = CornerRadius(6f, 6f),
@@ -829,10 +836,10 @@ fun TowerBattleScreen(
           // Right: Live Tactical Minimap + Retreat Icon
           Surface(
             shape = RoundedCornerShape(10.dp),
-            color = ObsidianVoid.copy(alpha = 0.90f),
+            color = Color(0x8A102038),
             modifier = Modifier
               .size(width = 92.dp, height = 52.dp)
-              .border(1.dp, BorderRune, RoundedCornerShape(10.dp))
+              .border(1.dp, PortalCyan.copy(alpha = 0.65f), RoundedCornerShape(10.dp))
               .testTag("tactical_minimap"),
           ) {
             Canvas(modifier = Modifier.fillMaxSize().padding(4.dp)) {
@@ -872,8 +879,8 @@ fun TowerBattleScreen(
             modifier = Modifier
               .size(48.dp)
               .clip(RoundedCornerShape(10.dp))
-              .background(SanctuaryStone.copy(alpha = 0.90f))
-              .border(1.dp, BorderRune, RoundedCornerShape(10.dp))
+              .background(Color(0x98162842))
+              .border(1.dp, WarningAmber.copy(alpha = 0.65f), RoundedCornerShape(10.dp))
               .testTag("retreat_mission_button"),
           ) {
             Icon(
@@ -1052,8 +1059,8 @@ fun TowerBattleScreen(
         Row(
           modifier = Modifier
             .horizontalScroll(rememberScrollState())
-            .background(ObsidianVoid.copy(alpha = 0.86f), RoundedCornerShape(12.dp))
-            .border(1.dp, SummonerGold.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+            .background(Color(0x8812223A), RoundedCornerShape(12.dp))
+            .border(1.dp, SummonerGold.copy(alpha = 0.58f), RoundedCornerShape(12.dp))
             .padding(4.dp),
           horizontalArrangement = Arrangement.spacedBy(5.dp),
         ) {
@@ -1061,12 +1068,12 @@ fun TowerBattleScreen(
             val isSelected = combatEngine.activeOrder == order
             Surface(
               shape = RoundedCornerShape(9.dp),
-              color = if (isSelected) SummonerGold else SanctuaryStone.copy(alpha = 0.94f),
+              color = if (isSelected) SummonerGold else Color(0xA4172944),
               modifier = Modifier
                 .heightIn(min = 48.dp)
                 .border(
                   1.dp,
-                  if (isSelected) Color.White else BorderRune,
+                  if (isSelected) Color.White else PortalCyan.copy(alpha = 0.45f),
                   RoundedCornerShape(9.dp),
                 )
                 .testTag("order_${order.name.lowercase()}")
@@ -1110,24 +1117,24 @@ fun TowerBattleScreen(
       }
     }
 
-    // 5. Floor Intro Manhwa Dialogue Box
+    // 5. Floor Intro Manhwa Dialogue Box (No black screen curtain — live battlefield shines behind!)
     if (combatEngine.stage == MissionStage.INTRO_DIALOGUE) {
       val beat = introBeats[introIndex.coerceIn(0, introBeats.lastIndex)]
       Box(
         modifier = Modifier
           .fillMaxSize()
-          .background(ObsidianVoid.copy(alpha = 0.72f))
+          .background(Color(0x18081224))
           .windowInsetsPadding(WindowInsets.safeDrawing)
           .padding(14.dp),
         contentAlignment = Alignment.BottomCenter,
       ) {
         Surface(
-          shape = RoundedCornerShape(16.dp),
-          color = FantasySkin.Panel,
+          shape = RoundedCornerShape(18.dp),
+          color = Color(0xCE132238),
           modifier = Modifier
             .fillMaxWidth()
             .widthIn(max = 640.dp)
-            .border(1.5.dp, SummonerGold, RoundedCornerShape(16.dp)),
+            .border(1.5.dp, SummonerGold.copy(alpha = 0.88f), RoundedCornerShape(18.dp)),
         ) {
           Column(
             modifier = Modifier
@@ -1203,18 +1210,18 @@ fun TowerBattleScreen(
       Box(
         modifier = Modifier
           .fillMaxSize()
-          .background(ObsidianVoid.copy(alpha = 0.80f))
+          .background(Color(0x26081224))
           .windowInsetsPadding(WindowInsets.safeDrawing)
           .padding(16.dp),
         contentAlignment = Alignment.Center,
       ) {
         Surface(
-          shape = RoundedCornerShape(16.dp),
-          color = FantasySkin.Panel,
+          shape = RoundedCornerShape(18.dp),
+          color = Color(0xD4132238),
           modifier = Modifier
             .fillMaxWidth()
             .widthIn(max = 420.dp)
-            .border(1.5.dp, WarningAmber, RoundedCornerShape(16.dp)),
+            .border(1.5.dp, WarningAmber, RoundedCornerShape(18.dp)),
         ) {
           Column(
             modifier = Modifier
@@ -1277,21 +1284,21 @@ fun TowerBattleScreen(
       Box(
         modifier = Modifier
           .fillMaxSize()
-          .background(ObsidianVoid.copy(alpha = 0.86f))
+          .background(Color(0x2C081224))
           .windowInsetsPadding(WindowInsets.safeDrawing)
           .padding(14.dp),
         contentAlignment = Alignment.Center,
       ) {
         Surface(
-          shape = RoundedCornerShape(18.dp),
-          color = FantasySkin.Panel,
+          shape = RoundedCornerShape(20.dp),
+          color = Color(0xD4132238),
           modifier = Modifier
             .fillMaxWidth()
             .widthIn(max = 540.dp)
             .border(
               2.dp,
               modalBorderColor,
-              RoundedCornerShape(18.dp),
+              RoundedCornerShape(20.dp),
             ),
         ) {
           Column(
@@ -1342,8 +1349,8 @@ fun TowerBattleScreen(
               }
             } else {
               Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = ObsidianVoid.copy(alpha = 0.72f),
+                shape = RoundedCornerShape(12.dp),
+                color = Color(0x98162842),
                 modifier = Modifier.fillMaxWidth(),
               ) {
                 Column(

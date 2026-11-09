@@ -109,7 +109,7 @@ fun FloorSelectionScreen(
   BoxWithConstraints(
     modifier = Modifier
       .fillMaxSize()
-      .background(ObsidianVoid),
+      .background(Color(0xFF102038)),
   ) {
     val isWide = maxWidth >= 620.dp
 
@@ -117,7 +117,7 @@ fun FloorSelectionScreen(
       painter = painterResource(id = R.drawable.img_sanctuary_gate),
       contentDescription = null,
       contentScale = ContentScale.Crop,
-      alpha = 0.22f,
+      alpha = 0.78f,
       modifier = Modifier.fillMaxSize(),
     )
 
@@ -131,11 +131,11 @@ fun FloorSelectionScreen(
       // Ornate Slim Header Bar
       Surface(
         shape = RoundedCornerShape(14.dp),
-        color = FantasySkin.Panel.copy(alpha = 0.94f),
+        color = Color(0xC4132238),
         modifier = Modifier
           .fillMaxWidth()
           .widthIn(max = 880.dp)
-          .border(1.dp, SummonerGold.copy(alpha = 0.5f), RoundedCornerShape(14.dp)),
+          .border(1.5.dp, SummonerGold.copy(alpha = 0.72f), RoundedCornerShape(14.dp)),
       ) {
         Row(
           modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -261,7 +261,7 @@ fun FloorSelectionScreen(
 
           Surface(
             shape = RoundedCornerShape(16.dp),
-            color = FantasySkin.Panel.copy(alpha = if (isUnlocked) 0.95f else 0.68f),
+            color = if (isUnlocked) Color(0xC2132238) else Color(0x88111D30),
             modifier = Modifier
               .fillMaxWidth()
               .border(1.5.dp, borderColor, RoundedCornerShape(16.dp))
@@ -331,14 +331,14 @@ private fun FloorBannerBox(
         .fillMaxSize()
         .background(
           Brush.verticalGradient(
-            listOf(ObsidianVoid.copy(alpha = 0.15f), ObsidianVoid.copy(alpha = 0.88f))
+            listOf(Color(0x100B1628), Color(0x740C172B))
           )
         ),
     )
 
     Surface(
       shape = RoundedCornerShape(8.dp),
-      color = ObsidianVoid.copy(alpha = 0.88f),
+      color = Color(0xA8132238),
       modifier = Modifier
         .align(Alignment.TopEnd)
         .padding(8.dp)
@@ -378,11 +378,11 @@ private fun FloorBannerBox(
 
     Surface(
       shape = RoundedCornerShape(8.dp),
-      color = ObsidianVoid.copy(alpha = 0.86f),
+      color = Color(0xA8132238),
       modifier = Modifier
         .align(Alignment.TopStart)
         .padding(8.dp)
-        .border(1.dp, PortalCyan.copy(alpha = 0.65f), RoundedCornerShape(8.dp)),
+        .border(1.dp, PortalCyan.copy(alpha = 0.75f), RoundedCornerShape(8.dp)),
     ) {
       Text(
         text = floor.missionTypeVi,
@@ -449,8 +449,8 @@ private fun FloorDetailsBody(
       floor.knownMonstersVi.forEach { monsterName ->
         Surface(
           shape = RoundedCornerShape(6.dp),
-          color = ObsidianVoid.copy(alpha = 0.78f),
-          modifier = Modifier.border(1.dp, CrimsonBlood.copy(alpha = 0.45f), RoundedCornerShape(6.dp)),
+          color = Color(0x981A2C48),
+          modifier = Modifier.border(1.dp, CrimsonBlood.copy(alpha = 0.55f), RoundedCornerShape(6.dp)),
         ) {
           Text(
             text = "⚔ $monsterName",
@@ -544,7 +544,7 @@ fun SquadPreparationScreen(
   BoxWithConstraints(
     modifier = Modifier
       .fillMaxSize()
-      .background(ObsidianVoid),
+      .background(Color(0xFF102038)),
   ) {
     val isWide = maxWidth >= 620.dp
 
@@ -552,7 +552,7 @@ fun SquadPreparationScreen(
       painter = painterResource(id = floor.bannerRes),
       contentDescription = null,
       contentScale = ContentScale.Crop,
-      alpha = 0.22f,
+      alpha = 0.76f,
       modifier = Modifier.fillMaxSize(),
     )
 
@@ -566,11 +566,11 @@ fun SquadPreparationScreen(
       // Compact Responsive Top Bar (Zero text wrapping on 360dp phones!)
       Surface(
         shape = RoundedCornerShape(14.dp),
-        color = FantasySkin.Panel.copy(alpha = 0.94f),
+        color = Color(0xC4132238),
         modifier = Modifier
           .fillMaxWidth()
           .widthIn(max = 920.dp)
-          .border(1.dp, SummonerGold.copy(alpha = 0.5f), RoundedCornerShape(14.dp)),
+          .border(1.5.dp, SummonerGold.copy(alpha = 0.72f), RoundedCornerShape(14.dp)),
       ) {
         Row(
           modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -851,7 +851,7 @@ private fun SquadHeroRosterList(
 
       Surface(
         shape = RoundedCornerShape(12.dp),
-        color = if (selected) Color(0xFF221A3D) else SanctuaryStone.copy(alpha = 0.90f),
+        color = if (selected) Color(0xC81C2E50) else Color(0xAD15253E),
         modifier = Modifier
           .fillMaxWidth()
           .border(
@@ -859,7 +859,7 @@ private fun SquadHeroRosterList(
             color = when {
               injured -> CrimsonBlood.copy(alpha = 0.7f)
               selected -> SummonerGold
-              else -> BorderRune
+              else -> PortalCyan.copy(alpha = 0.45f)
             },
             shape = RoundedCornerShape(12.dp),
           )

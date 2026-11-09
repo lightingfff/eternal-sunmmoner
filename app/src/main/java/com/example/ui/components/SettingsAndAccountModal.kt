@@ -85,20 +85,20 @@ fun SettingsAndAccountModal(
   Box(
     modifier = Modifier
       .fillMaxSize()
-      .background(ObsidianVoid.copy(alpha = 0.86f))
+      .background(Color(0x28081224))
       .windowInsetsPadding(WindowInsets.safeDrawing)
-      .padding(horizontal = 14.dp, vertical = 10.dp)
+      .padding(horizontal = 16.dp, vertical = 12.dp)
       .testTag("settings_account_modal"),
     contentAlignment = Alignment.Center,
   ) {
     Surface(
-      shape = RoundedCornerShape(18.dp),
-      color = FantasySkin.Panel,
+      shape = RoundedCornerShape(20.dp),
+      color = Color(0xD4132238),
       tonalElevation = 12.dp,
       modifier = Modifier
-        .fillMaxWidth()
-        .widthIn(max = 580.dp)
-        .border(1.5.dp, SummonerGold.copy(alpha = 0.65f), RoundedCornerShape(18.dp)),
+        .fillMaxWidth(0.94f)
+        .widthIn(max = 560.dp)
+        .border(1.5.dp, SummonerGold.copy(alpha = 0.82f), RoundedCornerShape(20.dp)),
     ) {
       Column(
         modifier = Modifier
@@ -246,8 +246,8 @@ fun SettingsAndAccountModal(
           modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .background(ObsidianVoid.copy(alpha = 0.68f))
-            .border(1.dp, BorderRune, RoundedCornerShape(14.dp))
+            .background(Color(0x98162842))
+            .border(1.dp, PortalCyan.copy(alpha = 0.45f), RoundedCornerShape(14.dp))
             .padding(12.dp),
           verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {

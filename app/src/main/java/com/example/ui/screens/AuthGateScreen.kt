@@ -50,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -104,7 +105,7 @@ fun AuthGateScreen(
   BoxWithConstraints(
     modifier = Modifier
       .fillMaxSize()
-      .background(ObsidianVoid),
+      .background(Color(0xFF102038)),
   ) {
     val isLandscape = maxWidth > maxHeight
 
@@ -113,26 +114,19 @@ fun AuthGateScreen(
       contentDescription = "Cổng Thánh Địa Eternal Summoner",
       modifier = Modifier.fillMaxSize(),
       contentScale = ContentScale.Crop,
-      alpha = 0.60f,
+      alpha = 0.94f,
     )
 
-    // P27B-V5 CP6 (debt D): this scrim carried the whole legibility of the login screen.
-    // Its text is SummonerGold / PortalCyan / RuneSilver, which measure 11.2 / 9.3 / 8.8:1
-    // on ObsidianVoid but only 1.37 / 1.34:1 on a light backdrop. At 0.42 alpha on top the
-    // brightest world (lit ivory, luma ~240) the title sat at 4.3:1 and the subtitle at
-    // 4.1:1 - borderline, and it is the first screen anyone sees. Measured floor against
-    // the brightest possible backing (lit ivory): 0.68 -> gold 4.45, 0.76 -> 5.90 / 4.90 /
-    // 6.08. 0.76 is the smallest step that clears 4.5 on all three colours while the
-    // sanctuary art still clearly reads through the scrim.
+    // Luminous Royal Astral Glass veil instead of an opaque black curtain so the Sanctuary Gate shines through.
     Box(
       modifier = Modifier
         .fillMaxSize()
         .background(
           Brush.verticalGradient(
             colors = listOf(
-              ObsidianVoid.copy(alpha = 0.76f),
-              ObsidianVoid.copy(alpha = 0.86f),
-              ObsidianVoid.copy(alpha = 0.96f),
+              Color(0x280A1628),
+              Color(0x460D1C34),
+              Color(0x6C0B162A),
             )
           )
         ),
@@ -151,8 +145,8 @@ fun AuthGateScreen(
           .align(Alignment.TopEnd)
           .size(48.dp)
           .clip(RoundedCornerShape(12.dp))
-          .background(SanctuaryStone.copy(alpha = 0.90f))
-          .border(1.dp, SummonerGold.copy(alpha = 0.55f), RoundedCornerShape(12.dp))
+          .background(Color(0xB4132238))
+          .border(1.dp, SummonerGold.copy(alpha = 0.72f), RoundedCornerShape(12.dp))
           .testTag("login_settings_button"),
       ) {
         Icon(
@@ -277,9 +271,9 @@ private fun AuthSignInCard(
 ) {
   Surface(
     modifier = modifier
-      .border(1.5.dp, SummonerGold.copy(alpha = 0.68f), RoundedCornerShape(20.dp)),
-    shape = RoundedCornerShape(20.dp),
-    color = SanctuaryStone.copy(alpha = 0.94f),
+      .border(1.5.dp, SummonerGold.copy(alpha = 0.82f), RoundedCornerShape(22.dp)),
+    shape = RoundedCornerShape(22.dp),
+    color = Color(0xCC132238),
     tonalElevation = 10.dp,
   ) {
     Column(
@@ -317,7 +311,8 @@ private fun AuthSignInCard(
         modifier = Modifier
           .fillMaxWidth()
           .clip(RoundedCornerShape(12.dp))
-          .background(ObsidianVoid.copy(alpha = 0.74f))
+          .background(Color(0x98162842))
+          .border(1.dp, PortalCyan.copy(alpha = 0.45f), RoundedCornerShape(12.dp))
           .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),

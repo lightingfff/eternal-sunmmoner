@@ -65,12 +65,12 @@ fun MasterHubScreen(
       .testTag("master_hub_screen")
       .clickable(enabled = false) {},
   ) {
-    // Explicit modal scrim (only while the user has this page open).
+    // Explicit modal scrim (light crystal veil so the Sanctuary remains visible behind).
     Box(Modifier.fillMaxSize().clickable { onClose() })
     Surface(
-      shape = RoundedCornerShape(16.dp),
-      color = FantasySkin.HudGlass.copy(alpha = 0.97f),
-      border = BorderStroke(1.dp, ESTokens.AntiqueGold.copy(alpha = 0.6f)),
+      shape = RoundedCornerShape(20.dp),
+      color = Color(0xCC132238),
+      border = BorderStroke(1.5.dp, ESTokens.AntiqueGold.copy(alpha = 0.78f)),
       modifier = Modifier
         .align(Alignment.Center)
         .widthIn(max = 520.dp)
@@ -111,9 +111,9 @@ fun MasterHubScreen(
 
         // Real resources from MasterProfile — nothing invented.
         Surface(
-          shape = RoundedCornerShape(10.dp),
-          color = Color(0xFF0A0E18).copy(alpha = 0.55f),
-          border = BorderStroke(1.dp, ESTokens.BronzeMid.copy(alpha = 0.5f)),
+          shape = RoundedCornerShape(12.dp),
+          color = Color(0x94162842),
+          border = BorderStroke(1.dp, ESTokens.BronzeMid.copy(alpha = 0.65f)),
           modifier = Modifier.fillMaxWidth(),
         ) {
           Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {

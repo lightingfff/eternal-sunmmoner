@@ -129,9 +129,9 @@ fun ContextualFacilityPromptCard(
   val isEnterable = facility in SanctuaryLobbyEngine.ENTERABLE_FACILITIES && onEnterInterior != null
 
   Surface(
-    shape = RoundedCornerShape(14.dp),
-    color = FantasySkin.Panel.copy(alpha = 0.96f),
-    border = BorderStroke(1.5.dp, accent.copy(alpha = 0.85f)),
+    shape = RoundedCornerShape(16.dp),
+    color = Color(0xC4132238),
+    border = BorderStroke(1.5.dp, accent.copy(alpha = 0.88f)),
     tonalElevation = 8.dp,
     modifier = modifier
       .widthIn(max = 390.dp)
@@ -248,9 +248,9 @@ fun SelectedHeroCompactCard(
   val atkTotal = hero.totalAttack(equipment)
 
   Surface(
-    shape = RoundedCornerShape(14.dp),
-    color = FantasySkin.Panel.copy(alpha = 0.96f),
-    border = BorderStroke(1.2.dp, classAccent.copy(alpha = 0.85f)),
+    shape = RoundedCornerShape(16.dp),
+    color = Color(0xC4132238),
+    border = BorderStroke(1.5.dp, classAccent.copy(alpha = 0.88f)),
     modifier = modifier
       .widthIn(max = 390.dp)
       .testTag("selected_hero_compact_card"),
@@ -395,23 +395,24 @@ fun HeroFullProfileModal(
   BoxWithConstraints(
     modifier = Modifier
       .fillMaxSize()
-      .background(ObsidianVoid.copy(alpha = 0.88f))
+      .background(Color(0x28081224))
       .windowInsetsPadding(WindowInsets.safeDrawing)
-      .padding(horizontal = 12.dp, vertical = 8.dp)
+      .padding(horizontal = 16.dp, vertical = 12.dp)
       .testTag("hero_full_profile_modal"),
     contentAlignment = Alignment.Center,
   ) {
     val isShort = maxHeight < 460.dp
 
     Surface(
-      shape = RoundedCornerShape(18.dp),
-      color = FantasySkin.Panel,
+      shape = RoundedCornerShape(20.dp),
+      color = Color(0xD4132238),
       tonalElevation = 10.dp,
       modifier = Modifier
-        .fillMaxSize()
-        .widthIn(max = 760.dp)
-        .heightIn(max = 660.dp)
-        .border(1.5.dp, classAccent.copy(alpha = 0.75f), RoundedCornerShape(18.dp)),
+        .fillMaxWidth(0.94f)
+        .fillMaxSize(if (isShort) 0.94f else 0.88f)
+        .widthIn(max = 720.dp)
+        .heightIn(max = 610.dp)
+        .border(1.5.dp, classAccent.copy(alpha = 0.85f), RoundedCornerShape(20.dp)),
     ) {
       Column(
         modifier = Modifier
@@ -468,8 +469,8 @@ fun HeroFullProfileModal(
             val active = selectedTab == idx
             Surface(
               shape = RoundedCornerShape(10.dp),
-              color = if (active) classAccent.copy(alpha = 0.25f) else ObsidianVoid.copy(alpha = 0.72f),
-              border = BorderStroke(if (active) 1.5.dp else 1.dp, if (active) classAccent else BorderRune),
+              color = if (active) classAccent.copy(alpha = 0.28f) else Color(0x98162842),
+              border = BorderStroke(if (active) 1.5.dp else 1.dp, if (active) classAccent else PortalCyan.copy(alpha = 0.42f)),
               modifier = Modifier
                 .heightIn(min = 42.dp)
                 .testTag(tag)
@@ -588,8 +589,8 @@ private fun HeroOverviewTab(
 
     Surface(
       shape = RoundedCornerShape(12.dp),
-      color = ObsidianVoid.copy(alpha = 0.72f),
-      border = BorderStroke(1.dp, BorderRune),
+      color = Color(0x98162842),
+      border = BorderStroke(1.dp, PortalCyan.copy(alpha = 0.42f)),
       modifier = Modifier.fillMaxWidth(),
     ) {
       Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -700,8 +701,8 @@ private fun HeroStatsTab(
         val active = selectedFocus == focus
         Surface(
           shape = RoundedCornerShape(9.dp),
-          color = if (active) SummonerGold.copy(alpha = 0.24f) else ObsidianVoid,
-          border = BorderStroke(1.dp, if (active) SummonerGold else BorderRune),
+          color = if (active) SummonerGold.copy(alpha = 0.26f) else Color(0x98162842),
+          border = BorderStroke(1.dp, if (active) SummonerGold else PortalCyan.copy(alpha = 0.42f)),
           modifier = Modifier
             .heightIn(min = 40.dp)
             .clickable { onSelectFocus(focus) },
@@ -900,8 +901,8 @@ private fun EquippedSlotBox(
 ) {
   Surface(
     shape = RoundedCornerShape(12.dp),
-    color = ObsidianVoid.copy(alpha = 0.76f),
-    border = BorderStroke(1.dp, if (item != null) SummonerGold.copy(alpha = 0.65f) else BorderRune),
+    color = Color(0x98162842),
+    border = BorderStroke(1.dp, if (item != null) SummonerGold.copy(alpha = 0.65f) else PortalCyan.copy(alpha = 0.42f)),
     modifier = modifier,
   ) {
     Column(
@@ -1122,8 +1123,8 @@ private fun RoutineChoiceButton(
 ) {
   Surface(
     shape = RoundedCornerShape(10.dp),
-    color = if (selected) EmeraldVitality.copy(alpha = 0.25f) else ObsidianVoid,
-    border = BorderStroke(1.dp, if (selected) EmeraldVitality else BorderRune),
+    color = if (selected) EmeraldVitality.copy(alpha = 0.28f) else Color(0x98162842),
+    border = BorderStroke(1.dp, if (selected) EmeraldVitality else PortalCyan.copy(alpha = 0.42f)),
     modifier = modifier
       .heightIn(min = 48.dp)
       .testTag(tag)
@@ -1153,21 +1154,22 @@ fun IslandExpansionModal(
   BoxWithConstraints(
     modifier = Modifier
       .fillMaxSize()
-      .background(ObsidianVoid.copy(alpha = 0.86f))
+      .background(Color(0x28081224))
       .windowInsetsPadding(WindowInsets.safeDrawing)
-      .padding(12.dp)
+      .padding(16.dp)
       .testTag("island_expansion_modal"),
     contentAlignment = Alignment.Center,
   ) {
     Surface(
-      shape = RoundedCornerShape(18.dp),
-      color = FantasySkin.Panel,
+      shape = RoundedCornerShape(20.dp),
+      color = Color(0xD4132238),
       tonalElevation = 10.dp,
       modifier = Modifier
-        .fillMaxSize()
-        .widthIn(max = 720.dp)
-        .heightIn(max = 600.dp)
-        .border(1.5.dp, SummonerGold, RoundedCornerShape(18.dp)),
+        .fillMaxWidth(0.94f)
+        .fillMaxSize(0.88f)
+        .widthIn(max = 680.dp)
+        .heightIn(max = 560.dp)
+        .border(1.5.dp, SummonerGold.copy(alpha = 0.88f), RoundedCornerShape(20.dp)),
     ) {
       Column(
         modifier = Modifier

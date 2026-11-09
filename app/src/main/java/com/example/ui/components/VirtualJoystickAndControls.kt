@@ -41,7 +41,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.example.data.model.HeroClassType
-import com.example.game.pixel.PixelCharacterAtlas
+import com.example.game.pixel.FantasyHd128CharacterAtlas
+import com.example.game.pixel.FantasyHd128Structures
 import com.example.ui.theme.ArcaneViolet
 import com.example.ui.theme.BorderRune
 import com.example.ui.theme.ObsidianVoid
@@ -105,31 +106,31 @@ fun VirtualTouchJoystick(
       val outerR = size.minDimension / 2f - 4f
       drawCircle(
         brush = Brush.radialGradient(
-          colors = listOf(Color(0x991C1635), Color(0xCC0A0812)),
+          colors = listOf(Color(0x55223656), Color(0x88101C30)),
           center = center,
           radius = outerR,
         ),
         radius = outerR,
         center = center,
       )
-      // Double gilded RPG ring
+      // Double gilded RPG ring with astral cyan inner compass
       drawCircle(
-        color = SummonerGold.copy(alpha = 0.55f),
+        color = SummonerGold.copy(alpha = 0.72f),
         radius = outerR,
         center = center,
-        style = Stroke(width = 2.5f),
+        style = Stroke(width = 2.6f),
       )
       drawCircle(
-        color = ArcaneViolet.copy(alpha = 0.35f),
-        radius = outerR * 0.62f,
+        color = PortalCyan.copy(alpha = 0.45f),
+        radius = outerR * 0.66f,
         center = center,
-        style = Stroke(width = 1.5f),
+        style = Stroke(width = 1.6f),
       )
 
       val knobCenter = center + knobOffset
       drawCircle(
         brush = Brush.radialGradient(
-          colors = listOf(SummonerGold, Color(0xFFA86B10)),
+          colors = listOf(Color(0xFFFFF3C4), SummonerGold, Color(0xFFB47818)),
           center = knobCenter,
           radius = outerR * 0.36f,
         ),
@@ -137,7 +138,7 @@ fun VirtualTouchJoystick(
         center = knobCenter,
       )
       drawCircle(
-        color = Color.White.copy(alpha = 0.6f),
+        color = Color.White.copy(alpha = 0.75f),
         radius = outerR * 0.33f,
         center = knobCenter,
         style = Stroke(width = 2f),
@@ -155,8 +156,12 @@ fun CameraZoomControls(
 ) {
   val containerMod = modifier
     .clip(RoundedCornerShape(12.dp))
-    .background(SanctuaryStone.copy(alpha = 0.90f))
-    .border(1.dp, SummonerGold.copy(alpha = 0.45f), RoundedCornerShape(12.dp))
+    .background(
+      Brush.verticalGradient(
+        listOf(Color(0xA61A2B44), Color(0xBF0F1A2C))
+      )
+    )
+    .border(1.2.dp, SummonerGold.copy(alpha = 0.62f), RoundedCornerShape(12.dp))
 
   if (horizontal) {
     Row(
@@ -205,13 +210,13 @@ fun PixelHeroPortraitAvatar(
   heroName: String? = null,
 ) {
   val bg = when (heroClass) {
-    HeroClassType.KNIGHT -> Color(0xFF1E3A5F)
-    HeroClassType.ARCHER -> Color(0xFF1B4332)
-    HeroClassType.MAGE -> Color(0xFF3B1963)
-    HeroClassType.ASSASSIN -> Color(0xFF281A2D)
-    HeroClassType.PRIEST -> Color(0xFF3B341F)
-    HeroClassType.BERSERKER -> Color(0xFF4A151B)
-    null -> Color(0xFF221A40)
+    HeroClassType.KNIGHT -> Color(0xFF234876)
+    HeroClassType.ARCHER -> Color(0xFF1F543D)
+    HeroClassType.MAGE -> Color(0xFF4B227A)
+    HeroClassType.ASSASSIN -> Color(0xFF3A1E46)
+    HeroClassType.PRIEST -> Color(0xFF524420)
+    HeroClassType.BERSERKER -> Color(0xFF631C26)
+    null -> Color(0xFF2D2256)
   }
 
   Box(
@@ -220,35 +225,26 @@ fun PixelHeroPortraitAvatar(
       .clip(RoundedCornerShape(10.dp))
       .background(
         Brush.radialGradient(
-          listOf(bg.copy(alpha = 0.95f), Color(0xFF0B0814))
+          listOf(bg.copy(alpha = 0.92f), Color(0xCC101828))
         )
       )
-      .border(1.5.dp, SummonerGold.copy(alpha = 0.78f), RoundedCornerShape(10.dp)),
+      .border(1.5.dp, SummonerGold.copy(alpha = 0.85f), RoundedCornerShape(10.dp)),
     contentAlignment = Alignment.Center,
   ) {
-    Canvas(modifier = Modifier.size(sizeDp * 0.90f)) {
-      // Authored bust first (Lyra ships one), otherwise the legacy world-atlas crop.
-      val bust = com.example.game.pixel.PremiumPortraits.get(heroName)
-      if (bust != null) {
-        drawImage(
-          image = bust,
-          dstOffset = IntOffset(0, 0),
-          dstSize = IntSize(size.width.toInt().coerceAtLeast(2), size.height.toInt().coerceAtLeast(2)),
-          filterQuality = FilterQuality.None,
-        )
-        return@Canvas
-      }
-      val premium = if (heroName == "Kaelen" && heroClass == HeroClassType.KNIGHT)
-        com.example.game.pixel.PremiumActorAtlas.get("kaelen") else null
-      val sprite = premium?.frame(true,false,false,0f,false,0f,false,0f) ?: if (heroClass == null) {
-        PixelCharacterAtlas.masterSprites.idleRight.first()
+    Canvas(modifier = Modifier.size(sizeDp * 0.92f)) {
+      val baseSprite = if (heroClass == null) {
+        FantasyHd128CharacterAtlas.masterSheet.idleRight.first()
       } else {
-        PixelCharacterAtlas.heroSheet(heroClass).idleRight.first()
+        FantasyHd128CharacterAtlas.heroSheet(heroClass).idleRight.first()
       }
+      val hdSprite = FantasyHd128Structures.hdFor(
+        baseSprite,
+        FantasyHd128Structures.MaterialProfile.CHARACTER,
+      )
       drawImage(
-        image = sprite,
-        srcOffset = if (premium == null) IntOffset(6, 3) else IntOffset(19, 4),
-        srcSize = IntSize(26, 26),
+        image = hdSprite,
+        srcOffset = IntOffset(28, 6),
+        srcSize = IntSize(96, 96),
         dstOffset = IntOffset(0, 0),
         dstSize = IntSize(size.width.toInt().coerceAtLeast(2), size.height.toInt().coerceAtLeast(2)),
         filterQuality = FilterQuality.None,
@@ -270,16 +266,23 @@ fun ResourcePillBadge(
 ) {
   Row(
     modifier = modifier
-      .clip(RoundedCornerShape(8.dp))
-      .background(if (lightOnIvory) Color(0xFFEBE6DB) else ObsidianVoid.copy(alpha = 0.88f))
-      .border(1.dp, if (lightOnIvory) Color(0xFFA7977D) else accent.copy(alpha = 0.55f), RoundedCornerShape(8.dp))
-      .padding(horizontal = 7.dp, vertical = 4.dp),
+      .clip(RoundedCornerShape(9.dp))
+      .background(
+        if (lightOnIvory) {
+          Brush.verticalGradient(listOf(Color(0xFFF3EFE6), Color(0xFFE5DEC9)))
+        } else {
+          Brush.verticalGradient(listOf(Color(0xAD1B2C46), Color(0xC4101B2E)))
+        }
+      )
+      .border(
+        1.dp,
+        if (lightOnIvory) Color(0xFFA7977D) else accent.copy(alpha = 0.68f),
+        RoundedCornerShape(9.dp),
+      )
+      .padding(horizontal = 8.dp, vertical = 4.dp),
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(4.dp),
   ) {
-    // P27B-V5 CP5: on dark glass the dot is the only colour cue, so it has to clear the
-    // 3:1 non-text floor. ArcaneViolet (0xFF9D6BFF) measured 2.7:1 against the panel and
-    // 1.3:1 against the ivory world, i.e. effectively invisible; lifts to ~10:1.
     val dotColor = if (lightOnIvory || accent.red + accent.green + accent.blue >= 1.5f) {
       accent
     } else {

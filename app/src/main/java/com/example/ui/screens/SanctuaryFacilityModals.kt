@@ -156,21 +156,22 @@ fun SanctuaryFacilityModalOverlay(
   BoxWithConstraints(
     modifier = Modifier
       .fillMaxSize()
-      .background(ObsidianVoid.copy(alpha = if (isIvory) 0.74f else 0.85f))
+      .background(Color(0x26081224))
       .windowInsetsPadding(WindowInsets.safeDrawing)
-      .padding(horizontal = 12.dp, vertical = 8.dp),
+      .padding(horizontal = 16.dp, vertical = 12.dp),
     contentAlignment = Alignment.Center,
   ) {
     val isShort = maxHeight < 460.dp
 
     Surface(
       modifier = Modifier
-        .fillMaxSize()
-        .widthIn(max = 760.dp)
-        .heightIn(max = 680.dp)
-        .border(1.5.dp, if (isIvory) SanctuaryUi.gold else accentColor.copy(alpha = 0.72f), RoundedCornerShape(18.dp)),
-      shape = RoundedCornerShape(18.dp),
-      color = if (isIvory) SanctuaryUi.surface else FantasySkin.Panel,
+        .fillMaxWidth(0.94f)
+        .fillMaxSize(if (isShort) 0.94f else 0.88f)
+        .widthIn(max = 720.dp)
+        .heightIn(max = 620.dp)
+        .border(1.5.dp, if (isIvory) SanctuaryUi.gold else accentColor.copy(alpha = 0.85f), RoundedCornerShape(20.dp)),
+      shape = RoundedCornerShape(20.dp),
+      color = if (isIvory) SanctuaryUi.surface.copy(alpha = 0.93f) else Color(0xD2132238),
       tonalElevation = 10.dp,
     ) {
       Column(
@@ -575,8 +576,8 @@ private fun TrainingGroundContent(
         modifier = Modifier
           .fillMaxWidth()
           .clip(RoundedCornerShape(12.dp))
-          .background(ObsidianVoid.copy(alpha = 0.75f))
-          .border(1.dp, AmberWarning.copy(alpha = 0.55f), RoundedCornerShape(12.dp))
+          .background(Color(0x98162842))
+          .border(1.dp, AmberWarning.copy(alpha = 0.65f), RoundedCornerShape(12.dp))
           .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
       ) {
@@ -591,8 +592,8 @@ private fun TrainingGroundContent(
             val active = selectedFocus == focus
             Surface(
               shape = RoundedCornerShape(9.dp),
-              color = if (active) AmberWarning.copy(alpha = 0.25f) else AstralSlate,
-              border = BorderStroke(1.dp, if (active) AmberWarning else BorderRune),
+              color = if (active) AmberWarning.copy(alpha = 0.28f) else Color(0x9E192D48),
+              border = BorderStroke(1.dp, if (active) AmberWarning else PortalCyan.copy(alpha = 0.42f)),
               modifier = Modifier
                 .heightIn(min = 40.dp)
                 .testTag("focus_chip_${focus.name.lowercase()}")
@@ -622,8 +623,8 @@ private fun TrainingGroundContent(
         modifier = Modifier
           .fillMaxWidth()
           .clip(RoundedCornerShape(12.dp))
-          .background(AstralSlate)
-          .border(1.dp, if (inTraining) AmberWarning else BorderRune, RoundedCornerShape(12.dp))
+          .background(Color(0xA4182B46))
+          .border(1.dp, if (inTraining) AmberWarning else PortalCyan.copy(alpha = 0.42f), RoundedCornerShape(12.dp))
           .padding(12.dp),
       ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -745,8 +746,8 @@ private fun ArmoryContent(
           modifier = Modifier
             .heightIn(min = 44.dp)
             .clip(RoundedCornerShape(10.dp))
-            .background(if (active) PortalCyan.copy(alpha = 0.24f) else ObsidianVoid)
-            .border(1.dp, if (active) SummonerGold else BorderRune, RoundedCornerShape(10.dp))
+            .background(if (active) PortalCyan.copy(alpha = 0.28f) else Color(0x96162842))
+            .border(1.dp, if (active) SummonerGold else PortalCyan.copy(alpha = 0.42f), RoundedCornerShape(10.dp))
             .clickable { selectedHeroId = h.id }
             .padding(horizontal = 12.dp),
           contentAlignment = Alignment.Center,
@@ -799,8 +800,8 @@ private fun ArmoryContent(
           modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(AstralSlate)
-            .border(1.dp, if (alreadyOnSelected) SummonerGold else BorderRune, RoundedCornerShape(12.dp))
+            .background(Color(0xA4182B46))
+            .border(1.dp, if (alreadyOnSelected) SummonerGold else PortalCyan.copy(alpha = 0.42f), RoundedCornerShape(12.dp))
             .padding(10.dp),
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -882,8 +883,8 @@ private fun ArmoryEquippedSlotPill(
 ) {
   Surface(
     shape = RoundedCornerShape(10.dp),
-    color = ObsidianVoid.copy(alpha = 0.78f),
-    border = BorderStroke(1.dp, if (item != null) SummonerGold.copy(alpha = 0.6f) else BorderRune),
+    color = Color(0x98162842),
+    border = BorderStroke(1.dp, if (item != null) SummonerGold.copy(alpha = 0.68f) else PortalCyan.copy(alpha = 0.42f)),
     modifier = modifier,
   ) {
     Row(
@@ -1001,8 +1002,8 @@ private fun SynthesisLabContent(
         modifier = Modifier
           .fillMaxWidth()
           .clip(RoundedCornerShape(12.dp))
-          .background(ObsidianVoid.copy(alpha = 0.65f))
-          .border(1.dp, BorderRune, RoundedCornerShape(12.dp))
+          .background(Color(0x9E172944))
+          .border(1.dp, PortalCyan.copy(alpha = 0.42f), RoundedCornerShape(12.dp))
           .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -1048,8 +1049,8 @@ private fun HeroQuartersContent(
         modifier = Modifier
           .fillMaxWidth()
           .clip(RoundedCornerShape(12.dp))
-          .background(ObsidianVoid.copy(alpha = 0.72f))
-          .border(1.dp, EmeraldVitality.copy(alpha = 0.55f), RoundedCornerShape(12.dp))
+          .background(Color(0x98162842))
+          .border(1.dp, EmeraldVitality.copy(alpha = 0.65f), RoundedCornerShape(12.dp))
           .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
       ) {
@@ -1082,8 +1083,8 @@ private fun HeroQuartersContent(
         modifier = Modifier
           .fillMaxWidth()
           .clip(RoundedCornerShape(12.dp))
-          .background(AstralSlate)
-          .border(1.dp, if (needsStatusClear) AmberWarning else if (isResting) EmeraldVitality else BorderRune, RoundedCornerShape(12.dp))
+          .background(Color(0xA4182B46))
+          .border(1.dp, if (needsStatusClear) AmberWarning else if (isResting) EmeraldVitality else PortalCyan.copy(alpha = 0.42f), RoundedCornerShape(12.dp))
           .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -1173,8 +1174,8 @@ private fun RestaurantContent(
         modifier = Modifier
           .fillMaxWidth()
           .clip(RoundedCornerShape(14.dp))
-          .background(AstralSlate)
-          .border(1.dp, SummonerGold.copy(alpha = 0.6f), RoundedCornerShape(14.dp))
+          .background(Color(0xA4182B46))
+          .border(1.dp, SummonerGold.copy(alpha = 0.65f), RoundedCornerShape(14.dp))
           .padding(14.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
       ) {
@@ -1203,8 +1204,8 @@ private fun RestaurantContent(
           val isSel = selectedRecipe == recipe
           Surface(
             shape = RoundedCornerShape(10.dp),
-            color = if (isSel) SummonerGold.copy(alpha = 0.18f) else ObsidianVoid.copy(alpha = 0.72f),
-            border = BorderStroke(1.dp, if (isSel) SummonerGold else BorderRune),
+            color = if (isSel) SummonerGold.copy(alpha = 0.22f) else Color(0x9815263E),
+            border = BorderStroke(1.dp, if (isSel) SummonerGold else PortalCyan.copy(alpha = 0.42f)),
             modifier = Modifier
               .fillMaxWidth()
               .testTag("meal_recipe_${recipe.code.lowercase()}")
@@ -1262,7 +1263,7 @@ private fun RestaurantContent(
         modifier = Modifier
           .fillMaxWidth()
           .clip(RoundedCornerShape(10.dp))
-          .background(ObsidianVoid.copy(alpha = 0.65f))
+          .background(Color(0x98162842))
           .padding(10.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,

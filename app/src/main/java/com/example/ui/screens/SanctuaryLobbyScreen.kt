@@ -685,17 +685,23 @@ fun SanctuaryLobbyScreen(
         placedTagRects += rect
 
         drawRoundRect(
-          color = Color(0xDF172033),
+          color = Color(0x9E12223A),
           topLeft = topLeft,
           size = Size(boxW, boxH),
-          cornerRadius = CornerRadius(8f, 8f),
+          cornerRadius = CornerRadius(9f, 9f),
         )
         drawRoundRect(
-          color = borderCol.copy(alpha = 0.88f),
+          color = Color(0x387DD3FC),
+          topLeft = Offset(topLeft.x + 1.5f, topLeft.y + 1.5f),
+          size = Size((boxW - 3f).coerceAtLeast(2f), (boxH * 0.45f).coerceAtLeast(2f)),
+          cornerRadius = CornerRadius(7f, 7f),
+        )
+        drawRoundRect(
+          color = borderCol.copy(alpha = 0.92f),
           topLeft = topLeft,
           size = Size(boxW, boxH),
-          cornerRadius = CornerRadius(8f, 8f),
-          style = Stroke(width = 1.4f),
+          cornerRadius = CornerRadius(9f, 9f),
+          style = Stroke(width = 1.5f),
         )
         drawText(measured, topLeft = Offset(zx - measured.size.width / 2f, zy - measured.size.height / 2f))
       }
@@ -798,17 +804,17 @@ fun SanctuaryLobbyScreen(
           if (placedTagRects.none { it.overlaps(candidateRect) }) {
             placedTagRects += candidateRect
             drawRoundRect(
-              color = Color(0xCC0D0A1A),
+              color = Color(0x94102038),
               topLeft = pillTopLeft,
               size = Size(pillW, pillH),
-              cornerRadius = CornerRadius(6f, 6f),
+              cornerRadius = CornerRadius(7f, 7f),
             )
             drawRoundRect(
-              color = (if (actor.isSanctuaryKeeperNpc) PortalCyan else SummonerGold).copy(alpha = 0.55f),
+              color = (if (actor.isSanctuaryKeeperNpc) PortalCyan else SummonerGold).copy(alpha = 0.72f),
               topLeft = pillTopLeft,
               size = Size(pillW, pillH),
-              cornerRadius = CornerRadius(6f, 6f),
-              style = Stroke(width = 1f),
+              cornerRadius = CornerRadius(7f, 7f),
+              style = Stroke(width = 1.1f),
             )
             drawText(nameLayout, topLeft = Offset(hx - nameLayout.size.width / 2f, footTagY + 1.5f))
           }
@@ -830,17 +836,17 @@ fun SanctuaryLobbyScreen(
           if (placedTagRects.none { it.overlaps(bubbleRect) }) {
             placedTagRects += bubbleRect
             drawRoundRect(
-              color = Color(0xEE141122),
+              color = Color(0xBA14243D),
               topLeft = Offset(bx - 7f, by - 4f),
               size = Size(bLayout.size.width + 14f, bLayout.size.height + 8f),
-              cornerRadius = CornerRadius(8f, 8f),
+              cornerRadius = CornerRadius(9f, 9f),
             )
             drawRoundRect(
-              color = SummonerGold.copy(alpha = 0.55f),
+              color = SummonerGold.copy(alpha = 0.78f),
               topLeft = Offset(bx - 7f, by - 4f),
               size = Size(bLayout.size.width + 14f, bLayout.size.height + 8f),
-              cornerRadius = CornerRadius(8f, 8f),
-              style = Stroke(width = 1f),
+              cornerRadius = CornerRadius(9f, 9f),
+              style = Stroke(width = 1.2f),
             )
             drawText(bLayout, topLeft = Offset(bx, by))
           }
@@ -1412,16 +1418,16 @@ fun SanctuaryLobbyScreen(
       )
     }
 
-    // 7. Opening Manhwa Awakening Cutscene
+    // 7. Opening Manhwa Awakening Cutscene (Crystal Glass Overlay — keeps Sanctuary world visible!)
     if (showPrologue && openFacility == null && !showPauseMapModal && !showExpansionModal && inspectingHero == null) {
       val beat = ManhwaStoryData.PROLOGUE_BEATS[prologueIndex.coerceIn(0, ManhwaStoryData.PROLOGUE_BEATS.lastIndex)]
       Box(
         modifier = Modifier
           .fillMaxSize()
-          .background(ObsidianVoid.copy(alpha = 0.88f))
+          .background(Color(0x280A1628))
           .windowInsetsPadding(WindowInsets.safeDrawing)
           .padding(14.dp),
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.BottomCenter,
       ) {
         if (isWideScreen && isShortHeight) {
           Row(
@@ -1505,19 +1511,19 @@ private fun SanctuaryOverviewMapOverlay(
   Box(
     modifier = Modifier
       .fillMaxSize()
-      .background(ObsidianVoid.copy(alpha = 0.88f))
+      .background(Color(0x2E0A1628))
       .windowInsetsPadding(WindowInsets.safeDrawing)
-      .padding(12.dp),
+      .padding(16.dp),
     contentAlignment = Alignment.Center,
   ) {
     Surface(
-      shape = RoundedCornerShape(18.dp),
-      color = FantasySkin.Panel,
+      shape = RoundedCornerShape(20.dp),
+      color = Color(0xD6132238),
       modifier = Modifier
-        .fillMaxSize()
-        .widthIn(max = 760.dp)
-        .heightIn(max = 580.dp)
-        .border(1.5.dp, SummonerGold, RoundedCornerShape(18.dp)),
+        .fillMaxWidth(0.94f)
+        .widthIn(max = 720.dp)
+        .heightIn(max = 520.dp)
+        .border(1.5.dp, SummonerGold.copy(alpha = 0.85f), RoundedCornerShape(20.dp)),
     ) {
       Column(
         modifier = Modifier.padding(16.dp),
@@ -1714,19 +1720,19 @@ private fun SanctuaryChronicleOverlay(
   Box(
     modifier = Modifier
       .fillMaxSize()
-      .background(ObsidianVoid.copy(alpha = 0.88f))
+      .background(Color(0x280A1628))
       .windowInsetsPadding(WindowInsets.safeDrawing)
-      .padding(14.dp),
+      .padding(16.dp),
     contentAlignment = Alignment.Center,
   ) {
     Surface(
-      shape = RoundedCornerShape(18.dp),
-      color = FantasySkin.Panel,
+      shape = RoundedCornerShape(20.dp),
+      color = Color(0xD4132238),
       modifier = Modifier
-        .fillMaxWidth()
-        .widthIn(max = 680.dp)
-        .heightIn(max = 520.dp)
-        .border(1.5.dp, PortalCyan, RoundedCornerShape(18.dp)),
+        .fillMaxWidth(0.92f)
+        .widthIn(max = 640.dp)
+        .heightIn(max = 480.dp)
+        .border(1.5.dp, PortalCyan.copy(alpha = 0.88f), RoundedCornerShape(20.dp)),
     ) {
       Column(
         modifier = Modifier.padding(18.dp),
@@ -1774,9 +1780,9 @@ private fun SanctuaryChronicleOverlay(
 @Composable
 private fun ChronicleTile(title: String, desc: String, accentCol: Color) {
   Surface(
-    shape = RoundedCornerShape(10.dp),
-    color = Color(0xFF1B1632),
-    modifier = Modifier.fillMaxWidth().border(1.dp, accentCol.copy(alpha = 0.45f), RoundedCornerShape(10.dp)),
+    shape = RoundedCornerShape(12.dp),
+    color = Color(0x9E192B46),
+    modifier = Modifier.fillMaxWidth().border(1.dp, accentCol.copy(alpha = 0.58f), RoundedCornerShape(12.dp)),
   ) {
     Column(modifier = Modifier.padding(12.dp)) {
       Text(title, style = MaterialTheme.typography.labelLarge, color = accentCol)
@@ -1796,9 +1802,9 @@ private fun PrologueDialogueCard(
   modifier: Modifier = Modifier,
 ) {
   Surface(
-    shape = RoundedCornerShape(16.dp),
-    color = FantasySkin.Panel,
-    modifier = modifier.border(1.5.dp, ArcaneViolet, RoundedCornerShape(16.dp)),
+    shape = RoundedCornerShape(18.dp),
+    color = Color(0xD4132238),
+    modifier = modifier.border(1.5.dp, SummonerGold.copy(alpha = 0.82f), RoundedCornerShape(18.dp)),
   ) {
     Column(modifier = Modifier.padding(16.dp)) {
       Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {

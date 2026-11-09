@@ -65,10 +65,30 @@ object SanctuarySunlightSystem {
     ShadowFootprint(1020f, 1920f, 185f, 120f), // Hero Quarters
   )
 
+  // Curated tree-canopy gobo clusters (worldX, worldY, canopyRadius) for dappled leaf shadows & sunlit gaps
+  private val canopyGoboClusters = listOf(
+    Triple(1435f, 490f, 92f),
+    Triple(1690f, 495f, 92f),
+    Triple(2245f, 520f, 96f),
+    Triple(2385f, 605f, 98f),
+    Triple(2520f, 725f, 96f),
+    Triple(2645f, 890f, 102f),
+    Triple(2765f, 1095f, 104f),
+    Triple(2775f, 1355f, 104f),
+    Triple(2715f, 1590f, 98f),
+    Triple(415f, 1485f, 92f),
+    Triple(535f, 1475f, 90f),
+    Triple(980f, 2245f, 94f),
+    Triple(1715f, 1845f, 98f),
+    Triple(1865f, 2025f, 98f),
+    Triple(1060f, 485f, 84f),
+    Triple(1485f, 655f, 86f),
+  )
+
   /**
    * PASS 1 (Ground-Plane Shader Pass): Drawn immediately after the 128x128 terrain tiles & roads,
-   * BEFORE buildings, trees, and characters so ground sun pools, cloud drift shadows, and stone/water
-   * specular micro-reflections sit genuinely ON the ground plane underneath actors and shadows.
+   * BEFORE buildings, trees, and characters so ground sun pools, cloud drift shadows, dappled
+   * tree-canopy gobos, and stone/water specular micro-reflections sit genuinely ON the ground plane.
    */
   fun DrawScope.drawGroundSunPoolsAndSpecularity(
     camX: Float,
@@ -79,22 +99,22 @@ object SanctuarySunlightSystem {
     val halfW = size.width / 2f
     val halfH = size.height / 2f
     val envLight = WorldEnvironment.lighting
-    val daylightStrength = (0.55f + 0.45f * envLight.ambientIntensity).coerceIn(0.35f, 1.0f)
+    val daylightStrength = (0.58f + 0.42f * envLight.ambientIntensity).coerceIn(0.38f, 1.0f)
 
-    // 1. Slow-drifting organic high-altitude cloud shadow bands across the 2.5D ground plane
+    // 1. Slow-drifting organic high-altitude cloud shadow bands across the 2.5D ground plane (deeper contrast)
     for (band in 0 until 4) {
       val worldBandX = ((band * 820f + timeSec * 22f) % 3400f) - 100f
       val worldBandY = 500f + band * 560f + sin(timeSec * 0.18f + band) * 90f
       val sx = ObliqueCamera.worldToScreenX(worldBandX, camX, zoom, halfW)
       val sy = ObliqueCamera.worldToScreenY(worldBandY, camY, zoom, halfH)
-      val rx = 460f * zoom
+      val rx = 480f * zoom
       val ry = rx * ObliqueCamera.OBLIQUE_Y_SCALE
       if (sx + rx >= 0f && sx - rx <= size.width && sy + ry >= 0f && sy - ry <= size.height) {
         drawOval(
           brush = Brush.radialGradient(
             colors = listOf(
-              Color(0x240B1024),
-              Color(0x100B1024),
+              Color(0x36060B1A),
+              Color(0x1C060B1A),
               Color.Transparent,
             ),
             center = Offset(sx, sy),
@@ -106,9 +126,48 @@ object SanctuarySunlightSystem {
       }
     }
 
+    // 1B. Animated Dappled Tree-Canopy Gobo Shadows & Sunlit Leaf-Gap Caustics on the Ground
+    canopyGoboClusters.forEachIndexed { idx, (gxWorld, gyWorld, radiusWorld) ->
+      val cx = ObliqueCamera.worldToScreenX(gxWorld + 18f, camX, zoom, halfW)
+      val cy = ObliqueCamera.worldToScreenY(gyWorld + 12f, camY, zoom, halfH)
+      val rx = radiusWorld * zoom
+      val ry = rx * ObliqueCamera.OBLIQUE_Y_SCALE
+      if (cx + rx < -30f || cx - rx > size.width + 30f || cy + ry < -30f || cy - ry > size.height + 30f) {
+        return@forEachIndexed
+      }
+      val breeze = sin(timeSec * 1.6f + idx * 0.9f) * 4.5f * zoom
+      // Deep dappled foliage shadow lobes
+      for (lobe in 0 until 5) {
+        val ang = lobe * 1.256f + idx * 0.5f
+        val lx = cx + cos(ang) * rx * 0.38f + breeze * (if (lobe % 2 == 0) 1f else -0.7f)
+        val ly = cy + sin(ang) * ry * 0.38f
+        val lrx = rx * (0.42f + (lobe % 2) * 0.12f)
+        val lry = lrx * ObliqueCamera.OBLIQUE_Y_SCALE
+        drawOval(
+          color = Color(0x40050A16),
+          topLeft = Offset(lx - lrx, ly - lry),
+          size = Size(lrx * 2f, lry * 2f),
+        )
+      }
+      // Sunlit leaf-gap golden caustic flecks dancing between the shadow lobes
+      for (fleck in 0 until 3) {
+        val fAng = fleck * 2.09f + idx * 0.8f + timeSec * 0.4f
+        val fx = cx + cos(fAng) * rx * 0.28f - breeze * 0.5f
+        val fy = cy + sin(fAng) * ry * 0.28f
+        val frx = (11f + fleck * 3f) * zoom
+        val fry = frx * ObliqueCamera.OBLIQUE_Y_SCALE
+        drawOval(
+          color = Color(0x38FFF3C4),
+          topLeft = Offset(fx - frx, fy - fry),
+          size = Size(frx * 2f, fry * 2f),
+          blendMode = BlendMode.Plus,
+        )
+      }
+    }
+
     // 2. Foreshortened (Y=0.72) Sunlit Ground Pools with Building Shadow Occlusion Attenuation
     val isGoldenHour = envLight.hour in 5.5f..8.5f || envLight.hour in 16.5f..19.5f
-    val coreSunColor = if (isGoldenHour) Color(0xFFFFE0B2) else Color(0xFFFFF6D6)
+    val coreSunColor = if (isGoldenHour) Color(0xFFFFE0B2) else Color(0xFFFFF8E1)
     val outerSunColor = if (isGoldenHour) Color(0xFFFFB74D) else Color(0xFFFFDF80)
 
     sanctuarySunAnchors.forEach { anchor ->
@@ -122,8 +181,8 @@ object SanctuarySunlightSystem {
       }
 
       val occlusion = computeShadowOcclusionFactor(anchor.worldX, anchor.worldY)
-      val alphaCore = (0.19f * anchor.intensity * daylightStrength * occlusion).coerceIn(0.03f, 0.24f)
-      val alphaMid = (0.10f * anchor.intensity * daylightStrength * occlusion).coerceIn(0.02f, 0.14f)
+      val alphaCore = (0.22f * anchor.intensity * daylightStrength * occlusion).coerceIn(0.04f, 0.28f)
+      val alphaMid = (0.12f * anchor.intensity * daylightStrength * occlusion).coerceIn(0.02f, 0.16f)
 
       drawOval(
         brush = Brush.radialGradient(
@@ -141,45 +200,45 @@ object SanctuarySunlightSystem {
       )
     }
 
-    // 3. HD-2D Shader Specular Micro-Reflections on Plaza Flagstones, Astrolabe Runes & Cobble Roads
+    // 3. HD-2D Shader Specular Micro-Reflections on Plaza Flagstones, Astrolabe Runes & Crystal Canal
     val plazaX = SanctuaryIslandGeometry.PLAZA_CENTER_X
     val plazaY = SanctuaryIslandGeometry.PLAZA_CENTER_Y
     val centerSx = ObliqueCamera.worldToScreenX(plazaX, camX, zoom, halfW)
     val centerSy = ObliqueCamera.worldToScreenY(plazaY, camY, zoom, halfH)
-    val medallionRx = 224f * zoom
-    val medallionRy = 152f * zoom
+    val medallionRx = 236f * zoom
+    val medallionRy = 162f * zoom
     if (
       centerSx + medallionRx >= 0f && centerSx - medallionRx <= size.width &&
       centerSy + medallionRy >= 0f && centerSy - medallionRy <= size.height
     ) {
-      val ringAlpha = 0.22f + 0.08f * sin(timeSec * 2.1f)
+      val ringAlpha = 0.26f + 0.09f * sin(timeSec * 2.1f)
       drawOval(
         color = Color(0xFFFFE57F).copy(alpha = ringAlpha),
         topLeft = Offset(centerSx - medallionRx * 0.88f, centerSy - medallionRy * 0.88f),
         size = Size(medallionRx * 1.76f, medallionRy * 1.76f),
-        style = Stroke(width = (2.2f * zoom).coerceAtLeast(1f)),
+        style = Stroke(width = (2.4f * zoom).coerceAtLeast(1f)),
         blendMode = BlendMode.Plus,
       )
       drawOval(
-        color = Color(0xFF38BDF8).copy(alpha = ringAlpha * 0.85f),
+        color = Color(0xFF38BDF8).copy(alpha = ringAlpha * 0.90f),
         topLeft = Offset(centerSx - medallionRx * 0.58f, centerSy - medallionRy * 0.58f),
         size = Size(medallionRx * 1.16f, medallionRy * 1.16f),
-        style = Stroke(width = (1.8f * zoom).coerceAtLeast(1f)),
+        style = Stroke(width = (2.0f * zoom).coerceAtLeast(1f)),
         blendMode = BlendMode.Plus,
       )
 
-      // 24 Specular stone-bevel & gold-filigree micro-glints around the plaza and main causeways
-      for (i in 0 until 24) {
-        val angle = i * (Math.PI * 2.0 / 24.0) + 0.25
-        val dist = 95f + (i % 4) * 72f
+      // 32 Specular stone-bevel, water-crystal & gold-filigree micro-glints around the plaza and canals
+      for (i in 0 until 32) {
+        val angle = i * (Math.PI * 2.0 / 32.0) + 0.25
+        val dist = 85f + (i % 5) * 68f
         val gxWorld = plazaX + cos(angle).toFloat() * dist
         val gyWorld = plazaY + sin(angle).toFloat() * dist
-        val shimmer = sin(timeSec * 2.8f + i * 1.37f)
-        if (shimmer > 0.25f) {
+        val shimmer = sin(timeSec * 2.9f + i * 1.37f)
+        if (shimmer > 0.20f) {
           val gsx = ObliqueCamera.worldToScreenX(gxWorld, camX, zoom, halfW)
           val gsy = ObliqueCamera.worldToScreenY(gyWorld, camY, zoom, halfH)
-          val glintAlpha = ((shimmer - 0.25f) / 0.75f) * 0.48f * daylightStrength
-          val glintR = (3.5f + (i % 3) * 1.4f) * zoom
+          val glintAlpha = ((shimmer - 0.20f) / 0.80f) * 0.54f * daylightStrength
+          val glintR = (3.6f + (i % 3) * 1.5f) * zoom
           drawCircle(
             color = if (i % 3 == 0) Color(0xFFE0F2FE).copy(alpha = glintAlpha)
             else Color(0xFFFFF8E1).copy(alpha = glintAlpha),
@@ -193,7 +252,7 @@ object SanctuarySunlightSystem {
   }
 
   /**
-   * PASS 2 (Volumetric Sun Shafts & Floating Golden Motes): Drawn in world space along `AZ=142°`.
+   * PASS 2 (Dual-Layer Crepuscular Volumetric Sun Shafts & Floating Golden Motes): Drawn in world space along `AZ=142°`.
    */
   fun DrawScope.drawVolumetricSunShaftsAndMotes(
     camX: Float,
@@ -207,12 +266,13 @@ object SanctuarySunlightSystem {
     val envLight = WorldEnvironment.lighting
     val isGoldenHour = envLight.hour in 5.5f..8.5f || envLight.hour in 16.5f..19.5f
     val beamTint = if (isGoldenHour) Color(0xFFFFD180) else Color(0xFFFFF3C4)
+    val coreTint = if (isGoldenHour) Color(0xFFFFF8E1) else Color(0xFFFFFFFF)
 
     sanctuarySunAnchors.forEachIndexed { idx, anchor ->
       val targetSx = ObliqueCamera.worldToScreenX(anchor.worldX, camX, zoom, halfW)
       val targetSy = ObliqueCamera.worldToScreenY(anchor.worldY, camY, zoom, halfH)
-      val beamHalfW = (anchor.radiusWorld * 0.48f) * zoom
-      val beamLen = 520f * zoom
+      val beamHalfW = (anchor.radiusWorld * 0.50f) * zoom
+      val beamLen = 540f * zoom
 
       if (
         targetSx + beamHalfW * 2f < -120f || targetSx - beamLen > size.width + 120f ||
@@ -225,36 +285,58 @@ object SanctuarySunlightSystem {
       val originY = targetSy - beamLen * 0.82f
       val sway = sin(timeSec * 0.55f + anchor.phaseOffset) * 14f * zoom
       val breath = 0.86f + 0.14f * sin(timeSec * 0.85f + idx * 0.9f)
-      val shaftAlpha = (0.11f * anchor.intensity * breath).coerceIn(0.03f, 0.15f)
+      val shaftAlpha = (0.125f * anchor.intensity * breath).coerceIn(0.03f, 0.17f)
 
-      val path = Path().apply {
-        moveTo(originX - beamHalfW * 0.52f + sway, originY)
-        lineTo(originX + beamHalfW * 0.52f + sway, originY)
-        lineTo(targetSx + beamHalfW * 1.12f, targetSy + beamHalfW * 0.35f)
-        lineTo(targetSx - beamHalfW * 0.95f, targetSy + beamHalfW * 0.35f)
+      // Outer wide atmospheric sun shaft
+      val outerPath = Path().apply {
+        moveTo(originX - beamHalfW * 0.54f + sway, originY)
+        lineTo(originX + beamHalfW * 0.54f + sway, originY)
+        lineTo(targetSx + beamHalfW * 1.15f, targetSy + beamHalfW * 0.36f)
+        lineTo(targetSx - beamHalfW * 0.98f, targetSy + beamHalfW * 0.36f)
         close()
       }
-
       drawPath(
-        path = path,
+        path = outerPath,
         brush = Brush.linearGradient(
           colors = listOf(
-            beamTint.copy(alpha = shaftAlpha * 1.15f),
-            beamTint.copy(alpha = shaftAlpha * 0.65f),
+            beamTint.copy(alpha = shaftAlpha * 1.18f),
+            beamTint.copy(alpha = shaftAlpha * 0.68f),
             Color.Transparent,
           ),
           start = Offset(originX + sway, originY),
-          end = Offset(targetSx, targetSy + beamHalfW * 0.35f),
+          end = Offset(targetSx, targetSy + beamHalfW * 0.36f),
+        ),
+        blendMode = BlendMode.Plus,
+      )
+
+      // Inner focused crepuscular diamond-core ray
+      val corePath = Path().apply {
+        moveTo(originX - beamHalfW * 0.18f + sway * 1.1f, originY)
+        lineTo(originX + beamHalfW * 0.18f + sway * 1.1f, originY)
+        lineTo(targetSx + beamHalfW * 0.42f, targetSy + beamHalfW * 0.22f)
+        lineTo(targetSx - beamHalfW * 0.36f, targetSy + beamHalfW * 0.22f)
+        close()
+      }
+      drawPath(
+        path = corePath,
+        brush = Brush.linearGradient(
+          colors = listOf(
+            coreTint.copy(alpha = shaftAlpha * 0.92f),
+            beamTint.copy(alpha = shaftAlpha * 0.48f),
+            Color.Transparent,
+          ),
+          start = Offset(originX + sway * 1.1f, originY),
+          end = Offset(targetSx, targetSy + beamHalfW * 0.22f),
         ),
         blendMode = BlendMode.Plus,
       )
     }
 
     if (particlesEnabled) {
-      for (i in 0 until 32) {
+      for (i in 0 until 38) {
         val anchor = sanctuarySunAnchors[i % sanctuarySunAnchors.size]
         val localAngle = (i * 1.618f) + timeSec * 0.28f
-        val localDist = ((i * 37) % 160) * (0.6f + 0.4f * sin(timeSec * 0.4f + i))
+        val localDist = ((i * 37) % 165) * (0.6f + 0.4f * sin(timeSec * 0.4f + i))
         val wx = anchor.worldX + cos(localAngle) * localDist
         val wy = anchor.worldY + sin(localAngle) * localDist
         val elevZ = 18f + ((i * 19f + timeSec * 14f) % 95f)
@@ -263,15 +345,16 @@ object SanctuarySunlightSystem {
         val sy = ObliqueCamera.worldToScreenY(wy, camY, zoom, halfH, elevationZ = elevZ)
         if (sx in 0f..size.width && sy in 0f..size.height) {
           val twinkle = 0.45f + 0.55f * abs(sin(timeSec * 2.2f + i * 0.77f))
-          val r = (1.6f + (i % 3) * 0.85f) * zoom
+          val r = (1.7f + (i % 3) * 0.9f) * zoom
           drawCircle(
-            color = Color(0xFFFFECB3).copy(alpha = 0.22f * twinkle),
-            radius = r * 2.4f,
+            color = if (i % 4 == 0) Color(0xFFBAE6FD).copy(alpha = 0.26f * twinkle)
+            else Color(0xFFFFECB3).copy(alpha = 0.26f * twinkle),
+            radius = r * 2.6f,
             center = Offset(sx, sy),
             blendMode = BlendMode.Plus,
           )
           drawCircle(
-            color = Color(0xFFFFFDE7).copy(alpha = 0.78f * twinkle),
+            color = Color(0xFFFFFDE7).copy(alpha = 0.84f * twinkle),
             radius = r,
             center = Offset(sx, sy),
             blendMode = BlendMode.Plus,
@@ -293,45 +376,45 @@ object SanctuarySunlightSystem {
     val isGoldenHour = envLight.hour in 5.5f..8.5f || envLight.hour in 16.5f..19.5f
 
     // 1. Upper-left NW Warm Solar Key-Light Bloom
-    val nwBloomColor = if (isGoldenHour) Color(0x30FFCC80) else Color(0x2CFFECB3)
+    val nwBloomColor = if (isGoldenHour) Color(0x36FFCC80) else Color(0x32FFECB3)
     drawRect(
       brush = Brush.radialGradient(
         colors = listOf(nwBloomColor, Color.Transparent),
         center = Offset(w * 0.14f, h * 0.12f),
-        radius = (w.coerceAtLeast(h) * 0.72f).coerceAtLeast(10f),
+        radius = (w.coerceAtLeast(h) * 0.74f).coerceAtLeast(10f),
       ),
       size = size,
       blendMode = BlendMode.Plus,
     )
 
-    // 2. Far-Horizon Aerial Perspective Haze (Top 22% of screen)
+    // 2. Far-Horizon Aerial Perspective Haze (Top 20% of screen)
     drawRect(
       brush = Brush.verticalGradient(
         colors = listOf(
-          Color(0x2838BDF8),
-          Color(0x12FEF08A),
+          Color(0x2C38BDF8),
+          Color(0x14FEF08A),
           Color.Transparent,
         ),
         startY = 0f,
-        endY = h * 0.22f,
+        endY = h * 0.20f,
       ),
-      size = Size(w, h * 0.22f),
+      size = Size(w, h * 0.20f),
       blendMode = BlendMode.Plus,
     )
 
-    // 3. Subtle Foreground Tilt-Shift Depth & Edge Vignette
+    // 3. Subtle Foreground Depth Framing (Bottom 18% only so gameplay stays bright and crisp)
     drawRect(
       brush = Brush.verticalGradient(
         colors = listOf(
           Color.Transparent,
-          Color(0x18070913),
-          Color(0x44070913),
+          Color(0x14060A16),
+          Color(0x32060A16),
         ),
-        startY = h * 0.76f,
+        startY = h * 0.82f,
         endY = h,
       ),
-      topLeft = Offset(0f, h * 0.76f),
-      size = Size(w, h * 0.24f),
+      topLeft = Offset(0f, h * 0.82f),
+      size = Size(w, h * 0.18f),
     )
   }
 
