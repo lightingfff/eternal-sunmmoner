@@ -302,6 +302,7 @@ fun EternalSummonerRootApp() {
           state = uiState,
           onSelectFloor = vm::selectFloorForPrep,
           onBackToLobby = vm::returnToSanctuaryLobby,
+          playEntryCutscene = true,
         )
       }
 

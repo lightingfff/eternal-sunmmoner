@@ -480,7 +480,12 @@ fun SanctuaryLobbyScreen(
               // 1. Contextual Facility Tap Priority (External Master Commander — no walking required!)
               val tappedFacility = lobbyEngine.selectFacilityAt(worldX, worldY)
               if (tappedFacility != null) {
-                promptedFacility = tappedFacility
+                if (tappedFacility == FacilityType.TOWER_GATE) {
+                  promptedFacility = null
+                  onOpenFacility(FacilityType.TOWER_GATE)
+                } else {
+                  promptedFacility = tappedFacility
+                }
                 return@detectTapGestures
               }
 
@@ -499,9 +504,11 @@ fun SanctuaryLobbyScreen(
                   lobbyEngine.selectedHeroId = tappedHero.heroId
                   hudSelectedHeroId = tappedHero.heroId
                   promptedFacility = null
+                } else if (tappedHero.heroId == "npc_gatekeeper") {
+                  promptedFacility = null
+                  onOpenFacility(FacilityType.TOWER_GATE)
                 } else {
                   promptedFacility = when (tappedHero.heroId) {
-                    "npc_gatekeeper" -> FacilityType.TOWER_GATE
                     "npc_alchemist" -> FacilityType.SYNTHESIS_LAB
                     "npc_registry_officer" -> FacilityType.SUMMONING_HALL
                     "npc_trainer" -> FacilityType.TRAINING_GROUND
@@ -1803,10 +1810,24 @@ private fun PrologueDialogueCard(
 ) {
   Surface(
     shape = RoundedCornerShape(18.dp),
-    color = Color(0xD4132238),
-    modifier = modifier.border(1.5.dp, SummonerGold.copy(alpha = 0.82f), RoundedCornerShape(18.dp)),
+    color = Color(0xDC08172E),
+    modifier = modifier.border(1.5.dp, PortalCyan.copy(alpha = 0.85f), RoundedCornerShape(18.dp)),
   ) {
     Column(modifier = Modifier.padding(16.dp)) {
+      Surface(
+        shape = RoundedCornerShape(6.dp),
+        color = Color(0xA4102646),
+        modifier = Modifier.border(1.dp, SummonerGold.copy(alpha = 0.65f), RoundedCornerShape(6.dp)),
+      ) {
+        Text(
+          text = "[ SYSTEM AWAKENING • KHỞI ĐẦU KHẾ ƯỚC VĨNH HẰNG ]",
+          style = MaterialTheme.typography.labelSmall,
+          color = PortalCyan,
+          fontWeight = FontWeight.Bold,
+          modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+        )
+      }
+      Spacer(modifier = Modifier.height(8.dp))
       Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         PixelHeroPortraitAvatar(heroClass = beat.heroClassForPortrait, sizeDp = 48.dp)
         Column(modifier = Modifier.weight(1f)) {
