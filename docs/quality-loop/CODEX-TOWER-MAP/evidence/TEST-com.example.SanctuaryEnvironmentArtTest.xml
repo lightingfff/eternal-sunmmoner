@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.SanctuaryEnvironmentArtTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-09T14:30:16.361Z" hostname="b316c1c49299" time="7.902">
+  <properties/>
+  <testcase name="characterBehindCanopy" classname="com.example.SanctuaryEnvironmentArtTest" time="5.209"/>
+  <testcase name="obliqueProjectionAndAnchorsRemainConsistent" classname="com.example.SanctuaryEnvironmentArtTest" time="0.05"/>
+  <testcase name="environmentDetailsAtMultipleZooms" classname="com.example.SanctuaryEnvironmentArtTest" time="1.063"/>
+  <testcase name="terrainCloseupsInRuntimeRenderer" classname="com.example.SanctuaryEnvironmentArtTest" time="1.282"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

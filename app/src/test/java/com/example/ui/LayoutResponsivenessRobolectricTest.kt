@@ -484,6 +484,7 @@ class LayoutResponsivenessRobolectricTest {
             state = state,
             onSelectFloor = { currentScreen = 1 },
             onBackToLobby = {},
+            sceneActive = false,
           )
           1 -> SquadPreparationScreen(
             state = state,
@@ -519,6 +520,10 @@ class LayoutResponsivenessRobolectricTest {
     composeTestRule.mainClock.advanceTimeBy(64L)
 
     val rootBounds = composeTestRule.onRoot().fetchSemanticsNode().boundsInRoot
+    // The owner-requested map starts with no floor-list overlay. Open the actual center gate.
+    composeTestRule.mainClock.autoAdvance = true
+    composeTestRule.onNodeWithTag("nexus_gate_tower").performClick()
+    composeTestRule.onNodeWithTag("enter_floor_1_button").performScrollTo()
     val floor1Btn = composeTestRule.onNodeWithTag("enter_floor_1_button").fetchSemanticsNode().boundsInRoot
     assertInsideViewport("Narrow Portrait Floor 01 Button", floor1Btn, rootBounds)
 
@@ -757,10 +762,12 @@ class LayoutResponsivenessRobolectricTest {
     val initial=buildRichSampleState()
     var state by mutableStateOf(initial)
     var tower by mutableStateOf(false)
+    var backDispatcher: androidx.activity.OnBackPressedDispatcher? = null
     var host: View?=null
     composeTestRule.mainClock.autoAdvance=false
     composeTestRule.setContent {
       host=LocalView.current
+      backDispatcher = androidx.activity.compose.LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
       EternalSummonerTheme {
         if(tower) FloorSelectionScreen(state=state,onSelectFloor={},onBackToLobby={tower=false})
         else SanctuaryLobbyScreen(state=state,onOpenFacility={if(it==FacilityType.TOWER_GATE) tower=true else state=state.copy(activeFacilityModal=it)},
@@ -800,9 +807,9 @@ class LayoutResponsivenessRobolectricTest {
     composeTestRule.onNodeWithTag("nav_tower").performClick()
     composeTestRule.mainClock.advanceTimeBy(160)
     composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("back_to_lobby_button").assertExists()
+    composeTestRule.onNodeWithTag("dimensional_nexus_minimap_canvas").assertExists()
     host?.let { saveViewScreenshot(it,"build/visual_screenshots/p2/tower.png") }
-    composeTestRule.onNodeWithTag("back_to_lobby_button").performClick()
+    composeTestRule.runOnIdle { requireNotNull(backDispatcher).onBackPressed() }
     composeTestRule.mainClock.advanceTimeBy(160)
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("nav_heroes").performClick()

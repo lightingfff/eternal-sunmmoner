@@ -200,6 +200,7 @@ object SanctuaryWorldRenderer {
         tileScreenH = tileScreenH,
       )
       drawArchedMarbleFootbridges(::sx, ::sy, zoom)
+      drawSouthernProcessionCarpet(paths, ::sx, ::sy, zoom, 1735f, 2210f)
 
       // 3E. Monumental Central Circular White Stone Plaza, 4 Pastel Elemental Runes, Central Astral Fountain & Grand SE Staircase
       with(PremiumSliceRenderer) { drawSmithyVerge(camX,camY,zoom) }
@@ -214,11 +215,10 @@ object SanctuaryWorldRenderer {
       }
     }
 
-    // 3H. Twin Cliffside Cascading Waterfalls & Rising Prism Mist on the Southern Cliff Drop-off
-    drawSouthernCliffWaterfalls(::sx, ::sy, zoom, timeSec)
+    // Southern entrance is a dry ceremonial approach; no front canal outlets.
 
     // 4. Southern Main Gate Raised Stone Courtyard, Flanking Angled Stairs & Dual Wooden Drawbridges
-    drawSouthernMainGateAndBridges(::sx, ::sy, zoom)
+    drawSouthernMainGateAndBridges(paths, ::sx, ::sy, zoom)
 
     // 5. Tall Continuous Crenellated Pale-Limestone Back & Side Fortress Walls + North Arched Wall Tunnel
     val eastBridgeOpen = IslandExpansionMilestone.EAST_CELESTIAL_GARDEN in unlockedExpansions
@@ -950,14 +950,7 @@ object SanctuaryWorldRenderer {
       1750f to 760f,
       1475f to 995f,
       1455f to 1340f,
-      1505f to 1720f,
-      1335f to 2060f,
-      1315f to 2375f,
-    )
-    val eastBranch = listOf(
-      1505f to 1720f,
-      1760f to 1980f,
-      1895f to 2375f,
+      // The garden watercourse ends before the processional avenue.
     )
 
     fun drawWaterBranch(pts: List<Pair<Float, Float>>, widthWorld: Float) {
@@ -989,7 +982,6 @@ object SanctuaryWorldRenderer {
     }
 
     drawWaterBranch(riverSpine, 56f)
-    drawWaterBranch(eastBranch, 48f)
   }
 
   private fun DrawScope.drawArchedMarbleFootbridges(
@@ -1000,7 +992,6 @@ object SanctuaryWorldRenderer {
     // Sculpted 2.5D Arched White-Marble & Gold-Filigree Stone Footbridges where avenues cross the Celestial River
     val bridges = listOf(
       Triple(1455f, 1340f, true),  // Mid-West Avenue Bridge
-      Triple(1505f, 1720f, false), // Southern Spine Bridge
       Triple(1545f, 825f, false),  // Northern Spine Bridge
     )
     bridges.forEach { (bxWorld, byWorld, horizontal) ->
@@ -1130,16 +1121,6 @@ object SanctuaryWorldRenderer {
     }
     drawPath(northCarpet, Color(0xFF881337))
     drawPath(northCarpet, Color(0xFFF5B841), style = Stroke(width = 2.0f * zoom))
-
-    val southCarpet = Path().apply {
-      moveTo(sx(1576f), sy(1735f, 0f))
-      lineTo(sx(1636f), sy(1735f, 0f))
-      lineTo(sx(1642f), sy(2210f, 0f))
-      lineTo(sx(1572f), sy(2210f, 0f))
-      close()
-    }
-    drawPath(southCarpet, Color(0xFF881337))
-    drawPath(southCarpet, Color(0xFFF5B841), style = Stroke(width = 2.0f * zoom))
 
     // 1. Stepped Outer Limestone & Royal Gold Curb + Deep Drop Shadow
     drawOval(Color(0xFF0A1020), Offset(cx - rx * 1.03f, cy - ry * 1.02f + 8f * zoom), Size(rx * 2.06f, ry * 2.04f))
@@ -1322,7 +1303,29 @@ object SanctuaryWorldRenderer {
     drawLine(Color(0xFFD4AF37), Offset(sx(2258f), sy(1572f, 12f)), Offset(sx(2402f), sy(1720f, 6f)), strokeWidth = 2.0f * zoom)
   }
 
+  private fun DrawScope.drawSouthernProcessionCarpet(
+    paths: List<PathSegment>, sx: (Float) -> Float, sy: (Float, Float) -> Float,
+    zoom: Float, startY: Float, endY: Float,
+  ) {
+    val halfWidth = SanctuaryEntranceApproach.HALF_CARPET_WIDTH
+    // Retain the road's endpoint bend before extending straight through the gate.
+    val ys = listOf(startY, 2240f.coerceIn(startY, endY), endY).distinct()
+    val runner = Path().apply {
+      ys.forEachIndexed { index, y ->
+        val x = SanctuaryEntranceApproach.centerX(y, paths) - halfWidth
+        if (index == 0) moveTo(sx(x), sy(y, 0f)) else lineTo(sx(x), sy(y, 0f))
+      }
+      ys.asReversed().forEach { y ->
+        lineTo(sx(SanctuaryEntranceApproach.centerX(y, paths) + halfWidth), sy(y, 0f))
+      }
+      close()
+    }
+    drawPath(runner, Color(0xFF881337))
+    drawPath(runner, Color(0xFFF5B841), style = Stroke(width = 2f * zoom))
+  }
+
   private fun DrawScope.drawSouthernMainGateAndBridges(
+    paths: List<PathSegment>,
     sx: (Float) -> Float,
     sy: (Float, Float) -> Float,
     zoom: Float,
@@ -1350,6 +1353,9 @@ object SanctuaryWorldRenderer {
       val ly = sy(gy.toFloat(), 0f)
       drawLine(Color(0xFFA8A296), Offset(platL, ly), Offset(platR, ly), strokeWidth = 1.2f * zoom)
     }
+
+    // Continue the SAME road-aligned runner across the opaque gatehouse deck.
+    drawSouthernProcessionCarpet(paths, sx, sy, zoom, 2175f, 2390f)
 
     // Flanking Angled Grey-Stone Staircases on Left & Right of the Gatehouse (matching reference!)
     val leftWingStairs = Path().apply {

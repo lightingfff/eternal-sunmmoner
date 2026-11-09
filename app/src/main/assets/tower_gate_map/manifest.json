@@ -1,0 +1,44 @@
+{
+  "author": "Codex, original deterministic Pillow pixel artwork",
+  "seed": 8341,
+  "ground_y_scale": 0.72,
+  "scene_size": [
+    960,
+    540
+  ],
+  "portals": {
+    "court": [
+      [
+        480,
+        326,
+        72,
+        231
+      ]
+    ],
+    "nexus": [
+      [
+        205,
+        323,
+        47,
+        164
+      ],
+      [
+        480,
+        285,
+        60,
+        200
+      ],
+      [
+        755,
+        323,
+        47,
+        164
+      ]
+    ]
+  },
+  "files": {
+    "engraved_door_leaves.png": "5dfcf878bbe6b1e0f44de79a680f9db662c5d538383fd3d09ec9b2ef23924627",
+    "eternal_gate_court.png": "75e1830bf8090308aff7e5e7991d747d3b82acf52883cbc35260fca64ba1493a",
+    "three_gate_nexus.png": "a0b2e69dd99212ce0ed07c0a46d9b6d8bc69ddc15675d4dca8b151774b4c7ccb"
+  }
+}
