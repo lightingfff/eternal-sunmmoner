@@ -960,6 +960,137 @@ class SummonerRepository(
     mutateLobbyAssignment(heroId, assignment, true)
   }
 
+  override suspend fun healHeroAtInfirmary(
+    profile: MasterProfile,
+    hero: HeroRecord,
+    goldCost: Long,
+  ) {
+    val uid = requireUserId()
+    require(profile.gold >= goldCost) { "Cần $goldCost Vàng để Trị Thương (+50% Max HP)." }
+    val userRef = db.collection("users").document(uid)
+    val heroRef = userRef.collection("heroes").document(hero.id)
+    val nowSec = System.currentTimeMillis() / 1000L
+    val (_, nextRoster) = com.example.data.LobbyHeroAssignments.healHeroAtInfirmary(
+      profile = profile,
+      roster = listOf(hero),
+      heroId = hero.id,
+      now = nowSec,
+      goldCost = goldCost,
+    )
+    val updatedHero = nextRoster.single()
+    val batch = db.batch()
+    batch.update(userRef, mapOf("gold" to (profile.gold - goldCost).coerceAtLeast(0L), "updatedAt" to FieldValue.serverTimestamp()))
+    batch.update(
+      heroRef,
+      mapOf(
+        "currentHp" to updatedHero.currentHp,
+        "status" to updatedHero.status,
+        "injuryRecoveryUntilEpochSec" to 0L,
+        "restStartedAtEpochSec" to 0L,
+        "currentAssignment" to updatedHero.currentAssignment,
+        "hiddenTrait" to com.example.data.LobbyHeroPersistenceFields.traitFields(updatedHero.hiddenTrait),
+        "updatedAt" to FieldValue.serverTimestamp(),
+      ),
+    )
+    batch.commit().await()
+  }
+
+  override suspend fun serveHeartyMealToHero(
+    profile: MasterProfile,
+    hero: HeroRecord,
+    goldCost: Long,
+  ) {
+    val uid = requireUserId()
+    require(profile.gold >= goldCost) { "Cần $goldCost Vàng để dùng Bữa Ăn Thịnh Soạn (+40 Tinh thần & xóa Hoảng loạn)." }
+    val userRef = db.collection("users").document(uid)
+    val heroRef = userRef.collection("heroes").document(hero.id)
+    val nowSec = System.currentTimeMillis() / 1000L
+    val (_, nextRoster) = com.example.data.LobbyHeroAssignments.serveHeartyMealToHero(
+      profile = profile,
+      roster = listOf(hero),
+      heroId = hero.id,
+      now = nowSec,
+      goldCost = goldCost,
+    )
+    val updatedHero = nextRoster.single()
+    val batch = db.batch()
+    batch.update(userRef, mapOf("gold" to (profile.gold - goldCost).coerceAtLeast(0L), "updatedAt" to FieldValue.serverTimestamp()))
+    batch.update(
+      heroRef,
+      mapOf(
+        "morale" to updatedHero.morale,
+        "sanityState" to updatedHero.sanityState,
+        "hiddenTrait" to com.example.data.LobbyHeroPersistenceFields.traitFields(updatedHero.hiddenTrait),
+        "updatedAt" to FieldValue.serverTimestamp(),
+      ),
+    )
+    batch.commit().await()
+  }
+
+  override suspend fun performCruelHeroSynthesis(
+    targetHeroId: String,
+    sacrificedHeroIds: List<String>,
+  ): com.example.data.CruelSynthesisOutcome {
+    val uid = requireUserId()
+    val userRef = db.collection("users").document(uid)
+    val docs = userRef.collection("heroes").whereEqualTo("userId", uid).get().await().documents
+    val currentRoster = docs.mapNotNull { it.toObject(HeroRecord::class.java) }
+    val nowSec = System.currentTimeMillis() / 1000L
+    val outcome = com.example.data.LobbyHeroAssignments.performCruelSynthesis(
+      roster = currentRoster,
+      targetHeroId = targetHeroId,
+      sacrificedHeroIds = sacrificedHeroIds,
+      now = nowSec,
+    )
+    val batch = db.batch()
+    sacrificedHeroIds.distinct().filter { it != targetHeroId }.forEach { sacId ->
+      batch.delete(userRef.collection("heroes").document(sacId))
+    }
+    outcome.updatedRoster.forEach { updated ->
+      val prev = currentRoster.firstOrNull { it.id == updated.id }
+      if (prev != updated) {
+        batch.update(
+          userRef.collection("heroes").document(updated.id),
+          mapOf(
+            "level" to updated.level,
+            "exp" to updated.exp,
+            "maxHp" to updated.maxHp,
+            "currentHp" to updated.currentHp,
+            "attack" to updated.attack,
+            "defense" to updated.defense,
+            "morale" to updated.morale,
+            "sanityState" to updated.sanityState,
+            "hiddenTrait" to com.example.data.LobbyHeroPersistenceFields.traitFields(updated.hiddenTrait),
+            "updatedAt" to FieldValue.serverTimestamp(),
+          ),
+        )
+      }
+    }
+    batch.update(userRef, mapOf("updatedAt" to FieldValue.serverTimestamp()))
+    batch.commit().await()
+    return outcome
+  }
+
+  override suspend fun applySocialDisdainPenalty(lowStarHeroId: String, penalty: Int) {
+    val uid = requireUserId()
+    val heroRef = db.collection("users").document(uid).collection("heroes").document(lowStarHeroId)
+    val snap = heroRef.get().await().toObject(HeroRecord::class.java) ?: return
+    val updated = com.example.data.LobbyHeroAssignments.applyProximityDisdainMoralePenalty(
+      roster = listOf(snap),
+      lowStarHeroId = lowStarHeroId,
+      penalty = penalty,
+    ).single()
+    if (updated != snap) {
+      heroRef.update(
+        mapOf(
+          "morale" to updated.morale,
+          "sanityState" to updated.sanityState,
+          "updatedAt" to FieldValue.serverTimestamp(),
+        ),
+      ).await()
+    }
+  }
+
   override suspend fun toggleHeroInSquad(hero: HeroRecord, currentSquadSize: Int) {
     mutateLobbyAssignment(hero.id, null, false)
   }
@@ -1162,30 +1293,56 @@ class SummonerRepository(
         else -> (hero.morale - 22L).coerceIn(moraleFloor, 100L)
       }
 
+      val nextMaxHp = (hero.maxHp + if (didLevelUp) 32L else 0L).coerceAtMost(100000L)
+      val currentRealHp = if (hero.currentHp < 0L) hero.maxHp else hero.currentHp
+      val postRunHp = if (wasKnockedOut) {
+        nextMaxHp / 4L
+      } else if (hero.currentHp < 0L) {
+        -1L
+      } else {
+        (currentRealHp + if (didLevelUp) 32L else 0L).coerceAtMost(nextMaxHp)
+      }
+      val returnedLowHp = postRunHp > 0L && postRunHp * 100L < nextMaxHp * 15L
+      val baseBond = if (courierForgeUnlocked && hero.id == memoryHeroId) {
+        courierMemoryHeroName = hero.name
+        LostCourierProgression.rememberRescue(hero.bondSummary)
+      } else hero.bondSummary
+      val updatedBond = com.example.data.LobbyHeroAssignments.recordExpeditionSurvival(
+        bondSummary = baseBond,
+        survivedThisRun = !wasKnockedOut,
+        returnedUnder15PctHp = returnedLowHp,
+      )
+      val appraisedHero = com.example.data.LobbyHeroAssignments.checkAndUnlockHiddenTrait(
+        hero.copy(
+          level = nextLevel,
+          morale = nextMorale,
+          maxHp = nextMaxHp,
+          currentHp = postRunHp,
+          bondSummary = updatedBond,
+        ),
+        nowSec,
+      )
+
       updateDocument(
         heroRef,
         mapOf(
           "level" to nextLevel,
           "exp" to remExp.coerceAtMost(10000000L),
-          "maxHp" to (hero.maxHp + if (didLevelUp) 32L else 0L).coerceAtMost(100000L),
+          "maxHp" to nextMaxHp,
           "attack" to (hero.attack + if (didLevelUp) 7L else 0L).coerceAtMost(50000L),
           "defense" to (hero.defense + if (didLevelUp) 4L else 0L).coerceAtMost(50000L),
           "speed" to (hero.speed + if (didLevelUp) 2L else 0L).coerceAtMost(500L),
           "status" to nextStatus,
           "injuryRecoveryUntilEpochSec" to recoveryUntil,
           "morale" to nextMorale,
-          "hiddenTrait" to com.example.data.LobbyHeroPersistenceFields.traitFields(hero.hiddenTrait.copy(unlocked = hero.hiddenTrait.unlocked || hero.hiddenTrait.canUnlock(nextLevel.toInt(), nextMorale.toInt(), com.example.data.model.HeroSanityState.fromRaw(hero.sanityState)))),
+          "hiddenTrait" to com.example.data.LobbyHeroPersistenceFields.traitFields(appraisedHero.hiddenTrait),
           "inActiveSquad" to if (wasKnockedOut) false else hero.inActiveSquad,
-          "currentHp" to if (wasKnockedOut) hero.maxHp / 4L else if (hero.currentHp < 0L) -1L else (hero.currentHp + if (didLevelUp) 32L else 0L).coerceAtMost(100000L),
+          "currentHp" to postRunHp,
           "currentAssignment" to if (wasKnockedOut) "RESTING" else if (hero.inActiveSquad) "IN_PARTY" else "UNASSIGNED",
           "restStartedAtEpochSec" to if (wasKnockedOut) nowSec else 0L,
+          "bondSummary" to updatedBond,
           "updatedAt" to FieldValue.serverTimestamp(),
-        ).let { fields ->
-          if (courierForgeUnlocked && hero.id == memoryHeroId) {
-            courierMemoryHeroName = hero.name
-            fields + ("bondSummary" to LostCourierProgression.rememberRescue(hero.bondSummary))
-          } else fields
-        },
+        ),
       )
     }
 

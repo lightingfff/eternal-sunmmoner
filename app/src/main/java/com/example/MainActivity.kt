@@ -295,6 +295,10 @@ fun EternalSummonerRootApp() {
           onDropHero = vm::assignLobbyHero,
           onHostMealWithRecipe = vm::hostRestaurantMealWithRecipe,
           onUnlockExpansion = vm::unlockIslandExpansion,
+          onHealHeroInfirmary = vm::healHeroAtInfirmary,
+          onServeHeartyMeal = vm::serveHeartyMealToHero,
+          onCruelSynthesis = vm::performCruelHeroSynthesis,
+          onSocialDisdainPenalty = { heroId -> vm.applySocialDisdainPenalty(heroId, 2) },
         )
       }
 

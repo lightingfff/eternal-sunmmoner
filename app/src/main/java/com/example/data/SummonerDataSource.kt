@@ -126,6 +126,25 @@ interface SummonerDataSource {
 
   suspend fun assignLobbyHero(heroId: String, assignment: com.example.data.model.HeroAssignment)
 
+  suspend fun healHeroAtInfirmary(
+    profile: MasterProfile,
+    hero: HeroRecord,
+    goldCost: Long = LobbyHeroAssignments.INFIRMARY_HEAL_GOLD_COST,
+  ) {}
+
+  suspend fun serveHeartyMealToHero(
+    profile: MasterProfile,
+    hero: HeroRecord,
+    goldCost: Long = LobbyHeroAssignments.HEARTY_MEAL_GOLD_COST,
+  ) {}
+
+  suspend fun performCruelHeroSynthesis(
+    targetHeroId: String,
+    sacrificedHeroIds: List<String>,
+  ): CruelSynthesisOutcome? = null
+
+  suspend fun applySocialDisdainPenalty(lowStarHeroId: String, penalty: Int = 2) {}
+
   suspend fun toggleHeroInSquad(hero: HeroRecord, currentSquadSize: Int)
 
   suspend fun markStoryFlag(profile: MasterProfile, flag: String)

@@ -31,6 +31,7 @@ class LobbyHeroTouchTest {
   @get:Rule val rule=createComposeRule()
   private var view: View?=null
   private val received=mutableListOf<Pair<String,HeroAssignment>>()
+  private val openedFacilities=mutableListOf<FacilityType>()
   private fun start(accept:Boolean=true) {
     rule.mainClock.autoAdvance=false
     val hero=HeroRecord(id="touch_hero",name="Kaelen",currentHp=50,maxHp=100)
@@ -39,7 +40,7 @@ class LobbyHeroTouchTest {
     rule.setContent {
       view=LocalView.current
       EternalSummonerTheme {
-        SanctuaryLobbyScreen(initial,{}, {}, {}, {_,_->}, {_,_->}, {}, {}, {_,_->}, {}, {}, {}, {},
+        SanctuaryLobbyScreen(initial,{ openedFacilities += it }, {}, {}, {_,_->}, {_,_->}, {}, {}, {_,_->}, {}, {}, {}, {},
           settings=GameSettings(defaultZoom=.36f),sceneActive=false,
           onDropHero={ id, assignment -> received+=id to assignment; accept })
       }
@@ -105,4 +106,17 @@ class LobbyHeroTouchTest {
     node.performTouchInput { up(1);moveTo(0,target);up(0) }
     rule.mainClock.advanceTimeBy(100);assertTrue(received.isEmpty())
   }
+  @Test fun tappingHouseOrTowerGateWithoutDraggingHeroOpensFacilityUiDirectly() {
+    start()
+    val node=rule.onNodeWithTag("sanctuary_canvas")
+    val housePoint=screen(735f,875f)
+    val gatePoint=screen(1960f,585f)
+    node.performTouchInput { click(housePoint) }
+    rule.mainClock.advanceTimeBy(100)
+    node.performTouchInput { click(gatePoint) }
+    rule.mainClock.advanceTimeBy(100)
+    assertEquals(listOf(FacilityType.HERO_QUARTERS, FacilityType.TOWER_GATE), openedFacilities)
+    assertTrue(received.isEmpty())
+  }
 }
+

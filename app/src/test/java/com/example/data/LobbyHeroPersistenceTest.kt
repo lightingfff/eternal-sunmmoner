@@ -85,4 +85,39 @@ class LobbyHeroPersistenceTest {
     assertEquals(8,restored.heroes.map { it.id }.distinct().size)
     assertEquals(4,restored.heroes.count { it.currentAssignment=="IN_PARTY" || it.inActiveSquad })
   }
+
+  @Test fun sanctuaryInfirmaryHealHeartyMealAndCruelSynthesisPersistImmediatelyToLocalJson() = runTest {
+    val manager = LocalGuestSaveManager(context)
+    manager.startOrResumeGuestSession("SanctuarySave")
+    manager.mutateSnapshot { s ->
+      s.copy(
+        profile = s.profile.copy(gold = 500L),
+        heroes = listOf(
+          HeroRecord(id = "target", userId = s.guestPlayerId, name = "Han Ysl", rarity = 4, attack = 100, defense = 60, maxHp = 200, currentHp = 80, morale = 20, sanityState = "PANICKED"),
+          HeroRecord(id = "mat", userId = s.guestPlayerId, name = "Tân Binh", rarity = 1, attack = 40, defense = 20, maxHp = 100, currentHp = 100, morale = 50),
+          HeroRecord(id = "coward", userId = s.guestPlayerId, name = "Kẻ Nhát Gan", rarity = 2, personality = "COWARD", morale = 70, maxHp = 120, currentHp = 120),
+        ),
+      )
+    }
+    val source = LocalGuestDataSource(manager)
+    val snap1 = manager.guestSnapshot.value!!
+    source.healHeroAtInfirmary(snap1.profile, snap1.heroes.first { it.id == "target" })
+    val snap2 = manager.guestSnapshot.value!!
+    source.serveHeartyMealToHero(snap2.profile, snap2.heroes.first { it.id == "target" })
+    source.performCruelHeroSynthesis("target", listOf("mat"))
+
+    val reloaded = LocalGuestSaveManager(context).startOrResumeGuestSession()
+    assertEquals(355L, reloaded.profile.gold) // 500 - 80 - 65
+    assertEquals(2, reloaded.heroes.size)
+    assertTrue(reloaded.heroes.none { it.id == "mat" })
+    val targetReloaded = reloaded.heroes.first { it.id == "target" }
+    assertEquals(108L, targetReloaded.attack)
+    assertEquals(64L, targetReloaded.defense)
+    assertEquals(220L, targetReloaded.maxHp)
+    assertEquals(60L, targetReloaded.morale)
+    assertEquals("NORMAL", targetReloaded.sanityState)
+    val cowardReloaded = reloaded.heroes.first { it.id == "coward" }
+    assertEquals(60L, cowardReloaded.morale)
+  }
 }
+

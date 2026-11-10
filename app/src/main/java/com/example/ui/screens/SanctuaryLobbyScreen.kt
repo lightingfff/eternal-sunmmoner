@@ -242,6 +242,10 @@ fun SanctuaryLobbyScreen(
   onUnlockExpansion: (IslandExpansionMilestone) -> Unit = {},
   sceneActive: Boolean = true,
   onDropHero: suspend (String, HeroAssignment) -> Boolean = { _, _ -> false },
+  onHealHeroInfirmary: (HeroRecord) -> Unit = { h -> onRecoverHero(h, false) },
+  onServeHeartyMeal: (HeroRecord) -> Unit = { h -> onRecoverHero(h, true) },
+  onCruelSynthesis: (String, List<String>) -> Unit = { _, _ -> },
+  onSocialDisdainPenalty: (String) -> Unit = {},
 ) {
   val artContext = androidx.compose.ui.platform.LocalContext.current
   remember(artContext) { com.example.game.pixel.SanctuaryArtAssets.init(artContext) }
@@ -250,6 +254,7 @@ fun SanctuaryLobbyScreen(
   val depthQueue = remember { LobbyDrawQueue() }
   val dropScope = rememberCoroutineScope()
   val persistDrop by rememberUpdatedState(onDropHero)
+  val latestDisdainCallback by rememberUpdatedState(onSocialDisdainPenalty)
   var pickupOffset by remember { mutableStateOf(Offset.Zero) }
   var pendingDrop by remember { mutableStateOf(false) }
   val dragInvalidation = remember { mutableIntStateOf(0) }
@@ -359,6 +364,10 @@ fun SanctuaryLobbyScreen(
     val dx = if (kotlin.math.abs(joyDx) > 0.05f) joyDx else kDx
     val dy = if (kotlin.math.abs(joyDy) > 0.05f) joyDy else kDy
     fixedSimulation.advance(dt) { step -> lobbyEngine.step(step, dx, dy) }
+    val disdainTargets = lobbyEngine.consumePendingDisdainPenaltyHeroIds()
+    if (disdainTargets.isNotEmpty()) {
+      disdainTargets.forEach { targetId -> latestDisdainCallback(targetId) }
+    }
     activeInteriorState = lobbyEngine.activeInterior
     hudClock[0] += dt
     if (hudClock[0] >= 0.25f) {
@@ -401,8 +410,11 @@ fun SanctuaryLobbyScreen(
                 zoom = lobbyEngine.zoom
               } else {
                 lobbyEngine.nearbyFacility?.let { fac ->
-                  if (lobbyEngine.isInsideInterior) onOpenFacility(fac)
-                  else promptedFacility = fac
+                  if (lobbyEngine.isInsideInterior || fac == FacilityType.TOWER_GATE || fac == FacilityType.HERO_QUARTERS) {
+                    onOpenFacility(fac)
+                  } else {
+                    promptedFacility = fac
+                  }
                 }
               }
             }
@@ -476,6 +488,7 @@ fun SanctuaryLobbyScreen(
                 if (!tappedHero.isSanctuaryKeeperNpc) {
                   lobbyEngine.selectedHeroId = tappedHero.heroId
                   hudSelectedHeroId = tappedHero.heroId
+                  dragInvalidation.intValue++
                 } else {
                   onOpenFacility(activeInt)
                 }
@@ -487,19 +500,39 @@ fun SanctuaryLobbyScreen(
               }
               lobbyEngine.setTapDestination(worldX, worldY)
             } else {
-              // 1. Contextual Facility Tap Priority (External Master Commander — no walking required!)
+              // 1. Strict Hero Hitbox Priority: Tapping directly on an owned Hero selects them & triggers Speech Bubble immediately
+              val screenHitHero = pickupHeroAtScreen(
+                lobbyEngine.heroActors,
+                tapOffset,
+                camX,
+                camY,
+                zoom,
+                Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat()),
+                minimumTargetPx = 44f * artContext.resources.displayMetrics.density,
+              ) ?: lobbyEngine.selectHeroAt(worldX, worldY)?.takeIf { !it.isSanctuaryKeeperNpc }
+
+              if (screenHitHero != null && !screenHitHero.isSanctuaryKeeperNpc) {
+                lobbyEngine.selectedHeroId = screenHitHero.heroId
+                hudSelectedHeroId = screenHitHero.heroId
+                lobbyEngine.triggerHeroTapSpeech(screenHitHero.heroId)
+                promptedFacility = null
+                dragInvalidation.intValue++
+                return@tap
+              }
+
+              // 2. Facility Tap: Tapping "Ngôi Nhà" (HERO_QUARTERS) or "Cổng Tháp" (TOWER_GATE) opens its UI directly without blocking!
               val tappedFacility = lobbyEngine.selectFacilityAt(worldX, worldY)
               if (tappedFacility != null) {
-                if (tappedFacility == FacilityType.TOWER_GATE) {
+                if (tappedFacility == FacilityType.TOWER_GATE || tappedFacility == FacilityType.HERO_QUARTERS) {
                   promptedFacility = null
-                  onOpenFacility(FacilityType.TOWER_GATE)
+                  onOpenFacility(tappedFacility)
                 } else {
                   promptedFacility = tappedFacility
                 }
                 return@tap
               }
 
-              // 2. Physical Island Expansion Beacon / Terrace Tap
+              // 3. Physical Island Expansion Beacon / Terrace Tap
               val tappedExpansion = lobbyEngine.selectExpansionAt(worldX, worldY)
               if (tappedExpansion != null) {
                 promptedFacility = null
@@ -507,18 +540,14 @@ fun SanctuaryLobbyScreen(
                 return@tap
               }
 
-              // 3. Hero or Keeper NPC Selection
-              val tappedHero = lobbyEngine.selectHeroAt(worldX, worldY)
-              if (tappedHero != null) {
-                if (!tappedHero.isSanctuaryKeeperNpc) {
-                  lobbyEngine.selectedHeroId = tappedHero.heroId
-                  hudSelectedHeroId = tappedHero.heroId
-                  promptedFacility = null
-                } else if (tappedHero.heroId == "npc_gatekeeper") {
+              // 4. Keeper NPC Selection
+              val tappedNpc = lobbyEngine.selectHeroAt(worldX, worldY)
+              if (tappedNpc != null && tappedNpc.isSanctuaryKeeperNpc) {
+                if (tappedNpc.heroId == "npc_gatekeeper") {
                   promptedFacility = null
                   onOpenFacility(FacilityType.TOWER_GATE)
                 } else {
-                  promptedFacility = when (tappedHero.heroId) {
+                  promptedFacility = when (tappedNpc.heroId) {
                     "npc_alchemist" -> FacilityType.SYNTHESIS_LAB
                     "npc_registry_officer" -> FacilityType.SUMMONING_HALL
                     "npc_trainer" -> FacilityType.TRAINING_GROUND
@@ -530,7 +559,7 @@ fun SanctuaryLobbyScreen(
                 return@tap
               }
 
-              // 4. Empty Terrain Tap: Command selected hero or pan camera
+              // 5. Empty Terrain Tap: Command selected hero or pan camera
               promptedFacility = null
               lobbyEngine.setTapDestination(worldX, worldY)
             }
@@ -811,17 +840,7 @@ fun SanctuaryLobbyScreen(
         )
       }
 
-      // Crisp Under-Foot RPG Name Pills + Single Closest Speech Bubble (only at gameplay zoom >= 0.64f)
-      val activeSpeakerId = if (zoom >= 0.64f) {
-        lobbyEngine.heroActors
-          .filter { it.speechBubble != null }
-          .minByOrNull { hypot(it.x - lobbyEngine.masterX, it.y - lobbyEngine.masterY) }
-          ?.takeIf { hypot(it.x - lobbyEngine.masterX, it.y - lobbyEngine.masterY) <= 420f }
-          ?.heroId
-      } else {
-        null
-      }
-
+      // Crisp Under-Foot RPG Name Pills + Dynamic Floating Speech Bubbles above Heroes (3.5s fade-out)
       lobbyEngine.heroActors.forEach { actor ->
         if (zoom < 0.62f && actor.isSanctuaryKeeperNpc) return@forEach
         val hx = ObliqueCamera.worldToScreenX(actor.x, camX, zoom, halfW)
@@ -864,32 +883,52 @@ fun SanctuaryLobbyScreen(
         }
       }
 
-      lobbyEngine.heroActors.firstOrNull { it.heroId == activeSpeakerId && it.speechBubble != null }?.let { actor ->
-        val bubble = actor.speechBubble ?: return@let
+      // Render Floating Speech Bubbles above all active speaking Heroes (prioritizing picked/selected Hero first)
+      val speakingActors = lobbyEngine.heroActors
+        .filter { !it.speechBubble.isNullOrBlank() && it.speechTimer > 0f }
+        .sortedByDescending {
+          when {
+            it.heroId == lobbyEngine.pickedHeroId -> 3
+            it.heroId == lobbyEngine.selectedHeroId -> 2
+            !it.isSanctuaryKeeperNpc -> 1
+            else -> 0
+          }
+        }
+
+      speakingActors.forEach { actor ->
+        val bubble = actor.speechBubble ?: return@forEach
+        val isHeld = actor.heroId == lobbyEngine.pickedHeroId
+        val fadeAlpha = if (isHeld) 1f else (actor.speechTimer / 0.85f).coerceIn(0.15f, 1f)
         val hx = ObliqueCamera.worldToScreenX(actor.x, camX, zoom, halfW)
-        val headY = ObliqueCamera.worldToScreenY(actor.y, camY, zoom, halfH, elevationZ = 84f)
-        if (hx in 24f..(size.width - 24f) && headY in (topHudSafePx + 24f)..(size.height - 32f)) {
+        val headElevation = if (isHeld) 108f else 86f
+        val headY = ObliqueCamera.worldToScreenY(actor.y, camY, zoom, halfH, elevationZ = headElevation)
+        if (hx in 16f..(size.width - 16f) && headY in (topHudSafePx + 18f)..(size.height - 24f)) {
+          val displayBubble = if (bubble.length > 92) bubble.take(92) + "…" else bubble
           val bLayout = textMeasurer.measure(
-            text = bubble.take(42) + if (bubble.length > 42) "…" else "",
-            style = TextStyle(color = SummonerGold, fontSize = 10.sp, fontWeight = FontWeight.Medium),
+            text = displayBubble,
+            style = TextStyle(
+              color = SummonerGold.copy(alpha = fadeAlpha),
+              fontSize = if (zoom < 0.56f) 9.sp else 10.sp,
+              fontWeight = FontWeight.Medium,
+            ),
           )
           val bx = (hx - bLayout.size.width / 2f).coerceIn(12f, (size.width - bLayout.size.width - 18f).coerceAtLeast(12f))
-          val by = (headY - bLayout.size.height - 6f).coerceAtLeast(topHudSafePx + 8f)
-          val bubbleRect = androidx.compose.ui.geometry.Rect(Offset(bx - 7f, by - 4f), Size(bLayout.size.width + 14f, bLayout.size.height + 8f))
-          if (placedTagRects.none { it.overlaps(bubbleRect) }) {
+          val by = (headY - bLayout.size.height - 8f).coerceAtLeast(topHudSafePx + 8f)
+          val bubbleRect = androidx.compose.ui.geometry.Rect(Offset(bx - 8f, by - 5f), Size(bLayout.size.width + 16f, bLayout.size.height + 10f))
+          if (isHeld || placedTagRects.none { it.overlaps(bubbleRect) }) {
             placedTagRects += bubbleRect
             drawRoundRect(
-              color = Color(0xBA14243D),
-              topLeft = Offset(bx - 7f, by - 4f),
-              size = Size(bLayout.size.width + 14f, bLayout.size.height + 8f),
+              color = Color(0xD8102038).copy(alpha = 0.88f * fadeAlpha),
+              topLeft = Offset(bx - 8f, by - 5f),
+              size = Size(bLayout.size.width + 16f, bLayout.size.height + 10f),
               cornerRadius = CornerRadius(9f, 9f),
             )
             drawRoundRect(
-              color = SummonerGold.copy(alpha = 0.78f),
-              topLeft = Offset(bx - 7f, by - 4f),
-              size = Size(bLayout.size.width + 14f, bLayout.size.height + 8f),
+              color = (if (isHeld) PortalCyan else SummonerGold).copy(alpha = 0.85f * fadeAlpha),
+              topLeft = Offset(bx - 8f, by - 5f),
+              size = Size(bLayout.size.width + 16f, bLayout.size.height + 10f),
               cornerRadius = CornerRadius(9f, 9f),
-              style = Stroke(width = 1.2f),
+              style = Stroke(width = if (isHeld) 1.6f else 1.2f),
             )
             drawText(bLayout, topLeft = Offset(bx, by))
           }
@@ -1379,6 +1418,9 @@ fun SanctuaryLobbyScreen(
           inspectingHeroId = hero.id
         },
         initialSelectedHeroId = lobbyEngine.selectedHeroId,
+        onHealHeroInfirmary = onHealHeroInfirmary,
+        onServeHeartyMeal = onServeHeartyMeal,
+        onCruelSynthesis = onCruelSynthesis,
       )
     }
 
