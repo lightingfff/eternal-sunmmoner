@@ -358,6 +358,64 @@ class SummonerViewModel(
     }
   }
 
+  fun healHeroAtInfirmary(hero: HeroRecord) {
+    val profile = uiState.value.profile ?: return
+    if (_isBusyAction.value) return
+    _isBusyAction.value = true
+    viewModelScope.launch {
+      try {
+        repository.healHeroAtInfirmary(profile, hero)
+        _bannerFeedback.value = "Đã trị thương cho ${hero.name} (+50% Max HP)!"
+      } catch (e: Exception) {
+        _bannerFeedback.value = e.message ?: "Không đủ Vàng để trị thương."
+      } finally {
+        _isBusyAction.value = false
+      }
+    }
+  }
+
+  fun serveHeartyMealToHero(hero: HeroRecord) {
+    val profile = uiState.value.profile ?: return
+    if (_isBusyAction.value) return
+    _isBusyAction.value = true
+    viewModelScope.launch {
+      try {
+        repository.serveHeartyMealToHero(profile, hero)
+        _bannerFeedback.value = "${hero.name} đã dùng Bữa Ăn Thịnh Soạn (+40 Tinh thần & xóa Hoảng loạn)!"
+      } catch (e: Exception) {
+        _bannerFeedback.value = e.message ?: "Không đủ Vàng để phục vụ Bữa Ăn Thịnh Soạn."
+      } finally {
+        _isBusyAction.value = false
+      }
+    }
+  }
+
+  fun performCruelHeroSynthesis(targetHeroId: String, sacrificedHeroIds: List<String>) {
+    if (_isBusyAction.value) return
+    _isBusyAction.value = true
+    viewModelScope.launch {
+      try {
+        val outcome = repository.performCruelHeroSynthesis(targetHeroId, sacrificedHeroIds)
+        if (outcome != null) {
+          val traitNote = outcome.inheritedTraitName?.let { " • Kế thừa Kỹ năng ẩn [$it]!" }.orEmpty()
+          val cowardNote = if (outcome.cowardHeroesAffected > 0) " • ${outcome.cowardHeroesAffected} Anh hùng Hèn nhát bị -10 Tinh thần!" else ""
+          _bannerFeedback.value =
+            "Dung hợp hoàn tất: ${outcome.updatedTarget.name} nhận +${outcome.bonusAtk} ATK, +${outcome.bonusDef} DEF, +${outcome.bonusMaxHp} HP, +${outcome.bonusExp} EXP$traitNote$cowardNote"
+        }
+      } catch (e: Exception) {
+        _bannerFeedback.value = e.message ?: "Không thể thực hiện dung hợp."
+      } finally {
+        _isBusyAction.value = false
+      }
+    }
+  }
+
+  fun applySocialDisdainPenalty(lowStarHeroId: String, penalty: Int = 2) {
+    viewModelScope.launch {
+      runCatching { repository.applySocialDisdainPenalty(lowStarHeroId, penalty) }
+    }
+  }
+
   fun hostRestaurantMeal() {
     hostRestaurantMealWithRecipe(SanctuaryMealRecipe.ROAST_BEAST_PLATTER)
   }

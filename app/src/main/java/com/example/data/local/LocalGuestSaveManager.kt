@@ -118,13 +118,13 @@ class LocalGuestSaveManager(context: Context) {
       ?: loadValidSnapshotFromDisk()
       ?: createStarterGuestSnapshot("Master")
     val transformed = transform(current)
+    val nowSec = System.currentTimeMillis() / 1000L
     val next = transformed.copy(
       heroes = transformed.heroes.map { hero ->
-        if (!hero.hiddenTrait.unlocked && hero.hiddenTrait.canUnlock(hero.level.toInt(), hero.morale.toInt(), com.example.data.model.HeroSanityState.fromRaw(hero.sanityState)))
-          hero.copy(hiddenTrait = hero.hiddenTrait.copy(unlocked = true)) else hero
+        com.example.data.LobbyHeroAssignments.checkAndUnlockHiddenTrait(hero, nowSec)
       },
       schemaVersion = GuestSaveSnapshot.CURRENT_SAVE_SCHEMA_VERSION,
-      lastSavedEpochSec = System.currentTimeMillis() / 1000L,
+      lastSavedEpochSec = nowSec,
     )
     writeSnapshotAtomically(next)
     _guestSnapshot.value = next
@@ -1083,6 +1083,77 @@ class LocalGuestDataSource(
     }
   }
 
+  override suspend fun healHeroAtInfirmary(
+    profile: MasterProfile,
+    hero: HeroRecord,
+    goldCost: Long,
+  ) {
+    val nowSec = System.currentTimeMillis() / 1000L
+    saveManager.mutateSnapshot { snap ->
+      val (nextProfile, nextHeroes) = com.example.data.LobbyHeroAssignments.healHeroAtInfirmary(
+        profile = snap.profile,
+        roster = snap.heroes,
+        heroId = hero.id,
+        now = nowSec,
+        goldCost = goldCost,
+      )
+      snap.copy(profile = nextProfile, heroes = nextHeroes)
+    }
+  }
+
+  override suspend fun serveHeartyMealToHero(
+    profile: MasterProfile,
+    hero: HeroRecord,
+    goldCost: Long,
+  ) {
+    val nowSec = System.currentTimeMillis() / 1000L
+    saveManager.mutateSnapshot { snap ->
+      val (nextProfile, nextHeroes) = com.example.data.LobbyHeroAssignments.serveHeartyMealToHero(
+        profile = snap.profile,
+        roster = snap.heroes,
+        heroId = hero.id,
+        now = nowSec,
+        goldCost = goldCost,
+      )
+      snap.copy(profile = nextProfile, heroes = nextHeroes)
+    }
+  }
+
+  override suspend fun performCruelHeroSynthesis(
+    targetHeroId: String,
+    sacrificedHeroIds: List<String>,
+  ): com.example.data.CruelSynthesisOutcome {
+    val nowSec = System.currentTimeMillis() / 1000L
+    var outcome: com.example.data.CruelSynthesisOutcome? = null
+    saveManager.mutateSnapshot { snap ->
+      val res = com.example.data.LobbyHeroAssignments.performCruelSynthesis(
+        roster = snap.heroes,
+        targetHeroId = targetHeroId,
+        sacrificedHeroIds = sacrificedHeroIds,
+        now = nowSec,
+      )
+      outcome = res
+      val sacrificedSet = sacrificedHeroIds.toSet()
+      val nextEquipment = snap.equipment.map { eq ->
+        if (eq.equippedByHeroId in sacrificedSet) eq.copy(equippedByHeroId = "") else eq
+      }
+      snap.copy(heroes = res.updatedRoster, equipment = nextEquipment)
+    }
+    return requireNotNull(outcome)
+  }
+
+  override suspend fun applySocialDisdainPenalty(lowStarHeroId: String, penalty: Int) {
+    saveManager.mutateSnapshot { snap ->
+      snap.copy(
+        heroes = com.example.data.LobbyHeroAssignments.applyProximityDisdainMoralePenalty(
+          roster = snap.heroes,
+          lowStarHeroId = lowStarHeroId,
+          penalty = penalty,
+        ),
+      )
+    }
+  }
+
   override suspend fun toggleHeroInSquad(hero: HeroRecord, currentSquadSize: Int) {
     saveManager.mutateSnapshot { snap ->
       val current = requireNotNull(snap.heroes.find { it.id == hero.id })
@@ -1205,24 +1276,44 @@ class LocalGuestDataSource(
             else -> (hero.morale - 22L).coerceIn(moraleFloor, 100L)
           }
 
-          hero.copy(
-            level = nextLevel,
-            exp = remExp.coerceAtMost(10000000L),
-            maxHp = (hero.maxHp + if (didLevelUp) 32L else 0L).coerceAtMost(100000L),
-            attack = (hero.attack + if (didLevelUp) 7L else 0L).coerceAtMost(50000L),
-            defense = (hero.defense + if (didLevelUp) 4L else 0L).coerceAtMost(50000L),
-            speed = (hero.speed + if (didLevelUp) 2L else 0L).coerceAtMost(500L),
-            status = nextStatus,
-            injuryRecoveryUntilEpochSec = recoveryUntil,
-            morale = nextMorale,
-            inActiveSquad = if (wasKnockedOut) false else hero.inActiveSquad,
-            currentHp = if (wasKnockedOut) hero.maxHp / 4L else if (hero.currentHp < 0L) -1L else (hero.currentHp + if (didLevelUp) 32L else 0L).coerceAtMost(100000L),
-            currentAssignment = if (wasKnockedOut) "RESTING" else if (hero.inActiveSquad) "IN_PARTY" else "UNASSIGNED",
-            restStartedAtEpochSec = if (wasKnockedOut) nowSec else 0L,
-            bondSummary = if (courierForgeUnlocked && hero.id == memoryHeroId) {
-              courierMemoryHeroName = hero.name
-              LostCourierProgression.rememberRescue(hero.bondSummary)
-            } else hero.bondSummary,
+          val nextMaxHp = (hero.maxHp + if (didLevelUp) 32L else 0L).coerceAtMost(100000L)
+          val currentRealHp = if (hero.currentHp < 0L) hero.maxHp else hero.currentHp
+          val postRunHp = if (wasKnockedOut) {
+            nextMaxHp / 4L
+          } else if (hero.currentHp < 0L) {
+            -1L
+          } else {
+            (currentRealHp + if (didLevelUp) 32L else 0L).coerceAtMost(nextMaxHp)
+          }
+          val returnedLowHp = postRunHp > 0L && postRunHp * 100L < nextMaxHp * 15L
+          val baseBond = if (courierForgeUnlocked && hero.id == memoryHeroId) {
+            courierMemoryHeroName = hero.name
+            LostCourierProgression.rememberRescue(hero.bondSummary)
+          } else hero.bondSummary
+          val updatedBond = com.example.data.LobbyHeroAssignments.recordExpeditionSurvival(
+            bondSummary = baseBond,
+            survivedThisRun = !wasKnockedOut,
+            returnedUnder15PctHp = returnedLowHp,
+          )
+
+          com.example.data.LobbyHeroAssignments.checkAndUnlockHiddenTrait(
+            hero.copy(
+              level = nextLevel,
+              exp = remExp.coerceAtMost(10000000L),
+              maxHp = nextMaxHp,
+              attack = (hero.attack + if (didLevelUp) 7L else 0L).coerceAtMost(50000L),
+              defense = (hero.defense + if (didLevelUp) 4L else 0L).coerceAtMost(50000L),
+              speed = (hero.speed + if (didLevelUp) 2L else 0L).coerceAtMost(500L),
+              status = nextStatus,
+              injuryRecoveryUntilEpochSec = recoveryUntil,
+              morale = nextMorale,
+              inActiveSquad = if (wasKnockedOut) false else hero.inActiveSquad,
+              currentHp = postRunHp,
+              currentAssignment = if (wasKnockedOut) "RESTING" else if (hero.inActiveSquad) "IN_PARTY" else "UNASSIGNED",
+              restStartedAtEpochSec = if (wasKnockedOut) nowSec else 0L,
+              bondSummary = updatedBond,
+            ),
+            nowSec,
           )
         }
       }

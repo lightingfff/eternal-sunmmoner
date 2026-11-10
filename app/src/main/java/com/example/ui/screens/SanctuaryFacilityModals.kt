@@ -127,6 +127,9 @@ fun SanctuaryFacilityModalOverlay(
   onEnterFacilityInterior: ((FacilityType) -> Unit)? = null,
   onOpenHeroProfile: ((HeroRecord) -> Unit)? = null,
   initialSelectedHeroId: String? = null,
+  onHealHeroInfirmary: (HeroRecord) -> Unit = { h -> onRecoverHero(h, false) },
+  onServeHeartyMeal: (HeroRecord) -> Unit = { h -> onRecoverHero(h, true) },
+  onCruelSynthesis: (String, List<String>) -> Unit = { _, _ -> },
 ) {
   BackHandler(onBack = onClose)
 
@@ -299,6 +302,9 @@ fun SanctuaryFacilityModalOverlay(
               onRecoverHero = onRecoverHero,
               onAssignHeroActivity = onAssignHeroActivity,
               onOpenHeroProfile = onOpenHeroProfile,
+              onHealHeroInfirmary = onHealHeroInfirmary,
+              onServeHeartyMeal = onServeHeartyMeal,
+              onCruelSynthesis = onCruelSynthesis,
             )
 
             FacilityType.RESTAURANT -> RestaurantContent(
@@ -1033,118 +1039,571 @@ private fun HeroQuartersContent(
   onRecoverHero: (HeroRecord, Boolean) -> Unit,
   onAssignHeroActivity: (HeroRecord, HeroStatusType) -> Unit,
   onOpenHeroProfile: ((HeroRecord) -> Unit)? = null,
+  onHealHeroInfirmary: (HeroRecord) -> Unit = { h -> onRecoverHero(h, false) },
+  onServeHeartyMeal: (HeroRecord) -> Unit = { h -> onRecoverHero(h, true) },
+  onCruelSynthesis: (String, List<String>) -> Unit = { _, _ -> },
 ) {
+  var activeTab by remember { mutableStateOf(0) } // 0 = Dormitory & Blind Appraisal, 1 = Infirmary & Canteen, 2 = Cruel Synthesis Chamber
+  val activeHeroes = remember(heroes) {
+    heroes.filter { it.currentAssignment != com.example.data.model.HeroAssignment.SACRIFICED.name }
+  }
   val eastGardenUnlocked = SanctuaryProgressionHelper.isExpansionUnlocked(
     profile.storyFlags,
     IslandExpansionMilestone.EAST_CELESTIAL_GARDEN,
   )
-  val injuredCount = heroes.count { it.status == HeroStatusType.INJURED.name }
+  val injuredCount = activeHeroes.count {
+    it.status == HeroStatusType.INJURED.name || (it.currentHp in 1 until it.maxHp) || it.morale < 60L
+  }
 
-  LazyColumn(
-    modifier = Modifier.fillMaxSize(),
-    verticalArrangement = Arrangement.spacedBy(10.dp),
-  ) {
-    item {
-      Column(
-        modifier = Modifier
-          .fillMaxWidth()
-          .clip(RoundedCornerShape(12.dp))
-          .background(Color(0x98162842))
-          .border(1.dp, EmeraldVitality.copy(alpha = 0.65f), RoundedCornerShape(12.dp))
-          .padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+  var selectedInfirmaryHeroId by remember(activeHeroes) {
+    val defaultHero = activeHeroes.firstOrNull {
+      it.status == HeroStatusType.INJURED.name || (it.currentHp in 1 until it.maxHp) || it.morale < 80L ||
+        it.sanityState == com.example.data.model.HeroSanityState.PANICKED.name
+    } ?: activeHeroes.firstOrNull()
+    mutableStateOf(defaultHero?.id)
+  }
+
+  var synthesisTargetId by remember(activeHeroes) {
+    mutableStateOf(activeHeroes.maxByOrNull { it.rarity * 100L + it.level }?.id)
+  }
+  var synthesisMaterialIds by remember(activeHeroes, synthesisTargetId) {
+    mutableStateOf(emptyList<String>())
+  }
+
+  Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    // 3-Tab Sanctuary House Navigation Bar
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+      OutlinedButton(
+        onClick = { activeTab = 0 },
+        modifier = Modifier.weight(1f).heightIn(min = 42.dp).testTag("quarters_tab_dormitory"),
+        colors = ButtonDefaults.outlinedButtonColors(
+          containerColor = if (activeTab == 0) EmeraldVitality.copy(alpha = 0.24f) else Color(0x88132238),
+        ),
+        border = BorderStroke(1.dp, if (activeTab == 0) EmeraldVitality else PortalCyan.copy(alpha = 0.45f)),
+        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
       ) {
         Text(
-          text = "Giường Tịnh Dưỡng Khu Nghỉ Ngơi: Đang sử dụng $injuredCount / 6 giường",
-          style = MaterialTheme.typography.titleSmall,
-          color = EmeraldVitality,
+          text = "1. Ký Túc Xá & Giám Định",
+          style = MaterialTheme.typography.labelMedium,
+          color = if (activeTab == 0) SummonerGold else ParchmentLight,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
         )
+      }
+      OutlinedButton(
+        onClick = { activeTab = 1 },
+        modifier = Modifier.weight(1f).heightIn(min = 42.dp).testTag("quarters_tab_infirmary"),
+        colors = ButtonDefaults.outlinedButtonColors(
+          containerColor = if (activeTab == 1) PortalCyan.copy(alpha = 0.24f) else Color(0x88132238),
+        ),
+        border = BorderStroke(1.dp, if (activeTab == 1) PortalCyan else PortalCyan.copy(alpha = 0.45f)),
+        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
+      ) {
         Text(
-          text = "Anh hùng trọng thương trong Tháp được đưa thẳng về đây nghỉ ngơi, không mất vĩnh viễn và không tự ý tuần tra ngoài trời.",
-          style = MaterialTheme.typography.bodySmall,
-          color = RuneSilver,
+          text = "2. Nghỉ Dưỡng & Nhà Ăn",
+          style = MaterialTheme.typography.labelMedium,
+          color = if (activeTab == 1) SummonerGold else ParchmentLight,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
         )
-        if (eastGardenUnlocked) {
-          Text(
-            text = "✦ Suối Thánh Đài Vườn Đông đang hoạt động: Giảm 25% thời gian hồi phục chấn thương!",
-            style = MaterialTheme.typography.labelSmall,
-            color = PortalCyan,
-          )
-        }
+      }
+      OutlinedButton(
+        onClick = { activeTab = 2 },
+        modifier = Modifier.weight(1f).heightIn(min = 42.dp).testTag("quarters_tab_synthesis"),
+        colors = ButtonDefaults.outlinedButtonColors(
+          containerColor = if (activeTab == 2) CrimsonBlood.copy(alpha = 0.28f) else Color(0x88132238),
+        ),
+        border = BorderStroke(1.dp, if (activeTab == 2) CrimsonBlood else PortalCyan.copy(alpha = 0.45f)),
+        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
+      ) {
+        Text(
+          text = "3. Lò Dung Hợp Tàn Khốc",
+          style = MaterialTheme.typography.labelMedium,
+          color = if (activeTab == 2) SummonerGold else ParchmentLight,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
+        )
       }
     }
 
-    items(heroes, key = { it.id }) { hero ->
-      val remSec = hero.remainingInjurySeconds(nowEpochSec)
-      val needsStatusClear = hero.status == HeroStatusType.INJURED.name
-      val isResting = hero.statusType == HeroStatusType.RESTING
-
-      Row(
-        modifier = Modifier
-          .fillMaxWidth()
-          .clip(RoundedCornerShape(12.dp))
-          .background(Color(0xA4182B46))
-          .border(1.dp, if (needsStatusClear) AmberWarning else if (isResting) EmeraldVitality else PortalCyan.copy(alpha = 0.42f), RoundedCornerShape(12.dp))
-          .padding(10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-      ) {
-        PixelHeroPortraitAvatar(heroName = hero.name, heroClass = hero.classType, sizeDp = 46.dp)
-        Column(modifier = Modifier.weight(1f)) {
-          Text("${hero.name} • Sĩ khí ${hero.morale}%", style = MaterialTheme.typography.titleSmall, color = ParchmentLight)
-          Text(
-            text = when {
-              remSec > 0L -> "Đang băng bó trên giường bệnh • Còn ${remSec}s"
-              needsStatusClear -> "Đã tịnh dưỡng xong • Sẵn sàng xuất viện!"
-              isResting -> "Đang nghỉ ngơi thư giãn trong Khu Nghỉ Ngơi"
-              else -> "Khỏe mạnh • ${hero.personalityType.lobbyHabitVi}"
-            },
-            style = MaterialTheme.typography.bodySmall,
-            color = if (remSec > 0L) AmberWarning else EmeraldVitality,
-          )
-        }
-
-        if (onOpenHeroProfile != null) {
-          IconButton(
-            onClick = { onOpenHeroProfile(hero) },
-            modifier = Modifier.size(44.dp).testTag("quarters_profile_${hero.id}"),
-          ) {
-            Icon(Icons.Default.Person, contentDescription = "Mở hồ sơ ${hero.name}", tint = SummonerGold)
-          }
-        }
-
-        if (needsStatusClear) {
-          Button(
-            onClick = { onRecoverHero(hero, remSec > 0L) },
-            enabled = !isBusy && (remSec == 0L || (profile.rations >= 2L && profile.manaCrystals >= 15L)),
-            modifier = Modifier
-              .heightIn(min = 48.dp)
-              .testTag("recover_hero_${hero.id}"),
-            colors = FantasySkin.buttonColors(
-              containerColor = if (remSec == 0L) EmeraldVitality else AmberWarning,
-              contentColor = ObsidianVoid,
-            ),
-          ) {
-            Icon(Icons.Default.Favorite, contentDescription = null, modifier = Modifier.size(15.dp))
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(if (remSec == 0L) "Hoàn Tất" else "Trị Ngay", maxLines = 1)
-          }
-        } else {
-          OutlinedButton(
-            onClick = {
-              onAssignHeroActivity(
-                hero,
-                if (isResting) HeroStatusType.READY else HeroStatusType.RESTING,
+    when (activeTab) {
+      // ===================================================
+      // TAB 1: KÝ TÚC XÁ & GIÁM ĐỊNH MÙ (DORMITORY & BLIND APPRAISAL)
+      // ===================================================
+      0 -> {
+        LazyColumn(
+          modifier = Modifier.weight(1f).fillMaxWidth(),
+          verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+          item {
+            Column(
+              modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0x98162842))
+                .border(1.dp, EmeraldVitality.copy(alpha = 0.65f), RoundedCornerShape(12.dp))
+                .padding(12.dp),
+              verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+              Text(
+                text = "Ký Túc Xá & Giám Định Mù • Đang điều trị/nghỉ ngơi: $injuredCount Anh hùng",
+                style = MaterialTheme.typography.titleSmall,
+                color = EmeraldVitality,
               )
-            },
-            enabled = !isBusy,
-            modifier = Modifier.heightIn(min = 48.dp),
-          ) {
+              Text(
+                text = "Các Anh hùng 1★–2★ mang kỹ năng ẩn [??? (Chưa thức tỉnh)]. Sống sót qua 3 trận leo tháp hoặc trở về với mức HP dưới 15% sẽ tự động thức tỉnh kỹ năng thật!",
+                style = MaterialTheme.typography.bodySmall,
+                color = RuneSilver,
+              )
+              if (eastGardenUnlocked) {
+                Text(
+                  text = "✦ Suối Thánh Đài Vườn Đông đang hoạt động: Giảm 25% thời gian hồi phục chấn thương!",
+                  style = MaterialTheme.typography.labelSmall,
+                  color = PortalCyan,
+                )
+              }
+            }
+          }
+
+          items(activeHeroes, key = { it.id }) { hero ->
+            val remSec = hero.remainingInjurySeconds(nowEpochSec)
+            val needsStatusClear = hero.status == HeroStatusType.INJURED.name
+            val isResting = hero.statusType == HeroStatusType.RESTING ||
+              hero.currentAssignment == com.example.data.model.HeroAssignment.RESTING.name
+            val heroData = com.example.data.model.HeroData.fromRecord(hero, nowEpochSec)
+            val survivedRuns = com.example.data.LobbyHeroAssignments.survivedExpeditionCount(hero.bondSummary)
+            val lowHpSurvivor = com.example.data.LobbyHeroAssignments.hasReturnedUnder15PctHp(hero.bondSummary) || heroData.isCriticalReturnHp
+            val hpRatio = (heroData.currentHP.toFloat() / heroData.maxHP.coerceAtLeast(1).toFloat()).coerceIn(0f, 1f)
+            val moraleRatio = (heroData.morale.toFloat() / 100f).coerceIn(0f, 1f)
+
+            Column(
+              modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xA4182B46))
+                .border(
+                  1.dp,
+                  if (needsStatusClear) AmberWarning else if (isResting) EmeraldVitality else PortalCyan.copy(alpha = 0.42f),
+                  RoundedCornerShape(12.dp),
+                )
+                .padding(10.dp),
+              verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+              Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+              ) {
+                PixelHeroPortraitAvatar(heroName = hero.name, heroClass = hero.classType, sizeDp = 46.dp)
+                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                  Text(
+                    text = "${hero.name} (${"★".repeat(hero.rarity.toInt().coerceIn(1, 5))}) • Lv.${hero.level} • Tính cách: ${hero.personalityType.labelVi}",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = ParchmentLight,
+                  )
+                  Text(
+                    text = "HP: ${heroData.currentHP}/${heroData.maxHP} (${(hpRatio * 100).toInt()}%) • Tinh thần (Morale): ${heroData.morale}% • Tâm trí: ${heroData.sanityState.labelVi}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (hpRatio < 0.4f || heroData.morale < 30) AmberWarning else EmeraldVitality,
+                  )
+                  Text(
+                    text = "Kỹ năng ẩn: ${heroData.hiddenTrait.detailedDisplayNameVi}" +
+                      if (!heroData.hiddenTrait.unlocked) " (Leo tháp: $survivedRuns/3 trận${if (lowHpSurvivor) " • Đã vượt ngưỡng <15% HP" else ""})" else " ★ ĐÃ THỨC TỈNH",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (heroData.hiddenTrait.unlocked) SummonerGold else PortalCyan,
+                  )
+                }
+
+                if (onOpenHeroProfile != null) {
+                  IconButton(
+                    onClick = { onOpenHeroProfile(hero) },
+                    modifier = Modifier.size(44.dp).testTag("quarters_profile_${hero.id}"),
+                  ) {
+                    Icon(Icons.Default.Person, contentDescription = "Mở hồ sơ ${hero.name}", tint = SummonerGold)
+                  }
+                }
+
+                if (needsStatusClear) {
+                  Button(
+                    onClick = { onRecoverHero(hero, remSec > 0L) },
+                    enabled = !isBusy && (remSec == 0L || (profile.rations >= 2L && profile.manaCrystals >= 15L)),
+                    modifier = Modifier
+                      .heightIn(min = 48.dp)
+                      .testTag("recover_hero_${hero.id}"),
+                    colors = FantasySkin.buttonColors(
+                      containerColor = if (remSec == 0L) EmeraldVitality else AmberWarning,
+                      contentColor = ObsidianVoid,
+                    ),
+                  ) {
+                    Icon(Icons.Default.Favorite, contentDescription = null, modifier = Modifier.size(15.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(if (remSec == 0L) "Hoàn Tất" else "Trị Ngay", maxLines = 1)
+                  }
+                } else {
+                  OutlinedButton(
+                    onClick = {
+                      onAssignHeroActivity(
+                        hero,
+                        if (isResting) HeroStatusType.READY else HeroStatusType.RESTING,
+                      )
+                    },
+                    enabled = !isBusy,
+                    modifier = Modifier.heightIn(min = 48.dp),
+                  ) {
+                    Text(
+                      text = if (isResting) "Ra Tuần Tra" else "Nghỉ Ngơi",
+                      color = if (isResting) PortalCyan else EmeraldVitality,
+                      maxLines = 1,
+                    )
+                  }
+                }
+              }
+
+              // Visual HP & Morale Progress Bars
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+              ) {
+                Column(modifier = Modifier.weight(1f)) {
+                  Box(
+                    modifier = Modifier
+                      .fillMaxWidth()
+                      .height(6.dp)
+                      .clip(RoundedCornerShape(3.dp))
+                      .background(Color(0xFF0E1B2E)),
+                  ) {
+                    Box(
+                      modifier = Modifier
+                        .fillMaxWidth(hpRatio)
+                        .height(6.dp)
+                        .background(if (hpRatio < 0.4f) CrimsonBlood else EmeraldVitality),
+                    )
+                  }
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                  Box(
+                    modifier = Modifier
+                      .fillMaxWidth()
+                      .height(6.dp)
+                      .clip(RoundedCornerShape(3.dp))
+                      .background(Color(0xFF0E1B2E)),
+                  ) {
+                    Box(
+                      modifier = Modifier
+                        .fillMaxWidth(moraleRatio)
+                        .height(6.dp)
+                        .background(if (heroData.morale < 30) AmberWarning else PortalCyan),
+                    )
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // ===================================================
+      // TAB 2: PHÒNG NGHỈ DƯỠNG & NHÀ ĂN (INFIRMARY & CANTEEN)
+      // ===================================================
+      1 -> {
+        val selectedHero = activeHeroes.firstOrNull { it.id == selectedInfirmaryHeroId } ?: activeHeroes.firstOrNull()
+        val healCost = com.example.data.LobbyHeroAssignments.INFIRMARY_HEAL_GOLD_COST
+        val mealCost = com.example.data.LobbyHeroAssignments.HEARTY_MEAL_GOLD_COST
+
+        LazyColumn(
+          modifier = Modifier.weight(1f).fillMaxWidth(),
+          verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+          item {
+            Column(
+              modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(14.dp))
+                .background(Color(0xA4182B46))
+                .border(1.dp, PortalCyan.copy(alpha = 0.65f), RoundedCornerShape(14.dp))
+                .padding(12.dp),
+              verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+              Text(
+                text = "Phòng Nghỉ Dưỡng & Nhà Ăn Nội Khu",
+                style = MaterialTheme.typography.titleSmall,
+                color = SummonerGold,
+              )
+              Text(
+                text = "Máu (HP) và Tinh thần (Morale) sau khi đi Tháp về KHÔNG tự đầy. Chọn Anh hùng bên dưới để Trị Thương (+50% Max HP) hoặc dùng Bữa Ăn Thịnh Soạn (+40 Morale & xóa Hoảng loạn).",
+                style = MaterialTheme.typography.bodySmall,
+                color = RuneSilver,
+              )
+
+              if (selectedHero != null) {
+                val heroData = com.example.data.model.HeroData.fromRecord(selectedHero, nowEpochSec)
+                val isPanicked = heroData.sanityState == com.example.data.model.HeroSanityState.PANICKED || heroData.isFrightened
+                Surface(
+                  shape = RoundedCornerShape(10.dp),
+                  color = Color(0x98102038),
+                  border = BorderStroke(1.dp, SummonerGold.copy(alpha = 0.65f)),
+                  modifier = Modifier.fillMaxWidth(),
+                ) {
+                  Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(
+                      text = "Đang chọn: ${selectedHero.name} (${selectedHero.personalityType.labelVi})",
+                      style = MaterialTheme.typography.titleSmall,
+                      color = SummonerGold,
+                    )
+                    Text(
+                      text = "HP hiện tại: ${heroData.currentHP}/${heroData.maxHP} • Tinh thần: ${heroData.morale}/100 • Trạng thái: ${if (isPanicked) "HOẢNG LOẠN (Panic)" else "Bình ổn"}",
+                      style = MaterialTheme.typography.bodySmall,
+                      color = if (isPanicked || heroData.currentHP < heroData.maxHP) AmberWarning else EmeraldVitality,
+                    )
+
+                    Row(
+                      modifier = Modifier.fillMaxWidth(),
+                      horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                      Button(
+                        onClick = { onHealHeroInfirmary(selectedHero) },
+                        enabled = !isBusy && profile.gold >= healCost,
+                        modifier = Modifier
+                          .weight(1f)
+                          .heightIn(min = 48.dp)
+                          .testTag("infirmary_heal_button"),
+                        colors = FantasySkin.buttonColors(containerColor = EmeraldVitality, contentColor = ObsidianVoid),
+                      ) {
+                        Icon(Icons.Default.Favorite, contentDescription = null, modifier = Modifier.size(15.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Trị Thương (+50% HP • $healCost Vàng)", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                      }
+
+                      Button(
+                        onClick = { onServeHeartyMeal(selectedHero) },
+                        enabled = !isBusy && profile.gold >= mealCost,
+                        modifier = Modifier
+                          .weight(1f)
+                          .heightIn(min = 48.dp)
+                          .testTag("canteen_hearty_meal_button"),
+                        colors = FantasySkin.buttonColors(containerColor = SummonerGold, contentColor = ObsidianVoid),
+                      ) {
+                        Icon(Icons.Default.Restaurant, contentDescription = null, modifier = Modifier.size(15.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Bữa Ăn Thịnh Soạn (+40 Morale • $mealCost Vàng)", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          items(activeHeroes, key = { it.id }) { hero ->
+            val heroData = com.example.data.model.HeroData.fromRecord(hero, nowEpochSec)
+            val isSelected = selectedHero?.id == hero.id
+            val isPanicked = heroData.sanityState == com.example.data.model.HeroSanityState.PANICKED || heroData.isFrightened
+            Row(
+              modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(if (isSelected) Color(0xBA1E3658) else Color(0x98162842))
+                .border(1.dp, if (isSelected) SummonerGold else PortalCyan.copy(alpha = 0.42f), RoundedCornerShape(12.dp))
+                .testTag("infirmary_select_hero_${hero.id}")
+                .clickable { selectedInfirmaryHeroId = hero.id }
+                .padding(10.dp),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+              PixelHeroPortraitAvatar(heroName = hero.name, heroClass = hero.classType, sizeDp = 42.dp)
+              Column(modifier = Modifier.weight(1f)) {
+                Text(
+                  text = "${hero.name} • HP ${heroData.currentHP}/${heroData.maxHP} • Morale ${heroData.morale}%",
+                  style = MaterialTheme.typography.titleSmall,
+                  color = if (isSelected) SummonerGold else ParchmentLight,
+                )
+                Text(
+                  text = if (isPanicked) "⚠ Đang Hoảng Loạn (Panic) — Cần dùng Bữa Ăn Thịnh Soạn"
+                  else if (heroData.currentHP < heroData.maxHP) "Đang bị thương — Cần Trị Thương (+50% Max HP)"
+                  else "Sức khỏe & Tinh thần ổn định",
+                  style = MaterialTheme.typography.bodySmall,
+                  color = if (isPanicked || heroData.currentHP < heroData.maxHP) AmberWarning else EmeraldVitality,
+                )
+              }
+            }
+          }
+        }
+      }
+
+      // ===================================================
+      // TAB 3: LÒ DUNG HỢP TÀN KHỐC (CRUEL SYNTHESIS CHAMBER)
+      // ===================================================
+      2 -> {
+        val targetHero = activeHeroes.firstOrNull { it.id == synthesisTargetId } ?: activeHeroes.firstOrNull()
+        val selectedMaterials = activeHeroes.filter { it.id in synthesisMaterialIds && it.id != targetHero?.id }
+        val gainAtk = selectedMaterials.sumOf { (it.attack * 0.20).toLong().coerceAtLeast(1L) }
+        val gainDef = selectedMaterials.sumOf { (it.defense * 0.20).toLong().coerceAtLeast(1L) }
+        val gainHp = selectedMaterials.sumOf { (it.maxHp * 0.20).toLong().coerceAtLeast(5L) }
+        val gainExp = selectedMaterials.sumOf { 65L + it.level * 35L + it.rarity * 25L }
+
+        LazyColumn(
+          modifier = Modifier.weight(1f).fillMaxWidth(),
+          verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+          item {
+            Column(
+              modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(14.dp))
+                .background(Color(0xB424111E))
+                .border(1.5.dp, CrimsonBlood.copy(alpha = 0.85f), RoundedCornerShape(14.dp))
+                .padding(12.dp),
+              verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+              Text(
+                text = "Lò Dung Hợp Tàn Khốc (Permadeath Synthesis)",
+                style = MaterialTheme.typography.titleSmall,
+                color = SummonerGold,
+              )
+              Text(
+                text = "Chọn 1 Hero Chính và tối đa 3 Hero Hiến Tế. Hero Hiến Tế sẽ bị xóa vĩnh viễn để truyền +20% ATK, DEF, MaxHP & EXP sang Hero Chính (20% cơ hội kế thừa Kỹ năng ẩn). Mọi Hero [Hèn nhát] ở sảnh sẽ bị trừ 10 điểm Morale vì kinh hãi!",
+                style = MaterialTheme.typography.bodySmall,
+                color = ParchmentLight,
+              )
+
+              // 1. Target Hero Selector Row
+              Text("1. Chọn Hero Chính (Target):", style = MaterialTheme.typography.labelLarge, color = PortalCyan)
+              Row(
+                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+              ) {
+                activeHeroes.forEach { h ->
+                  val isTarget = h.id == targetHero?.id
+                  OutlinedButton(
+                    onClick = {
+                      synthesisTargetId = h.id
+                      synthesisMaterialIds = synthesisMaterialIds.filterNot { it == h.id }
+                    },
+                    modifier = Modifier.heightIn(min = 40.dp).testTag("synthesis_target_${h.id}"),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                      containerColor = if (isTarget) PortalCyan.copy(alpha = 0.26f) else Color(0x88132238),
+                    ),
+                    border = BorderStroke(1.dp, if (isTarget) SummonerGold else PortalCyan.copy(alpha = 0.45f)),
+                  ) {
+                    Text(
+                      text = "${h.name} (${"★".repeat(h.rarity.toInt().coerceIn(1, 5))})",
+                      color = if (isTarget) SummonerGold else ParchmentLight,
+                      maxLines = 1,
+                    )
+                  }
+                }
+              }
+
+              // 2. Final Plea / Last Words Box when Material Hero(es) are selected
+              if (selectedMaterials.isNotEmpty()) {
+                Surface(
+                  shape = RoundedCornerShape(10.dp),
+                  color = Color(0xD82A0B14),
+                  border = BorderStroke(1.5.dp, AmberWarning),
+                  modifier = Modifier.fillMaxWidth().testTag("synthesis_sacrifice_plea_box"),
+                ) {
+                  Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                      text = "⚠ TIẾNG VAN XIN / TRĂN TRỐI TỪ LÒ HIẾN TẾ (${selectedMaterials.size}/3):",
+                      style = MaterialTheme.typography.labelLarge,
+                      color = AmberWarning,
+                    )
+                    selectedMaterials.forEach { mat ->
+                      val matData = com.example.data.model.HeroData.fromRecord(mat, nowEpochSec)
+                      val plea = com.example.data.model.ContextAwareDialogueDatabase.lineForSacrificePlea(matData)
+                      Text(
+                        text = "• ${mat.name} (${mat.personalityType.labelVi}): \"$plea\"",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = ParchmentLight,
+                      )
+                    }
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                      text = "Dự kiến truyền sang ${targetHero?.name ?: "Hero Chính"}: +$gainAtk ATK • +$gainDef DEF • +$gainHp MaxHP • +$gainExp EXP (20% cơ hội kế thừa Kỹ năng ẩn)",
+                      style = MaterialTheme.typography.labelSmall,
+                      color = EmeraldVitality,
+                    )
+                  }
+                }
+              }
+
+              Button(
+                onClick = {
+                  val tId = targetHero?.id ?: return@Button
+                  if (selectedMaterials.isNotEmpty()) {
+                    val matIds = selectedMaterials.map { it.id }
+                    synthesisMaterialIds = emptyList()
+                    onCruelSynthesis(tId, matIds)
+                  }
+                },
+                enabled = !isBusy && targetHero != null && selectedMaterials.isNotEmpty(),
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .heightIn(min = 48.dp)
+                  .testTag("confirm_cruel_synthesis_button"),
+                colors = FantasySkin.buttonColors(containerColor = CrimsonBlood, contentColor = ParchmentLight),
+              ) {
+                Text(
+                  text = "Xác Nhận Dung Hợp (${selectedMaterials.size}/3 Hiến Tế • Vĩnh Viễn)",
+                  fontWeight = FontWeight.Bold,
+                  maxLines = 1,
+                )
+              }
+            }
+          }
+
+          item {
             Text(
-              text = if (isResting) "Ra Tuần Tra" else "Nghỉ Ngơi",
-              color = if (isResting) PortalCyan else EmeraldVitality,
-              maxLines = 1,
+              text = "2. Chọn tối đa 3 Hero Hiến Tế (Materials — Chạm để đưa vào lò):",
+              style = MaterialTheme.typography.titleSmall,
+              color = AmberWarning,
             )
+          }
+
+          items(activeHeroes.filter { it.id != targetHero?.id }, key = { it.id }) { candidate ->
+            val isMaterial = candidate.id in synthesisMaterialIds
+            val candidateData = com.example.data.model.HeroData.fromRecord(candidate, nowEpochSec)
+            Row(
+              modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(if (isMaterial) Color(0xBA3B121E) else Color(0x98162842))
+                .border(1.dp, if (isMaterial) CrimsonBlood else PortalCyan.copy(alpha = 0.42f), RoundedCornerShape(12.dp))
+                .testTag("synthesis_material_${candidate.id}")
+                .clickable {
+                  synthesisMaterialIds = if (isMaterial) {
+                    synthesisMaterialIds - candidate.id
+                  } else if (synthesisMaterialIds.size < 3) {
+                    synthesisMaterialIds + candidate.id
+                  } else {
+                    synthesisMaterialIds
+                  }
+                }
+                .padding(10.dp),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+              PixelHeroPortraitAvatar(heroName = candidate.name, heroClass = candidate.classType, sizeDp = 42.dp)
+              Column(modifier = Modifier.weight(1f)) {
+                Text(
+                  text = "${candidate.name} (${"★".repeat(candidate.rarity.toInt().coerceIn(1, 5))}) • Tính cách: ${candidate.personalityType.labelVi}",
+                  style = MaterialTheme.typography.titleSmall,
+                  color = if (isMaterial) AmberWarning else ParchmentLight,
+                )
+                Text(
+                  text = "Truyền 20%: +${(candidate.attack * 0.20).toLong().coerceAtLeast(1L)} ATK • +${(candidate.defense * 0.20).toLong().coerceAtLeast(1L)} DEF • +${(candidate.maxHp * 0.20).toLong().coerceAtLeast(5L)} HP • Kỹ năng: ${candidateData.hiddenTrait.detailedDisplayNameVi}",
+                  style = MaterialTheme.typography.bodySmall,
+                  color = RuneSilver,
+                )
+              }
+              Text(
+                text = if (isMaterial) "🔥 HIẾN TẾ" else "Chọn",
+                style = MaterialTheme.typography.labelMedium,
+                color = if (isMaterial) AmberWarning else PortalCyan,
+              )
+            }
           }
         }
       }

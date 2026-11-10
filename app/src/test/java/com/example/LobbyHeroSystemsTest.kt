@@ -123,4 +123,116 @@ class LobbyHeroSystemsTest {
     party.syncHeroes(listOf(hero("dead").copy(currentAssignment="SACRIFICED"), hero("rest").copy(status="RESTING")),1000)
     assertTrue(party.heroActors.none { !it.isSanctuaryKeeperNpc })
   }
+
+  @Test fun contextAwareDialogueDatabaseProvidesAtLeast25LinesAndExactContextLines() {
+    assertTrue("Must contain at least 25 distinct lines", ContextAwareDialogueDatabase.allCatalogDialogues().distinct().size >= 25)
+    val coward = HeroData.fromRecord(hero("c").copy(personality = "COWARD", sanityState = "NORMAL"))
+    val arrogant = HeroData.fromRecord(hero("a").copy(personality = "ARROGANT", sanityState = "NORMAL"))
+    val selfAware = HeroData.fromRecord(hero("s").copy(personality = "STOIC", sanityState = "SELF_AWARE"))
+    assertEquals(
+      "Á! Đừng ném tôi vào lò dung hợp mà Master! Tôi xin ngài!",
+      ContextAwareDialogueDatabase.lineForPickedUp(coward),
+    )
+    assertEquals(
+      "Bỏ cái ngón tay bẩn thỉu của ngươi ra khỏi người ta!",
+      ContextAwareDialogueDatabase.lineForPickedUp(arrogant),
+    )
+    assertEquals(
+      "Lại định sắp xếp đội hình đấy à? Chọn người cho khôn ngoan vào.",
+      ContextAwareDialogueDatabase.lineForPickedUp(selfAware),
+    )
+    val lowMorale = HeroData.fromRecord(hero("m1", morale = 20))
+    val highMorale = HeroData.fromRecord(hero("m2", morale = 80))
+    assertEquals(
+      "Không... tầng trước đám đồng đội đã chết sạch rồi, tôi không muốn vào đó!",
+      ContextAwareDialogueDatabase.lineForPartyAssignment(lowMorale),
+    )
+    assertEquals(
+      "Cứ giao vị trí tiên phong cho tôi.",
+      ContextAwareDialogueDatabase.lineForPartyAssignment(highMorale),
+    )
+    assertEquals(
+      "Vết thương rỉ máu mãi không ngừng... làm ơn cho tôi vào Nhà nghỉ ngơi...",
+      ContextAwareDialogueDatabase.lineForLowHpNearHouse(),
+    )
+    val star4 = HeroData.fromRecord(hero("s4").copy(rarity = 4))
+    val star1 = HeroData.fromRecord(hero("s1").copy(rarity = 1))
+    assertEquals(
+      "Tránh đường ra đồ rác rưởi 1 sao!",
+      ContextAwareDialogueDatabase.lineForHighStarDisdain(star4, star1),
+    )
+  }
+
+  @Test fun socialProximityTriggerDeductsTwoMoraleFromLowStarHeroAndShowsDisdainBubble() {
+    val lobby = SanctuaryLobbyEngine()
+    val highStar = hero("high", morale = 90).copy(rarity = 4, personality = "ARROGANT")
+    val lowStar = hero("low", morale = 50).copy(rarity = 1, personality = "COWARD")
+    lobby.syncHeroes(listOf(highStar, lowStar), 1000)
+    val highActor = lobby.heroActors.first { it.heroId == "high" }
+    val lowActor = lobby.heroActors.first { it.heroId == "low" }
+    highActor.x = 1600f; highActor.y = 1200f; highActor.targetX = 1600f; highActor.targetY = 1200f
+    lowActor.x = 1640f; lowActor.y = 1200f; lowActor.targetX = 1640f; lowActor.targetY = 1200f
+    lobby.step(1f / 60f)
+    assertEquals("Tránh đường ra đồ rác rưởi 1 sao!", highActor.speechBubble)
+    assertEquals(48, lowActor.lobbyData?.morale)
+    assertEquals(listOf("low"), lobby.consumePendingDisdainPenaltyHeroIds())
+  }
+
+  @Test fun sanctuaryBlindAppraisalInfirmaryAndCruelSynthesisMechanicsWorkCompletely() {
+    val summaryLowHp = LobbyHeroAssignments.recordExpeditionSurvival("", survivedThisRun = true, returnedUnder15PctHp = true)
+    assertTrue(LobbyHeroAssignments.hasReturnedUnder15PctHp(summaryLowHp))
+    val lowStar = hero("low1", hp = 12, morale = 40).copy(rarity = 1, level = 1, bondSummary = summaryLowHp, hiddenTrait = HeroHiddenTrait(unlocked = false))
+    val unlockedByLowHp = LobbyHeroAssignments.checkAndUnlockHiddenTrait(lowStar, 1000L)
+    assertTrue(unlockedByLowHp.hiddenTrait.unlocked)
+    assertTrue(HeroHiddenTrait.AWAKENED_TRAIT_POOL.any { it.second == unlockedByLowHp.hiddenTrait.name })
+
+    var summary3Runs = ""
+    repeat(3) { summary3Runs = LobbyHeroAssignments.recordExpeditionSurvival(summary3Runs, survivedThisRun = true, returnedUnder15PctHp = false) }
+    assertEquals(3, LobbyHeroAssignments.survivedExpeditionCount(summary3Runs))
+    val unlockedBy3Runs = LobbyHeroAssignments.checkAndUnlockHiddenTrait(
+      hero("low2").copy(rarity = 2, level = 2, bondSummary = summary3Runs, hiddenTrait = HeroHiddenTrait(unlocked = false)),
+      1000L,
+    )
+    assertTrue(unlockedBy3Runs.hiddenTrait.unlocked)
+
+    // Infirmary Heal (+50% MaxHP) & Hearty Meal (+40 Morale & clears PANICKED)
+    val initialProfile = MasterProfile(id = "p1", gold = 200L)
+    val injured = hero("inj", hp = 30, morale = 20).copy(maxHp = 200, currentHp = 40, sanityState = "PANICKED")
+    val (profileAfterHeal, healedList) = LobbyHeroAssignments.healHeroAtInfirmary(initialProfile, listOf(injured), "inj", now = 1000L)
+    assertEquals(120L, profileAfterHeal.gold)
+    assertEquals(140L, healedList.single().currentHp)
+
+    val (profileAfterMeal, fedList) = LobbyHeroAssignments.serveHeartyMealToHero(profileAfterHeal, healedList, "inj", now = 1000L)
+    assertEquals(55L, profileAfterMeal.gold)
+    assertEquals(60L, fedList.single().morale)
+    assertEquals("NORMAL", fedList.single().sanityState)
+    assertFalse(HeroData.fromRecord(fedList.single(), 1000L).isFrightened)
+
+    // Cruel Synthesis: Permadeath + 20% stat transfer + Coward -10 Morale + 20% Hidden Trait inheritance
+    val seedForTraitInherit = (0..1000).first { kotlin.random.Random(it).nextInt(100) < 20 }
+    val target = hero("target", hp = 200, morale = 85).copy(attack = 100, defense = 50, maxHp = 300, currentHp = 300, rarity = 4)
+    val mat1 = hero("mat1", hp = 100, morale = 60).copy(
+      attack = 50, defense = 25, maxHp = 150, rarity = 2,
+      hiddenTrait = HeroHiddenTrait(id = "assassin_instinct", name = "Bản Năng Sát Thủ - Tăng 30% Crit", unlocked = true),
+    )
+    val cowardSurvivor = hero("coward_survivor", hp = 100, morale = 50).copy(personality = "COWARD")
+    val outcome = LobbyHeroAssignments.performCruelSynthesis(
+      roster = listOf(target, mat1, cowardSurvivor),
+      targetHeroId = "target",
+      sacrificedHeroIds = listOf("mat1"),
+      random = kotlin.random.Random(seedForTraitInherit),
+      now = 1000L,
+    )
+    assertEquals(2, outcome.updatedRoster.size)
+    assertTrue(outcome.updatedRoster.none { it.id == "mat1" })
+    assertEquals(110L, outcome.updatedTarget.attack)
+    assertEquals(55L, outcome.updatedTarget.defense)
+    assertEquals(330L, outcome.updatedTarget.maxHp)
+    assertEquals("Bản Năng Sát Thủ - Tăng 30% Crit", outcome.inheritedTraitName)
+    assertEquals("Bản Năng Sát Thủ - Tăng 30% Crit", outcome.updatedTarget.hiddenTrait.name)
+    val updatedCoward = outcome.updatedRoster.first { it.id == "coward_survivor" }
+    assertEquals(40L, updatedCoward.morale)
+  }
 }
+
+
