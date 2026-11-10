@@ -74,6 +74,7 @@ class P27BUiTest {
           onClose = {}, onSummonHero = onSummon, onTrainHero = { _, _ -> },
           onEquipItem = { _, _ -> }, onSynthesizeGear = {}, onEnhanceGear = {},
           onRecoverHero = { _, _ -> }, onHostMeal = {}, onToggleSquad = {},
+          onHealHeroInfirmary = {}, onServeHeartyMeal = {}, onCruelSynthesis = { _, _ -> },
         )
       }
     }

@@ -195,7 +195,7 @@ fun TowerBattleScreen(
   onReturnToSanctuary: () -> Unit,
   settings: GameSettings = GameSettings(),
   sceneActive: Boolean = true,
-  onFinishExpeditionDetailed: ((Boolean, Set<String>, Boolean, Long, Long, Set<String>, com.example.data.model.CourierOutcome?, String?) -> Unit)? = null,
+  onFinishExpeditionDetailed: ((Boolean, Set<String>, Boolean, Long, Long, Set<String>, com.example.data.model.CourierOutcome?, String?, Map<String, Float>) -> Unit)? = null,
 ) {
   val nowSec = remember { System.currentTimeMillis() / 1000L }
   val feastBuffActive = remember(state.profile?.storyFlags) {
@@ -281,7 +281,7 @@ fun TowerBattleScreen(
       if(onFinishExpeditionDetailed!=null) onFinishExpeditionDetailed(
         combatEngine.stage==MissionStage.VICTORY,combatEngine.fallenHeroIds(),combatEngine.retreatCompleted,
         combatEngine.bonusDiscoveryGold,combatEngine.bonusDiscoveryMana,combatEngine.discoveredNodeIds(),
-        combatEngine.lostCourier?.outcome,combatEngine.lostCourier?.frightenedHeroId)
+        combatEngine.lostCourier?.outcome,combatEngine.lostCourier?.frightenedHeroId,combatEngine.remainingHeroHpRatios())
       else onFinishExpedition(combatEngine.stage==MissionStage.VICTORY,combatEngine.fallenHeroIds())
     }
   }
@@ -314,7 +314,7 @@ fun TowerBattleScreen(
       if(onFinishExpeditionDetailed!=null) onFinishExpeditionDetailed(
         combatEngine.stage==MissionStage.VICTORY,combatEngine.fallenHeroIds(),combatEngine.retreatCompleted,
         combatEngine.bonusDiscoveryGold,combatEngine.bonusDiscoveryMana,combatEngine.discoveredNodeIds(),
-        combatEngine.lostCourier?.outcome,combatEngine.lostCourier?.frightenedHeroId)
+        combatEngine.lostCourier?.outcome,combatEngine.lostCourier?.frightenedHeroId,combatEngine.remainingHeroHpRatios())
       else onFinishExpedition(combatEngine.stage==MissionStage.VICTORY,combatEngine.fallenHeroIds())
     }
     if(settings.performanceOverlay) {
@@ -1337,7 +1337,7 @@ fun TowerBattleScreen(
                 CircularProgressIndicator(color = SummonerGold, modifier = Modifier.size(22.dp))
                 if(!state.isBusyAction && state.bannerFeedback != null) {
                   Button(onClick={
-                    if(onFinishExpeditionDetailed!=null) onFinishExpeditionDetailed(isWin,combatEngine.fallenHeroIds(),combatEngine.retreatCompleted,combatEngine.bonusDiscoveryGold,combatEngine.bonusDiscoveryMana,combatEngine.discoveredNodeIds(),combatEngine.lostCourier?.outcome,combatEngine.lostCourier?.frightenedHeroId)
+                    if(onFinishExpeditionDetailed!=null) onFinishExpeditionDetailed(isWin,combatEngine.fallenHeroIds(),combatEngine.retreatCompleted,combatEngine.bonusDiscoveryGold,combatEngine.bonusDiscoveryMana,combatEngine.discoveredNodeIds(),combatEngine.lostCourier?.outcome,combatEngine.lostCourier?.frightenedHeroId,combatEngine.remainingHeroHpRatios())
                     else onFinishExpedition(isWin,combatEngine.fallenHeroIds())
                   },modifier=Modifier.testTag("retry_settlement_button")) { Text("Thử lưu lại") }
                 }

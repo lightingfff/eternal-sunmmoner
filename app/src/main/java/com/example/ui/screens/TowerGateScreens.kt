@@ -474,6 +474,9 @@ fun SquadPreparationScreen(
   onUnequipItem: (HeroRecord, String) -> Unit = { _, _ -> },
   onAssignHeroActivity: (HeroRecord, HeroStatusType) -> Unit = { _, _ -> },
   onHostMealWithRecipe: (SanctuaryMealRecipe) -> Unit = { _ -> onHostMeal() },
+  onHealHeroInfirmary: (HeroRecord) -> Unit,
+  onServeHeartyMeal: (HeroRecord) -> Unit,
+  onCruelSynthesis: (String, List<String>) -> Unit,
 ) {
   BackHandler {
     if (state.activeFacilityModal != null) {
@@ -777,6 +780,9 @@ fun SquadPreparationScreen(
         onUnequipItem = onUnequipItem,
         onAssignHeroActivity = onAssignHeroActivity,
         onHostMealWithRecipe = onHostMealWithRecipe,
+        onHealHeroInfirmary = onHealHeroInfirmary,
+        onServeHeartyMeal = onServeHeartyMeal,
+        onCruelSynthesis = onCruelSynthesis,
       )
     }
   }

@@ -1,0 +1,280 @@
+Picked up JAVA_TOOL_OPTIONS:  -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts=localhost|127.*
+Calculating task graph as no cached configuration is available for tasks: :app:checkDebugDuplicateClasses :app:assembleDebug :app:testDebugUnitTest --tests com.example.SanctuaryHouseRulesTest --tests com.example.SanctuarySpeechEngineTest --tests com.example.SanctuaryCombatHealthTest --tests com.example.LobbyHeroSystemsTest --tests com.example.data.LobbyHeroPersistenceTest --tests com.example.data.SanctuaryHousePersistenceTest --tests com.example.data.SanctuarySocialPersistenceTest --tests com.example.data.GuestSavePersistenceRobolectricTest --tests com.example.data.LostCourierPersistenceRobolectricTest --tests com.example.LostCourierEncounterTest --tests com.example.LostCourierStarterPartyTest --tests com.example.PremiumSliceCombatTest --tests com.example.ManagementTransactionTest --tests com.example.performance.SceneFrameLoopLifecycleRobolectricTest
+> Task :app:preBuild UP-TO-DATE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :app:processDebugGoogleServices UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:kspDebugKotlin SKIPPED
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:mergeDebugNativeLibs UP-TO-DATE
+> Task :app:generateDebugRFile UP-TO-DATE
+> Task :app:processDebugUnitTestManifest UP-TO-DATE
+> Task :app:stripDebugDebugSymbols UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:packageDebugUnitTestForUnitTest UP-TO-DATE
+> Task :app:generateDebugUnitTestConfig UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:bundleDebugClassesToCompileJar UP-TO-DATE
+> Task :app:kspDebugUnitTestKotlin SKIPPED
+> Task :app:bundleDebugClassesToRuntimeJar UP-TO-DATE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:dexBuilderDebug UP-TO-DATE
+> Task :app:compileDebugUnitTestKotlin UP-TO-DATE
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processDebugUnitTestJavaRes UP-TO-DATE
+> Task :app:mergeProjectDexDebug UP-TO-DATE
+> Task :app:packageDebug UP-TO-DATE
+> Task :app:assembleDebug UP-TO-DATE
+> Task :app:createDebugApkListingFileRedirect UP-TO-DATE
+
+> Task :app:testDebugUnitTest
+Picked up JAVA_TOOL_OPTIONS:  -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts=localhost|127.*
+
+LobbyHeroSystemsTest > socialProximityTriggerDeductsTwoMoraleFromLowStarHeroAndShowsDisdainBubble PASSED
+
+LobbyHeroSystemsTest > heldHeroFollowsViewportEdgeScrollWithoutAssigningOrMovingOnItsOwn PASSED
+
+LobbyHeroSystemsTest > contextAwareDialogueDatabaseProvidesAtLeast25LinesAndExactContextLines PASSED
+
+LobbyHeroSystemsTest > lowHpHalvesActualMovementAndPickupSuspendsAiThenCancelRestoresPosition PASSED
+
+LobbyHeroSystemsTest > nearbyUnassignedHeroesStopAndFaceEachOtherForConversation PASSED
+
+LobbyHeroSystemsTest > acceptedDropDiscardsOldWanderRouteAndPickupHitTestingUsesProjectedSpriteAtAllZooms PASSED
+
+LobbyHeroSystemsTest > afraidHeroActuallyReachesSafetyWhileFourPartyMembersFormBeforeGate PASSED
+
+LobbyHeroSystemsTest > modelValidatesBoundsAndLocksThenRevealsTheActualHiddenTrait PASSED
+
+LobbyHeroSystemsTest > deadAndInjuredHeroesCannotBeSentIntoPartyAndHouseDropNeverSacrifices PASSED
+
+LobbyHeroSystemsTest > fifthDropEvictsOldestAndRepeatDropDoesNotEvictAnotherMember PASSED
+
+LobbyHeroSystemsTest > sanctuaryBlindAppraisalInfirmaryAndCruelSynthesisMechanicsWorkCompletely PASSED
+
+LostCourierEncounterTest > escortWaitsForARealHeroAndRequiresTheGateAfterCombat PASSED
+
+LostCourierEncounterTest > fearReducesRealStatsAndReassuranceRecoversWithoutRepeatingTheEvent PASSED
+
+LostCourierEncounterTest > authoredEscortRouteHasCollisionClearanceWithoutChangingNavigation PASSED
+
+LostCourierEncounterTest > encounterIsOptInAndPreservesTheExistingFloorMap PASSED
+
+LostCourierEncounterTest > scoutHasACounterWindowAndInterceptionPreventsRealReinforcements PASSED
+
+LostCourierStarterPartyTest > newGuestCanRescueCourierWithTaughtOrders PASSED
+
+ManagementTransactionTest > rapidSummonOnlySpendsOnceAndPersistsHero PASSED
+
+PremiumSliceCombatTest > contactIsOnceAndIndependentOfStepSize PASSED
+
+PremiumSliceCombatTest > captureIdleWalkAndDefeatFromSimulation PASSED
+
+PremiumSliceCombatTest > kaelenDamageAndShieldAreDeliveredAtAuthoredContacts PASSED
+
+PremiumSliceCombatTest > assetsAndShadowsAreCachedAndFarOffscreenCastersDoNotLoad PASSED
+
+PremiumSliceCombatTest > drawQueueReusesObjectsAndRespondsToMovingActorsAndSceneChanges PASSED
+
+PremiumSliceCombatTest > captureRealCombatSequence PASSED
+
+PremiumSliceCombatTest > retreatCancelsWindupAndUnrelatedKnightsRemainUnchanged PASSED
+
+PremiumSliceCombatTest > goblinContactAndStaleTargetAreSafe PASSED
+
+SanctuaryCombatHealthTest > persistedHpFractionSurvivesEquipmentAndFeastBonusesWithoutStartingFull PASSED
+
+SanctuaryCombatHealthTest > remainingHpSnapshotIsDetachedIncludesFallenHeroesAndCanStartTheNextBattleWounded PASSED
+
+SanctuaryCombatHealthTest > legacyUnknownHpStartsFullButExplicitZeroStaysKnockedOutAndOneHpStaysAlive PASSED
+
+SanctuaryCombatHealthTest > premiumKnightCriticalHitStillWaitsForTheAuthoredContactFrame PASSED
+
+SanctuaryCombatHealthTest > criticalChanceBoundaryIsThirtyPercentAndNotGuaranteedForAwakenedHeroes PASSED
+
+SanctuaryCombatHealthTest > criticalArrowUsesProjectileDeliveryAndCannotApplyDamageAtLaunch PASSED
+
+SanctuaryCombatHealthTest > equipmentHpScalingRoundTripsWithoutHealingOrDamageFromIntegerRounding PASSED
+
+SanctuaryCombatHealthTest > awakenedAssassinTraitDealsRealOneAndHalfMeleeDamageWhileLockedTraitDoesNot PASSED
+
+SanctuaryHouseRulesTest > mealDebitsSixtyFiveGoldAddsFortyMoraleAndClearsPanicWithoutHealing PASSED
+
+SanctuaryHouseRulesTest > treatmentCapsHpAndRejectsInsufficientGoldOrAFullHealthHero PASSED
+
+SanctuaryHouseRulesTest > existingActiveKnownTraitKeepsItsIdWhenResolvedFromALegacyDisplayName PASSED
+
+SanctuaryHouseRulesTest > assassinCritChanceRequiresAnUnlockedMatchingTrait PASSED
+
+SanctuaryHouseRulesTest > fusionPreviewAndOutcomeReportOnlyEffectiveGainsAtStatAndExperienceCaps PASSED
+
+SanctuaryHouseRulesTest > socialPenaltyRejectsInvalidAmountsAndHighRarityOrMissingVictims PASSED
+
+SanctuaryHouseRulesTest > mealRejectsInsufficientGoldAndAlreadyNormalFullMorale PASSED
+
+SanctuaryHouseRulesTest > fusionRejectsEmptyDuplicateSelfAndOverCapacityMaterialSelections PASSED
+
+SanctuaryHouseRulesTest > provenCriticalReturnUnlocksEvenAfterHealingWithoutGrantingAnotherHeal PASSED
+
+SanctuaryHouseRulesTest > restingDoesNotRestoreHpWhenTimePassesOrClockMovesBackwards PASSED
+
+SanctuaryHouseRulesTest > mealCapsMoraleAndPreservesSelfAwareness PASSED
+
+SanctuaryHouseRulesTest > treatmentDebitsEightyGoldAndRestoresExactlyHalfMaximumHp PASSED
+
+SanctuaryHouseRulesTest > partialTreatmentKeepsActiveInjuryUntilFullyHealed PASSED
+
+SanctuaryHouseRulesTest > twoSurvivedBattlesRemainLockedAndThreeUnlockWithoutErasingStoryText PASSED
+
+SanctuaryHouseRulesTest > mealRejectsClientSuppliedFreeNegativeOrDiscountedPrices PASSED
+
+SanctuaryHouseRulesTest > fullHpInjuredHeroPaysForExplicitInjuryClearAndKeepsExistingPartyMembership PASSED
+
+SanctuaryHouseRulesTest > fusionTransfersFlooredTwentyPercentOfSummedStatsAndDoesNotHealTarget PASSED
+
+SanctuaryHouseRulesTest > highRarityAppraisalIsImmediateAndReturnsARealTrait PASSED
+
+SanctuaryHouseRulesTest > fusionRejectsMissingOrAlreadySacrificedTargetsAndMaterials PASSED
+
+SanctuaryHouseRulesTest > traitInheritanceUsesStrictTwentyPercentBoundaryAndIsRepeatableForSameRoll PASSED
+
+SanctuaryHouseRulesTest > unlockedIndomitableTraitPreventsSocialPanicWhileRetainingMoralePenalty PASSED
+
+SanctuaryHouseRulesTest > treatmentRejectsClientSuppliedFreeNegativeOrDiscountedPrices PASSED
+
+SanctuaryHouseRulesTest > selfAwareCowardKeepsSelfAwarenessAfterPsychologicalPenalty PASSED
+
+SanctuaryHouseRulesTest > fusionPenalizesEveryLivingCowardOnceAndClampsMoraleAtZero PASSED
+
+SanctuaryHouseRulesTest > unlockedAttackDefenseAndSpeedTraitsAffectEffectiveStatsOnly PASSED
+
+SanctuaryHouseRulesTest > partyAndHouseAssignmentsPreserveHpAndDoNotInventSurvivalProgress PASSED
+
+SanctuaryHouseRulesTest > allThreeMaterialsArePermanentlyDeletedAndCannotBeReused PASSED
+
+SanctuaryHouseRulesTest > lowCurrentHpWithoutARecordedReturnDoesNotUnlockHiddenTrait PASSED
+
+SanctuaryHouseRulesTest > mealStillClearsPanicWhenMoraleIsAlreadyFull PASSED
+
+SanctuaryHouseRulesTest > paidActionsCannotModifyPermanentlySacrificedHeroes PASSED
+
+SanctuaryHouseRulesTest > legacyProgressTagsRetainRoomInsideLongStoryAndDoNotOverflow PASSED
+
+SanctuaryHouseRulesTest > legacyUnspecifiedHpRetainsFullHpFallbackWithoutStartingATimer PASSED
+
+SanctuaryHouseRulesTest > existingLegacySurvivalTagStillUnlocksDuringMigration PASSED
+
+SanctuaryHouseRulesTest > alreadyRevealedLegacyGenericTraitMigratesOnceAndPreservesCustomOrKnownIdentity PASSED
+
+SanctuaryHouseRulesTest > highLevelAndMoraleDoNotBypassLowRarityTowerAppraisal PASSED
+
+SanctuarySpeechEngineTest > proximityHysteresisAndCooldownPreventBoundaryJitterAndRapidReentryPenalties PASSED
+
+SanctuarySpeechEngineTest > socialDisdainPenalizesOncePerPassAndDoesNotRepeatWhileStandingNearby PASSED
+
+SanctuarySpeechEngineTest > playerDialogueAndPickedUpHeroesCannotBeInterruptedBySocialDisdain PASSED
+
+SanctuarySpeechEngineTest > tappingSpeaksImmediatelyAndRefreshesTheCompleteThreeAndHalfSecondLifetime PASSED
+
+SanctuarySpeechEngineTest > pickedUpBubbleExpiresAfterThreeAndHalfSecondsWhileHeroRemainsHeld PASSED
+
+SanctuarySpeechEngineTest > movingTrainingPartyAndPlayerHoldDoNotConsumeIdleSpeechInterval PASSED
+
+SanctuarySpeechEngineTest > ambientSpeechWaitsSixIdleSecondsAndReschedulesWithinSixToTenSeconds PASSED
+
+SanctuarySpeechEngineTest > routineConversationCannotOverwriteTapDialogue PASSED
+
+SanctuarySpeechEngineTest > ownedIndoorSpeechUsesHeroContextAndExpiresAfterThreeAndHalfSeconds PASSED
+
+SanctuarySpeechEngineTest > lowHpHouseDialogueUsesTheSameProximityForTapAndAutomaticTrigger PASSED
+
+GuestSavePersistenceRobolectricTest > corrupted primary save file automatically recovers from backup without losing player progress PASSED
+
+GuestSavePersistenceRobolectricTest > logout to title gate preserves guest save on disk for seamless re-entry PASSED
+
+GuestSavePersistenceRobolectricTest > feast buff boosts squad combat stats and hero AI updates observable intent labels across all 8 orders PASSED
+
+GuestSavePersistenceRobolectricTest > one-tap guest creation initializes starter roster gear and persists GUEST_LOCAL session PASSED
+
+GuestSavePersistenceRobolectricTest > returning guest launch automatically restores saved progress across simulated app restart PASSED
+
+LobbyHeroPersistenceTest > hiddenTraitUnlockIsPermanentAndCloudImportFieldsKeepLobbyState PASSED
+
+LobbyHeroPersistenceTest > assignmentHealthSanityPersonalityAndHiddenTraitSurviveRestart PASSED
+
+LobbyHeroPersistenceTest > autoJoinedSummonGetsNewerOrderThanExistingPartyAndTrainingDoesNotLoseHp PASSED
+
+LobbyHeroPersistenceTest > overlappingDropRequestsNeverPersistAFullPartyPlusOne PASSED
+
+LobbyHeroPersistenceTest > legacySaveWithoutNewFieldsLoadsWithoutResettingProgress PASSED
+
+LobbyHeroPersistenceTest > sanctuaryInfirmaryHealHeartyMealAndCruelSynthesisPersistImmediatelyToLocalJson PASSED
+
+LostCourierPersistenceRobolectricTest > full old bond retains new memory and permanent flags survive transient churn PASSED
+
+LostCourierPersistenceRobolectricTest > failed atomic write does not claim rescue or alter valid saves and retry succeeds PASSED
+
+LostCourierPersistenceRobolectricTest > failed escort is saved and a later rescue remains available PASSED
+
+LostCourierPersistenceRobolectricTest > rescue unlock and one hero memory survive restart and stale-profile replay PASSED
+
+LostCourierPersistenceRobolectricTest > saved courier service allows crafting with exactly ninety gold PASSED
+
+SanctuaryHousePersistenceTest > diskFailureDoesNotPublishOrChargePaidAction PASSED
+
+SanctuaryHousePersistenceTest > staleUiGoldAndHpCannotOverwriteFreshTreatment PASSED
+
+SanctuaryHousePersistenceTest > threeSurvivalsStillUnlockWithFullStoryMemoryAndNoCriticalHp PASSED
+
+SanctuaryHousePersistenceTest > legacySurvivalCounterCannotOverflowOrExceedThePersistedSchemaBound PASSED
+
+SanctuaryHousePersistenceTest > concurrentSynthesisCannotConsumeSameMaterialTwiceAndUnbindsGear PASSED
+
+SanctuaryHousePersistenceTest > actualCombatReturnUnlocksCriticalTraitAndPersistsHpWithoutLevelUpHeal PASSED
+
+SanctuaryHousePersistenceTest > criticalReturnRequiresActualReturnAndKnockoutDoesNotCountAsSurvival PASSED
+
+SanctuaryHousePersistenceTest > settingsSaveCannotOverwriteConcurrentPaidHeroMutation PASSED
+
+SanctuaryHousePersistenceTest > concurrentTreatmentsCannotOverspendGold PASSED
+
+SanctuaryHousePersistenceTest > socialEventRetryIsIdempotentAcrossConcurrentRequestsAndRestart PASSED
+
+SanctuarySocialPersistenceTest > transientFailureRetriesTheSameEventAndCommitsOnlyOnePenalty PASSED
+
+SanctuarySocialPersistenceTest > terminalWriteFailureReconcilesOptimisticLobbyWithAuthoritativeRoster PASSED
+
+SceneFrameLoopLifecycleRobolectricTest > stoppedLifecycleAndBlockingModalCancelFramesAndResumeWithoutTimeJump PASSED
+
+BUILD SUCCESSFUL in 18s
+47 actionable tasks: 1 executed, 46 up-to-date
+Configuration cache entry stored.

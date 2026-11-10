@@ -1,0 +1,394 @@
+{
+  "base_sha": "e3bae5797d760f2f5c77c14611c9cb406c1269b5",
+  "android_jvm_tests": 136,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "suites": [
+    {
+      "name": "com.example.LobbyHeroSystemsTest",
+      "tests": "11",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.134",
+      "cases": [
+        "socialProximityTriggerDeductsTwoMoraleFromLowStarHeroAndShowsDisdainBubble",
+        "heldHeroFollowsViewportEdgeScrollWithoutAssigningOrMovingOnItsOwn",
+        "contextAwareDialogueDatabaseProvidesAtLeast25LinesAndExactContextLines",
+        "lowHpHalvesActualMovementAndPickupSuspendsAiThenCancelRestoresPosition",
+        "nearbyUnassignedHeroesStopAndFaceEachOtherForConversation",
+        "acceptedDropDiscardsOldWanderRouteAndPickupHitTestingUsesProjectedSpriteAtAllZooms",
+        "afraidHeroActuallyReachesSafetyWhileFourPartyMembersFormBeforeGate",
+        "modelValidatesBoundsAndLocksThenRevealsTheActualHiddenTrait",
+        "deadAndInjuredHeroesCannotBeSentIntoPartyAndHouseDropNeverSacrifices",
+        "fifthDropEvictsOldestAndRepeatDropDoesNotEvictAnotherMember",
+        "sanctuaryBlindAppraisalInfirmaryAndCruelSynthesisMechanicsWorkCompletely"
+      ]
+    },
+    {
+      "name": "com.example.LostCourierEncounterTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.061",
+      "cases": [
+        "escortWaitsForARealHeroAndRequiresTheGateAfterCombat",
+        "fearReducesRealStatsAndReassuranceRecoversWithoutRepeatingTheEvent",
+        "authoredEscortRouteHasCollisionClearanceWithoutChangingNavigation",
+        "encounterIsOptInAndPreservesTheExistingFloorMap",
+        "scoutHasACounterWindowAndInterceptionPreventsRealReinforcements"
+      ]
+    },
+    {
+      "name": "com.example.LostCourierStarterPartyTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "4.191",
+      "cases": [
+        "newGuestCanRescueCourierWithTaughtOrders"
+      ]
+    },
+    {
+      "name": "com.example.ManagementTransactionTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.119",
+      "cases": [
+        "rapidSummonOnlySpendsOnceAndPersistsHero"
+      ]
+    },
+    {
+      "name": "com.example.PremiumSliceCombatTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "9.265",
+      "cases": [
+        "contactIsOnceAndIndependentOfStepSize",
+        "captureIdleWalkAndDefeatFromSimulation",
+        "kaelenDamageAndShieldAreDeliveredAtAuthoredContacts",
+        "assetsAndShadowsAreCachedAndFarOffscreenCastersDoNotLoad",
+        "drawQueueReusesObjectsAndRespondsToMovingActorsAndSceneChanges",
+        "captureRealCombatSequence",
+        "retreatCancelsWindupAndUnrelatedKnightsRemainUnchanged",
+        "goblinContactAndStaleTargetAreSafe"
+      ]
+    },
+    {
+      "name": "com.example.SanctuaryCombatHealthTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.009",
+      "cases": [
+        "persistedHpFractionSurvivesEquipmentAndFeastBonusesWithoutStartingFull",
+        "remainingHpSnapshotIsDetachedIncludesFallenHeroesAndCanStartTheNextBattleWounded",
+        "legacyUnknownHpStartsFullButExplicitZeroStaysKnockedOutAndOneHpStaysAlive",
+        "premiumKnightCriticalHitStillWaitsForTheAuthoredContactFrame",
+        "criticalChanceBoundaryIsThirtyPercentAndNotGuaranteedForAwakenedHeroes",
+        "criticalArrowUsesProjectileDeliveryAndCannotApplyDamageAtLaunch",
+        "equipmentHpScalingRoundTripsWithoutHealingOrDamageFromIntegerRounding",
+        "awakenedAssassinTraitDealsRealOneAndHalfMeleeDamageWhileLockedTraitDoesNot"
+      ]
+    },
+    {
+      "name": "com.example.SanctuaryHouseRulesTest",
+      "tests": "35",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.02",
+      "cases": [
+        "mealDebitsSixtyFiveGoldAddsFortyMoraleAndClearsPanicWithoutHealing",
+        "treatmentCapsHpAndRejectsInsufficientGoldOrAFullHealthHero",
+        "existingActiveKnownTraitKeepsItsIdWhenResolvedFromALegacyDisplayName",
+        "assassinCritChanceRequiresAnUnlockedMatchingTrait",
+        "fusionPreviewAndOutcomeReportOnlyEffectiveGainsAtStatAndExperienceCaps",
+        "socialPenaltyRejectsInvalidAmountsAndHighRarityOrMissingVictims",
+        "mealRejectsInsufficientGoldAndAlreadyNormalFullMorale",
+        "fusionRejectsEmptyDuplicateSelfAndOverCapacityMaterialSelections",
+        "provenCriticalReturnUnlocksEvenAfterHealingWithoutGrantingAnotherHeal",
+        "restingDoesNotRestoreHpWhenTimePassesOrClockMovesBackwards",
+        "mealCapsMoraleAndPreservesSelfAwareness",
+        "treatmentDebitsEightyGoldAndRestoresExactlyHalfMaximumHp",
+        "partialTreatmentKeepsActiveInjuryUntilFullyHealed",
+        "twoSurvivedBattlesRemainLockedAndThreeUnlockWithoutErasingStoryText",
+        "mealRejectsClientSuppliedFreeNegativeOrDiscountedPrices",
+        "fullHpInjuredHeroPaysForExplicitInjuryClearAndKeepsExistingPartyMembership",
+        "fusionTransfersFlooredTwentyPercentOfSummedStatsAndDoesNotHealTarget",
+        "highRarityAppraisalIsImmediateAndReturnsARealTrait",
+        "fusionRejectsMissingOrAlreadySacrificedTargetsAndMaterials",
+        "traitInheritanceUsesStrictTwentyPercentBoundaryAndIsRepeatableForSameRoll",
+        "unlockedIndomitableTraitPreventsSocialPanicWhileRetainingMoralePenalty",
+        "treatmentRejectsClientSuppliedFreeNegativeOrDiscountedPrices",
+        "selfAwareCowardKeepsSelfAwarenessAfterPsychologicalPenalty",
+        "fusionPenalizesEveryLivingCowardOnceAndClampsMoraleAtZero",
+        "unlockedAttackDefenseAndSpeedTraitsAffectEffectiveStatsOnly",
+        "partyAndHouseAssignmentsPreserveHpAndDoNotInventSurvivalProgress",
+        "allThreeMaterialsArePermanentlyDeletedAndCannotBeReused",
+        "lowCurrentHpWithoutARecordedReturnDoesNotUnlockHiddenTrait",
+        "mealStillClearsPanicWhenMoraleIsAlreadyFull",
+        "paidActionsCannotModifyPermanentlySacrificedHeroes",
+        "legacyProgressTagsRetainRoomInsideLongStoryAndDoNotOverflow",
+        "legacyUnspecifiedHpRetainsFullHpFallbackWithoutStartingATimer",
+        "existingLegacySurvivalTagStillUnlocksDuringMigration",
+        "alreadyRevealedLegacyGenericTraitMigratesOnceAndPreservesCustomOrKnownIdentity",
+        "highLevelAndMoraleDoNotBypassLowRarityTowerAppraisal"
+      ]
+    },
+    {
+      "name": "com.example.SanctuarySpeechEngineTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.005",
+      "cases": [
+        "proximityHysteresisAndCooldownPreventBoundaryJitterAndRapidReentryPenalties",
+        "socialDisdainPenalizesOncePerPassAndDoesNotRepeatWhileStandingNearby",
+        "playerDialogueAndPickedUpHeroesCannotBeInterruptedBySocialDisdain",
+        "tappingSpeaksImmediatelyAndRefreshesTheCompleteThreeAndHalfSecondLifetime",
+        "pickedUpBubbleExpiresAfterThreeAndHalfSecondsWhileHeroRemainsHeld",
+        "movingTrainingPartyAndPlayerHoldDoNotConsumeIdleSpeechInterval",
+        "ambientSpeechWaitsSixIdleSecondsAndReschedulesWithinSixToTenSeconds",
+        "routineConversationCannotOverwriteTapDialogue",
+        "ownedIndoorSpeechUsesHeroContextAndExpiresAfterThreeAndHalfSeconds",
+        "lowHpHouseDialogueUsesTheSameProximityForTapAndAutomaticTrigger"
+      ]
+    },
+    {
+      "name": "com.example.data.GuestSavePersistenceRobolectricTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.188",
+      "cases": [
+        "corrupted primary save file automatically recovers from backup without losing player progress",
+        "logout to title gate preserves guest save on disk for seamless re-entry",
+        "feast buff boosts squad combat stats and hero AI updates observable intent labels across all 8 orders",
+        "one-tap guest creation initializes starter roster gear and persists GUEST_LOCAL session",
+        "returning guest launch automatically restores saved progress across simulated app restart"
+      ]
+    },
+    {
+      "name": "com.example.data.LobbyHeroPersistenceTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.221",
+      "cases": [
+        "hiddenTraitUnlockIsPermanentAndCloudImportFieldsKeepLobbyState",
+        "assignmentHealthSanityPersonalityAndHiddenTraitSurviveRestart",
+        "autoJoinedSummonGetsNewerOrderThanExistingPartyAndTrainingDoesNotLoseHp",
+        "overlappingDropRequestsNeverPersistAFullPartyPlusOne",
+        "legacySaveWithoutNewFieldsLoadsWithoutResettingProgress",
+        "sanctuaryInfirmaryHealHeartyMealAndCruelSynthesisPersistImmediatelyToLocalJson"
+      ]
+    },
+    {
+      "name": "com.example.data.LostCourierPersistenceRobolectricTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.13",
+      "cases": [
+        "full old bond retains new memory and permanent flags survive transient churn",
+        "failed atomic write does not claim rescue or alter valid saves and retry succeeds",
+        "failed escort is saved and a later rescue remains available",
+        "rescue unlock and one hero memory survive restart and stale-profile replay",
+        "saved courier service allows crafting with exactly ninety gold"
+      ]
+    },
+    {
+      "name": "com.example.data.SanctuaryHousePersistenceTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.375",
+      "cases": [
+        "diskFailureDoesNotPublishOrChargePaidAction",
+        "staleUiGoldAndHpCannotOverwriteFreshTreatment",
+        "threeSurvivalsStillUnlockWithFullStoryMemoryAndNoCriticalHp",
+        "legacySurvivalCounterCannotOverflowOrExceedThePersistedSchemaBound",
+        "concurrentSynthesisCannotConsumeSameMaterialTwiceAndUnbindsGear",
+        "actualCombatReturnUnlocksCriticalTraitAndPersistsHpWithoutLevelUpHeal",
+        "criticalReturnRequiresActualReturnAndKnockoutDoesNotCountAsSurvival",
+        "settingsSaveCannotOverwriteConcurrentPaidHeroMutation",
+        "concurrentTreatmentsCannotOverspendGold",
+        "socialEventRetryIsIdempotentAcrossConcurrentRequestsAndRestart"
+      ]
+    },
+    {
+      "name": "com.example.data.SanctuarySocialPersistenceTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.064",
+      "cases": [
+        "transientFailureRetriesTheSameEventAndCommitsOnlyOnePenalty",
+        "terminalWriteFailureReconcilesOptimisticLobbyWithAuthoritativeRoster"
+      ]
+    },
+    {
+      "name": "com.example.performance.SceneFrameLoopLifecycleRobolectricTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.418",
+      "cases": [
+        "stoppedLifecycleAndBlockingModalCancelFramesAndResumeWithoutTimeJump"
+      ]
+    },
+    {
+      "name": "com.example.data.firebase.SanctuaryCloudHouseTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "11.558",
+      "cases": [
+        "actualCloudTreatmentUsesFreshGoldAndHpUnderConcurrentStaleUiCalls",
+        "actualCloudFusionQueriesOwnedGearAndAtomicallyDeletesOnlyOnce",
+        "actualCloudMealAndSocialRetriesPreserveIndependentFreshMorale"
+      ]
+    },
+    {
+      "name": "com.example.data.firebase.SummonerRepositoryRuleTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.14",
+      "cases": [
+        "linkGuestSaveToCloudAccount_andFeastMeal_succeedWithinFirestoreRules",
+        "courierRescue_staleProfileReplay_grantsOneMemoryAndPermanentService",
+        "observeHeroes_unauthenticatedCaller_failsWithPermissionDenied",
+        "getHeroById_crossUserAccess_failsWithPermissionDenied",
+        "trainSummonAndSettleExpedition_authenticatedOwner_succeedsWithinRules",
+        "bootstrapAndObserve_authenticatedOwner_createsStarterSanctuaryAndHeroes"
+      ]
+    },
+    {
+      "name": "com.example.ui.LobbyHeroTouchTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "6.88",
+      "cases": [
+        "secondFingerCancelsHeldHeroWithoutAssignment",
+        "longPressPhysicalDragToHouseDispatchesRestingAssignment",
+        "tappingHouseOrTowerGateWithoutDraggingHeroOpensFacilityUiDirectly",
+        "failedPersistenceRollsBackSoOriginalHeroCanBePickedAgain",
+        "heroAccessibilityPaddingCannotStealGateTapOrLongHoldOutsideTheSprite",
+        "longPressPhysicalDragToGateDispatchesSinglePartyAssignment",
+        "fastDragIsCameraPanAndInvalidDropAndCancelNeverAssign",
+        "holdingBuildingWithoutAHeroStillOpensItOnRelease"
+      ]
+    },
+    {
+      "name": "com.example.ui.LobbyHeroVisualTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.082",
+      "cases": [
+        "heldWrithingUsesExistingSpriteFramesAndRendersAtGameZoom"
+      ]
+    },
+    {
+      "name": "com.example.ui.SanctuaryHouseUiTest",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "6.502",
+      "cases": [
+        "deletedHeroesDoNotSurviveSelectionOrPendingConfirmation",
+        "busyStateBlocksSynthesisAndStateUpdatesInvalidateThePreviewedConfirmation",
+        "synthesisCapPreviewMatchesTheDestructiveConfirmation",
+        "synthesisCapsAtThreeAndSelectedMaterialCannotAlsoBeTheTarget",
+        "treatmentTargetsChosenHeroAndKeepsSelectionWhenPersistedStatsArrive",
+        "dormitoryUsesOwnedHpMoraleAndActualPersonalityWithoutInventingAnAwakening",
+        "portraitTabsTreatmentAndCloseRemainAccessibleAndReturnToLobby",
+        "insufficientGoldAndBusyStateBlockCareAndHeroChanges",
+        "synthesisShowsImmediatePleaAndExactPreviewThenRequiresSeparateConfirmation"
+      ]
+    },
+    {
+      "name": "com.example.ui.SquadHouseIntegrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.773",
+      "cases": [
+        "squadPreparationHouseUsesRealPaidCareAndSynthesisThenReturnsToPreparation"
+      ]
+    }
+  ],
+  "rules_sdk_cases": [
+    "legacy own hero and constrained roster query readable",
+    "full legacy trait migration and new lobby fields update",
+    "same transaction replaces party member and updates profile revision",
+    "house rest fields allowed",
+    "new personality at owned hero creation allowed",
+    "negative HP rejected",
+    "HP beyond max rejected",
+    "invalid sanity rejected",
+    "BeingPickedUp cannot become persisted assignment",
+    "invalid trait condition rejected",
+    "partial hidden trait map rejected",
+    "invalid revision rejected",
+    "cross-account write denied",
+    "anonymous read denied",
+    "dedicated survival and social metadata accepted",
+    "negative survival count rejected",
+    "fractional survival count rejected",
+    "nonboolean critical return rejected",
+    "unbounded social dedupe history rejected",
+    "malformed social history tail rejected",
+    "numeric social history tail rejected",
+    "empty social history tail rejected",
+    "oversized social history tail rejected",
+    "nested social array rejected by Firestore SDK",
+    "boolean social history tail rejected",
+    "non UUID event ID rejected",
+    "multiple UUIDs hidden in one array element rejected",
+    "complete 32 entry social history accepted",
+    "cloud treatment payload serializes Gold and current HP",
+    "synthesis transaction deletes material unbinds gear and cannot consume twice",
+    "equipment membership revision rejects stale fusion query before any deletion",
+    "cross-owner material removal rejects whole transaction",
+    "durable social event payload applies once after retry"
+  ],
+  "rules_sdk_total": 33,
+  "logs_sha256": {
+    "final-build-regression.log": "0d9b1d9431924d6e12e24c52fe72cad942f94ddd07bfc0803e1b7342997b45c2",
+    "final-sdk-ui.log": "e3833981e95caf055cba6fcc3e1ee5ad6be980f1092ece6e1eb919c077b874ea",
+    "firestore-final-proof.log": "3f1ee6b7719376b5928ccfa6ab1ea813ba03fafcb8b818746fa6dcd67695837c"
+  },
+  "physical_device": "NOT TESTED; adb devices empty",
+  "production_rules_deployed": false,
+  "raw_logs_sha256": {
+    "final-build-regression.log": "0d9b1d9431924d6e12e24c52fe72cad942f94ddd07bfc0803e1b7342997b45c2",
+    "final-sdk-ui.log": "e3833981e95caf055cba6fcc3e1ee5ad6be980f1092ece6e1eb919c077b874ea",
+    "firestore-final-proof.log": "3f1ee6b7719376b5928ccfa6ab1ea813ba03fafcb8b818746fa6dcd67695837c"
+  },
+  "log_export": "Trailing whitespace normalized; raw log hashes retained separately."
+}

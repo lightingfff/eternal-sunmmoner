@@ -26,7 +26,7 @@ class LobbyHeroPersistenceTest {
     val manager = LocalGuestSaveManager(context)
     manager.startOrResumeGuestSession("Lobby")
     manager.mutateSnapshot { s -> s.copy(heroes=(1..5).map { HeroRecord(id="h$it", userId=s.guestPlayerId,
-      name="Hero $it", inActiveSquad=it<5, partyJoinedOrder=it.toLong(), level=12,
+      name="Hero $it", inActiveSquad=it<5, partyJoinedOrder=it.toLong(), level=12, survivedExpeditions=3,
       maxHp=400, currentHp=90, morale=80, sanityState="SELF_AWARE", personality="REBEL") }) }
     val source = LocalGuestDataSource(manager)
     source.assignLobbyHero("h5",HeroAssignment.IN_PARTY)
@@ -54,7 +54,7 @@ class LobbyHeroPersistenceTest {
 
   @Test fun hiddenTraitUnlockIsPermanentAndCloudImportFieldsKeepLobbyState() = runTest {
     val manager=LocalGuestSaveManager(context);manager.startOrResumeGuestSession()
-    manager.mutateSnapshot { s -> s.copy(heroes=s.heroes.map { it.copy(level=10,morale=80,personality="COWARD",sanityState="SELF_AWARE") }) }
+    manager.mutateSnapshot { s -> s.copy(heroes=s.heroes.map { it.copy(level=10,morale=80,personality="COWARD",sanityState="SELF_AWARE",survivedExpeditions=3) }) }
     manager.mutateSnapshot { s -> s.copy(heroes=s.heroes.map { it.copy(morale=10) }) }
     val hero=LocalGuestSaveManager(context).startOrResumeGuestSession().heroes.first()
     assertTrue(hero.hiddenTrait.unlocked)
@@ -115,7 +115,7 @@ class LobbyHeroPersistenceTest {
     assertEquals(64L, targetReloaded.defense)
     assertEquals(220L, targetReloaded.maxHp)
     assertEquals(60L, targetReloaded.morale)
-    assertEquals("NORMAL", targetReloaded.sanityState)
+    assertEquals("SELF_AWARE", HeroData.fromRecord(targetReloaded).sanityState.name)
     val cowardReloaded = reloaded.heroes.first { it.id == "coward" }
     assertEquals(60L, cowardReloaded.morale)
   }

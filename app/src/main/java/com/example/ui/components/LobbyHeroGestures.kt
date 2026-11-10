@@ -63,11 +63,21 @@ fun Modifier.lobbyHeroGestures(
         } finally { if (!dropped) cancel.value() }
       } else {
         var event = firstMotion ?: awaitPointerEvent()
+        var transformed = firstMotion != null
         while (true) {
-          if (event.changes.any { it.isConsumed } || event.changes.none { it.pressed }) break
-          val pan = event.calculatePan(); val zoom = event.calculateZoom()
-          transform.value(event.calculateCentroid(useCurrent = false), pan, zoom)
-          event.changes.forEach { if (it.position != it.previousPosition) it.consume() }
+          if (event.changes.any { it.isConsumed }) break
+          if (event.changes.none { it.pressed }) {
+            if (!transformed) tap.value(down.position)
+            break
+          }
+          val current = event.changes.firstOrNull { it.id == down.id }
+          transformed = transformed || event.changes.count { it.pressed } > 1 ||
+            current == null || (current.position - down.position).getDistance() > viewConfiguration.touchSlop
+          if (transformed) {
+            val pan = event.calculatePan(); val zoom = event.calculateZoom()
+            transform.value(event.calculateCentroid(useCurrent = false), pan, zoom)
+            event.changes.forEach { if (it.position != it.previousPosition) it.consume() }
+          }
           event = awaitPointerEvent()
         }
       }

@@ -3,6 +3,7 @@ package com.example.game.combat
 import androidx.compose.ui.graphics.Color
 import com.example.data.model.EquipmentRecord
 import com.example.data.model.HeroClassType
+import com.example.data.model.HeroData
 import com.example.data.model.HeroRecord
 import com.example.data.model.SanctuaryMealRecipe
 import com.example.data.model.TacticalOrder
@@ -14,6 +15,7 @@ import com.example.game.tower.GeneratedMapLayout
 import com.example.game.tower.TowerFloorCatalog
 import java.util.UUID
 import kotlin.math.hypot
+import kotlin.math.roundToInt
 import kotlin.random.Random
 
 enum class MissionStage {
@@ -31,8 +33,10 @@ class TowerCombatEngine(
   val feastBuffActive: Boolean = false,
   val activeMealRecipe: SanctuaryMealRecipe? = null,
   enableLostCourier: Boolean = false,
+  private val random: Random = Random.Default,
 ) {
   val mapLayout: GeneratedMapLayout = TowerFloorCatalog.buildTowerFloorMap(floorSpec)
+  private val criticalHitChanceByHeroId = squadRecords.associate { it.id to it.criticalHitChance.coerceIn(0f, 1f) }
 
   private val hpBonusMult: Float = when {
     activeMealRecipe != null -> 1f + activeMealRecipe.hpBuffPct / 100f
@@ -87,8 +91,12 @@ class TowerCombatEngine(
   var eventBannerTimer: Float = 0f
 
   val heroes: List<HeroCombatUnit> = squadRecords.mapIndexed { idx, record ->
+    val savedHero = HeroData.fromRecord(record)
     val baseMaxHp = record.totalMaxHp(equipment)
-    val maxHp = (baseMaxHp * hpBonusMult).toInt()
+    val maxHp = (baseMaxHp * hpBonusMult).toInt().coerceAtLeast(1)
+    val currentHp = if (savedHero.currentHP == 0) 0 else {
+      (savedHero.currentHP.toDouble() * maxHp / savedHero.maxHP).roundToInt().coerceIn(1, maxHp)
+    }
     val moraleMult = if (record.morale >= 90L) 1.08f else 1.0f
     val effectiveAtk = (record.totalAttack(equipment) * moraleMult * atkBonusMult).toInt()
     val startX = floorSpec.spawnX + if (record.classType.preferredRange < 80f) 65f else -42f
@@ -100,7 +108,7 @@ class TowerCombatEngine(
       heroClass = record.classType,
       personality = record.personalityType,
       maxHp = maxHp,
-      hp = maxHp,
+      hp = currentHp,
       attack = effectiveAtk,
       defense = record.totalDefense(equipment) + defBonusFlat,
       speed = record.totalSpeed(equipment).toFloat().coerceIn(75f, 185f),
@@ -110,7 +118,7 @@ class TowerCombatEngine(
       anchorX = startX,
       anchorY = startY,
       formationIndex = idx,
-    )
+    ).apply { knockedOut = currentHp <= 0 }
   }
 
   val enemies: MutableList<EnemyCombatUnit> = mutableListOf()
@@ -557,11 +565,13 @@ class TowerCombatEngine(
         designatedTargetId = designatedTargetId,
         moveBeacon = moveBeacon,
         mapLayout = mapLayout,
-        spawnProjectile = { projectiles += it },
+        spawnProjectile = { projectile ->
+          projectiles += projectile.copy(damage = rollHeroAttackDamage(hero.id, projectile.damage))
+        },
         spawnAoE = { aoeEffects += it },
         spawnText = { floatingTexts += it },
         dealDamageToEnemy = { enemy, rawDmg, isSkill ->
-          applyDamageToEnemy(enemy, rawDmg, isSkill)
+          applyDamageToEnemy(enemy, rollHeroAttackDamage(hero.id, rawDmg), isSkill)
         },
         protectedAllyPosition = lostCourier?.courier?.let { it.x to it.y },
       )
@@ -821,10 +831,16 @@ class TowerCombatEngine(
     }
   }
 
+  private fun rollHeroAttackDamage(heroId: String, rawDamage: Int): Int {
+    val chance = criticalHitChanceByHeroId[heroId] ?: 0f
+    if (chance <= 0f || random.nextFloat() >= chance) return rawDamage
+    return (rawDamage.toLong() * 3L / 2L).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+  }
+
   private fun applyDamageToEnemy(enemy: EnemyCombatUnit, rawDmg: Int, isSkill: Boolean) {
     if (enemy.dead) return
     enemy.aggroed = true
-    val variance = 0.92f + Random.nextFloat() * 0.16f
+    val variance = 0.92f + random.nextFloat() * 0.16f
     val courierMission = lostCourier
     val counterMult = if (courierMission != null && enemy.id == courierMission.eliteEnemyId &&
       courierMission.eliteRecoveryRemaining > 0f && activeOrder == TacticalOrder.FOCUS_FIRE) 1.35f else 1f
@@ -874,4 +890,8 @@ class TowerCombatEngine(
   }
 
   fun fallenHeroIds(): Set<String> = heroes.filter { it.knockedOut }.map { it.id }.toSet()
+
+  fun remainingHeroHpRatios(): Map<String, Float> = heroes.associate { hero ->
+    hero.id to if (hero.knockedOut) 0f else (hero.hp.toFloat() / hero.maxHp.coerceAtLeast(1)).coerceIn(0f, 1f)
+  }
 }

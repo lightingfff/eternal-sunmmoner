@@ -130,20 +130,20 @@ interface SummonerDataSource {
     profile: MasterProfile,
     hero: HeroRecord,
     goldCost: Long = LobbyHeroAssignments.INFIRMARY_HEAL_GOLD_COST,
-  ) {}
+  )
 
   suspend fun serveHeartyMealToHero(
     profile: MasterProfile,
     hero: HeroRecord,
     goldCost: Long = LobbyHeroAssignments.HEARTY_MEAL_GOLD_COST,
-  ) {}
+  )
 
   suspend fun performCruelHeroSynthesis(
     targetHeroId: String,
     sacrificedHeroIds: List<String>,
-  ): CruelSynthesisOutcome? = null
+  ): CruelSynthesisOutcome
 
-  suspend fun applySocialDisdainPenalty(lowStarHeroId: String, penalty: Int = 2) {}
+  suspend fun applySocialDisdainPenalty(lowStarHeroId: String, penalty: Int = 2, eventId: String = "")
 
   suspend fun toggleHeroInSquad(hero: HeroRecord, currentSquadSize: Int)
 
@@ -161,6 +161,7 @@ interface SummonerDataSource {
     discoveredNodeIds: Set<String> = emptySet(),
     courierOutcome: CourierOutcome? = null,
     courierMemoryHeroId: String? = null,
+    remainingHeroHpRatios: Map<String, Float> = emptyMap(),
   ): ExpeditionSettlementResult
 }
 

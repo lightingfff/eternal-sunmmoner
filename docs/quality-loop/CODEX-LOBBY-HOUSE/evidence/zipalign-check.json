@@ -1,0 +1,18 @@
+{
+  "local_pr87": {
+    "zipalign_16k_exit": 0,
+    "output": ""
+  },
+  "ci_pr87": {
+    "zipalign_16k_exit": 0,
+    "output": ""
+  },
+  "main_before_pr87": {
+    "zipalign_16k_exit": 0,
+    "output": ""
+  },
+  "main_latest": {
+    "zipalign_16k_exit": 0,
+    "output": ""
+  }
+}

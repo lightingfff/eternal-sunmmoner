@@ -80,6 +80,7 @@ class LobbyHeroTouchTest {
   @Test fun longPressPhysicalDragToHouseDispatchesRestingAssignment() {
     start();hold();release(screen(825f,820f))
     assertEquals(listOf("touch_hero" to HeroAssignment.RESTING),received)
+    assertEquals(listOf(FacilityType.HERO_QUARTERS),openedFacilities)
   }
   @Test fun fastDragIsCameraPanAndInvalidDropAndCancelNeverAssign() {
     start()
@@ -117,6 +118,31 @@ class LobbyHeroTouchTest {
     rule.mainClock.advanceTimeBy(100)
     assertEquals(listOf(FacilityType.HERO_QUARTERS, FacilityType.TOWER_GATE), openedFacilities)
     assertTrue(received.isEmpty())
+  }
+
+  @Test fun holdingBuildingWithoutAHeroStillOpensItOnRelease() {
+    start()
+    val node=rule.onNodeWithTag("sanctuary_canvas")
+    node.performTouchInput { down(screen(735f,875f)) }
+    rule.mainClock.advanceTimeBy(700)
+    node.performTouchInput { up() }
+    rule.mainClock.advanceTimeBy(100)
+    assertEquals(listOf(FacilityType.HERO_QUARTERS),openedFacilities)
+    assertTrue(received.isEmpty())
+  }
+
+  @Test fun heroAccessibilityPaddingCannotStealGateTapOrLongHoldOutsideTheSprite() {
+    start(); hold(); release(screen(1960f,620f))
+    val node=rule.onNodeWithTag("sanctuary_canvas")
+    val besideHero=screen(2040f,585f)
+    node.performTouchInput { click(besideHero) }
+    rule.mainClock.advanceTimeBy(100)
+    node.performTouchInput { down(besideHero) }
+    rule.mainClock.advanceTimeBy(700)
+    node.performTouchInput { up() }
+    rule.mainClock.advanceTimeBy(100)
+    assertEquals(listOf(FacilityType.TOWER_GATE,FacilityType.TOWER_GATE),openedFacilities)
+    assertEquals(listOf("touch_hero" to HeroAssignment.IN_PARTY),received)
   }
 }
 

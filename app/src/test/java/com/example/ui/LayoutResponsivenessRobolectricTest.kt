@@ -497,6 +497,7 @@ class LayoutResponsivenessRobolectricTest {
             onSynthesizeGear = {},
             onEnhanceGear = {},
             onRecoverHero = { _, _ -> },
+            onHealHeroInfirmary = {}, onServeHeartyMeal = {}, onCruelSynthesis = { _, _ -> },
             onHostMeal = {},
             onDeploy = { currentScreen = 2 },
             onBack = {},
@@ -511,6 +512,7 @@ class LayoutResponsivenessRobolectricTest {
             onSynthesizeGear = {},
             onEnhanceGear = {},
             onRecoverHero = { _, _ -> },
+            onHealHeroInfirmary = {}, onServeHeartyMeal = {}, onCruelSynthesis = { _, _ -> },
             onHostMeal = {},
             onToggleSquad = {},
           )
@@ -562,6 +564,7 @@ class LayoutResponsivenessRobolectricTest {
             onSynthesizeGear = {},
             onEnhanceGear = {},
             onRecoverHero = { _, _ -> },
+            onHealHeroInfirmary = {}, onServeHeartyMeal = {}, onCruelSynthesis = { _, _ -> },
             onHostMeal = {},
             onToggleSquad = {},
             onCompletePrologue = {},
@@ -656,6 +659,7 @@ class LayoutResponsivenessRobolectricTest {
             onSynthesizeGear = {},
             onEnhanceGear = {},
             onRecoverHero = { _, _ -> },
+            onHealHeroInfirmary = {}, onServeHeartyMeal = {}, onCruelSynthesis = { _, _ -> },
             onHostMeal = {},
             onToggleSquad = {},
             onCompletePrologue = {},
@@ -850,7 +854,7 @@ class LayoutResponsivenessRobolectricTest {
     composeTestRule.setContent { EternalSummonerTheme {
       SanctuaryFacilityModalOverlay(facility=FacilityType.SUMMONING_HALL,state=state,onClose={},
         onSummonHero={calls++},onTrainHero={_,_->},onEquipItem={_,_->},onSynthesizeGear={},
-        onEnhanceGear={},onRecoverHero={_,_->},onHostMeal={},onToggleSquad={})
+        onEnhanceGear={},onRecoverHero={_,_->},onHostMeal={},onToggleSquad={},onHealHeroInfirmary={},onServeHeartyMeal={},onCruelSynthesis={_,_->})
     } }
     composeTestRule.onNodeWithTag("summon_ritual_button").performClick()
     composeTestRule.onNodeWithTag("cancel_summon_spend").performClick()

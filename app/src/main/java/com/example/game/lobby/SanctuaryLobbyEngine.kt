@@ -75,7 +75,9 @@ data class LobbyHeroActor(
   var stuckTimer: Float = 0f,
   var lastProgressX: Float = x,
   var lastProgressY: Float = y,
-)
+) {
+  internal var speechPriority: Int = 0
+}
 
 /**
  * 20-Node Connected Road & Courtyard Waypoint Graph for the Reconstructed 3200x2760 Floating Sanctuary Island.
@@ -274,6 +276,7 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
   private val actors = mutableMapOf<String, LobbyHeroActor>()
   private var dragSession: LobbyDragSession? = null
   private val pendingDisdainMoralePenaltyIds = mutableListOf<String>()
+  private val activeDisdainPairs = mutableSetOf<Pair<String, String>>()
   val pickedHeroId: String? get() = dragSession?.heroId
   val dropZones: List<LobbyDropZone> by lazy {
     listOf("monument_tower_gate" to HeroAssignment.IN_PARTY, "building_hero_quarters" to HeroAssignment.RESTING).map { (id, assignment) ->
@@ -287,6 +290,44 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
     pendingDisdainMoralePenaltyIds.clear()
     return snapshot
   }
+
+  private fun nextAmbientSpeechDelay(): Float = 6f + random.nextFloat() * 4f
+
+  private fun canSpeak(actor: LobbyHeroActor, priority: Int): Boolean {
+    if (actor.heroId == pickedHeroId && priority < SPEECH_PLAYER) return false
+    val alreadySpeaking = actor.speechBubble != null && actor.speechTimer > 0f
+    return !alreadySpeaking || (priority > SPEECH_AMBIENT && priority >= actor.speechPriority)
+  }
+
+  private fun showSpeech(actor: LobbyHeroActor, text: String, priority: Int): Boolean {
+    if (!canSpeak(actor, priority)) return false
+    actor.speechBubble = text
+    actor.speechTimer = ContextAwareDialogueDatabase.DEFAULT_BUBBLE_DURATION_SEC
+    actor.speechPriority = priority
+    actor.ambientSpeechCooldown = nextAmbientSpeechDelay()
+    return true
+  }
+
+  private fun tickSpeech(actor: LobbyHeroActor, dt: Float) {
+    if (actor.speechTimer <= 0f) return
+    actor.speechTimer = (actor.speechTimer - dt).coerceAtLeast(0f)
+    if (actor.speechTimer <= 0f) {
+      actor.speechBubble = null
+      actor.speechPriority = SPEECH_AMBIENT
+    }
+  }
+
+  private fun isNearHouse(actor: LobbyHeroActor): Boolean {
+    val house = TowerFloorCatalog.SANCTUARY_ZONES.first { it.facility == FacilityType.HERO_QUARTERS }
+    return hypot(actor.x - house.centerX, actor.y - house.centerY) <= house.interactRadius * 1.45f
+  }
+
+  private fun isFreeForAmbientSpeech(actor: LobbyHeroActor): Boolean =
+    actor.lobbyData?.currentAssignment == HeroAssignment.UNASSIGNED &&
+      actor.heroId != pickedHeroId && !actor.isMoving && !actor.isPlayerCommanded &&
+      actor.chatPartnerId == null &&
+      (actor.activity == LobbyActivityState.PATROLLING || actor.activity == LobbyActivityState.COWERING ||
+        actor.activity == LobbyActivityState.CHATTING)
 
   fun renderedCamera(width: Float, height: Float, renderZoom: Float = zoom): Pair<Float, Float> {
     val worldW = if (!isInsideInterior && IslandExpansionMilestone.EAST_CELESTIAL_GARDEN in unlockedExpansions)
@@ -317,10 +358,8 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
     actor.locomotion = LobbyLocomotion.BEING_PICKED_UP
     actor.isMoving = false
     actor.chatPartnerId = null
-    actor.speechBubble = actor.lobbyData?.let { ContextAwareDialogueDatabase.lineForPickedUp(it) }
-      ?: "Master, hãy nhẹ tay!"
-    actor.speechTimer = ContextAwareDialogueDatabase.DEFAULT_BUBBLE_DURATION_SEC
-    actor.ambientSpeechCooldown = 6f + random.nextFloat() * 4f
+    showSpeech(actor, actor.lobbyData?.let { ContextAwareDialogueDatabase.lineForPickedUp(it) }
+      ?: "Master, hãy nhẹ tay!", SPEECH_PLAYER)
     return true
   }
 
@@ -336,12 +375,9 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
     actors[id]?.let { actor ->
       val data = actor.lobbyData
       if (data != null && target.assignment == HeroAssignment.IN_PARTY) {
-        actor.speechBubble = ContextAwareDialogueDatabase.lineForPartyAssignment(data)
-        actor.speechTimer = ContextAwareDialogueDatabase.DEFAULT_BUBBLE_DURATION_SEC
-        actor.ambientSpeechCooldown = 6f + random.nextFloat() * 4f
+        showSpeech(actor, ContextAwareDialogueDatabase.lineForPartyAssignment(data), SPEECH_PLAYER)
       } else if (data != null && target.assignment == HeroAssignment.RESTING) {
-        actor.speechBubble = "Cuối cùng cũng được ngả lưng xuống giường ấm tại Ký Túc Xá Thánh Địa."
-        actor.speechTimer = ContextAwareDialogueDatabase.DEFAULT_BUBBLE_DURATION_SEC
+        showSpeech(actor, "Cuối cùng cũng được ngả lưng xuống giường ấm tại Ký Túc Xá Thánh Địa.", SPEECH_PLAYER)
       }
     }
     return LobbyHeroDrop(id, target.assignment)
@@ -386,6 +422,14 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
   private val interiorActors = mutableListOf<LobbyHeroActor>()
 
   companion object {
+    private const val SPEECH_AMBIENT = 0
+    private const val SPEECH_SOCIAL = 1
+    private const val SPEECH_CONTEXT = 2
+    private const val SPEECH_PLAYER = 3
+    private const val DISDAIN_ENTER_DISTANCE = 165f
+    private const val DISDAIN_EXIT_DISTANCE = 195f
+    private const val DISDAIN_COOLDOWN_SEC = 11f
+
     val ENTERABLE_FACILITIES: Set<FacilityType> = setOf(
       FacilityType.HERO_QUARTERS,
       FacilityType.RESTAURANT,
@@ -645,17 +689,15 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
   fun triggerHeroTapSpeech(heroId: String): String? {
     val actor = actors[heroId] ?: heroActors.firstOrNull { it.heroId == heroId } ?: return null
     if (actor.isSanctuaryKeeperNpc) return actor.speechBubble
+    if (actor.heroId == pickedHeroId) return actor.speechBubble
     val data = actor.lobbyData
-    val (houseX, houseY) = zoneCenter(FacilityType.HERO_QUARTERS)
-    val nearHouse = hypot(actor.x - houseX, actor.y - houseY) <= 260f
     val line = if (data != null) {
-      ContextAwareDialogueDatabase.lineForTapOrAmbient(data, nearHouse, random.nextInt(100))
+      ContextAwareDialogueDatabase.lineForTapOrAmbient(data, isNearHouse(actor), random.nextInt(100))
     } else {
       actor.personality.sampleQuoteVi
     }
-    actor.speechBubble = line
-    actor.speechTimer = ContextAwareDialogueDatabase.DEFAULT_BUBBLE_DURATION_SEC
-    actor.ambientSpeechCooldown = 6f + random.nextFloat() * 4f
+    showSpeech(actor, line, SPEECH_PLAYER)
+    if (data?.isLowHpNearHouse == true && isNearHouse(actor)) actor.lowHpHouseSpeechCooldown = 9.5f
     return line
   }
 
@@ -738,8 +780,7 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
       hero.isMoving = true
       hero.isPlayerCommanded = true
       hero.activity = LobbyActivityState.PATROLLING
-      hero.speechBubble = "Rõ lệnh Master! Đang di chuyển."
-      hero.speechTimer = 4f
+      showSpeech(hero, "Rõ lệnh Master! Đang di chuyển.", SPEECH_PLAYER)
     }
   }
 
@@ -751,8 +792,7 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
       hero.isMoving = false
       hero.isPlayerCommanded = true
       hero.activity = LobbyActivityState.GUARDING_GATE
-      hero.speechBubble = "Đang giữ vị trí phòng thủ thưa Master!"
-      hero.speechTimer = 4f
+      showSpeech(hero, "Đang giữ vị trí phòng thủ thưa Master!", SPEECH_PLAYER)
     }
   }
 
@@ -772,8 +812,7 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
         HeroTaskType.PREPARE_TOWER -> LobbyActivityState.GUARDING_GATE
         HeroTaskType.RETURN_QUARTERS -> LobbyActivityState.RESTING
       }
-      hero.speechBubble = "Đang tiến về ${task.labelVi}!"
-      hero.speechTimer = 4.5f
+      showSpeech(hero, "Đang tiến về ${task.labelVi}!", SPEECH_PLAYER)
     }
   }
 
@@ -861,9 +900,9 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
             speechBubble = if (injured) {
               "Đang tịnh dưỡng hồi thương (${hero.remainingInjurySeconds(nowSec)}s)..."
             } else {
-              "Nghỉ ngơi trên giường êm giúp hồi lại Sĩ Khí thật nhanh!"
+              "Tôi đang nghỉ trong Nhà, chờ được trị thương và dùng bữa."
             },
-            speechTimer = 5.5f,
+            speechTimer = ContextAwareDialogueDatabase.DEFAULT_BUBBLE_DURATION_SEC,
           )
         }
 
@@ -883,7 +922,7 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
             facingRight = idx == 0,
             activity = LobbyActivityState.RESTING,
             speechBubble = if (idx == 0) "Phòng nghỉ luôn ấm áp ánh đèn thưa Master." else null,
-            speechTimer = if (idx == 0) 4.5f else 0f,
+            speechTimer = if (idx == 0) ContextAwareDialogueDatabase.DEFAULT_BUBBLE_DURATION_SEC else 0f,
           )
         }
       }
@@ -930,7 +969,7 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
             activity = LobbyActivityState.DINING,
             waitTimer = 8f + idx * 2.5f,
             speechBubble = if (idx < 2) quotes[idx % quotes.size] else null,
-            speechTimer = if (idx < 2) 5.5f + idx * 1.5f else 0f,
+            speechTimer = if (idx < 2) ContextAwareDialogueDatabase.DEFAULT_BUBBLE_DURATION_SEC else 0f,
             isSeatedDining = !startsWalkingIn,
           )
         }
@@ -967,7 +1006,7 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
             speechBubble = if (hero.statusType == HeroStatusType.TRAINING) {
               "Đang rèn luyện chuyên sâu theo chỉ thị của Master!"
             } else null,
-            speechTimer = if (hero.statusType == HeroStatusType.TRAINING) 5.0f else 0f,
+            speechTimer = if (hero.statusType == HeroStatusType.TRAINING) ContextAwareDialogueDatabase.DEFAULT_BUBBLE_DURATION_SEC else 0f,
           )
         }
       }
@@ -997,12 +1036,17 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
               facingRight = ix < 600f,
               activity = LobbyActivityState.INSPECTING_ARMORY,
               speechBubble = if (idx == 0) "Vũ khí vừa mài sắc bén hơn hẳn rồi Master!" else null,
-              speechTimer = if (idx == 0) 4.8f else 0f,
+              speechTimer = if (idx == 0) ContextAwareDialogueDatabase.DEFAULT_BUBBLE_DURATION_SEC else 0f,
             )
           }
       }
 
       else -> Unit
+    }
+    interiorActors.forEach { actor ->
+      cachedRoster.firstOrNull { it.id == actor.heroId }?.let { hero ->
+        actor.lobbyData = HeroData.fromRecord(hero, nowSec)
+      }
     }
   }
 
@@ -1016,6 +1060,7 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
     val healthyOutdoorHeroes = cachedRoster.filter { HeroData.fromRecord(it, nowEpochSec).currentAssignment !in setOf(HeroAssignment.RESTING, HeroAssignment.SACRIFICED) }
     val activeOutdoorIds = healthyOutdoorHeroes.map { it.id }.toSet()
     actors.keys.retainAll(activeOutdoorIds)
+    activeDisdainPairs.removeAll { (high, low) -> high !in activeOutdoorIds || low !in activeOutdoorIds }
 
     healthyOutdoorHeroes.forEachIndexed { idx, hero ->
       val existing = actors[hero.id]
@@ -1049,6 +1094,7 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
           ambientSpeechCooldown = 6f + (idx % 5) * 0.95f,
         )
         actor.lobbyData = heroData
+        if (heroData.currentAssignment == HeroAssignment.IN_PARTY) actor.speechPriority = SPEECH_PLAYER
         actors[hero.id] = actor
         priorityRoutine(actor)
       } else {
@@ -1057,8 +1103,7 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
         existing.lobbyData = updatedData
         existing.isInjured = updatedData.isLowHpNearHouse
         if (before?.currentAssignment != updatedData.currentAssignment && updatedData.currentAssignment == HeroAssignment.IN_PARTY) {
-          existing.speechBubble = ContextAwareDialogueDatabase.lineForPartyAssignment(updatedData)
-          existing.speechTimer = ContextAwareDialogueDatabase.DEFAULT_BUBBLE_DURATION_SEC
+          showSpeech(existing, ContextAwareDialogueDatabase.lineForPartyAssignment(updatedData), SPEECH_PLAYER)
         }
         if (pickedHeroId != hero.id && (before?.currentAssignment != updatedData.currentAssignment || before?.isFrightened != updatedData.isFrightened)) {
           existing.isPlayerCommanded = false
@@ -1114,10 +1159,7 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
       nearbyFacility = interior
 
       heroActors.forEachIndexed { idx, actor ->
-        if (actor.speechTimer > 0f) {
-          actor.speechTimer = (actor.speechTimer - dt).coerceAtLeast(0f)
-          if (actor.speechTimer <= 0f) actor.speechBubble = null
-        }
+        tickSpeech(actor, dt)
 
         // Animate indoor training loops, smithing hammer swings, and dining enter -> sit -> leave cycle!
         if (actor.activity == LobbyActivityState.TRAINING || actor.heroId == "npc_armory_smith") {
@@ -1174,24 +1216,14 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
       else -> null
     }
 
-    val houseZone = TowerFloorCatalog.SANCTUARY_ZONES.first { it.facility == FacilityType.HERO_QUARTERS }
-
     // Step Autonomous & Commanded Heroes along Waypoint Graph Routes
     actors.values.forEachIndexed { idx, actor ->
-      if (actor.heroId == pickedHeroId) {
-        if (actor.speechTimer > 0f) {
-          actor.speechTimer = (actor.speechTimer - dt).coerceAtLeast(0f)
-          if (actor.speechTimer <= 0f) actor.speechBubble = null
-        }
-        return@forEachIndexed
-      }
-      if (actor.speechTimer > 0f) {
-        actor.speechTimer = (actor.speechTimer - dt).coerceAtLeast(0f)
-        if (actor.speechTimer <= 0f) actor.speechBubble = null
-      }
+      tickSpeech(actor, dt)
       actor.lowHpHouseSpeechCooldown = (actor.lowHpHouseSpeechCooldown - dt).coerceAtLeast(0f)
       actor.proximityDisdainCooldown = (actor.proximityDisdainCooldown - dt).coerceAtLeast(0f)
-      actor.ambientSpeechCooldown = (actor.ambientSpeechCooldown - dt).coerceAtLeast(0f)
+      if (actor.heroId == pickedHeroId) {
+        return@forEachIndexed
+      }
 
       val dx = actor.targetX - actor.x
       val dy = actor.targetY - actor.y
@@ -1265,56 +1297,27 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
       }
 
       val heroData = actor.lobbyData
-      val distToHouse = hypot(actor.x - houseZone.centerX, actor.y - houseZone.centerY)
-      val nearHouse = distToHouse <= houseZone.interactRadius * 1.45f
+      val nearHouse = isNearHouse(actor)
 
       // 1) Low HP (< 40% MaxHP) walking past the House trigger
       if (heroData != null && heroData.isLowHpNearHouse && nearHouse && actor.lowHpHouseSpeechCooldown <= 0f) {
-        actor.speechBubble = ContextAwareDialogueDatabase.lineForLowHpNearHouse()
-        actor.speechTimer = ContextAwareDialogueDatabase.DEFAULT_BUBBLE_DURATION_SEC
-        actor.lowHpHouseSpeechCooldown = 9.5f
-        actor.ambientSpeechCooldown = 6f + random.nextFloat() * 4f
-      }
-
-      // 2) Social Proximity Trigger: 3-5 Star Hero passing near a 1-2 Star Hero -> disdain + -2 Morale
-      if (heroData != null && heroData.rarity in 3..5 && actor.proximityDisdainCooldown <= 0f) {
-        val lowStarNeighbor = actors.values.firstOrNull { other ->
-          other.heroId != actor.heroId &&
-            other.heroId != pickedHeroId &&
-            (other.lobbyData?.rarity ?: 3) in 1..2 &&
-            other.proximityDisdainCooldown <= 0f &&
-            hypot(other.x - actor.x, other.y - actor.y) <= 165f
-        }
-        val lowStarData = lowStarNeighbor?.lobbyData
-        if (lowStarNeighbor != null && lowStarData != null) {
-          actor.speechBubble = ContextAwareDialogueDatabase.lineForHighStarDisdain(heroData, lowStarData)
-          actor.speechTimer = ContextAwareDialogueDatabase.DEFAULT_BUBBLE_DURATION_SEC
-          actor.proximityDisdainCooldown = 11f
-          actor.ambientSpeechCooldown = 7f + random.nextFloat() * 3f
-
-          val newMorale = (lowStarData.morale - 2).coerceAtLeast(0)
-          lowStarNeighbor.lobbyData = lowStarData.copy(morale = newMorale)
-          lowStarNeighbor.speechBubble = ContextAwareDialogueDatabase.lineForLowStarHumiliated()
-          lowStarNeighbor.speechTimer = ContextAwareDialogueDatabase.DEFAULT_BUBBLE_DURATION_SEC
-          lowStarNeighbor.proximityDisdainCooldown = 11f
-          lowStarNeighbor.ambientSpeechCooldown = 7f + random.nextFloat() * 3f
-          pendingDisdainMoralePenaltyIds.add(lowStarNeighbor.heroId)
+        if (showSpeech(actor, ContextAwareDialogueDatabase.lineForLowHpNearHouse(), SPEECH_CONTEXT)) {
+          actor.lowHpHouseSpeechCooldown = 9.5f
         }
       }
 
-      // 3) Random 6-10s Ambient Speech Trigger for idle/free Heroes
-      if (actor.ambientSpeechCooldown <= 0f) {
-        actor.ambientSpeechCooldown = 6f + random.nextFloat() * 4f
-        if (actor.speechBubble == null && heroData != null) {
-          actor.speechBubble = ContextAwareDialogueDatabase.lineForTapOrAmbient(
-            hero = heroData,
-            nearHouse = nearHouse,
-            seed = idx + random.nextInt(4),
-          )
-          actor.speechTimer = ContextAwareDialogueDatabase.DEFAULT_BUBBLE_DURATION_SEC
+      // Only idle, available heroes consume their randomized ambient speech interval.
+      if (isFreeForAmbientSpeech(actor)) {
+        actor.ambientSpeechCooldown = (actor.ambientSpeechCooldown - dt).coerceAtLeast(0f)
+        if (actor.ambientSpeechCooldown <= 0f && actor.speechBubble == null && heroData != null) {
+          showSpeech(actor, ContextAwareDialogueDatabase.lineForTapOrAmbient(
+            heroData, nearHouse, idx + random.nextInt(4),
+          ), SPEECH_AMBIENT)
         }
       }
     }
+
+    stepSocialProximity()
 
     // Step Resident Sanctuary Keepers
     exteriorKeepers.forEach { keeper ->
@@ -1336,6 +1339,35 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
         }
         keeper.speechTimer = 4.5f
       }
+    }
+  }
+
+  private fun stepSocialProximity() {
+    activeDisdainPairs.removeAll { (highId, lowId) ->
+      val high = actors[highId]
+      val low = actors[lowId]
+      high == null || low == null || (high.lobbyData?.rarity ?: 0) !in 3..5 || (low.lobbyData?.rarity ?: 0) !in 1..2 ||
+        hypot(high.x - low.x, high.y - low.y) > DISDAIN_EXIT_DISTANCE
+    }
+    for (high in actors.values) {
+      val highData = high.lobbyData ?: continue
+      if (highData.rarity !in 3..5 || high.heroId == pickedHeroId ||
+        high.proximityDisdainCooldown > 0f || !canSpeak(high, SPEECH_SOCIAL)) continue
+      val low = actors.values.firstOrNull { candidate ->
+        candidate.heroId != pickedHeroId && (candidate.lobbyData?.rarity ?: 0) in 1..2 &&
+          candidate.proximityDisdainCooldown <= 0f &&
+          (high.heroId to candidate.heroId) !in activeDisdainPairs &&
+          canSpeak(candidate, SPEECH_SOCIAL) &&
+          hypot(high.x - candidate.x, high.y - candidate.y) <= DISDAIN_ENTER_DISTANCE
+      } ?: continue
+      val lowData = low.lobbyData ?: continue
+      activeDisdainPairs.add(high.heroId to low.heroId)
+      showSpeech(high, ContextAwareDialogueDatabase.lineForHighStarDisdain(highData, lowData), SPEECH_SOCIAL)
+      showSpeech(low, ContextAwareDialogueDatabase.lineForLowStarHumiliated(), SPEECH_SOCIAL)
+      high.proximityDisdainCooldown = DISDAIN_COOLDOWN_SEC
+      low.proximityDisdainCooldown = DISDAIN_COOLDOWN_SEC
+      low.lobbyData = lowData.copy(morale = (lowData.morale - 2).coerceAtLeast(0))
+      pendingDisdainMoralePenaltyIds.add(low.heroId)
     }
   }
 
@@ -1413,8 +1445,8 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
           speaker.chatPartnerId = listener.heroId; speaker.waypointQueue.clear()
           speaker.targetX = speaker.x; speaker.targetY = speaker.y; speaker.waitTimer = 4.5f
           speaker.facingRight = listener.x >= speaker.x
-          speaker.speechBubble = if (speaker.lobbyData?.personality == LobbyPersonality.REBEL) "Tự chọn lấy con đường của mình." else "Chúng ta sẽ cùng trở về."
-          speaker.speechTimer = 4.5f
+          val line = if (speaker.lobbyData?.personality == LobbyPersonality.REBEL) "Tự chọn lấy con đường của mình." else "Chúng ta sẽ cùng trở về."
+          showSpeech(speaker, line, SPEECH_AMBIENT)
         }
         return
       }
@@ -1440,13 +1472,6 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
         assignHeroDestination(actor, destX, destY)
       }
       actor.activity = LobbyActivityState.CHATTING
-      actor.speechBubble = when (actor.personality) {
-        PersonalityType.RECKLESS -> "Tầng tiếp theo để tôi mở đường cho!"
-        PersonalityType.CALCULATING -> "Đội hình 3 lớp Tiền tuyến - Cung - Phép đang rất cân bằng."
-        PersonalityType.CYNICAL -> "Nhớ mang đủ trang bị từ Kho Vũ Khí trước khi vào Cổng."
-        else -> "Nắng ấm và hoa anh đào trên Thánh Địa hôm nay đẹp thật."
-      }
-      actor.speechTimer = 4.2f
     } else {
       val (destX, destY) = when (chosenFacility) {
         FacilityType.TRAINING_GROUND -> trainingPracticeSpot(indexSeed)
