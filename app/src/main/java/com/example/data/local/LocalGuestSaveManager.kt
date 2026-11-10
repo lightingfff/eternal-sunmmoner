@@ -117,7 +117,12 @@ class LocalGuestSaveManager(context: Context) {
     val current = _guestSnapshot.value
       ?: loadValidSnapshotFromDisk()
       ?: createStarterGuestSnapshot("Master")
-    val next = transform(current).copy(
+    val transformed = transform(current)
+    val next = transformed.copy(
+      heroes = transformed.heroes.map { hero ->
+        if (!hero.hiddenTrait.unlocked && hero.hiddenTrait.canUnlock(hero.level.toInt(), hero.morale.toInt(), com.example.data.model.HeroSanityState.fromRaw(hero.sanityState)))
+          hero.copy(hiddenTrait = hero.hiddenTrait.copy(unlocked = true)) else hero
+      },
       schemaVersion = GuestSaveSnapshot.CURRENT_SAVE_SCHEMA_VERSION,
       lastSavedEpochSec = System.currentTimeMillis() / 1000L,
     )
@@ -468,6 +473,16 @@ class LocalGuestSaveManager(context: Context) {
           put("equippedArmorId", h.equippedArmorId)
           put("inActiveSquad", h.inActiveSquad)
           put("bondSummary", h.bondSummary)
+          put("currentHp", h.currentHp)
+          put("sanityState", h.sanityState)
+          put("currentAssignment", h.currentAssignment)
+          put("partyJoinedOrder", h.partyJoinedOrder)
+          put("restStartedAtEpochSec", h.restStartedAtEpochSec)
+          put("hiddenTrait", JSONObject().apply {
+            put("id", h.hiddenTrait.id); put("name", h.hiddenTrait.name)
+            put("minimumLevel", h.hiddenTrait.minimumLevel); put("minimumMorale", h.hiddenTrait.minimumMorale)
+            put("requiresSelfAwareness", h.hiddenTrait.requiresSelfAwareness); put("unlocked", h.hiddenTrait.unlocked)
+          })
         },
       )
     }
@@ -561,7 +576,9 @@ class LocalGuestSaveManager(context: Context) {
           defense = h.optLong("defense", 20L).coerceIn(0L, 50000L),
           speed = h.optLong("speed", 100L).coerceIn(20L, 500L),
           skillLevel = h.optLong("skillLevel", 1L).coerceIn(1L, 20L),
-          personality = PersonalityType.fromRaw(h.optString("personality", "STOIC")).name,
+          personality = h.optString("personality", "STOIC").let { raw ->
+            if (com.example.data.model.LobbyPersonality.entries.any { it.name == raw }) raw else PersonalityType.fromRaw(raw).name
+          },
           status = HeroStatusType.fromRaw(h.optString("status", "READY")).name,
           injuryRecoveryUntilEpochSec = h.optLong("injuryRecoveryUntilEpochSec", 0L).coerceAtLeast(0L),
           morale = h.optLong("morale", 100L).coerceIn(0L, 100L),
@@ -569,6 +586,15 @@ class LocalGuestSaveManager(context: Context) {
           equippedArmorId = h.optString("equippedArmorId", ""),
           inActiveSquad = h.optBoolean("inActiveSquad", false),
           bondSummary = h.optString("bondSummary", "Chiến đấu vì Thánh Địa.").take(200),
+          currentHp = h.optLong("currentHp", -1L).coerceIn(-1L, h.optLong("maxHp", 350L).coerceIn(50L, 100000L)),
+          sanityState = com.example.data.model.HeroSanityState.fromRaw(h.optString("sanityState")).name,
+          currentAssignment = h.optString("currentAssignment").takeIf { raw -> com.example.data.model.HeroAssignment.entries.any { it.name == raw } }.orEmpty(),
+          partyJoinedOrder = h.optLong("partyJoinedOrder", 0L).coerceAtLeast(0L),
+          restStartedAtEpochSec = h.optLong("restStartedAtEpochSec", 0L).coerceAtLeast(0L),
+          hiddenTrait = h.optJSONObject("hiddenTrait")?.let { t -> com.example.data.model.HeroHiddenTrait(
+            id = t.optString("id", "unyielding_soul").take(80), name = t.optString("name", "Linh hồn bất khuất").take(100),
+            minimumLevel = t.optInt("minimumLevel", 10).coerceIn(1, 100), minimumMorale = t.optInt("minimumMorale", 60).coerceIn(0, 100),
+            requiresSelfAwareness = t.optBoolean("requiresSelfAwareness"), unlocked = t.optBoolean("unlocked")) } ?: com.example.data.model.HeroHiddenTrait(),
         )
       }
     }
@@ -665,10 +691,11 @@ class LocalGuestDataSource(
       }
 
     val heroId = "hero_${UUID.randomUUID().toString().replace("-", "").take(16)}"
-    val squadAutoJoin = existingHeroes.count { it.inActiveSquad && !it.isCurrentlyInjured() } < 4
 
     lateinit var createdHero: HeroRecord
     saveManager.mutateSnapshot { snap ->
+      require(snap.profile.soulShards >= shardCost && snap.profile.manaCrystals >= manaCost) { "Không đủ tài nguyên triệu hồi." }
+      val squadAutoJoin = snap.heroes.count { it.inActiveSquad } < 4
       createdHero = HeroRecord(
         id = heroId,
         userId = snap.guestPlayerId,
@@ -688,6 +715,7 @@ class LocalGuestDataSource(
         injuryRecoveryUntilEpochSec = 0L,
         morale = 100L,
         inActiveSquad = squadAutoJoin,
+        partyJoinedOrder = if (squadAutoJoin) ((snap.heroes.maxOfOrNull { it.partyJoinedOrder } ?: 0L).coerceAtMost(Long.MAX_VALUE-1) + 1L) else 0L,
         bondSummary = candidate.bond,
       )
       snap.copy(
@@ -756,6 +784,7 @@ class LocalGuestDataSource(
               it.copy(
                 level = (it.level + 1L).coerceAtMost(100L),
                 maxHp = (it.maxHp + hpGain).coerceAtMost(100000L),
+                currentHp = if (it.currentHp < 0L) -1L else (it.currentHp + hpGain).coerceAtMost(100000L),
                 attack = (it.attack + atkGain).coerceAtMost(50000L),
                 defense = (it.defense + defGain).coerceAtMost(50000L),
                 speed = (it.speed + spdGain).coerceAtMost(500L),
@@ -843,6 +872,10 @@ class LocalGuestDataSource(
             val moraleBoost = if (targetStatus == HeroStatusType.RESTING) 8L else 0L
             h.copy(
               status = targetStatus.name,
+              currentAssignment = if (targetStatus == HeroStatusType.RESTING) "RESTING" else if (h.inActiveSquad) "IN_PARTY" else "UNASSIGNED",
+              inActiveSquad = h.inActiveSquad && targetStatus != HeroStatusType.RESTING,
+              restStartedAtEpochSec = if (targetStatus == HeroStatusType.RESTING) nowSec else 0L,
+              currentHp = com.example.data.model.HeroData.fromRecord(h, nowSec).currentHP.toLong(),
               morale = (h.morale + moraleBoost).coerceIn(0L, 100L),
             )
           } else {
@@ -961,6 +994,9 @@ class LocalGuestDataSource(
           if (h.id == hero.id) {
             h.copy(
               status = HeroStatusType.READY.name,
+              currentHp = h.maxHp,
+              currentAssignment = if (h.inActiveSquad) "IN_PARTY" else "UNASSIGNED",
+              restStartedAtEpochSec = 0L,
               injuryRecoveryUntilEpochSec = 0L,
               morale = (h.morale + 15L).coerceAtMost(100L),
             )
@@ -1041,21 +1077,18 @@ class LocalGuestDataSource(
     }
   }
 
-  override suspend fun toggleHeroInSquad(hero: HeroRecord, currentSquadSize: Int) {
-    if (!hero.inActiveSquad) {
-      require(!hero.isCurrentlyInjured()) {
-        "${hero.name} đang bị thương! Hãy đưa về Khu Nghỉ Ngơi hồi phục trước."
-      }
-      require(currentSquadSize < 4) {
-        "Đội hình viễn chinh tối đa 4 Anh hùng."
-      }
-    }
+  override suspend fun assignLobbyHero(heroId: String, assignment: com.example.data.model.HeroAssignment) {
     saveManager.mutateSnapshot { snap ->
-      snap.copy(
-        heroes = snap.heroes.map { h ->
-          if (h.id == hero.id) h.copy(inActiveSquad = !h.inActiveSquad) else h
-        },
-      )
+      snap.copy(heroes = com.example.data.LobbyHeroAssignments.assign(snap.heroes, heroId, assignment, System.currentTimeMillis() / 1000L))
+    }
+  }
+
+  override suspend fun toggleHeroInSquad(hero: HeroRecord, currentSquadSize: Int) {
+    saveManager.mutateSnapshot { snap ->
+      val current = requireNotNull(snap.heroes.find { it.id == hero.id })
+      val assignment = if (current.inActiveSquad) com.example.data.model.HeroAssignment.UNASSIGNED else com.example.data.model.HeroAssignment.IN_PARTY
+      snap.copy(heroes = com.example.data.LobbyHeroAssignments.assign(snap.heroes, hero.id, assignment,
+        System.currentTimeMillis() / 1000L, replaceWhenFull = false))
     }
   }
 
@@ -1183,6 +1216,9 @@ class LocalGuestDataSource(
             injuryRecoveryUntilEpochSec = recoveryUntil,
             morale = nextMorale,
             inActiveSquad = if (wasKnockedOut) false else hero.inActiveSquad,
+            currentHp = if (wasKnockedOut) hero.maxHp / 4L else if (hero.currentHp < 0L) -1L else (hero.currentHp + if (didLevelUp) 32L else 0L).coerceAtMost(100000L),
+            currentAssignment = if (wasKnockedOut) "RESTING" else if (hero.inActiveSquad) "IN_PARTY" else "UNASSIGNED",
+            restStartedAtEpochSec = if (wasKnockedOut) nowSec else 0L,
             bondSummary = if (courierForgeUnlocked && hero.id == memoryHeroId) {
               courierMemoryHeroName = hero.name
               LostCourierProgression.rememberRescue(hero.bondSummary)

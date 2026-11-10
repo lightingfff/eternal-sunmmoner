@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.performance.ScenePerformanceTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-10T05:22:19.449Z" hostname="b316c1c49299" time="0.017">
+  <properties/>
+  <testcase name="disabledProbeDoesNoSamplingAndEnablingStartsFresh" classname="com.example.performance.ScenePerformanceTest" time="0.003"/>
+  <testcase name="samplesAtMostOncePerSecondAndReportsMeasuredCounters" classname="com.example.performance.ScenePerformanceTest" time="0.003"/>
+  <testcase name="worksAtHighRefreshAndResetsPauseTime" classname="com.example.performance.ScenePerformanceTest" time="0.001"/>
+  <testcase name="boundedSamplesReportTailAndJankWithoutRetainingPause" classname="com.example.performance.ScenePerformanceTest" time="0.0"/>
+  <testcase name="balancedHalvesRenderWorkWithoutChangingLogicalTime" classname="com.example.performance.ScenePerformanceTest" time="0.001"/>
+  <testcase name="fixedSimulationRetainsFractionalFramesAndResetClearsThem" classname="com.example.performance.ScenePerformanceTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

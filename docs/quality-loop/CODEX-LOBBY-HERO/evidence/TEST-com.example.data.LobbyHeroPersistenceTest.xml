@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.data.LobbyHeroPersistenceTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-10T05:22:17.333Z" hostname="b316c1c49299" time="0.273">
+  <properties/>
+  <testcase name="hiddenTraitUnlockIsPermanentAndCloudImportFieldsKeepLobbyState" classname="com.example.data.LobbyHeroPersistenceTest" time="0.052"/>
+  <testcase name="assignmentHealthSanityPersonalityAndHiddenTraitSurviveRestart" classname="com.example.data.LobbyHeroPersistenceTest" time="0.057"/>
+  <testcase name="autoJoinedSummonGetsNewerOrderThanExistingPartyAndTrainingDoesNotLoseHp" classname="com.example.data.LobbyHeroPersistenceTest" time="0.037"/>
+  <testcase name="overlappingDropRequestsNeverPersistAFullPartyPlusOne" classname="com.example.data.LobbyHeroPersistenceTest" time="0.081"/>
+  <testcase name="legacySaveWithoutNewFieldsLoadsWithoutResettingProgress" classname="com.example.data.LobbyHeroPersistenceTest" time="0.038"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

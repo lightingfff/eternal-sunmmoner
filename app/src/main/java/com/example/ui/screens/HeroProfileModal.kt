@@ -551,6 +551,7 @@ private fun HeroOverviewTab(
   isBusy: Boolean,
   onToggleSquad: () -> Unit,
 ) {
+  val lobbyHero = com.example.data.model.HeroData.fromRecord(hero, nowEpochSec)
   Column(
     modifier = Modifier
       .fillMaxSize()
@@ -568,15 +569,35 @@ private fun HeroOverviewTab(
         Text(hero.classType.roleSummaryVi, style = MaterialTheme.typography.bodyMedium, color = ParchmentLight)
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-          text = "Tính cách: ${hero.personalityType.labelVi} ${hero.personalityType.emotionTagVi}",
+          text = "Tính cách: ${when (lobbyHero.personality) {
+            com.example.data.model.LobbyPersonality.COWARD -> "Hèn nhát"
+            com.example.data.model.LobbyPersonality.ARROGANT -> "Ngạo mạn"
+            com.example.data.model.LobbyPersonality.LOYAL -> "Trung thành"
+            com.example.data.model.LobbyPersonality.LONER -> "Cô độc"
+            com.example.data.model.LobbyPersonality.REBEL -> "Bất tuân"
+          }}",
           style = MaterialTheme.typography.labelMedium,
           color = PortalCyan,
         )
         Text(
-          text = "«${hero.personalityType.sampleQuoteVi}»",
+          text = "«${when (lobbyHero.personality) {
+            com.example.data.model.LobbyPersonality.COWARD -> "Xin đừng bỏ tôi lại trong Tháp."
+            com.example.data.model.LobbyPersonality.ARROGANT -> "Tôi sẽ tự chứng minh sức mạnh của mình."
+            com.example.data.model.LobbyPersonality.LOYAL -> "Tôi sẽ cùng đồng đội trở về."
+            com.example.data.model.LobbyPersonality.LONER -> "Cho tôi một khoảng yên tĩnh."
+            com.example.data.model.LobbyPersonality.REBEL -> "Tôi tự chọn con đường của mình."
+          }}»",
           style = MaterialTheme.typography.bodySmall,
           color = RuneSilver,
         )
+        Text("HP ${lobbyHero.currentHP}/${lobbyHero.maxHP} • Tâm trí: ${when (lobbyHero.sanityState) {
+          com.example.data.model.HeroSanityState.NORMAL -> "Bình thường"
+          com.example.data.model.HeroSanityState.ANXIOUS -> "Lo âu"
+          com.example.data.model.HeroSanityState.PANICKED -> "Hoảng loạn"
+          com.example.data.model.HeroSanityState.SELF_AWARE -> "Thức tỉnh"
+        }}", color = RuneSilver, style = MaterialTheme.typography.bodySmall)
+        Text("Kỹ năng ẩn: ${lobbyHero.hiddenTrait.displayName}", color = SummonerGold, style = MaterialTheme.typography.bodyMedium)
+        if (!lobbyHero.hiddenTrait.unlocked) Text("Mở khóa: ${lobbyHero.hiddenTrait.unlockCondition}", color = RuneSilver, style = MaterialTheme.typography.bodySmall)
         if (hero.bondSummary.isNotBlank()) {
           Text(
             text = "Khế ước với Master: ${hero.bondSummary}",

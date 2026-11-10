@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.data.LostCourierPersistenceRobolectricTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-10T05:22:17.618Z" hostname="b316c1c49299" time="0.15">
+  <properties/>
+  <testcase name="full old bond retains new memory and permanent flags survive transient churn" classname="com.example.data.LostCourierPersistenceRobolectricTest" time="0.027"/>
+  <testcase name="failed atomic write does not claim rescue or alter valid saves and retry succeeds" classname="com.example.data.LostCourierPersistenceRobolectricTest" time="0.029"/>
+  <testcase name="failed escort is saved and a later rescue remains available" classname="com.example.data.LostCourierPersistenceRobolectricTest" time="0.026"/>
+  <testcase name="rescue unlock and one hero memory survive restart and stale-profile replay" classname="com.example.data.LostCourierPersistenceRobolectricTest" time="0.028"/>
+  <testcase name="saved courier service allows crafting with exactly ninety gold" classname="com.example.data.LostCourierPersistenceRobolectricTest" time="0.03"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

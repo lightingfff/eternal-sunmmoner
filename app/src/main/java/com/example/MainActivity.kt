@@ -292,6 +292,7 @@ fun EternalSummonerRootApp() {
           onTrainHeroWithFocus = vm::trainHeroWithFocus,
           onUnequipItem = vm::unequipItem,
           onAssignHeroActivity = vm::assignHeroActivity,
+          onDropHero = vm::assignLobbyHero,
           onHostMealWithRecipe = vm::hostRestaurantMealWithRecipe,
           onUnlockExpansion = vm::unlockIslandExpansion,
         )

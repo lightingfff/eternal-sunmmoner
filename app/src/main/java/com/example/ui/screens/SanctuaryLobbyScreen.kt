@@ -66,6 +66,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import kotlinx.coroutines.launch
+import com.example.data.model.HeroAssignment
+import com.example.ui.components.lobbyHeroGestures
+import com.example.ui.components.pickupHeroAtScreen
+import com.example.ui.components.drawLobbyHero
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -91,6 +102,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -229,12 +241,28 @@ fun SanctuaryLobbyScreen(
   onHostMealWithRecipe: (SanctuaryMealRecipe) -> Unit = { _ -> onHostMeal() },
   onUnlockExpansion: (IslandExpansionMilestone) -> Unit = {},
   sceneActive: Boolean = true,
+  onDropHero: suspend (String, HeroAssignment) -> Boolean = { _, _ -> false },
 ) {
   val artContext = androidx.compose.ui.platform.LocalContext.current
   remember(artContext) { com.example.game.pixel.SanctuaryArtAssets.init(artContext) }
   remember(artContext) { com.example.game.world.WorldEnvironment.init(artContext) }
   val lobbyEngine = remember { SanctuaryLobbyEngine() }
   val depthQueue = remember { LobbyDrawQueue() }
+  val dropScope = rememberCoroutineScope()
+  val persistDrop by rememberUpdatedState(onDropHero)
+  var pickupOffset by remember { mutableStateOf(Offset.Zero) }
+  var pendingDrop by remember { mutableStateOf(false) }
+  val dragInvalidation = remember { mutableIntStateOf(0) }
+  val heldPointer = remember { mutableStateOf<Offset?>(null) }
+  var canvasPixels by remember { mutableStateOf(Size.Zero) }
+  val lifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(lifecycleOwner, lobbyEngine) {
+    val observer = LifecycleEventObserver { _, event ->
+      if (event == Lifecycle.Event.ON_STOP) lobbyEngine.finishHeroPickUp(false)
+    }
+    lifecycleOwner.lifecycle.addObserver(observer)
+    onDispose { lifecycleOwner.lifecycle.removeObserver(observer); lobbyEngine.finishHeroPickUp(false) }
+  }
   val textMeasurer = rememberTextMeasurer()
   val focusRequester = remember { FocusRequester() }
 
@@ -323,6 +351,9 @@ fun SanctuaryLobbyScreen(
     // frames retain the same fixed 60 Hz simulation; background time is excluded by SceneFrameLoop.
     val dt = elapsed.coerceAtMost(0.25f)
     animTimeSec += dt
+    heldPointer.value?.takeIf { lobbyEngine.pickedHeroId != null && !pendingDrop }?.let { p ->
+      lobbyEngine.dragAtViewportEdge(p.x, p.y, canvasPixels.width, canvasPixels.height, pickupOffset.x, pickupOffset.y, dt)
+    }
     val kDx = (if (keyRight) 1f else 0f) - (if (keyLeft) 1f else 0f)
     val kDy = (if (keyDown) 1f else 0f) - (if (keyUp) 1f else 0f)
     val dx = if (kotlin.math.abs(joyDx) > 0.05f) joyDx else kDx
@@ -389,40 +420,21 @@ fun SanctuaryLobbyScreen(
       (constraints.maxHeight.toFloat() - 150f).coerceAtLeast(240f) / 2120f,
     ).coerceIn(0.27f, 0.54f)
 
-    fun computeLobbyCam(viewportHalfW: Float, viewportHalfH: Float): Pair<Float, Float> {
-      val layout = lobbyEngine.mapLayout
-      val effectiveWorldW = if (!lobbyEngine.isInsideInterior && IslandExpansionMilestone.EAST_CELESTIAL_GARDEN in unlockedExpansions) {
-        SanctuaryIslandGeometry.EXPANDED_WORLD_WIDTH
-      } else {
-        layout.width
-      }
-      val cx = ObliqueCamera.clampCamX(
-        desiredCamX = lobbyEngine.camX,
-        worldWidth = effectiveWorldW,
-        wallMargin = layout.wallMargin,
-        zoom = zoom,
-        viewportHalfW = viewportHalfW,
-      )
-      val cy = ObliqueCamera.clampCamY(
-        desiredCamY = lobbyEngine.camY,
-        worldHeight = layout.height,
-        wallMargin = layout.wallMargin,
-        zoom = zoom,
-        viewportHalfH = viewportHalfH,
-        northHeadroomWorld = 220f,
-      )
-      return cx to cy
-    }
+    fun computeLobbyCam(viewportHalfW: Float, viewportHalfH: Float): Pair<Float, Float> =
+      lobbyEngine.renderedCamera(viewportHalfW * 2f, viewportHalfH * 2f, zoom)
 
     // 1. Interactive True Oblique 3/4 Pixel-Art Sanctuary & 4 Enterable 2.5D Facility Interiors Canvas
     Canvas(
       modifier = Modifier
         .fillMaxSize()
         .testTag("sanctuary_canvas")
-        .pointerInput(Unit) {
-          detectTransformGestures { centroid, pan, zoomChange, _ ->
-            val halfW = size.width / 2f
-            val halfH = size.height / 2f
+        .onSizeChanged { canvasPixels = Size(it.width.toFloat(), it.height.toFloat()) }
+        .lobbyHeroGestures(
+          enabled = !pendingDrop && state.activeFacilityModal == null && managementMode == null &&
+            !showMasterHub && !showPauseMapModal && !showChronicleModal && !showExpansionModal && inspectingHeroId == null && !showPrologue,
+          onTransform = { centroid, pan, zoomChange ->
+            val halfW = constraints.maxWidth / 2f
+            val halfH = constraints.maxHeight / 2f
             if (abs(zoomChange - 1f) > 0.003f) {
               val oldZoom = lobbyEngine.zoom
               val newZoom = (oldZoom * zoomChange).coerceIn(0.36f, 1.48f)
@@ -442,24 +454,22 @@ fun SanctuaryLobbyScreen(
                 worldDy = -pan.y / (zoom * ObliqueCamera.OBLIQUE_Y_SCALE),
               )
             }
-          }
-        }
-        .pointerInput(zoom) {
-          detectTapGestures { tapOffset ->
-            val halfW = size.width / 2f
-            val halfH = size.height / 2f
+          },
+          onTap = tap@ { tapOffset ->
+            val halfW = constraints.maxWidth / 2f
+            val halfH = constraints.maxHeight / 2f
             val (camX, camY) = computeLobbyCam(halfW, halfH)
             val worldX = ObliqueCamera.screenToWorldX(tapOffset.x, camX, zoom, halfW)
             val worldY = ObliqueCamera.screenToWorldY(tapOffset.y, camY, zoom, halfH)
 
             if (lobbyEngine.isInsideInterior) {
-              val activeInt = lobbyEngine.activeInterior ?: return@detectTapGestures
+              val activeInt = lobbyEngine.activeInterior ?: return@tap
               val (exitX, exitY) = TowerFloorCatalog.interiorExitPoint(activeInt)
               if (hypot(worldX - exitX, worldY - exitY) <= 88f) {
                 lobbyEngine.exitFacilityInterior()
                 activeInteriorState = lobbyEngine.activeInterior
                 zoom = lobbyEngine.zoom
-                return@detectTapGestures
+                return@tap
               }
               val tappedHero = lobbyEngine.selectHeroAt(worldX, worldY)
               if (tappedHero != null) {
@@ -469,11 +479,11 @@ fun SanctuaryLobbyScreen(
                 } else {
                   onOpenFacility(activeInt)
                 }
-                return@detectTapGestures
+                return@tap
               }
               if (lobbyEngine.selectFacilityAt(worldX, worldY) != null) {
                 onOpenFacility(activeInt)
-                return@detectTapGestures
+                return@tap
               }
               lobbyEngine.setTapDestination(worldX, worldY)
             } else {
@@ -486,7 +496,7 @@ fun SanctuaryLobbyScreen(
                 } else {
                   promptedFacility = tappedFacility
                 }
-                return@detectTapGestures
+                return@tap
               }
 
               // 2. Physical Island Expansion Beacon / Terrace Tap
@@ -494,7 +504,7 @@ fun SanctuaryLobbyScreen(
               if (tappedExpansion != null) {
                 promptedFacility = null
                 showExpansionModal = true
-                return@detectTapGestures
+                return@tap
               }
 
               // 3. Hero or Keeper NPC Selection
@@ -517,16 +527,55 @@ fun SanctuaryLobbyScreen(
                     else -> FacilityType.TOWER_GATE
                   }
                 }
-                return@detectTapGestures
+                return@tap
               }
 
               // 4. Empty Terrain Tap: Command selected hero or pan camera
               promptedFacility = null
               lobbyEngine.setTapDestination(worldX, worldY)
             }
-          }
-        },
+          },
+          onPickUp = { point ->
+            val (cx, cy) = computeLobbyCam(constraints.maxWidth / 2f, constraints.maxHeight / 2f)
+            val actor = if (!lobbyEngine.isInsideInterior) pickupHeroAtScreen(lobbyEngine.heroActors, point, cx, cy, zoom,
+              Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat()), minimumTargetPx = 48f * artContext.resources.displayMetrics.density) else null
+            if (actor == null || !lobbyEngine.beginHeroPickUp(actor.heroId)) false else {
+              val wx = ObliqueCamera.screenToWorldX(point.x, cx, zoom, constraints.maxWidth / 2f)
+              val wy = ObliqueCamera.screenToWorldY(point.y, cy, zoom, constraints.maxHeight / 2f)
+              pickupOffset = Offset(actor.x - wx, actor.y - wy)
+              heldPointer.value = point
+              dragInvalidation.intValue++
+              promptedFacility = null
+              true
+            }
+          },
+          onDrag = { point ->
+            heldPointer.value = point
+            val (cx, cy) = computeLobbyCam(constraints.maxWidth / 2f, constraints.maxHeight / 2f)
+            dragInvalidation.intValue++
+            lobbyEngine.dragPickedHeroTo(
+              ObliqueCamera.screenToWorldX(point.x, cx, zoom, constraints.maxWidth / 2f) + pickupOffset.x,
+              ObliqueCamera.screenToWorldY(point.y, cy, zoom, constraints.maxHeight / 2f) + pickupOffset.y)
+          },
+          onDrop = { point ->
+            heldPointer.value = null
+            val (cx, cy) = computeLobbyCam(constraints.maxWidth / 2f, constraints.maxHeight / 2f)
+            val request = lobbyEngine.dropRequestAt(
+              ObliqueCamera.screenToWorldX(point.x, cx, zoom, constraints.maxWidth / 2f),
+              ObliqueCamera.screenToWorldY(point.y, cy, zoom, constraints.maxHeight / 2f))
+            if (request == null) lobbyEngine.finishHeroPickUp(false) else {
+              pendingDrop = true
+              dropScope.launch {
+                var accepted = false
+                try { accepted = persistDrop(request.heroId, request.assignment) }
+                finally { lobbyEngine.finishHeroPickUp(accepted); pendingDrop = false; dragInvalidation.intValue++ }
+              }
+            }
+          },
+          onCancel = { heldPointer.value = null; lobbyEngine.finishHeroPickUp(false); dragInvalidation.intValue++ },
+        ),
     ) {
+      dragInvalidation.intValue
       // Animation state is read in draw only, so a world tick does not recompose the HUD.
       val drawStarted = if (settings.performanceOverlay) System.nanoTime() else 0L
 
@@ -616,34 +665,8 @@ fun SanctuaryLobbyScreen(
           is LobbyDrawableItem.HeroNpc -> {
             val a = item.actor
             val isSelected = lobbyEngine.selectedHeroId == a.heroId
-            drawCharacterSprite(
-              worldX = a.x,
-              worldY = a.y,
-              camX = camX,
-              camY = camY,
-              zoom = zoom,
-              isMaster = false,
-              heroClass = a.heroClass,
-              facingRight = a.facingRight,
-              isMoving = a.isMoving,
-              attackAnimProgress = a.attackPracticeAnim,
-              hurtFlash = 0f,
-              hpFraction = if (a.isInjured) 0.35f else 1f,
-              shieldOrAuraColor = when {
-                isSelected -> SummonerGold.copy(alpha = 0.90f)
-                a.isSanctuaryKeeperNpc -> PortalCyan.copy(alpha = 0.45f)
-                else -> null
-              },
-              isInjuredResting = a.isInjured || a.isSeatedDining,
-              timeSec = animTimeSec,
-              facingNorth = a.facingNorth,
-              heroName = a.name,
-              emotion = when {
-                a.isInjured -> "fear"
-                a.attackPracticeAnim > 0f || isSelected -> "alert"
-                else -> "calm"
-              },
-            )
+            if (a.heroId == lobbyEngine.pickedHeroId) return@forEach
+            drawLobbyHero(a, camX, camY, zoom, animTimeSec, isSelected)
             drawActorCanopyOcclusion(layout.obstacles,a.x,a.y,camX,camY,zoom,animTimeSec)
           }
         }
@@ -663,6 +686,19 @@ fun SanctuaryLobbyScreen(
         drawWorldGrade()
         drawLocalLights(layout.obstacles,camX,camY,zoom)
         drawWeather(camX,camY,zoom,true)
+      }
+      lobbyEngine.pickedHeroId?.let { id ->
+        lobbyEngine.heroActors.firstOrNull { it.heroId == id }?.let { actor ->
+          drawLobbyHero(actor, camX, camY, zoom, animTimeSec, selected = true, held = true)
+        }
+        lobbyEngine.dropZones.forEach { zone ->
+          val r = zone.bounds
+          val left = ObliqueCamera.worldToScreenX(r.left, camX, zoom, halfW)
+          val top = ObliqueCamera.worldToScreenY(r.top, camY, zoom, halfH)
+          val right = ObliqueCamera.worldToScreenX(r.right, camX, zoom, halfW)
+          val bottom = ObliqueCamera.worldToScreenY(r.bottom, camY, zoom, halfH)
+          drawRect(PortalCyan.copy(alpha = .55f), Offset(left, top), Size(right - left, bottom - top), style = Stroke(2f))
+        }
       }
       val topHudSafePx = (if (isWideScreen) 64.dp else 112.dp).toPx()
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.ui.LobbyHeroVisualTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-10T05:22:28.392Z" hostname="b316c1c49299" time="1.101">
+  <properties/>
+  <testcase name="heldWrithingUsesExistingSpriteFramesAndRendersAtGameZoom" classname="com.example.ui.LobbyHeroVisualTest" time="1.098"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
