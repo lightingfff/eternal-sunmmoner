@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.data.GuestSavePersistenceRobolectricTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-10T05:22:12.465Z" hostname="b316c1c49299" time="4.858">
+  <properties/>
+  <testcase name="corrupted primary save file automatically recovers from backup without losing player progress" classname="com.example.data.GuestSavePersistenceRobolectricTest" time="4.282"/>
+  <testcase name="logout to title gate preserves guest save on disk for seamless re-entry" classname="com.example.data.GuestSavePersistenceRobolectricTest" time="0.069"/>
+  <testcase name="feast buff boosts squad combat stats and hero AI updates observable intent labels across all 8 orders" classname="com.example.data.GuestSavePersistenceRobolectricTest" time="0.12"/>
+  <testcase name="one-tap guest creation initializes starter roster gear and persists GUEST_LOCAL session" classname="com.example.data.GuestSavePersistenceRobolectricTest" time="0.037"/>
+  <testcase name="returning guest launch automatically restores saved progress across simulated app restart" classname="com.example.data.GuestSavePersistenceRobolectricTest" time="0.054"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

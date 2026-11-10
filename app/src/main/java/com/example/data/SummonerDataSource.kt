@@ -124,6 +124,8 @@ interface SummonerDataSource {
     milestone: IslandExpansionMilestone,
   )
 
+  suspend fun assignLobbyHero(heroId: String, assignment: com.example.data.model.HeroAssignment)
+
   suspend fun toggleHeroInSquad(hero: HeroRecord, currentSquadSize: Int)
 
   suspend fun markStoryFlag(profile: MasterProfile, flag: String)

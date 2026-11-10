@@ -1,0 +1,93 @@
+{
+  "base_sha": "ee1810504aca529aac453ffedf12223368a954e8",
+  "assembleDebug": "PASS",
+  "android_jvm_tests": 42,
+  "suites": [
+    {
+      "name": "com.example.LobbyHeroSystemsTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.159"
+    },
+    {
+      "name": "com.example.data.GuestSavePersistenceRobolectricTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "4.858"
+    },
+    {
+      "name": "com.example.data.LobbyHeroPersistenceTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.273"
+    },
+    {
+      "name": "com.example.data.LostCourierPersistenceRobolectricTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.15"
+    },
+    {
+      "name": "com.example.performance.SceneFrameLoopLifecycleRobolectricTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.657"
+    },
+    {
+      "name": "com.example.performance.ScenePerformanceTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.017"
+    },
+    {
+      "name": "com.example.ui.LayoutResponsivenessRobolectricTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "7.498"
+    },
+    {
+      "name": "com.example.ui.LobbyHeroTouchTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.396"
+    },
+    {
+      "name": "com.example.ui.LobbyHeroVisualTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.101"
+    },
+    {
+      "name": "com.example.ui.TowerGateMapTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "28.193"
+    }
+  ],
+  "firestore_emulator_tests": 14,
+  "firestore_production_deployment": "NOT PERFORMED",
+  "apk_sha256": "afa39fe7be570e397382a4c267a1525070fc51af0a96c5b91f8f300a64b772a0",
+  "apk_bytes": 40055110,
+  "apk_zip_crc": "PASS",
+  "physical_android": "NOT TESTED; adb devices -l empty"
+}

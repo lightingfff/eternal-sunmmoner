@@ -277,6 +277,18 @@ class SummonerViewModel(
     }
   }
 
+  suspend fun assignLobbyHero(heroId: String, assignment: com.example.data.model.HeroAssignment): Boolean {
+    if (_isBusyAction.value) { _bannerFeedback.value = "Đang lưu thao tác trước, hãy thử lại."; return false }
+    _isBusyAction.value = true
+    return try {
+      repository.assignLobbyHero(heroId, assignment)
+      _bannerFeedback.value = if (assignment == com.example.data.model.HeroAssignment.IN_PARTY) "Đã cập nhật đội hình tối đa 4 người." else "Anh hùng đã vào Nhà để nghỉ ngơi hồi phục."
+      true
+    } catch (e: kotlinx.coroutines.CancellationException) { throw e }
+    catch (e: Exception) { _bannerFeedback.value = e.message ?: "Không thể lưu vị trí Anh hùng."; false }
+    finally { _isBusyAction.value = false }
+  }
+
   fun assignHeroActivity(hero: HeroRecord, targetStatus: HeroStatusType) {
     if (_isBusyAction.value) return
     _isBusyAction.value = true

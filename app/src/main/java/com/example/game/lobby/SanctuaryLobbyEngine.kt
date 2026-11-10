@@ -3,6 +3,9 @@ package com.example.game.lobby
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.example.data.model.HeroData
+import com.example.data.model.HeroAssignment
+import com.example.data.model.LobbyPersonality
 import com.example.data.model.FacilityType
 import com.example.data.model.HeroClassType
 import com.example.data.model.HeroRecord
@@ -20,6 +23,8 @@ import kotlin.random.Random
 
 enum class LobbyActivityState(val labelVi: String) {
   PATROLLING("Tuần tra Đại Sảnh"),
+  COWERING("Run rẩy tránh xa Cổng Tháp"),
+  FORMING_PARTY("Tập hợp trước Cổng Tháp"),
   TRAINING("Đấu tập Sân Huấn Luyện"),
   DINING("Thưởng tiệc Nhà Ăn"),
   RESTING("Tịnh dưỡng hồi phục"),
@@ -40,6 +45,9 @@ enum class HeroTaskType(val labelVi: String, val targetFacility: FacilityType) {
 
 data class LobbyHeroActor(
   val heroId: String,
+  var lobbyData: HeroData? = null,
+  var locomotion: LobbyLocomotion = LobbyLocomotion.IDLE,
+  var chatPartnerId: String? = null,
   val name: String,
   val heroClass: HeroClassType,
   val personality: PersonalityType,
@@ -202,7 +210,7 @@ private object SanctuaryNavGraph {
   }
 }
 
-class SanctuaryLobbyEngine {
+class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
   private val exteriorLayout: GeneratedMapLayout = TowerFloorCatalog.buildSanctuaryMap()
   private val restaurantInteriorLayout: GeneratedMapLayout = TowerFloorCatalog.buildRestaurantInteriorMap()
   private val dormitoryInteriorLayout: GeneratedMapLayout = TowerFloorCatalog.buildDormitoryInteriorMap()
@@ -260,6 +268,100 @@ class SanctuaryLobbyEngine {
     private set
 
   private val actors = mutableMapOf<String, LobbyHeroActor>()
+  private var dragSession: LobbyDragSession? = null
+  val pickedHeroId: String? get() = dragSession?.heroId
+  val dropZones: List<LobbyDropZone> by lazy {
+    listOf("monument_tower_gate" to HeroAssignment.IN_PARTY, "building_hero_quarters" to HeroAssignment.RESTING).map { (id, assignment) ->
+      LobbyDropZone.fromObstacle(exteriorLayout.obstacles.first { it.id == id }, assignment)
+    }
+  }
+
+  fun renderedCamera(width: Float, height: Float, renderZoom: Float = zoom): Pair<Float, Float> {
+    val worldW = if (!isInsideInterior && IslandExpansionMilestone.EAST_CELESTIAL_GARDEN in unlockedExpansions)
+      SanctuaryIslandGeometry.EXPANDED_WORLD_WIDTH else mapLayout.width
+    return com.example.game.map.ObliqueCamera.clampCamX(camX, worldW, mapLayout.wallMargin, renderZoom, width / 2f) to
+      com.example.game.map.ObliqueCamera.clampCamY(camY, mapLayout.height, mapLayout.wallMargin, renderZoom, height / 2f, northHeadroomWorld = 220f)
+  }
+
+  fun dragAtViewportEdge(pointerX: Float, pointerY: Float, width: Float, height: Float, offsetX: Float, offsetY: Float, dt: Float) {
+    if (pickedHeroId == null || width <= 0f || height <= 0f) return
+    val edge = minOf(width, height) * .12f
+    fun direction(value: Float, extent: Float) = when {
+      value < edge -> -((edge-value)/edge).coerceIn(0f,1f)
+      value > extent-edge -> ((value-extent+edge)/edge).coerceIn(0f,1f)
+      else -> 0f
+    }
+    panCameraWorld(direction(pointerX,width)*360f*dt, direction(pointerY,height)*360f*dt)
+    val (cx,cy) = renderedCamera(width,height)
+    dragPickedHeroTo(com.example.game.map.ObliqueCamera.screenToWorldX(pointerX,cx,zoom,width/2f)+offsetX,
+      com.example.game.map.ObliqueCamera.screenToWorldY(pointerY,cy,zoom,height/2f)+offsetY)
+  }
+
+  fun beginHeroPickUp(heroId: String): Boolean {
+    if (isInsideInterior || dragSession != null) return false
+    val actor = actors[heroId] ?: return false
+    if (actor.lobbyData?.currentAssignment == HeroAssignment.SACRIFICED) return false
+    dragSession = LobbyDragSession(heroId, actor.x, actor.y)
+    actor.locomotion = LobbyLocomotion.BEING_PICKED_UP
+    actor.isMoving = false
+    actor.chatPartnerId = null
+    actor.speechBubble = when (actor.lobbyData?.personality) {
+      LobbyPersonality.COWARD -> "Đừng thả tôi xuống!"
+      LobbyPersonality.ARROGANT -> "Bỏ tay ra! Tôi tự đi được!"
+      LobbyPersonality.REBEL -> "Tôi không phải con rối của ngươi!"
+      LobbyPersonality.LONER -> "...Để tôi yên."
+      else -> "Master, hãy nhẹ tay!"
+    }
+    actor.speechTimer = 3f
+    return true
+  }
+
+  fun dragPickedHeroTo(x: Float, y: Float) {
+    if (!x.isFinite() || !y.isFinite()) return
+    val actor = dragSession?.heroId?.let { actors[it] } ?: return
+    actor.x = x; actor.y = y
+  }
+
+  fun dropRequestAt(x: Float, y: Float): LobbyHeroDrop? {
+    val id = pickedHeroId ?: return null
+    val target = dropZones.firstOrNull { it.bounds.contains(androidx.compose.ui.geometry.Offset(x, y)) } ?: return null
+    return LobbyHeroDrop(id, target.assignment)
+  }
+
+  fun finishHeroPickUp(accepted: Boolean) {
+    val session = dragSession ?: return
+    dragSession = null
+    actors[session.heroId]?.let { actor ->
+      if (!accepted) { actor.x = session.originX; actor.y = session.originY }
+      else { actor.waypointQueue.clear(); actor.targetX = actor.x; actor.targetY = actor.y }
+      actor.locomotion = LobbyLocomotion.IDLE
+      actor.lastProgressX = actor.x; actor.lastProgressY = actor.y; actor.stuckTimer = 0f
+      actor.waitTimer = 0f
+    }
+  }
+
+  private fun priorityRoutine(actor: LobbyHeroActor): Boolean {
+    val data = actor.lobbyData ?: return false
+    val destination = when {
+      data.currentAssignment == HeroAssignment.IN_PARTY -> {
+        val party = cachedRoster.filter { it.inActiveSquad }.sortedWith(compareBy<HeroRecord> { it.partyJoinedOrder }.thenBy { it.id })
+        val slot = party.indexOfFirst { it.id == actor.heroId }.coerceIn(0, 3)
+        actor.activity = LobbyActivityState.FORMING_PARTY
+        actor.locomotion = LobbyLocomotion.FORMING_PARTY
+        (1890f + slot * 44f) to 690f
+      }
+      data.isFrightened -> {
+        actor.activity = LobbyActivityState.COWERING
+        actor.locomotion = LobbyLocomotion.COWERING
+        val gate = zoneCenter(FacilityType.TOWER_GATE)
+        SanctuaryNavGraph.nodes.maxBy { hypot(it.first - gate.first, it.second - gate.second) }
+      }
+      else -> return false
+    }
+    if (hypot(actor.x - destination.first, actor.y - destination.second) > 18f) assignHeroDestination(actor, destination.first, destination.second)
+    actor.waitTimer = 3f
+    return true
+  }
   private var cachedRoster: List<HeroRecord> = emptyList()
   private var lastSyncEpochSec: Long = System.currentTimeMillis() / 1000L
   private val interiorActors = mutableListOf<LobbyHeroActor>()
@@ -620,8 +722,8 @@ class SanctuaryLobbyEngine {
   fun commandHeroTask(heroId: String, task: HeroTaskType) {
     actors[heroId]?.let { hero ->
       val (zx, zy) = zoneCenter(task.targetFacility)
-      val destX = zx + Random.nextFloat() * 44f - 22f
-      val destY = zy + 28f + Random.nextFloat() * 28f
+      val destX = zx + random.nextFloat() * 44f - 22f
+      val destY = zy + 28f + random.nextFloat() * 28f
       assignHeroDestination(hero, destX, destY)
       hero.isMoving = true
       hero.isPlayerCommanded = true
@@ -869,11 +971,12 @@ class SanctuaryLobbyEngine {
 
   fun syncHeroes(heroes: List<HeroRecord>, nowEpochSec: Long) {
     renderedActors = null
-    cachedRoster = heroes
+    cachedRoster = heroes.filter { it.currentAssignment != HeroAssignment.SACRIFICED.name }
+    if (pickedHeroId != null && heroes.none { it.id == pickedHeroId && it.currentAssignment != HeroAssignment.SACRIFICED.name }) finishHeroPickUp(false)
     lastSyncEpochSec = nowEpochSec
 
     // Strict consistency: Injured heroes rest on Dormitory beds indoors — never patrol outdoors!
-    val healthyOutdoorHeroes = heroes.filter { !it.isCurrentlyInjured(nowEpochSec) }
+    val healthyOutdoorHeroes = cachedRoster.filter { HeroData.fromRecord(it, nowEpochSec).currentAssignment !in setOf(HeroAssignment.RESTING, HeroAssignment.SACRIFICED) }
     val activeOutdoorIds = healthyOutdoorHeroes.map { it.id }.toSet()
     actors.keys.retainAll(activeOutdoorIds)
 
@@ -902,8 +1005,18 @@ class SanctuaryLobbyEngine {
           speechBubble = hero.personalityType.sampleQuoteVi,
           speechTimer = 4.5f + idx * 1.4f,
         )
+        actor.lobbyData = HeroData.fromRecord(hero, nowEpochSec)
         actors[hero.id] = actor
+        priorityRoutine(actor)
       } else {
+        val before = existing.lobbyData
+        existing.lobbyData = HeroData.fromRecord(hero, nowEpochSec)
+        if (pickedHeroId != hero.id && (before?.currentAssignment != existing.lobbyData?.currentAssignment || before?.isFrightened != existing.lobbyData?.isFrightened)) {
+          existing.isPlayerCommanded = false
+          existing.waypointQueue.clear()
+          existing.targetX = existing.x; existing.targetY = existing.y
+          if (!priorityRoutine(existing)) existing.waitTimer = 0f
+        }
         existing.isInjured = false
         when (hero.statusType) {
           HeroStatusType.TRAINING -> if (existing.activity != LobbyActivityState.TRAINING) {
@@ -940,6 +1053,7 @@ class SanctuaryLobbyEngine {
   }
 
   fun step(dt: Float, inputDx: Float = 0f, inputDy: Float = 0f) {
+    if (!dt.isFinite() || dt <= 0f) return
     if (abs(inputDx) > 0.02f || abs(inputDy) > 0.02f) {
       panCameraWorld(inputDx * 440f * dt, inputDy * 440f * dt)
     }
@@ -1014,6 +1128,7 @@ class SanctuaryLobbyEngine {
 
     // Step Autonomous & Commanded Heroes along Waypoint Graph Routes
     actors.values.forEachIndexed { idx, actor ->
+      if (actor.heroId == pickedHeroId) return@forEachIndexed
       if (actor.speechTimer > 0f) {
         actor.speechTimer = (actor.speechTimer - dt).coerceAtLeast(0f)
         if (actor.speechTimer <= 0f) actor.speechBubble = null
@@ -1024,10 +1139,11 @@ class SanctuaryLobbyEngine {
       val dist = hypot(dx, dy)
 
       if (dist > 14f) {
-        val heroSpeed = 124f
+        val heroSpeed = (actor.lobbyData?.movementSpeed ?: 124f).coerceAtLeast(1f)
+        val travel = (heroSpeed * dt).coerceAtMost(dist)
         val (rx, ry) = CollisionPhysics.resolvePosition(
-          targetX = actor.x + (dx / dist) * heroSpeed * dt,
-          targetY = actor.y + (dy / dist) * heroSpeed * dt,
+          targetX = actor.x + (dx / dist) * travel,
+          targetY = actor.y + (dy / dist) * travel,
           entityRadius = 16f,
           mapWidth = mapLayout.width,
           mapHeight = mapLayout.height,
@@ -1070,6 +1186,11 @@ class SanctuaryLobbyEngine {
       } else {
         actor.isMoving = false
         actor.facingNorth = false
+        val partner = actor.chatPartnerId?.let { actors[it] }
+        if (partner != null && partner.heroId != pickedHeroId) {
+          actor.facingRight = partner.x >= actor.x
+          actor.facingNorth = partner.y < actor.y - 18f
+        }
         if (actor.activity == LobbyActivityState.TRAINING) {
           actor.facingRight = (idx % 2 == 0)
           actor.attackPracticeAnim = (actor.attackPracticeAnim + dt * 2.0f) % 1f
@@ -1085,7 +1206,7 @@ class SanctuaryLobbyEngine {
       }
 
       val distToMaster = hypot(masterX - actor.x, masterY - actor.y)
-      if (distToMaster < 160f && actor.speechBubble == null && Random.nextFloat() < 0.014f) {
+      if (distToMaster < 160f && actor.speechBubble == null && random.nextFloat() < 0.014f) {
         actor.speechBubble = if (actor.isInjured) {
           "Vết thương sắp lành rồi... Xin hãy đợi tôi nhé Master!"
         } else {
@@ -1104,7 +1225,7 @@ class SanctuaryLobbyEngine {
       if (keeper.heroId == "npc_blacksmith" || keeper.heroId == "npc_trainer") {
         keeper.attackPracticeAnim = (keeper.attackPracticeAnim + dt * 1.4f) % 1f
       }
-      if (hypot(masterX - keeper.x, masterY - keeper.y) < 165f && keeper.speechBubble == null && Random.nextFloat() < 0.018f) {
+      if (hypot(masterX - keeper.x, masterY - keeper.y) < 165f && keeper.speechBubble == null && random.nextFloat() < 0.018f) {
         keeper.speechBubble = when (keeper.heroId) {
           "npc_gatekeeper" -> "Bước lên bậc thang Đá Đen để mở Cổng Tháp Vĩnh Hằng (Tầng 1–10)!"
           "npc_registry_officer" -> "Sảnh Hồ Sơ Anh Hùng đang cập nhật đội hình xuất chinh!"
@@ -1138,23 +1259,26 @@ class SanctuaryLobbyEngine {
   }
 
   private fun chooseNextRoutine(actor: LobbyHeroActor, indexSeed: Int) {
+    actor.chatPartnerId = null
+    if (priorityRoutine(actor)) return
+    actor.locomotion = LobbyLocomotion.WANDERING
     val heroRecord = cachedRoster.firstOrNull { it.id == actor.heroId }
     if (actor.isInjured || heroRecord?.statusType == HeroStatusType.RESTING) {
       val spot = restingGardenSpot(indexSeed)
       assignHeroDestination(actor, spot.first, spot.second)
       actor.activity = LobbyActivityState.RESTING
-      actor.waitTimer = 6f + Random.nextFloat() * 4f
+      actor.waitTimer = 6f + random.nextFloat() * 4f
       return
     }
     if (heroRecord?.statusType == HeroStatusType.TRAINING) {
       val spot = trainingPracticeSpot(indexSeed)
       assignHeroDestination(actor, spot.first, spot.second)
       actor.activity = LobbyActivityState.TRAINING
-      actor.waitTimer = 6.5f + Random.nextFloat() * 3.5f
+      actor.waitTimer = 6.5f + random.nextFloat() * 3.5f
       return
     }
 
-    val roll = Random.nextInt(100)
+    val roll = random.nextInt(100)
     val chosenFacility = when (actor.personality) {
       PersonalityType.RECKLESS, PersonalityType.STOIC -> when {
         roll < 42 -> FacilityType.TRAINING_GROUND
@@ -1179,17 +1303,31 @@ class SanctuaryLobbyEngine {
       }
     }
 
-    if (roll > 80) {
+    if (roll > 80 && actor.lobbyData?.personality != LobbyPersonality.LONER) {
+      val partner = actors.values.firstOrNull { it.heroId != actor.heroId && !it.isMoving && it.heroId != pickedHeroId &&
+        it.lobbyData?.currentAssignment == HeroAssignment.UNASSIGNED && it.lobbyData?.isFrightened == false &&
+        it.lobbyData?.personality != LobbyPersonality.LONER && hypot(it.x - actor.x, it.y - actor.y) < 220f }
+      if (partner != null) {
+        listOf(actor to partner, partner to actor).forEach { (speaker, listener) ->
+          speaker.activity = LobbyActivityState.CHATTING; speaker.locomotion = LobbyLocomotion.CHATTING
+          speaker.chatPartnerId = listener.heroId; speaker.waypointQueue.clear()
+          speaker.targetX = speaker.x; speaker.targetY = speaker.y; speaker.waitTimer = 4.5f
+          speaker.facingRight = listener.x >= speaker.x
+          speaker.speechBubble = if (speaker.lobbyData?.personality == LobbyPersonality.REBEL) "Tự chọn lấy con đường của mình." else "Chúng ta sẽ cùng trở về."
+          speaker.speechTimer = 4.5f
+        }
+        return
+      }
       val useEastGarden = IslandExpansionMilestone.EAST_CELESTIAL_GARDEN in unlockedExpansions && indexSeed % 2 == 0
       val destX = if (useEastGarden) {
-        SanctuaryIslandGeometry.EAST_TERRACE_CENTER_X + Random.nextFloat() * 90f - 45f
+        SanctuaryIslandGeometry.EAST_TERRACE_CENTER_X + random.nextFloat() * 90f - 45f
       } else {
-        TowerFloorCatalog.SANCTUARY_CENTER_X + Random.nextFloat() * 340f - 170f
+        TowerFloorCatalog.SANCTUARY_CENTER_X + random.nextFloat() * 340f - 170f
       }
       val destY = if (useEastGarden) {
-        SanctuaryIslandGeometry.EAST_TERRACE_CENTER_Y + Random.nextFloat() * 80f - 40f
+        SanctuaryIslandGeometry.EAST_TERRACE_CENTER_Y + random.nextFloat() * 80f - 40f
       } else {
-        TowerFloorCatalog.SANCTUARY_PLAZA_Y + Random.nextFloat() * 240f - 120f
+        TowerFloorCatalog.SANCTUARY_PLAZA_Y + random.nextFloat() * 240f - 120f
       }
       if (useEastGarden) {
         actor.waypointQueue.clear()
@@ -1216,7 +1354,7 @@ class SanctuaryLobbyEngine {
         FacilityType.TOWER_GATE -> (1915f + (indexSeed % 3) * 42f) to 665f
         else -> {
           val (zx, zy) = zoneCenter(chosenFacility)
-          (zx + Random.nextFloat() * 56f - 28f) to (zy + 42f + (indexSeed % 2) * 22f)
+          (zx + random.nextFloat() * 56f - 28f) to (zy + 42f + (indexSeed % 2) * 22f)
         }
       }
       assignHeroDestination(actor, destX, destY)
@@ -1229,7 +1367,7 @@ class SanctuaryLobbyEngine {
         else -> LobbyActivityState.PATROLLING
       }
     }
-    actor.waitTimer = 5.5f + Random.nextFloat() * 5.0f
+    actor.waitTimer = 5.5f + random.nextFloat() * 5.0f
   }
 
   private fun pickPreferredSpotForHero(

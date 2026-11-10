@@ -396,6 +396,12 @@ data class HeroRecord(
   val equippedArmorId: String = "",
   val inActiveSquad: Boolean = false,
   val bondSummary: String = "",
+  val currentHp: Long = -1L,
+  val sanityState: String = HeroSanityState.NORMAL.name,
+  val currentAssignment: String = "",
+  val partyJoinedOrder: Long = 0L,
+  val restStartedAtEpochSec: Long = 0L,
+  val hiddenTrait: HeroHiddenTrait = HeroHiddenTrait(),
   @ServerTimestamp val createdAt: Timestamp? = null,
   @ServerTimestamp val updatedAt: Timestamp? = null,
 ) {
@@ -422,7 +428,7 @@ data class HeroRecord(
       status == HeroStatusType.INJURED.name -> "Vừa bình phục • Chờ nhận lệnh tại Khu Nghỉ Ngơi"
       status == HeroStatusType.TRAINING.name -> "Đang rèn luyện tại Sân Tập"
       status == HeroStatusType.RESTING.name -> "Đang nghỉ ngơi hồi phục tại Khu Nghỉ Ngơi"
-      inActiveSquad -> "Trực chiến Đội Viễn Chinh • Tuần tra Thánh Địa"
+      inActiveSquad -> "Trực chiến Đội Viễn Chinh • Tập hợp chờ tại Cổng Tháp"
       else -> "Sinh hoạt tự do tại Thánh Địa"
     }
   }
