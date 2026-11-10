@@ -315,8 +315,9 @@ fun SanctuaryLobbyScreen(
     zoom = lobbyEngine.zoom
   }
 
-  LaunchedEffect(state.heroes) {
+  LaunchedEffect(state.heroes, state.lobbySyncRevision) {
     lobbyEngine.syncHeroes(state.heroes, System.currentTimeMillis() / 1000L)
+    dragInvalidation.intValue++
   }
 
   BackHandler(
@@ -500,7 +501,7 @@ fun SanctuaryLobbyScreen(
               }
               lobbyEngine.setTapDestination(worldX, worldY)
             } else {
-              // 1. Strict Hero Hitbox Priority: Tapping directly on an owned Hero selects them & triggers Speech Bubble immediately
+              val tappedFacility = lobbyEngine.selectFacilityAt(worldX, worldY)
               val screenHitHero = pickupHeroAtScreen(
                 lobbyEngine.heroActors,
                 tapOffset,
@@ -508,8 +509,8 @@ fun SanctuaryLobbyScreen(
                 camY,
                 zoom,
                 Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat()),
-                minimumTargetPx = 44f * artContext.resources.displayMetrics.density,
-              ) ?: lobbyEngine.selectHeroAt(worldX, worldY)?.takeIf { !it.isSanctuaryKeeperNpc }
+                minimumTargetPx = if (tappedFacility == null) 44f * artContext.resources.displayMetrics.density else 0f,
+              )
 
               if (screenHitHero != null && !screenHitHero.isSanctuaryKeeperNpc) {
                 lobbyEngine.selectedHeroId = screenHitHero.heroId
@@ -521,7 +522,6 @@ fun SanctuaryLobbyScreen(
               }
 
               // 2. Facility Tap: Tapping "Ngôi Nhà" (HERO_QUARTERS) or "Cổng Tháp" (TOWER_GATE) opens its UI directly without blocking!
-              val tappedFacility = lobbyEngine.selectFacilityAt(worldX, worldY)
               if (tappedFacility != null) {
                 if (tappedFacility == FacilityType.TOWER_GATE || tappedFacility == FacilityType.HERO_QUARTERS) {
                   promptedFacility = null
@@ -566,11 +566,13 @@ fun SanctuaryLobbyScreen(
           },
           onPickUp = { point ->
             val (cx, cy) = computeLobbyCam(constraints.maxWidth / 2f, constraints.maxHeight / 2f)
+            val wx = ObliqueCamera.screenToWorldX(point.x, cx, zoom, constraints.maxWidth / 2f)
+            val wy = ObliqueCamera.screenToWorldY(point.y, cy, zoom, constraints.maxHeight / 2f)
+            val facilityBehind = lobbyEngine.selectFacilityAt(wx, wy)
             val actor = if (!lobbyEngine.isInsideInterior) pickupHeroAtScreen(lobbyEngine.heroActors, point, cx, cy, zoom,
-              Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat()), minimumTargetPx = 48f * artContext.resources.displayMetrics.density) else null
+              Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat()),
+              minimumTargetPx = if (facilityBehind == null) 48f * artContext.resources.displayMetrics.density else 0f) else null
             if (actor == null || !lobbyEngine.beginHeroPickUp(actor.heroId)) false else {
-              val wx = ObliqueCamera.screenToWorldX(point.x, cx, zoom, constraints.maxWidth / 2f)
-              val wy = ObliqueCamera.screenToWorldY(point.y, cy, zoom, constraints.maxHeight / 2f)
               pickupOffset = Offset(actor.x - wx, actor.y - wy)
               heldPointer.value = point
               dragInvalidation.intValue++
@@ -596,7 +598,12 @@ fun SanctuaryLobbyScreen(
               pendingDrop = true
               dropScope.launch {
                 var accepted = false
-                try { accepted = persistDrop(request.heroId, request.assignment) }
+                try {
+                  accepted = persistDrop(request.heroId, request.assignment)
+                  if (accepted && request.assignment == HeroAssignment.RESTING) {
+                    onOpenFacility(FacilityType.HERO_QUARTERS)
+                  }
+                }
                 finally { lobbyEngine.finishHeroPickUp(accepted); pendingDrop = false; dragInvalidation.intValue++ }
               }
             }
@@ -898,18 +905,20 @@ fun SanctuaryLobbyScreen(
       speakingActors.forEach { actor ->
         val bubble = actor.speechBubble ?: return@forEach
         val isHeld = actor.heroId == lobbyEngine.pickedHeroId
-        val fadeAlpha = if (isHeld) 1f else (actor.speechTimer / 0.85f).coerceIn(0.15f, 1f)
+        val fadeAlpha = (actor.speechTimer / 0.85f).coerceIn(0f, 1f)
         val hx = ObliqueCamera.worldToScreenX(actor.x, camX, zoom, halfW)
         val headElevation = if (isHeld) 108f else 86f
         val headY = ObliqueCamera.worldToScreenY(actor.y, camY, zoom, halfH, elevationZ = headElevation)
         if (hx in 16f..(size.width - 16f) && headY in (topHudSafePx + 18f)..(size.height - 24f)) {
-          val displayBubble = if (bubble.length > 92) bubble.take(92) + "…" else bubble
           val bLayout = textMeasurer.measure(
-            text = displayBubble,
+            text = bubble,
             style = TextStyle(
               color = SummonerGold.copy(alpha = fadeAlpha),
               fontSize = if (zoom < 0.56f) 9.sp else 10.sp,
               fontWeight = FontWeight.Medium,
+            ),
+            constraints = androidx.compose.ui.unit.Constraints(
+              maxWidth = minOf(260.dp.toPx().toInt(), (size.width - 56f).toInt()).coerceAtLeast(1),
             ),
           )
           val bx = (hx - bLayout.size.width / 2f).coerceIn(12f, (size.width - bLayout.size.width - 18f).coerceAtLeast(12f))
@@ -1382,7 +1391,14 @@ fun SanctuaryLobbyScreen(
       SanctuaryFacilityModalOverlay(
         facility = openFacility,
         state = state,
-        onClose = onCloseFacility,
+        onClose = {
+          if (openFacility == FacilityType.HERO_QUARTERS && lobbyEngine.activeInterior == FacilityType.HERO_QUARTERS) {
+            lobbyEngine.exitFacilityInterior()
+            activeInteriorState = lobbyEngine.activeInterior
+            zoom = lobbyEngine.zoom
+          }
+          onCloseFacility()
+        },
         onSummonHero = onSummonHero,
         onTrainHero = onTrainHero,
         onEquipItem = onEquipItem,

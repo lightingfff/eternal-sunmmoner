@@ -24,6 +24,7 @@ import com.example.data.model.PersonalityType
 import com.example.data.model.SanctuaryMealRecipe
 import com.example.data.model.TrainingFocus
 import java.io.File
+import java.io.FileOutputStream
 import java.util.UUID
 import kotlin.random.Random
 import kotlinx.coroutines.flow.Flow
@@ -54,6 +55,7 @@ class LocalGuestSaveManager(context: Context) {
   private val sessionFile = File(storageDir, "session_state.json")
 
   private val ioMutex = Mutex()
+  private val snapshotGuard = Any()
 
   private val _sessionMode = MutableStateFlow(readInitialSessionMode())
   val sessionMode: StateFlow<SessionAccountMode> = _sessionMode.asStateFlow()
@@ -73,17 +75,19 @@ class LocalGuestSaveManager(context: Context) {
    */
   suspend fun startOrResumeGuestSession(preferredMasterName: String = "Master"): GuestSaveSnapshot =
     ioMutex.withLock {
-      val existing = _guestSnapshot.value ?: loadValidSnapshotFromDisk()
-      val activeSnapshot = if (existing != null) {
-        existing.copy(lastSavedEpochSec = System.currentTimeMillis() / 1000L)
-      } else {
-        createStarterGuestSnapshot(preferredMasterName)
+      synchronized(snapshotGuard) {
+        val existing = _guestSnapshot.value ?: loadValidSnapshotFromDisk()
+        val activeSnapshot = if (existing != null) {
+          existing.copy(lastSavedEpochSec = System.currentTimeMillis() / 1000L)
+        } else {
+          createStarterGuestSnapshot(preferredMasterName)
+        }
+        writeSnapshotAtomically(activeSnapshot)
+        _guestSnapshot.value = activeSnapshot
+        _sessionMode.value = SessionAccountMode.GUEST_LOCAL
+        persistSessionState(SessionAccountMode.GUEST_LOCAL, _settings.value)
+        activeSnapshot
       }
-      writeSnapshotAtomically(activeSnapshot)
-      _guestSnapshot.value = activeSnapshot
-      _sessionMode.value = SessionAccountMode.GUEST_LOCAL
-      persistSessionState(SessionAccountMode.GUEST_LOCAL, _settings.value)
-      activeSnapshot
     }
 
   fun markGoogleCloudSessionActive() {
@@ -98,37 +102,41 @@ class LocalGuestSaveManager(context: Context) {
   }
 
   fun updateSettings(newSettings: GameSettings) {
-    val snap = _guestSnapshot.value
-    if (snap != null) {
-      val updated = snap.copy(
-        settings = newSettings,
-        lastSavedEpochSec = System.currentTimeMillis() / 1000L,
-      )
-      writeSnapshotAtomically(updated)
-      _guestSnapshot.value = updated
+    synchronized(snapshotGuard) {
+      val snap = _guestSnapshot.value
+      if (snap != null) {
+        val updated = snap.copy(
+          settings = newSettings,
+          lastSavedEpochSec = System.currentTimeMillis() / 1000L,
+        )
+        writeSnapshotAtomically(updated)
+        _guestSnapshot.value = updated
+      }
+      _settings.value = newSettings
+      persistSessionState(_sessionMode.value, newSettings)
     }
-    _settings.value = newSettings
-    persistSessionState(_sessionMode.value, newSettings)
   }
 
   suspend fun mutateSnapshot(
     transform: (GuestSaveSnapshot) -> GuestSaveSnapshot,
   ): GuestSaveSnapshot = ioMutex.withLock {
-    val current = _guestSnapshot.value
-      ?: loadValidSnapshotFromDisk()
-      ?: createStarterGuestSnapshot("Master")
-    val transformed = transform(current)
-    val nowSec = System.currentTimeMillis() / 1000L
-    val next = transformed.copy(
-      heroes = transformed.heroes.map { hero ->
-        com.example.data.LobbyHeroAssignments.checkAndUnlockHiddenTrait(hero, nowSec)
-      },
-      schemaVersion = GuestSaveSnapshot.CURRENT_SAVE_SCHEMA_VERSION,
-      lastSavedEpochSec = nowSec,
-    )
-    writeSnapshotAtomically(next)
-    _guestSnapshot.value = next
-    next
+    synchronized(snapshotGuard) {
+      val current = _guestSnapshot.value
+        ?: loadValidSnapshotFromDisk()
+        ?: createStarterGuestSnapshot("Master")
+      val transformed = transform(current)
+      val nowSec = System.currentTimeMillis() / 1000L
+      val next = transformed.copy(
+        heroes = transformed.heroes.map { hero ->
+          com.example.data.LobbyHeroAssignments.checkAndUnlockHiddenTrait(hero, nowSec)
+        },
+        schemaVersion = GuestSaveSnapshot.CURRENT_SAVE_SCHEMA_VERSION,
+        lastSavedEpochSec = nowSec,
+      )
+      writeSnapshotAtomically(next)
+      _guestSnapshot.value = next
+      next
+    }
   }
 
   private fun readInitialSessionMode(): SessionAccountMode {
@@ -210,20 +218,30 @@ class LocalGuestSaveManager(context: Context) {
   private fun writeSnapshotAtomically(snapshot: GuestSaveSnapshot) {
     try {
       val json = serializeSnapshot(snapshot).toString()
-      tempSaveFile.writeText(json, Charsets.UTF_8)
+      FileOutputStream(tempSaveFile).use { stream ->
+        stream.write(json.toByteArray(Charsets.UTF_8))
+        stream.fd.sync()
+      }
       if (primarySaveFile.exists() && primarySaveFile.length() > 0L) {
         // Keep last known good primary as backup before replacing
         if (parseFileSafely(primarySaveFile) != null) {
-          primarySaveFile.copyTo(backupSaveFile, overwrite = true)
+          val backupTemp = File(storageDir, "guest_save_v2.bak.tmp")
+          FileOutputStream(backupTemp).use { stream ->
+            stream.write(primarySaveFile.readBytes())
+            stream.fd.sync()
+          }
+          check(backupTemp.renameTo(backupSaveFile)) { "Không thể lưu bản dự phòng an toàn." }
         }
       }
-      if (!tempSaveFile.renameTo(primarySaveFile)) {
-        tempSaveFile.copyTo(primarySaveFile, overwrite = true)
-        tempSaveFile.delete()
-      }
-      if (!backupSaveFile.exists()) {
-        primarySaveFile.copyTo(backupSaveFile, overwrite = true)
-      }
+      check(tempSaveFile.renameTo(primarySaveFile)) { "Không thể thay thế bản lưu nguyên tử." }
+      // The committed primary is authoritative. A backup repair must never turn a successful
+      // commit into a reported failure (which could repeat a paid action on retry).
+      if (!backupSaveFile.exists()) runCatching {
+        FileOutputStream(backupSaveFile).use { stream ->
+          stream.write(json.toByteArray(Charsets.UTF_8))
+          stream.fd.sync()
+        }
+      }.onFailure { Log.w(TAG, "Backup creation deferred; primary committed", it) }
     } catch (e: Exception) {
       Log.e(TAG, "Atomic guest save failed", e)
       throw e
@@ -393,7 +411,7 @@ class LocalGuestSaveManager(context: Context) {
       schemaVersion = GuestSaveSnapshot.CURRENT_SAVE_SCHEMA_VERSION,
       guestPlayerId = guestUid,
       profile = profile,
-      heroes = heroes,
+      heroes = heroes.map { com.example.data.LobbyHeroAssignments.checkAndUnlockHiddenTrait(it) },
       equipment = equipment,
       settings = _settings.value,
       lastSavedEpochSec = System.currentTimeMillis() / 1000L,
@@ -474,6 +492,9 @@ class LocalGuestSaveManager(context: Context) {
           put("inActiveSquad", h.inActiveSquad)
           put("bondSummary", h.bondSummary)
           put("currentHp", h.currentHp)
+          put("survivedExpeditions", h.survivedExpeditions)
+          put("returnedUnder15PctHp", h.returnedUnder15PctHp)
+          put("recentDisdainEventIds", JSONArray(h.recentDisdainEventIds.takeLast(32)))
           put("sanityState", h.sanityState)
           put("currentAssignment", h.currentAssignment)
           put("partyJoinedOrder", h.partyJoinedOrder)
@@ -587,6 +608,11 @@ class LocalGuestSaveManager(context: Context) {
           inActiveSquad = h.optBoolean("inActiveSquad", false),
           bondSummary = h.optString("bondSummary", "Chiến đấu vì Thánh Địa.").take(200),
           currentHp = h.optLong("currentHp", -1L).coerceIn(-1L, h.optLong("maxHp", 350L).coerceIn(50L, 100000L)),
+          survivedExpeditions = h.optInt("survivedExpeditions", 0).coerceIn(0, 1_000_000),
+          returnedUnder15PctHp = h.optBoolean("returnedUnder15PctHp", false),
+          recentDisdainEventIds = h.optJSONArray("recentDisdainEventIds")?.let { ids ->
+            (0 until ids.length()).mapNotNull { i -> ids.optString(i).takeIf { it.length in 1..80 } }.distinct().takeLast(32)
+          }.orEmpty(),
           sanityState = com.example.data.model.HeroSanityState.fromRaw(h.optString("sanityState")).name,
           currentAssignment = h.optString("currentAssignment").takeIf { raw -> com.example.data.model.HeroAssignment.entries.any { it.name == raw } }.orEmpty(),
           partyJoinedOrder = h.optLong("partyJoinedOrder", 0L).coerceAtLeast(0L),
@@ -628,7 +654,7 @@ class LocalGuestSaveManager(context: Context) {
       schemaVersion = GuestSaveSnapshot.CURRENT_SAVE_SCHEMA_VERSION,
       guestPlayerId = guestId,
       profile = profile,
-      heroes = heroes,
+      heroes = heroes.map { com.example.data.LobbyHeroAssignments.checkAndUnlockHiddenTrait(it) },
       equipment = equipment,
       settings = settings,
       lastSavedEpochSec = root.optLong("lastSavedEpochSec", System.currentTimeMillis() / 1000L),
@@ -1142,15 +1168,16 @@ class LocalGuestDataSource(
     return requireNotNull(outcome)
   }
 
-  override suspend fun applySocialDisdainPenalty(lowStarHeroId: String, penalty: Int) {
+  override suspend fun applySocialDisdainPenalty(lowStarHeroId: String, penalty: Int, eventId: String) {
+    val durableEventId = eventId.ifBlank { UUID.randomUUID().toString() }
+    require(com.example.data.LobbyHeroAssignments.isValidSocialEventId(durableEventId)) { "Mã biến cố tinh thần không hợp lệ." }
     saveManager.mutateSnapshot { snap ->
-      snap.copy(
-        heroes = com.example.data.LobbyHeroAssignments.applyProximityDisdainMoralePenalty(
-          roster = snap.heroes,
-          lowStarHeroId = lowStarHeroId,
-          penalty = penalty,
-        ),
-      )
+      val hero = snap.heroes.find { it.id == lowStarHeroId } ?: return@mutateSnapshot snap
+      if (durableEventId in hero.recentDisdainEventIds) return@mutateSnapshot snap
+      val changed = com.example.data.LobbyHeroAssignments.applyProximityDisdainMoralePenalty(snap.heroes, lowStarHeroId, penalty)
+      snap.copy(heroes = changed.map { h ->
+        if (h.id == lowStarHeroId) h.copy(recentDisdainEventIds = (h.recentDisdainEventIds + durableEventId).takeLast(32)) else h
+      })
     }
   }
 
@@ -1183,6 +1210,7 @@ class LocalGuestDataSource(
     discoveredNodeIds: Set<String>,
     courierOutcome: CourierOutcome?,
     courierMemoryHeroId: String?,
+    remainingHeroHpRatios: Map<String, Float>,
   ): ExpeditionSettlementResult {
     val nowSec = System.currentTimeMillis() / 1000L
     val hasAstralDock = SanctuaryProgressionHelper.isExpansionUnlocked(
@@ -1277,27 +1305,15 @@ class LocalGuestDataSource(
           }
 
           val nextMaxHp = (hero.maxHp + if (didLevelUp) 32L else 0L).coerceAtMost(100000L)
-          val currentRealHp = if (hero.currentHp < 0L) hero.maxHp else hero.currentHp
-          val postRunHp = if (wasKnockedOut) {
-            nextMaxHp / 4L
-          } else if (hero.currentHp < 0L) {
-            -1L
-          } else {
-            (currentRealHp + if (didLevelUp) 32L else 0L).coerceAtMost(nextMaxHp)
-          }
-          val returnedLowHp = postRunHp > 0L && postRunHp * 100L < nextMaxHp * 15L
+          val health = com.example.data.ExpeditionHeroHealth.returnFromBattle(
+            hero, nextMaxHp, wasKnockedOut, remainingHeroHpRatios[hero.id],
+          )
           val baseBond = if (courierForgeUnlocked && hero.id == memoryHeroId) {
             courierMemoryHeroName = hero.name
             LostCourierProgression.rememberRescue(hero.bondSummary)
           } else hero.bondSummary
-          val updatedBond = com.example.data.LobbyHeroAssignments.recordExpeditionSurvival(
-            bondSummary = baseBond,
-            survivedThisRun = !wasKnockedOut,
-            returnedUnder15PctHp = returnedLowHp,
-          )
-
           com.example.data.LobbyHeroAssignments.checkAndUnlockHiddenTrait(
-            hero.copy(
+            health.copy(
               level = nextLevel,
               exp = remExp.coerceAtMost(10000000L),
               maxHp = nextMaxHp,
@@ -1308,10 +1324,9 @@ class LocalGuestDataSource(
               injuryRecoveryUntilEpochSec = recoveryUntil,
               morale = nextMorale,
               inActiveSquad = if (wasKnockedOut) false else hero.inActiveSquad,
-              currentHp = postRunHp,
               currentAssignment = if (wasKnockedOut) "RESTING" else if (hero.inActiveSquad) "IN_PARTY" else "UNASSIGNED",
               restStartedAtEpochSec = if (wasKnockedOut) nowSec else 0L,
-              bondSummary = updatedBond,
+              bondSummary = baseBond,
             ),
             nowSec,
           )

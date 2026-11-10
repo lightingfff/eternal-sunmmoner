@@ -68,12 +68,23 @@ service cloud.firestore {
              data.updatedAt is timestamp && data.updatedAt <= request.time;
     }
 
+    function validRecentDisdainEventIds(ids) {
+      // UUID-only producer contract keeps complete validation within the rules expression budget.
+      let n = ids.size();
+      let serialized = ids.join('|');
+      return ids is list && n <= 32 &&
+             (n == 0 || (serialized.size() == n * 37 - 1 && serialized.matches('^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(\\|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}){0,31}$')));
+    }
+
     function validLobbyHeroFields(data) {
       return (!('currentHp' in data) || (data.currentHp is int && data.currentHp >= -1 && data.currentHp <= data.maxHp)) &&
              (!('sanityState' in data) || data.sanityState in ['NORMAL', 'ANXIOUS', 'PANICKED', 'SELF_AWARE']) &&
              (!('currentAssignment' in data) || data.currentAssignment in ['', 'UNASSIGNED', 'IN_PARTY', 'RESTING', 'SACRIFICED']) &&
              (!('partyJoinedOrder' in data) || (data.partyJoinedOrder is int && data.partyJoinedOrder >= 0)) &&
              (!('restStartedAtEpochSec' in data) || (data.restStartedAtEpochSec is int && data.restStartedAtEpochSec >= 0 && data.restStartedAtEpochSec <= 4102444800)) &&
+             (!('survivedExpeditions' in data) || (data.survivedExpeditions is int && data.survivedExpeditions >= 0 && data.survivedExpeditions <= 1000000)) &&
+             (!('returnedUnder15PctHp' in data) || data.returnedUnder15PctHp is bool) &&
+             (!('recentDisdainEventIds' in data) || validRecentDisdainEventIds(data.recentDisdainEventIds)) &&
              (!('hiddenTrait' in data) || (data.hiddenTrait is map &&
                data.hiddenTrait.keys().hasAll(['id', 'name', 'minimumLevel', 'minimumMorale', 'requiresSelfAwareness', 'unlocked']) &&
                data.hiddenTrait.keys().hasOnly(['id', 'name', 'minimumLevel', 'minimumMorale', 'requiresSelfAwareness', 'unlocked']) &&
@@ -101,7 +112,7 @@ service cloud.firestore {
                'injuryRecoveryUntilEpochSec', 'morale',
                'equippedWeaponId', 'equippedArmorId', 'inActiveSquad',
                'bondSummary', 'createdAt', 'updatedAt',
-               'currentHp', 'sanityState', 'currentAssignment', 'partyJoinedOrder', 'restStartedAtEpochSec', 'hiddenTrait'
+               'currentHp', 'sanityState', 'currentAssignment', 'partyJoinedOrder', 'restStartedAtEpochSec', 'hiddenTrait', 'survivedExpeditions', 'returnedUnder15PctHp', 'recentDisdainEventIds'
              ]) &&
              validLobbyHeroFields(data) &&
              data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
@@ -221,14 +232,14 @@ service cloud.firestore {
                              'level', 'exp', 'maxHp', 'attack', 'defense',
                              'speed', 'skillLevel', 'morale', 'bondSummary',
                              'updatedAt', 'currentHp', 'sanityState', 'currentAssignment',
-                             'partyJoinedOrder', 'restStartedAtEpochSec', 'hiddenTrait'
+                             'partyJoinedOrder', 'restStartedAtEpochSec', 'hiddenTrait', 'survivedExpeditions', 'returnedUnder15PctHp', 'recentDisdainEventIds'
                            ]) ||
                            // Action 2: Squad, Equipment, & Sanctuary Status
                            incoming().diff(existing()).affectedKeys().hasOnly([
                              'status', 'injuryRecoveryUntilEpochSec', 'morale',
                              'inActiveSquad', 'equippedWeaponId', 'equippedArmorId',
                              'updatedAt', 'currentHp', 'sanityState', 'currentAssignment',
-                             'partyJoinedOrder', 'restStartedAtEpochSec', 'hiddenTrait'
+                             'partyJoinedOrder', 'restStartedAtEpochSec', 'hiddenTrait', 'survivedExpeditions', 'returnedUnder15PctHp', 'recentDisdainEventIds'
                            ]) ||
                            // Action 3: Post-Expedition Combined Settlement
                            incoming().diff(existing()).affectedKeys().hasOnly([
@@ -237,7 +248,7 @@ service cloud.firestore {
                              'injuryRecoveryUntilEpochSec', 'morale',
                              'equippedWeaponId', 'equippedArmorId',
                              'inActiveSquad', 'bondSummary', 'updatedAt',
-                             'currentHp', 'sanityState', 'currentAssignment', 'partyJoinedOrder', 'restStartedAtEpochSec', 'hiddenTrait'
+                             'currentHp', 'sanityState', 'currentAssignment', 'partyJoinedOrder', 'restStartedAtEpochSec', 'hiddenTrait', 'survivedExpeditions', 'returnedUnder15PctHp', 'recentDisdainEventIds'
                            ])
                          );
 

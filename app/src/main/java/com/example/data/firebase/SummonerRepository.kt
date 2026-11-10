@@ -114,6 +114,7 @@ class SummonerRepository(
       .snapshots()
       .map { snap ->
         snap.toObjects(HeroRecord::class.java, DocumentSnapshot.ServerTimestampBehavior.ESTIMATE)
+          .map { com.example.data.LobbyHeroAssignments.checkAndUnlockHiddenTrait(it) }
       }
       .catch { error ->
         if (error is Exception) handleFirestoreError(error, OperationType.LIST, path)
@@ -559,6 +560,8 @@ class SummonerRepository(
           "updatedAt" to FieldValue.serverTimestamp(),
         ),
       )
+      batch.update(userRef, mapOf("lobbyRosterRevision" to FieldValue.increment(1L),
+        "updatedAt" to FieldValue.serverTimestamp()))
       batch.commit().await()
     } catch (e: CancellationException) {
       throw e
@@ -601,6 +604,8 @@ class SummonerRepository(
           ),
         )
       }
+      batch.update(userRef, mapOf("lobbyRosterRevision" to FieldValue.increment(1L),
+        "updatedAt" to FieldValue.serverTimestamp()))
       batch.commit().await()
     } catch (e: CancellationException) {
       throw e
@@ -937,6 +942,7 @@ class SummonerRepository(
               "inActiveSquad" to h.inActiveSquad, "currentAssignment" to h.currentAssignment,
               "status" to h.status, "currentHp" to h.currentHp, "partyJoinedOrder" to h.partyJoinedOrder,
               "restStartedAtEpochSec" to h.restStartedAtEpochSec,
+              "survivedExpeditions" to h.survivedExpeditions, "returnedUnder15PctHp" to h.returnedUnder15PctHp,
               "hiddenTrait" to mapOf("id" to h.hiddenTrait.id, "name" to h.hiddenTrait.name,
                 "minimumLevel" to h.hiddenTrait.minimumLevel, "minimumMorale" to h.hiddenTrait.minimumMorale,
                 "requiresSelfAwareness" to h.hiddenTrait.requiresSelfAwareness, "unlocked" to h.hiddenTrait.unlocked),
@@ -960,135 +966,120 @@ class SummonerRepository(
     mutateLobbyAssignment(heroId, assignment, true)
   }
 
-  override suspend fun healHeroAtInfirmary(
-    profile: MasterProfile,
-    hero: HeroRecord,
-    goldCost: Long,
-  ) {
-    val uid = requireUserId()
-    require(profile.gold >= goldCost) { "Cần $goldCost Vàng để Trị Thương (+50% Max HP)." }
-    val userRef = db.collection("users").document(uid)
-    val heroRef = userRef.collection("heroes").document(hero.id)
-    val nowSec = System.currentTimeMillis() / 1000L
-    val (_, nextRoster) = com.example.data.LobbyHeroAssignments.healHeroAtInfirmary(
-      profile = profile,
-      roster = listOf(hero),
-      heroId = hero.id,
-      now = nowSec,
-      goldCost = goldCost,
-    )
-    val updatedHero = nextRoster.single()
-    val batch = db.batch()
-    batch.update(userRef, mapOf("gold" to (profile.gold - goldCost).coerceAtLeast(0L), "updatedAt" to FieldValue.serverTimestamp()))
-    batch.update(
-      heroRef,
-      mapOf(
-        "currentHp" to updatedHero.currentHp,
-        "status" to updatedHero.status,
-        "injuryRecoveryUntilEpochSec" to 0L,
-        "restStartedAtEpochSec" to 0L,
-        "currentAssignment" to updatedHero.currentAssignment,
-        "hiddenTrait" to com.example.data.LobbyHeroPersistenceFields.traitFields(updatedHero.hiddenTrait),
-        "updatedAt" to FieldValue.serverTimestamp(),
-      ),
-    )
-    batch.commit().await()
-  }
+  private data class HouseMutation<T>(
+    val profile: MasterProfile,
+    val heroes: List<HeroRecord>,
+    val equipment: List<EquipmentRecord>,
+    val result: T,
+  )
 
-  override suspend fun serveHeartyMealToHero(
-    profile: MasterProfile,
-    hero: HeroRecord,
-    goldCost: Long,
-  ) {
-    val uid = requireUserId()
-    require(profile.gold >= goldCost) { "Cần $goldCost Vàng để dùng Bữa Ăn Thịnh Soạn (+40 Tinh thần & xóa Hoảng loạn)." }
-    val userRef = db.collection("users").document(uid)
-    val heroRef = userRef.collection("heroes").document(hero.id)
-    val nowSec = System.currentTimeMillis() / 1000L
-    val (_, nextRoster) = com.example.data.LobbyHeroAssignments.serveHeartyMealToHero(
-      profile = profile,
-      roster = listOf(hero),
-      heroId = hero.id,
-      now = nowSec,
-      goldCost = goldCost,
+  private fun houseHeroFields(hero: HeroRecord): Map<String, Any> =
+    com.example.data.LobbyHeroPersistenceFields.fields(hero) + mapOf(
+      "level" to hero.level, "exp" to hero.exp, "maxHp" to hero.maxHp,
+      "attack" to hero.attack, "defense" to hero.defense, "morale" to hero.morale,
+      "inActiveSquad" to hero.inActiveSquad, "status" to hero.status,
+      "injuryRecoveryUntilEpochSec" to hero.injuryRecoveryUntilEpochSec,
+      "bondSummary" to hero.bondSummary, "updatedAt" to FieldValue.serverTimestamp(),
     )
-    val updatedHero = nextRoster.single()
-    val batch = db.batch()
-    batch.update(userRef, mapOf("gold" to (profile.gold - goldCost).coerceAtLeast(0L), "updatedAt" to FieldValue.serverTimestamp()))
-    batch.update(
-      heroRef,
-      mapOf(
-        "morale" to updatedHero.morale,
-        "sanityState" to updatedHero.sanityState,
-        "hiddenTrait" to com.example.data.LobbyHeroPersistenceFields.traitFields(updatedHero.hiddenTrait),
-        "updatedAt" to FieldValue.serverTimestamp(),
-      ),
-    )
-    batch.commit().await()
-  }
 
-  override suspend fun performCruelHeroSynthesis(
-    targetHeroId: String,
-    sacrificedHeroIds: List<String>,
-  ): com.example.data.CruelSynthesisOutcome {
+  /** Query membership is protected by the same profile revision used by Lobby drops. */
+  private suspend fun <T> mutateHouseRoster(
+    materialIds: List<String> = emptyList(),
+    transform: (MasterProfile, List<HeroRecord>, List<EquipmentRecord>) -> HouseMutation<T>,
+  ): T {
     val uid = requireUserId()
     val userRef = db.collection("users").document(uid)
-    val docs = userRef.collection("heroes").whereEqualTo("userId", uid).get().await().documents
-    val currentRoster = docs.mapNotNull { it.toObject(HeroRecord::class.java) }
-    val nowSec = System.currentTimeMillis() / 1000L
-    val outcome = com.example.data.LobbyHeroAssignments.performCruelSynthesis(
-      roster = currentRoster,
-      targetHeroId = targetHeroId,
-      sacrificedHeroIds = sacrificedHeroIds,
-      now = nowSec,
-    )
-    val batch = db.batch()
-    sacrificedHeroIds.distinct().filter { it != targetHeroId }.forEach { sacId ->
-      batch.delete(userRef.collection("heroes").document(sacId))
-    }
-    outcome.updatedRoster.forEach { updated ->
-      val prev = currentRoster.firstOrNull { it.id == updated.id }
-      if (prev != updated) {
-        batch.update(
-          userRef.collection("heroes").document(updated.id),
-          mapOf(
-            "level" to updated.level,
-            "exp" to updated.exp,
-            "maxHp" to updated.maxHp,
-            "currentHp" to updated.currentHp,
-            "attack" to updated.attack,
-            "defense" to updated.defense,
-            "morale" to updated.morale,
-            "sanityState" to updated.sanityState,
-            "hiddenTrait" to com.example.data.LobbyHeroPersistenceFields.traitFields(updated.hiddenTrait),
-            "updatedAt" to FieldValue.serverTimestamp(),
-          ),
-        )
+    repeat(4) {
+      val before = userRef.get(com.google.firebase.firestore.Source.SERVER).await()
+      val heroDocs = userRef.collection("heroes").whereEqualTo("userId", uid)
+        .get(com.google.firebase.firestore.Source.SERVER).await().documents
+      val gearDocs = if (materialIds.isEmpty()) emptyList() else userRef.collection("equipment")
+        .whereEqualTo("userId", uid).whereIn("equippedByHeroId", materialIds)
+        .get(com.google.firebase.firestore.Source.SERVER).await().documents
+      require(heroDocs.size + gearDocs.size <= 450) { "Danh sách vượt giới hạn giao dịch an toàn." }
+      try {
+        return db.runTransaction { tx ->
+          val profileDoc = tx.get(userRef)
+          if (profileDoc.get("updatedAt") != before.get("updatedAt") ||
+            profileDoc.getLong("lobbyRosterRevision") != before.getLong("lobbyRosterRevision")) throw LobbyRosterChanged()
+          val currentProfile = requireNotNull(profileDoc.toObject(MasterProfile::class.java)) { "Không tìm thấy Master." }
+          val heroes = heroDocs.mapNotNull { tx.get(it.reference).toObject(HeroRecord::class.java) }
+          val gear = gearDocs.mapNotNull { tx.get(it.reference).toObject(EquipmentRecord::class.java) }
+          require(heroes.all { it.userId == uid } && gear.all { it.userId == uid }) { "Dữ liệu không thuộc Master hiện tại." }
+          val mutation = transform(currentProfile, heroes, gear)
+          val nextById = mutation.heroes.associateBy { it.id }
+          heroes.forEach { old ->
+            val next = nextById[old.id]
+            if (next == null) tx.delete(userRef.collection("heroes").document(old.id))
+            else if (next != old) tx.update(userRef.collection("heroes").document(old.id), houseHeroFields(next))
+          }
+          mutation.equipment.forEach { next ->
+            if (next != gear.find { it.id == next.id }) tx.update(userRef.collection("equipment").document(next.id),
+              mapOf("equippedByHeroId" to next.equippedByHeroId, "updatedAt" to FieldValue.serverTimestamp()))
+          }
+          tx.update(userRef, mapOf("gold" to mutation.profile.gold,
+            "lobbyRosterRevision" to ((profileDoc.getLong("lobbyRosterRevision") ?: 0L) + 1L),
+            "updatedAt" to FieldValue.serverTimestamp()))
+          mutation.result
+        }.await()
+      } catch (e: CancellationException) {
+        throw e
+      } catch (e: Exception) {
+        var cause: Throwable? = e
+        while (cause != null && cause !is LobbyRosterChanged) cause = cause.cause
+        if (cause == null) throw e
       }
     }
-    batch.update(userRef, mapOf("updatedAt" to FieldValue.serverTimestamp()))
-    batch.commit().await()
-    return outcome
+    error("Danh sách đang thay đổi. Vui lòng thử lại thao tác trong Nhà.")
   }
 
-  override suspend fun applySocialDisdainPenalty(lowStarHeroId: String, penalty: Int) {
-    val uid = requireUserId()
-    val heroRef = db.collection("users").document(uid).collection("heroes").document(lowStarHeroId)
-    val snap = heroRef.get().await().toObject(HeroRecord::class.java) ?: return
-    val updated = com.example.data.LobbyHeroAssignments.applyProximityDisdainMoralePenalty(
-      roster = listOf(snap),
-      lowStarHeroId = lowStarHeroId,
-      penalty = penalty,
-    ).single()
-    if (updated != snap) {
-      heroRef.update(
-        mapOf(
-          "morale" to updated.morale,
-          "sanityState" to updated.sanityState,
-          "updatedAt" to FieldValue.serverTimestamp(),
-        ),
-      ).await()
+  override suspend fun healHeroAtInfirmary(profile: MasterProfile, hero: HeroRecord, goldCost: Long) {
+    val now = System.currentTimeMillis() / 1000L
+    mutateHouseRoster { fresh, roster, gear ->
+      val (nextProfile, nextHeroes) = com.example.data.LobbyHeroAssignments.healHeroAtInfirmary(fresh, roster, hero.id, now, goldCost)
+      HouseMutation(nextProfile, nextHeroes, gear, Unit)
     }
+  }
+
+  override suspend fun serveHeartyMealToHero(profile: MasterProfile, hero: HeroRecord, goldCost: Long) {
+    val now = System.currentTimeMillis() / 1000L
+    mutateHouseRoster { fresh, roster, gear ->
+      val (nextProfile, nextHeroes) = com.example.data.LobbyHeroAssignments.serveHeartyMealToHero(fresh, roster, hero.id, now, goldCost)
+      HouseMutation(nextProfile, nextHeroes, gear, Unit)
+    }
+  }
+
+  override suspend fun performCruelHeroSynthesis(targetHeroId: String, sacrificedHeroIds: List<String>): com.example.data.CruelSynthesisOutcome {
+    require(sacrificedHeroIds.size in 1..3 && sacrificedHeroIds.distinct().size == sacrificedHeroIds.size && targetHeroId !in sacrificedHeroIds) {
+      "Chọn 1–3 Anh hùng hiến tế khác nhau, không trùng Anh hùng Chính."
+    }
+    val seed = Random.nextInt()
+    val now = System.currentTimeMillis() / 1000L
+    return mutateHouseRoster(sacrificedHeroIds) { fresh, roster, gear ->
+      // Firestore may invoke this lambda again: the same seed preserves the original 20% roll.
+      val outcome = com.example.data.LobbyHeroAssignments.performCruelSynthesis(roster, targetHeroId, sacrificedHeroIds, Random(seed), now)
+      HouseMutation(fresh, outcome.updatedRoster,
+        gear.map { if (it.equippedByHeroId in sacrificedHeroIds) it.copy(equippedByHeroId = "") else it }, outcome)
+    }
+  }
+
+  override suspend fun applySocialDisdainPenalty(lowStarHeroId: String, penalty: Int, eventId: String) {
+    require(penalty == 2)
+    val durableEventId = eventId.ifBlank { UUID.randomUUID().toString() }
+    require(com.example.data.LobbyHeroAssignments.isValidSocialEventId(durableEventId)) { "Mã biến cố tinh thần không hợp lệ." }
+    val userRef = db.collection("users").document(requireUserId())
+    val heroRef = userRef.collection("heroes").document(lowStarHeroId)
+    db.runTransaction { tx ->
+      val profile = tx.get(userRef)
+      val hero = tx.get(heroRef).toObject(HeroRecord::class.java) ?: return@runTransaction
+      if (durableEventId in hero.recentDisdainEventIds) return@runTransaction
+      val next = com.example.data.LobbyHeroAssignments.applyProximityDisdainMoralePenalty(listOf(hero), lowStarHeroId, penalty).single()
+      tx.update(heroRef, mapOf("morale" to next.morale, "sanityState" to next.sanityState,
+        "recentDisdainEventIds" to (hero.recentDisdainEventIds + durableEventId).takeLast(32),
+        "updatedAt" to FieldValue.serverTimestamp()))
+      tx.update(userRef, mapOf("lobbyRosterRevision" to ((profile.getLong("lobbyRosterRevision") ?: 0L) + 1L),
+        "updatedAt" to FieldValue.serverTimestamp()))
+    }.await()
   }
 
   override suspend fun toggleHeroInSquad(hero: HeroRecord, currentSquadSize: Int) {
@@ -1127,6 +1118,7 @@ class SummonerRepository(
     discoveredNodeIds: Set<String>,
     courierOutcome: CourierOutcome?,
     courierMemoryHeroId: String?,
+    remainingHeroHpRatios: Map<String, Float>,
   ): ExpeditionSettlementResult {
     val uid = requireUserId()
     val userRef = db.collection("users").document(uid)
@@ -1134,31 +1126,19 @@ class SummonerRepository(
       if (floorNumber == 1 && victory && it == CourierOutcome.RESCUED) CourierOutcome.RESCUED else CourierOutcome.FAILED
     }
     try {
-      // Read before writing: a retry or a stale UI profile cannot grant the service/memory twice.
-      if (escortOutcome != null) {
-        return db.runTransaction { transaction ->
-          val currentProfile = transaction.get(userRef).toObject(MasterProfile::class.java)
-            ?: error("Không tìm thấy tiến trình Master để lưu nhiệm vụ.")
-          val currentHeroes = squadHeroes.mapNotNull { hero ->
-            transaction.get(userRef.collection("heroes").document(hero.id)).toObject(HeroRecord::class.java)
-          }
-          buildExpeditionSettlement(
-            uid, currentProfile, currentHeroes, fallenHeroIds, floorNumber, victory, retreatUsed,
-            bonusGold, bonusMana, discoveredNodeIds, escortOutcome, courierMemoryHeroId,
-            updateDocument = { ref, fields -> transaction.update(ref, fields); Unit },
-            setDocument = { ref, fields -> transaction.set(ref, fields); Unit },
-          )
-        }.await()
-      }
-      val batch = db.batch()
-      val result = buildExpeditionSettlement(
-        uid, profile, squadHeroes, fallenHeroIds, floorNumber, victory, retreatUsed,
-        bonusGold, bonusMana, discoveredNodeIds, null, null,
-        updateDocument = { ref, fields -> batch.update(ref, fields); Unit },
-        setDocument = { ref, fields -> batch.set(ref, fields); Unit },
-      )
-      batch.commit().await()
-      return result
+      return db.runTransaction { transaction ->
+        val currentProfile = transaction.get(userRef).toObject(MasterProfile::class.java)
+          ?: error("Không tìm thấy tiến trình Master để lưu nhiệm vụ.")
+        val currentHeroes = squadHeroes.mapNotNull { hero ->
+          transaction.get(userRef.collection("heroes").document(hero.id)).toObject(HeroRecord::class.java)
+        }
+        buildExpeditionSettlement(
+          uid, currentProfile, currentHeroes, fallenHeroIds, floorNumber, victory, retreatUsed,
+          bonusGold, bonusMana, discoveredNodeIds, escortOutcome, courierMemoryHeroId, remainingHeroHpRatios,
+          updateDocument = { ref, fields -> transaction.update(ref, fields); Unit },
+          setDocument = { ref, fields -> transaction.set(ref, fields); Unit },
+        )
+      }.await()
     } catch (e: CancellationException) {
       throw e
     } catch (e: Exception) {
@@ -1180,6 +1160,7 @@ class SummonerRepository(
     discoveredNodeIds: Set<String>,
     courierOutcome: CourierOutcome?,
     courierMemoryHeroId: String?,
+    remainingHeroHpRatios: Map<String, Float>,
     updateDocument: (com.google.firebase.firestore.DocumentReference, Map<String, Any>) -> Unit,
     setDocument: (com.google.firebase.firestore.DocumentReference, Map<String, Any>) -> Unit,
   ): ExpeditionSettlementResult {
@@ -1294,31 +1275,19 @@ class SummonerRepository(
       }
 
       val nextMaxHp = (hero.maxHp + if (didLevelUp) 32L else 0L).coerceAtMost(100000L)
-      val currentRealHp = if (hero.currentHp < 0L) hero.maxHp else hero.currentHp
-      val postRunHp = if (wasKnockedOut) {
-        nextMaxHp / 4L
-      } else if (hero.currentHp < 0L) {
-        -1L
-      } else {
-        (currentRealHp + if (didLevelUp) 32L else 0L).coerceAtMost(nextMaxHp)
-      }
-      val returnedLowHp = postRunHp > 0L && postRunHp * 100L < nextMaxHp * 15L
+      val health = com.example.data.ExpeditionHeroHealth.returnFromBattle(
+        hero, nextMaxHp, wasKnockedOut, remainingHeroHpRatios[hero.id],
+      )
       val baseBond = if (courierForgeUnlocked && hero.id == memoryHeroId) {
         courierMemoryHeroName = hero.name
         LostCourierProgression.rememberRescue(hero.bondSummary)
       } else hero.bondSummary
-      val updatedBond = com.example.data.LobbyHeroAssignments.recordExpeditionSurvival(
-        bondSummary = baseBond,
-        survivedThisRun = !wasKnockedOut,
-        returnedUnder15PctHp = returnedLowHp,
-      )
       val appraisedHero = com.example.data.LobbyHeroAssignments.checkAndUnlockHiddenTrait(
-        hero.copy(
+        health.copy(
           level = nextLevel,
           morale = nextMorale,
           maxHp = nextMaxHp,
-          currentHp = postRunHp,
-          bondSummary = updatedBond,
+          bondSummary = baseBond,
         ),
         nowSec,
       )
@@ -1336,11 +1305,14 @@ class SummonerRepository(
           "injuryRecoveryUntilEpochSec" to recoveryUntil,
           "morale" to nextMorale,
           "hiddenTrait" to com.example.data.LobbyHeroPersistenceFields.traitFields(appraisedHero.hiddenTrait),
+          "sanityState" to appraisedHero.sanityState,
           "inActiveSquad" to if (wasKnockedOut) false else hero.inActiveSquad,
-          "currentHp" to postRunHp,
+          "currentHp" to appraisedHero.currentHp,
+          "survivedExpeditions" to appraisedHero.survivedExpeditions,
+          "returnedUnder15PctHp" to appraisedHero.returnedUnder15PctHp,
           "currentAssignment" to if (wasKnockedOut) "RESTING" else if (hero.inActiveSquad) "IN_PARTY" else "UNASSIGNED",
           "restStartedAtEpochSec" to if (wasKnockedOut) nowSec else 0L,
-          "bondSummary" to updatedBond,
+          "bondSummary" to baseBond,
           "updatedAt" to FieldValue.serverTimestamp(),
         ),
       )

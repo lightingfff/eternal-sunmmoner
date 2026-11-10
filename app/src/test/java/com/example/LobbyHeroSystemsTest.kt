@@ -15,10 +15,10 @@ class LobbyHeroSystemsTest {
     val legacy = HeroData.fromRecord(HeroRecord(id = "old", maxHp = 420), 1000)
     assertEquals(420, legacy.currentHP); assertEquals("???", legacy.hiddenTrait.displayName)
     assertEquals(HeroSanityState.NORMAL, legacy.sanityState)
-    val advanced = hero().copy(level = 10)
+    val advanced = hero().copy(level = 10, survivedExpeditions = 3)
     val revealed = LobbyHeroAssignments.assign(listOf(advanced), "h", HeroAssignment.IN_PARTY, 1000).single()
     assertTrue(revealed.hiddenTrait.unlocked)
-    assertEquals("Linh hồn bất khuất", revealed.hiddenTrait.displayName)
+    assertTrue(HeroHiddenTrait.AWAKENED_TRAIT_POOL.any { it.first == revealed.hiddenTrait.id && it.second == revealed.hiddenTrait.displayName })
     assertEquals(LobbyPersonality.REBEL, HeroData.fromRecord(hero().copy(personality = "REBEL")).personality)
     assertFalse(HeroData.fromRecord(hero(hp = 30)).isLimping)
     assertEquals(50f, HeroData.fromRecord(hero(hp = 29)).movementSpeed, .001f)
@@ -42,8 +42,8 @@ class LobbyHeroSystemsTest {
     assertThrows(IllegalArgumentException::class.java) { LobbyHeroAssignments.assign(listOf(dead), "h", HeroAssignment.RESTING, 1000) }
     assertThrows(IllegalArgumentException::class.java) { LobbyHeroAssignments.assign(listOf(hero()), "h", HeroAssignment.SACRIFICED, 1000) }
     val resting = LobbyHeroAssignments.assign(listOf(hero(hp = 10)), "h", HeroAssignment.RESTING, 1000).single()
-    assertEquals(60, HeroData.fromRecord(resting, 1060).currentHP)
-    assertEquals(100, HeroData.fromRecord(resting, 1120).currentHP)
+    assertEquals(10, HeroData.fromRecord(resting, 1060).currentHP)
+    assertEquals(10, HeroData.fromRecord(resting, 1120).currentHP)
     assertEquals(10, HeroData.fromRecord(resting, 900).currentHP)
   }
 

@@ -1,0 +1,26 @@
+{
+  "app/build.gradle.kts": {
+    "sha256": "4c1aa07cdb5e50e4f6ff78d739431ee74979e2aac06184442b1b50574cebb964",
+    "unchanged_from_base": true
+  },
+  "build.gradle.kts": {
+    "sha256": "aae50bb56871bbe6495e5fad0c011ae00ba6da06678ed4b5f7299bbf296a7f54",
+    "unchanged_from_base": true
+  },
+  "settings.gradle.kts": {
+    "sha256": "75a8bb4da3f42a6acaa97044931baea67af9662f9db7824cac97bbd7c49878be",
+    "unchanged_from_base": true
+  },
+  "gradle/libs.versions.toml": {
+    "sha256": "7dc531ea3db5ab3a6f0785d30ec318c0945c6adb55232592b11fae6bfc4e4f71",
+    "unchanged_from_base": true
+  },
+  "app/src/main/AndroidManifest.xml": {
+    "sha256": "d920bf2b70972a54681410627aa469a6dfbab02585d880d9936bc77fafe152e9",
+    "unchanged_from_base": true
+  },
+  "gradle/wrapper/gradle-wrapper.properties": {
+    "sha256": "a180163249c7252412ddaee1c7adcf59f6494b1183136f690fbd9a3b8aaed00e",
+    "unchanged_from_base": true
+  }
+}

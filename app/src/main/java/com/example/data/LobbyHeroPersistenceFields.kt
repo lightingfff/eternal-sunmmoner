@@ -12,6 +12,9 @@ object LobbyHeroPersistenceFields {
     "restStartedAtEpochSec" to hero.restStartedAtEpochSec,
     "personality" to hero.personality,
     "hiddenTrait" to traitFields(hero.hiddenTrait),
+    "survivedExpeditions" to hero.survivedExpeditions,
+    "returnedUnder15PctHp" to hero.returnedUnder15PctHp,
+    "recentDisdainEventIds" to hero.recentDisdainEventIds.takeLast(32),
   )
   fun traitFields(trait: HeroHiddenTrait): Map<String, Any> = mapOf(
     "id" to trait.id, "name" to trait.name, "minimumLevel" to trait.minimumLevel,

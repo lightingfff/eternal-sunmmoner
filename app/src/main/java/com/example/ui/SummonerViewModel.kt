@@ -25,6 +25,11 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlin.coroutines.cancellation.CancellationException
+import java.util.UUID
 
 enum class GameScreenMode {
   SANCTUARY_LOBBY,
@@ -47,6 +52,7 @@ data class SummonerUiState(
   val bannerFeedback: String? = null,
   val isBusyAction: Boolean = false,
   val isGuestAccount: Boolean = false,
+  val lobbySyncRevision: Long = 0L,
 )
 
 class SummonerViewModel(
@@ -64,6 +70,7 @@ class SummonerViewModel(
   private val _bannerFeedback = MutableStateFlow<String?>(null)
   private val _isBusyAction = MutableStateFlow(false)
   private val _isBootstrapping = MutableStateFlow(true)
+  private val _lobbySyncRevision = MutableStateFlow(0L)
 
   private val profileFlow = repository.observeMasterProfile(currentUserId)
     .catch { e ->
@@ -88,7 +95,8 @@ class SummonerViewModel(
     combine(_screenMode, _selectedFloor, _activeFacilityModal) { m, f, fac -> Triple(m, f, fac) },
     combine(_newlySummonedHero, _newlyForgedItem, _lastSettlement) { s, fg, st -> Triple(s, fg, st) },
     combine(_bannerFeedback, _isBusyAction, _isBootstrapping) { msg, busy, boot -> Triple(msg, busy, boot) },
-  ) { dataTriple, navTriple, rewardTriple, statusTriple ->
+    _lobbySyncRevision,
+  ) { dataTriple, navTriple, rewardTriple, statusTriple, lobbyRevision ->
     SummonerUiState(
       isBootstrapping = statusTriple.third && dataTriple.first == null,
       profile = dataTriple.first,
@@ -103,6 +111,7 @@ class SummonerViewModel(
       bannerFeedback = statusTriple.first,
       isBusyAction = statusTriple.second,
       isGuestAccount = repository.isGuestMode,
+      lobbySyncRevision = lobbyRevision,
     )
   }.stateIn(
     scope = viewModelScope,
@@ -366,6 +375,8 @@ class SummonerViewModel(
       try {
         repository.healHeroAtInfirmary(profile, hero)
         _bannerFeedback.value = "Đã trị thương cho ${hero.name} (+50% Max HP)!"
+      } catch (e: CancellationException) {
+        throw e
       } catch (e: Exception) {
         _bannerFeedback.value = e.message ?: "Không đủ Vàng để trị thương."
       } finally {
@@ -382,6 +393,8 @@ class SummonerViewModel(
       try {
         repository.serveHeartyMealToHero(profile, hero)
         _bannerFeedback.value = "${hero.name} đã dùng Bữa Ăn Thịnh Soạn (+40 Tinh thần & xóa Hoảng loạn)!"
+      } catch (e: CancellationException) {
+        throw e
       } catch (e: Exception) {
         _bannerFeedback.value = e.message ?: "Không đủ Vàng để phục vụ Bữa Ăn Thịnh Soạn."
       } finally {
@@ -396,12 +409,12 @@ class SummonerViewModel(
     viewModelScope.launch {
       try {
         val outcome = repository.performCruelHeroSynthesis(targetHeroId, sacrificedHeroIds)
-        if (outcome != null) {
-          val traitNote = outcome.inheritedTraitName?.let { " • Kế thừa Kỹ năng ẩn [$it]!" }.orEmpty()
-          val cowardNote = if (outcome.cowardHeroesAffected > 0) " • ${outcome.cowardHeroesAffected} Anh hùng Hèn nhát bị -10 Tinh thần!" else ""
-          _bannerFeedback.value =
-            "Dung hợp hoàn tất: ${outcome.updatedTarget.name} nhận +${outcome.bonusAtk} ATK, +${outcome.bonusDef} DEF, +${outcome.bonusMaxHp} HP, +${outcome.bonusExp} EXP$traitNote$cowardNote"
-        }
+        val traitNote = outcome.inheritedTraitName?.let { " • Kế thừa Kỹ năng ẩn [$it]!" }.orEmpty()
+        val cowardNote = if (outcome.cowardHeroesAffected > 0) " • ${outcome.cowardHeroesAffected} Anh hùng Hèn nhát bị -10 Tinh thần!" else ""
+        _bannerFeedback.value =
+          "Dung hợp hoàn tất: ${outcome.updatedTarget.name} nhận +${outcome.bonusAtk} ATK, +${outcome.bonusDef} DEF, +${outcome.bonusMaxHp} HP, +${outcome.bonusExp} EXP$traitNote$cowardNote"
+      } catch (e: CancellationException) {
+        throw e
       } catch (e: Exception) {
         _bannerFeedback.value = e.message ?: "Không thể thực hiện dung hợp."
       } finally {
@@ -410,9 +423,27 @@ class SummonerViewModel(
     }
   }
 
+  private val socialWriteMutex = Mutex()
+
   fun applySocialDisdainPenalty(lowStarHeroId: String, penalty: Int = 2) {
+    val eventId = UUID.randomUUID().toString()
     viewModelScope.launch {
-      runCatching { repository.applySocialDisdainPenalty(lowStarHeroId, penalty) }
+      socialWriteMutex.withLock {
+        repeat(3) { attempt ->
+          try {
+            repository.applySocialDisdainPenalty(lowStarHeroId, penalty, eventId)
+            return@withLock
+          } catch (e: CancellationException) {
+            throw e
+          } catch (e: Exception) {
+            if (attempt == 2) {
+              Log.e(TAG, "Unable to persist Lobby social encounter", e)
+              _bannerFeedback.value = "Chưa lưu được biến cố tinh thần. Sảnh đã trở về dữ liệu lưu gần nhất; hãy kiểm tra kết nối."
+              _lobbySyncRevision.value += 1L
+            } else delay(300L * (attempt + 1))
+          }
+        }
+      }
     }
   }
 
@@ -462,6 +493,7 @@ class SummonerViewModel(
     discoveredNodeIds: Set<String> = emptySet(),
     courierOutcome: CourierOutcome? = null,
     courierMemoryHeroId: String? = null,
+    remainingHeroHpRatios: Map<String, Float> = emptyMap(),
   ) {
     val state = uiState.value
     val profile = state.profile ?: return
@@ -483,6 +515,7 @@ class SummonerViewModel(
           discoveredNodeIds = discoveredNodeIds,
           courierOutcome = courierOutcome,
           courierMemoryHeroId = courierMemoryHeroId,
+          remainingHeroHpRatios = remainingHeroHpRatios,
         )
         _lastSettlement.value = result
       } catch (e: Exception) {

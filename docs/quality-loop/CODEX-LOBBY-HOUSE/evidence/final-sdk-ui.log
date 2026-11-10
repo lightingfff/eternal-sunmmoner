@@ -1,0 +1,119 @@
+i  emulators: Starting emulators: auth, firestore
+i  emulators: Detected demo project ID "demo-no-project", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail.
+i  firestore: Firestore Emulator logging to firestore-debug.log
+✔  firestore: Firestore Emulator UI websocket is running on 9150.
+i  Running script: bash /workspace/house-fix-evidence/run-native-cloud-tests.sh
+Picked up JAVA_TOOL_OPTIONS:  -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts=localhost|127.* -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts=localhost|127.* -Deternal.test.firestore.database=(default)
+Calculating task graph as no cached configuration is available for tasks: :app:testDebugUnitTest --tests com.example.data.firebase.SanctuaryCloudHouseTest --tests com.example.data.firebase.SummonerRepositoryRuleTest --tests com.example.ui.SanctuaryHouseUiTest --tests com.example.ui.LobbyHeroTouchTest --tests com.example.ui.LobbyHeroVisualTest --tests com.example.ui.SquadHouseIntegrationTest
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:processDebugGoogleServices UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:kspDebugKotlin SKIPPED
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:generateDebugRFile UP-TO-DATE
+> Task :app:processDebugUnitTestManifest UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:packageDebugUnitTestForUnitTest UP-TO-DATE
+> Task :app:generateDebugUnitTestConfig UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:bundleDebugClassesToRuntimeJar UP-TO-DATE
+> Task :app:bundleDebugClassesToCompileJar UP-TO-DATE
+> Task :app:kspDebugUnitTestKotlin SKIPPED
+> Task :app:compileDebugUnitTestKotlin UP-TO-DATE
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processDebugUnitTestJavaRes UP-TO-DATE
+
+> Task :app:testDebugUnitTest
+Picked up JAVA_TOOL_OPTIONS:  -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts=localhost|127.* -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts=localhost|127.* -Deternal.test.firestore.database=(default)
+
+SanctuaryCloudHouseTest > actualCloudTreatmentUsesFreshGoldAndHpUnderConcurrentStaleUiCalls PASSED
+
+SanctuaryCloudHouseTest > actualCloudFusionQueriesOwnedGearAndAtomicallyDeletesOnlyOnce PASSED
+
+SanctuaryCloudHouseTest > actualCloudMealAndSocialRetriesPreserveIndependentFreshMorale PASSED
+
+SummonerRepositoryRuleTest > linkGuestSaveToCloudAccount_andFeastMeal_succeedWithinFirestoreRules PASSED
+
+SummonerRepositoryRuleTest > courierRescue_staleProfileReplay_grantsOneMemoryAndPermanentService PASSED
+
+SummonerRepositoryRuleTest > observeHeroes_unauthenticatedCaller_failsWithPermissionDenied PASSED
+
+SummonerRepositoryRuleTest > getHeroById_crossUserAccess_failsWithPermissionDenied PASSED
+
+SummonerRepositoryRuleTest > trainSummonAndSettleExpedition_authenticatedOwner_succeedsWithinRules PASSED
+
+SummonerRepositoryRuleTest > bootstrapAndObserve_authenticatedOwner_createsStarterSanctuaryAndHeroes PASSED
+
+LobbyHeroTouchTest > secondFingerCancelsHeldHeroWithoutAssignment PASSED
+
+LobbyHeroTouchTest > longPressPhysicalDragToHouseDispatchesRestingAssignment PASSED
+
+LobbyHeroTouchTest > tappingHouseOrTowerGateWithoutDraggingHeroOpensFacilityUiDirectly PASSED
+
+LobbyHeroTouchTest > failedPersistenceRollsBackSoOriginalHeroCanBePickedAgain PASSED
+
+LobbyHeroTouchTest > heroAccessibilityPaddingCannotStealGateTapOrLongHoldOutsideTheSprite PASSED
+
+LobbyHeroTouchTest > longPressPhysicalDragToGateDispatchesSinglePartyAssignment PASSED
+
+LobbyHeroTouchTest > fastDragIsCameraPanAndInvalidDropAndCancelNeverAssign PASSED
+
+LobbyHeroTouchTest > holdingBuildingWithoutAHeroStillOpensItOnRelease PASSED
+
+LobbyHeroVisualTest > heldWrithingUsesExistingSpriteFramesAndRendersAtGameZoom PASSED
+
+SanctuaryHouseUiTest > deletedHeroesDoNotSurviveSelectionOrPendingConfirmation PASSED
+
+SanctuaryHouseUiTest > busyStateBlocksSynthesisAndStateUpdatesInvalidateThePreviewedConfirmation PASSED
+
+SanctuaryHouseUiTest > synthesisCapPreviewMatchesTheDestructiveConfirmation PASSED
+
+SanctuaryHouseUiTest > synthesisCapsAtThreeAndSelectedMaterialCannotAlsoBeTheTarget PASSED
+
+SanctuaryHouseUiTest > treatmentTargetsChosenHeroAndKeepsSelectionWhenPersistedStatsArrive PASSED
+
+SanctuaryHouseUiTest > dormitoryUsesOwnedHpMoraleAndActualPersonalityWithoutInventingAnAwakening PASSED
+
+SanctuaryHouseUiTest > portraitTabsTreatmentAndCloseRemainAccessibleAndReturnToLobby PASSED
+
+SanctuaryHouseUiTest > insufficientGoldAndBusyStateBlockCareAndHeroChanges PASSED
+
+SanctuaryHouseUiTest > synthesisShowsImmediatePleaAndExactPreviewThenRequiresSeparateConfirmation PASSED
+
+SquadHouseIntegrationTest > squadPreparationHouseUsesRealPaidCareAndSynthesisThenReturnsToPreparation PASSED
+
+BUILD SUCCESSFUL in 32s
+31 actionable tasks: 1 executed, 30 up-to-date
+Configuration cache entry stored.
+com.example.ui.SquadHouseIntegrationTest 1 PASS, zero skipped
+com.example.ui.LobbyHeroTouchTest 8 PASS, zero skipped
+com.example.ui.LobbyHeroVisualTest 1 PASS, zero skipped
+com.example.data.firebase.SanctuaryCloudHouseTest 3 PASS, zero skipped
+com.example.data.firebase.SummonerRepositoryRuleTest 6 PASS, zero skipped
+com.example.ui.SanctuaryHouseUiTest 9 PASS, zero skipped
+✔  Script exited successfully (code 0)
+i  emulators: Shutting down emulators.
+i  firestore: Stopping Firestore Emulator
+i  auth: Stopping Authentication Emulator
+i  hub: Stopping emulator hub
+i  logging: Stopping Logging Emulator

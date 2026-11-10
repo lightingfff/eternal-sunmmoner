@@ -330,6 +330,9 @@ fun EternalSummonerRootApp() {
           onUnequipItem = vm::unequipItem,
           onAssignHeroActivity = vm::assignHeroActivity,
           onHostMealWithRecipe = vm::hostRestaurantMealWithRecipe,
+          onHealHeroInfirmary = vm::healHeroAtInfirmary,
+          onServeHeartyMeal = vm::serveHeartyMealToHero,
+          onCruelSynthesis = vm::performCruelHeroSynthesis,
         )
       }
 

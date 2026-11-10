@@ -27,6 +27,7 @@ data class HeroHiddenTrait(
   val requiresSelfAwareness: Boolean = false,
   val unlocked: Boolean = false,
 ) {
+  @Suppress("UNUSED_PARAMETER")
   fun canUnlock(
     level: Int,
     morale: Int,
@@ -36,14 +37,12 @@ data class HeroHiddenTrait(
   ): Boolean =
     unlocked ||
       survivedExpeditions >= 3 ||
-      returnedLowHpOnce ||
-      (level >= minimumLevel && morale >= minimumMorale && (!requiresSelfAwareness || sanity == HeroSanityState.SELF_AWARE))
+      returnedLowHpOnce
 
   val displayName: String get() = if (unlocked) name else "???"
   val detailedDisplayNameVi: String get() = if (unlocked) name else "??? (Chưa thức tỉnh)"
   val unlockCondition: String
-    get() = "Sống sót ≥ 3 trận leo tháp • Từng trở về HP < 15% • Hoặc Cấp $minimumLevel & Tinh thần ≥ $minimumMorale" +
-      if (requiresSelfAwareness) " • Thức tỉnh" else ""
+    get() = "Sống sót ≥ 3 trận leo tháp hoặc từng trở về với HP dưới 15%"
 
   companion object {
     val AWAKENED_TRAIT_POOL: List<Pair<String, String>> = listOf(
@@ -51,7 +50,7 @@ data class HeroHiddenTrait(
       "indomitable_will" to "Bất Khuất - Miễn nhiễm Hoảng loạn",
       "mortal_sword_saint" to "Kiếm Thánh Phàm Trần - Tăng 25% ATK",
       "bloodline_bastion" to "Huyết Thống Thiết Giáp - Tăng 25% DEF",
-      "astral_eye" to "Nhãn Quan Tinh Không - Tăng 20% SPD & Chính xác",
+      "astral_eye" to "Nhãn Quan Tinh Không - Tăng 20% SPD",
     )
 
     fun defaultTraitForHero(heroId: String, rarity: Int): HeroHiddenTrait {
@@ -68,12 +67,15 @@ data class HeroHiddenTrait(
     }
 
     fun resolveAwakenedTrait(current: HeroHiddenTrait, heroId: String): HeroHiddenTrait {
-      val named = if (current.name.isBlank() || current.name == "Linh hồn bất khuất") {
-        val index = (heroId.hashCode() and Int.MAX_VALUE) % AWAKENED_TRAIT_POOL.size
-        val (traitId, traitName) = AWAKENED_TRAIT_POOL[index]
-        current.copy(id = traitId, name = traitName)
-      } else {
-        current
+      val knownTrait = AWAKENED_TRAIT_POOL.firstOrNull { it.first == current.id }
+      val named = when {
+        knownTrait != null -> current.copy(name = knownTrait.second)
+        current.name.isBlank() || current.name == "Linh hồn bất khuất" -> {
+          val index = (heroId.hashCode() and Int.MAX_VALUE) % AWAKENED_TRAIT_POOL.size
+          val (traitId, traitName) = AWAKENED_TRAIT_POOL[index]
+          current.copy(id = traitId, name = traitName)
+        }
+        else -> current
       }
       return named.copy(unlocked = true)
     }
@@ -95,7 +97,8 @@ data class HeroData(
   val isLimping get() = currentHP.toLong() * 100L < maxHP.toLong() * 30L
   val isLowHpNearHouse get() = currentHP.toLong() * 100L < maxHP.toLong() * 40L
   val isCriticalReturnHp get() = currentHP > 0 && currentHP.toLong() * 100L < maxHP.toLong() * 15L
-  val isFrightened get() = morale < 25 || sanityState == HeroSanityState.PANICKED
+  val isFrightened get() = !(hiddenTrait.unlocked && hiddenTrait.id == "indomitable_will") &&
+    (morale < 25 || sanityState == HeroSanityState.PANICKED)
   val movementSpeed get() = speed * if (isLimping) .5f else 1f
 
   companion object {
@@ -111,18 +114,10 @@ data class HeroData(
       val hp = if (hero.currentHp < 0L) {
         if (hero.isCurrentlyInjured(nowEpochSec)) max / 4 else max
       } else hero.currentHp.coerceIn(0L, max.toLong()).toInt()
-      val elapsed = if (assignment == HeroAssignment.RESTING && hero.restStartedAtEpochSec > 0L)
-        (nowEpochSec - hero.restStartedAtEpochSec).coerceIn(0L, 86400L) else 0L
-      val healed = (hp + elapsed * max / 120L).coerceAtMost(max.toLong()).toInt()
-      val effectiveSanity = if (hero.name.contains("Han Ysl", ignoreCase = true) || hero.bondSummary.contains("SELF_AWARE")) {
-        HeroSanityState.SELF_AWARE
-      } else {
-        HeroSanityState.fromRaw(hero.sanityState)
-      }
       return HeroData(hero.id, hero.name, hero.rarity.coerceIn(1L, 5L).toInt(), hero.level.coerceIn(1L, 100L).toInt(),
-        healed, max, hero.attack.coerceIn(0L, 50000L).toInt(), hero.defense.coerceIn(0L, 50000L).toInt(),
-        hero.speed.coerceIn(1L, 500L).toInt(), hero.morale.coerceIn(0L, 100L).toInt(),
-        effectiveSanity, LobbyPersonality.fromRaw(hero.personality), assignment, hero.hiddenTrait)
+        hp, max, hero.totalAttack(emptyList()), hero.totalDefense(emptyList()),
+        hero.totalSpeed(emptyList()).coerceAtLeast(1), hero.morale.coerceIn(0L, 100L).toInt(),
+        hero.effectiveSanityState(), LobbyPersonality.fromRaw(hero.personality), assignment, hero.hiddenTrait)
     }
   }
 }
