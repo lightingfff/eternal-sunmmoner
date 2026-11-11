@@ -488,7 +488,7 @@ fun SquadPreparationScreen(
 
   val floor = state.selectedFloor
   val nowSec = System.currentTimeMillis() / 1000L
-  val activeSquad = state.heroes.filter { it.inActiveSquad && !it.isCurrentlyInjured(nowSec) }
+  val activeSquad = state.heroes.filter { it.inActiveSquad && !it.isCurrentlyInjured(nowSec) && com.example.data.model.HeroData.fromRecord(it).currentHP > 0 }
   val squadPower = activeSquad.sumOf { h ->
     h.totalAttack(state.equipment) * 3 + h.totalDefense(state.equipment) * 2 + h.totalMaxHp(state.equipment) / 4
   }

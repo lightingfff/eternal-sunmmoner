@@ -53,6 +53,8 @@ data class SummonerUiState(
   val isBusyAction: Boolean = false,
   val isGuestAccount: Boolean = false,
   val lobbySyncRevision: Long = 0L,
+  val expeditionAttemptId: String? = null,
+  val expeditionSquad: List<HeroRecord>? = null,
 )
 
 class SummonerViewModel(
@@ -60,6 +62,10 @@ class SummonerViewModel(
   private val currentUserId: String,
   preferredDisplayName: String,
 ) : ViewModel() {
+
+  private var launchSquad: List<HeroRecord>? = null
+  private var launchFloorNumber: Int? = null
+  private var launchAttemptId: String? = null
 
   private val _screenMode = MutableStateFlow(GameScreenMode.SANCTUARY_LOBBY)
   private val _selectedFloor = MutableStateFlow(TowerFloorCatalog.FLOORS.first())
@@ -112,6 +118,8 @@ class SummonerViewModel(
       isBusyAction = statusTriple.second,
       isGuestAccount = repository.isGuestMode,
       lobbySyncRevision = lobbyRevision,
+      expeditionAttemptId = launchAttemptId,
+      expeditionSquad = launchSquad,
     )
   }.stateIn(
     scope = viewModelScope,
@@ -170,19 +178,37 @@ class SummonerViewModel(
   }
 
   fun returnToSanctuaryLobby() {
+    if (_screenMode.value == GameScreenMode.TOWER_COMBAT &&
+      (_isBusyAction.value || _lastSettlement.value == null)) return
     _lastSettlement.value = null
     _activeFacilityModal.value = null
     _screenMode.value = GameScreenMode.SANCTUARY_LOBBY
   }
 
+  /** A replay starts from preparation so persisted injuries and paid care remain authoritative. */
+  fun retryTowerExpedition() {
+    if (_isBusyAction.value || _lastSettlement.value == null) return
+    _lastSettlement.value = null
+    _activeFacilityModal.value = null
+    _screenMode.value = GameScreenMode.SQUAD_PREPARATION
+  }
+
   fun launchTowerExpedition() {
+    // Guard the authoritative navigation state: uiState may lag a queued second tap.
+    if (_isBusyAction.value || _screenMode.value == GameScreenMode.TOWER_COMBAT) return
     val state = uiState.value
-    val activeHealthySquad = state.heroes.filter { it.inActiveSquad && !it.isCurrentlyInjured() }
+    val activeHealthySquad = state.heroes.filter {
+      it.inActiveSquad && !it.isCurrentlyInjured() && com.example.data.model.HeroData.fromRecord(it).currentHP > 0
+    }
     if (activeHealthySquad.isEmpty()) {
-      _bannerFeedback.value = "Đội hình trống hoặc đang bị thương! Hãy chọn ít nhất 1 Anh hùng khỏe mạnh."
+      _bannerFeedback.value = "Đội hình chưa thể xuất chinh. Mở Nhà → Điều dưỡng để trị thương, sau đó chọn Anh hùng còn HP."
       return
     }
+    launchSquad = activeHealthySquad.toList()
+    launchFloorNumber = state.selectedFloor.floorNumber
+    launchAttemptId = UUID.randomUUID().toString()
     _lastSettlement.value = null
+    _bannerFeedback.value = null
     _screenMode.value = GameScreenMode.TOWER_COMBAT
   }
 
@@ -499,7 +525,9 @@ class SummonerViewModel(
     val profile = state.profile ?: return
     if (_lastSettlement.value != null || _isBusyAction.value) return
 
-    val squad = state.heroes.filter { it.inActiveSquad && !it.isCurrentlyInjured() }
+    val squad = launchSquad ?: return
+    val attemptId = launchAttemptId ?: return
+    val floorNumber = launchFloorNumber ?: return
     _isBusyAction.value = true
     viewModelScope.launch {
       try {
@@ -507,7 +535,7 @@ class SummonerViewModel(
           profile = profile,
           squadHeroes = squad,
           fallenHeroIds = fallenHeroIds,
-          floorNumber = state.selectedFloor.floorNumber,
+          floorNumber = floorNumber,
           victory = victory,
           retreatUsed = retreatUsed,
           bonusGold = bonusGold,
@@ -516,6 +544,7 @@ class SummonerViewModel(
           courierOutcome = courierOutcome,
           courierMemoryHeroId = courierMemoryHeroId,
           remainingHeroHpRatios = remainingHeroHpRatios,
+          attemptId = attemptId,
         )
         _lastSettlement.value = result
       } catch (e: Exception) {

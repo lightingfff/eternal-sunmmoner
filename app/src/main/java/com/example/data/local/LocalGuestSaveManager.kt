@@ -2,6 +2,7 @@ package com.example.data.local
 
 import android.content.Context
 import android.util.Log
+import com.example.data.ExpeditionSettlementCodec
 import com.example.data.FeastBuffHelper
 import com.example.data.GameSettings
 import com.example.data.GuestSaveSnapshot
@@ -125,6 +126,7 @@ class LocalGuestSaveManager(context: Context) {
         ?: loadValidSnapshotFromDisk()
         ?: createStarterGuestSnapshot("Master")
       val transformed = transform(current)
+      if (transformed === current) return@synchronized current
       val nowSec = System.currentTimeMillis() / 1000L
       val next = transformed.copy(
         heroes = transformed.heroes.map { hero ->
@@ -443,6 +445,9 @@ class LocalGuestSaveManager(context: Context) {
     put("guestPlayerId", s.guestPlayerId)
     put("lastSavedEpochSec", s.lastSavedEpochSec)
     put("settings", serializeSettings(s.settings))
+    put("settledExpeditions", JSONObject().apply {
+      s.settledExpeditions.forEach { (id, result) -> put(id, ExpeditionSettlementCodec.encode(result)) }
+    })
 
     val p = s.profile
     put(
@@ -657,6 +662,12 @@ class LocalGuestSaveManager(context: Context) {
       heroes = heroes.map { com.example.data.LobbyHeroAssignments.checkAndUnlockHiddenTrait(it) },
       equipment = equipment,
       settings = settings,
+      settledExpeditions = root.optJSONObject("settledExpeditions")?.let { ledger ->
+        require(ledger.length() <= ExpeditionSettlementCodec.MAX_RECORDS)
+        ledger.keys().asSequence().associate { id ->
+          ExpeditionSettlementCodec.validateAttemptId(id) to ExpeditionSettlementCodec.decode(ledger.getString(id))
+        }
+      }.orEmpty(),
       lastSavedEpochSec = root.optLong("lastSavedEpochSec", System.currentTimeMillis() / 1000L),
     )
   }
@@ -1211,7 +1222,10 @@ class LocalGuestDataSource(
     courierOutcome: CourierOutcome?,
     courierMemoryHeroId: String?,
     remainingHeroHpRatios: Map<String, Float>,
+    attemptId: String?,
   ): ExpeditionSettlementResult {
+    attemptId?.let(ExpeditionSettlementCodec::validateAttemptId)
+    var settlement: ExpeditionSettlementResult? = null
     val nowSec = System.currentTimeMillis() / 1000L
     val hasAstralDock = SanctuaryProgressionHelper.isExpansionUnlocked(
       profile.storyFlags,
@@ -1233,8 +1247,8 @@ class LocalGuestDataSource(
       retreatUsed -> 18L + floorNumber * 5L
       else -> 10L
     }
-    val goldEarned = ((baseGold + bonusGold) * dockMult).toLong()
-    val manaEarned = ((baseMana + bonusMana) * dockMult).toLong()
+    var goldEarned = ((baseGold + bonusGold) * dockMult).toLong()
+    var manaEarned = ((baseMana + bonusMana) * dockMult).toLong()
     val shardsEarned = when {
       victory -> 15L + floorNumber * 8L
       retreatUsed -> 5L + floorNumber * 2L
@@ -1254,7 +1268,7 @@ class LocalGuestDataSource(
     val leveledNames = mutableListOf<String>()
     var lootedName: String? = null
     val escortOutcome = courierOutcome?.let {
-      if (floorNumber == 1 && victory && it == CourierOutcome.RESCUED) CourierOutcome.RESCUED else CourierOutcome.FAILED
+      if (floorNumber == 1 && victory && LostCourierProgression.isRescue(it)) it else CourierOutcome.FAILED
     }
     var courierForgeUnlocked = false
     var courierMemoryHeroName: String? = null
@@ -1266,7 +1280,14 @@ class LocalGuestDataSource(
     }
 
     saveManager.mutateSnapshot { snap ->
+      val existing = attemptId?.let { snap.settledExpeditions[it] }
+      if (existing != null) {
+        settlement = existing
+        return@mutateSnapshot snap
+      }
       val cur = snap.profile
+      goldEarned += LostCourierProgression.bonusGold(cur.storyFlags, escortOutcome)
+      manaEarned += LostCourierProgression.bonusMana(cur.storyFlags, escortOutcome)
       val totalMasterExp = cur.masterExp + masterExpGain
       val newMasterLevel = (1L + totalMasterExp / 250L).coerceAtMost(100L)
       val newHighestFloor = if (victory) maxOf(cur.highestClearedFloor, floorNumber.toLong()) else cur.highestClearedFloor
@@ -1360,7 +1381,28 @@ class LocalGuestDataSource(
         LostCourierProgression.outcomeFlags(cur.storyFlags, escortOutcome) + nodeFlags,
       )
 
+      settlement = ExpeditionSettlementResult(
+        victory = victory,
+        floorNumber = floorNumber,
+        goldEarned = goldEarned,
+        manaEarned = manaEarned,
+        shardsEarned = shardsEarned,
+        oreEarned = oreEarned,
+        essenceEarned = essenceEarned,
+        injuredHeroNames = injuredNames,
+        leveledUpHeroNames = leveledNames,
+        lootedItemName = lootedName,
+        outcomeType = outcomeType,
+        bonusDiscoveryGold = bonusGold,
+        bonusDiscoveryMana = bonusMana,
+        discoveredNodesCount = discoveredNodeIds.size,
+        courierOutcome = escortOutcome,
+        courierForgeUnlocked = courierForgeUnlocked,
+        courierMemoryHeroName = courierMemoryHeroName,
+      )
+
       snap.copy(
+        settledExpeditions = if (attemptId != null) ExpeditionSettlementCodec.append(snap.settledExpeditions, attemptId, checkNotNull(settlement)) else snap.settledExpeditions,
         profile = cur.copy(
           masterLevel = newMasterLevel,
           masterExp = totalMasterExp.coerceAtMost(10000000L),
@@ -1379,24 +1421,6 @@ class LocalGuestDataSource(
       )
     }
 
-    return ExpeditionSettlementResult(
-      victory = victory,
-      floorNumber = floorNumber,
-      goldEarned = goldEarned,
-      manaEarned = manaEarned,
-      shardsEarned = shardsEarned,
-      oreEarned = oreEarned,
-      essenceEarned = essenceEarned,
-      injuredHeroNames = injuredNames,
-      leveledUpHeroNames = leveledNames,
-      lootedItemName = lootedName,
-      outcomeType = outcomeType,
-      bonusDiscoveryGold = bonusGold,
-      bonusDiscoveryMana = bonusMana,
-      discoveredNodesCount = discoveredNodeIds.size,
-      courierOutcome = escortOutcome,
-      courierForgeUnlocked = courierForgeUnlocked,
-      courierMemoryHeroName = courierMemoryHeroName,
-    )
+    return checkNotNull(settlement)
   }
 }
