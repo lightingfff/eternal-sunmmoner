@@ -199,6 +199,22 @@ service cloud.firestore {
 
       allow delete: if false;
 
+      match /expeditionSettlements/{attemptId} {
+        // A missing receipt must be readable before an idempotent transaction creates it.
+        allow get: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+        allow list: if false;
+        allow create: if isSignedIn() && request.auth.uid == userId &&
+          isValidId(userId) &&
+          attemptId.matches('^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$') &&
+          incoming().keys().hasAll(['userId', 'attemptId', 'createdAt', 'resultJSON']) &&
+          incoming().keys().hasOnly(['userId', 'attemptId', 'createdAt', 'resultJSON']) &&
+          incoming().userId == userId && incoming().attemptId == attemptId &&
+          incoming().createdAt == request.time &&
+          incoming().resultJSON is string && incoming().resultJSON.size() > 0 &&
+          incoming().resultJSON.size() <= 8192;
+        allow update, delete: if false;
+      }
+
       match /heroes/{heroId} {
         allow get: if isSignedIn() &&
                       isValidId(userId) &&

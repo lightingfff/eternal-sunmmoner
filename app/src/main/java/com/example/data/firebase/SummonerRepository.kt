@@ -2,6 +2,7 @@ package com.example.data.firebase
 
 import android.content.Context
 import com.example.R
+import com.example.data.ExpeditionSettlementCodec
 import com.example.data.FeastBuffHelper
 import com.example.data.GuestSaveSnapshot
 import com.example.data.LostCourierProgression
@@ -1119,25 +1120,43 @@ class SummonerRepository(
     courierOutcome: CourierOutcome?,
     courierMemoryHeroId: String?,
     remainingHeroHpRatios: Map<String, Float>,
+    attemptId: String?,
   ): ExpeditionSettlementResult {
+    attemptId?.let(ExpeditionSettlementCodec::validateAttemptId)
     val uid = requireUserId()
     val userRef = db.collection("users").document(uid)
     val escortOutcome = courierOutcome?.let {
-      if (floorNumber == 1 && victory && it == CourierOutcome.RESCUED) CourierOutcome.RESCUED else CourierOutcome.FAILED
+      if (floorNumber == 1 && victory && LostCourierProgression.isRescue(it)) it else CourierOutcome.FAILED
     }
     try {
+      val receiptRef = attemptId?.let { userRef.collection("expeditionSettlements").document(it) }
       return db.runTransaction { transaction ->
+        // All reads precede writes. A retried transaction or save request reuses this receipt.
+        if (receiptRef != null) {
+          val receipt = transaction.get(receiptRef)
+          if (receipt.exists()) {
+            require(receipt.getString("userId") == uid && receipt.getString("attemptId") == attemptId)
+            return@runTransaction ExpeditionSettlementCodec.decode(requireNotNull(receipt.getString("resultJSON")))
+          }
+        }
         val currentProfile = transaction.get(userRef).toObject(MasterProfile::class.java)
           ?: error("Không tìm thấy tiến trình Master để lưu nhiệm vụ.")
         val currentHeroes = squadHeroes.mapNotNull { hero ->
           transaction.get(userRef.collection("heroes").document(hero.id)).toObject(HeroRecord::class.java)
         }
-        buildExpeditionSettlement(
+        val result = buildExpeditionSettlement(
           uid, currentProfile, currentHeroes, fallenHeroIds, floorNumber, victory, retreatUsed,
           bonusGold, bonusMana, discoveredNodeIds, escortOutcome, courierMemoryHeroId, remainingHeroHpRatios,
           updateDocument = { ref, fields -> transaction.update(ref, fields); Unit },
           setDocument = { ref, fields -> transaction.set(ref, fields); Unit },
         )
+        if (receiptRef != null) transaction.set(receiptRef, mapOf(
+          "userId" to uid,
+          "attemptId" to checkNotNull(attemptId),
+          "createdAt" to FieldValue.serverTimestamp(),
+          "resultJSON" to ExpeditionSettlementCodec.encode(result),
+        ))
+        result
       }.await()
     } catch (e: CancellationException) {
       throw e
@@ -1187,8 +1206,8 @@ class SummonerRepository(
       retreatUsed -> 18L + floorNumber * 5L
       else -> 10L
     }
-    val goldEarned = ((baseGold + bonusGold) * dockMult).toLong()
-    val manaEarned = ((baseMana + bonusMana) * dockMult).toLong()
+    val goldEarned = ((baseGold + bonusGold) * dockMult).toLong() + LostCourierProgression.bonusGold(profile.storyFlags, courierOutcome)
+    val manaEarned = ((baseMana + bonusMana) * dockMult).toLong() + LostCourierProgression.bonusMana(profile.storyFlags, courierOutcome)
     val shardsEarned = when {
       victory -> 15L + floorNumber * 8L
       retreatUsed -> 5L + floorNumber * 2L

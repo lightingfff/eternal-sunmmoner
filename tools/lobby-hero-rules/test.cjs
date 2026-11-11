@@ -3,7 +3,7 @@ const { readFileSync } = require('node:fs');
 const path = require('node:path');
 const req = createRequire(process.env.LOBBY_RULES_PACKAGE || path.join(__dirname, 'package.json'));
 const { initializeTestEnvironment, assertSucceeds, assertFails } = req('@firebase/rules-unit-testing');
-const { doc, setDoc, updateDoc, getDoc, collection, query, where, getDocs, runTransaction, writeBatch, increment, Timestamp } = req('firebase/firestore');
+const { doc, setDoc, updateDoc, getDoc, collection, query, where, getDocs, runTransaction, writeBatch, increment, serverTimestamp, deleteDoc, Timestamp } = req('firebase/firestore');
 const projectId = 'demo-eternal-lobby';
 const eventId = n => `00000000-0000-0000-0000-${String(n).padStart(12,'0')}`;
 const at = Timestamp.fromMillis(Date.now() - 2000);
@@ -20,6 +20,27 @@ const hero = {userId:'owner',name:'Kaelen',title:'Guard',heroClass:'KNIGHT',rari
       const seed=c.firestore(); await setDoc(doc(seed,'users/owner'),profile);
       for(let i=1;i<=5;i++) await setDoc(doc(seed,`users/owner/heroes/h${i}`),{...hero,inActiveSquad:i<5});
     });
+    const receiptId='12345678-1234-4123-8123-123456789abc';
+    const receiptRef=doc(db,`users/owner/expeditionSettlements/${receiptId}`);
+    const receipt={userId:'owner',attemptId:receiptId,createdAt:serverTimestamp(),resultJSON:'{"version":1}'};
+    await check('missing own settlement receipt readable',()=>assertSucceeds(getDoc(receiptRef)));
+    await check('valid settlement receipt created',()=>assertSucceeds(setDoc(receiptRef,receipt)));
+    await check('own settlement receipt replay readable',()=>assertSucceeds(getDoc(receiptRef)));
+    await check('receipt cannot be rewritten',()=>assertFails(setDoc(receiptRef,receipt)));
+    await check('receipt cannot be deleted',()=>assertFails(deleteDoc(receiptRef)));
+    await check('receipt collection cannot be listed',()=>assertFails(getDocs(collection(db,'users/owner/expeditionSettlements'))));
+    await check('cross-account receipt read denied',()=>assertFails(getDoc(doc(env.authenticatedContext('intruder').firestore(),receiptRef.path))));
+    await check('anonymous receipt read denied',()=>assertFails(getDoc(doc(env.unauthenticatedContext().firestore(),receiptRef.path))));
+    const badRef=doc(db,'users/owner/expeditionSettlements/12345678-1234-4123-8123-123456789abd');
+    for(const [name,data] of [
+      ['wrong receipt user',{...receipt,userId:'intruder'}],
+      ['wrong receipt id',receipt],
+      ['oversized receipt',{...receipt,attemptId:badRef.id,resultJSON:'x'.repeat(8193)}],
+      ['wrong receipt timestamp',{...receipt,attemptId:badRef.id,createdAt:at}],
+      ['extra receipt field',{...receipt,attemptId:badRef.id,extra:true}],
+      ['nonstring receipt',{...receipt,attemptId:badRef.id,resultJSON:1}],
+    ]) await check(name+' rejected',()=>assertFails(setDoc(badRef,data)));
+    await check('invalid receipt path rejected',()=>assertFails(setDoc(doc(db,'users/owner/expeditionSettlements/invalid'),{...receipt,attemptId:'invalid'})));
     await check('legacy own hero and constrained roster query readable', async()=> {
       await assertSucceeds(getDoc(doc(db,'users/owner/heroes/h1')));
       const result=await assertSucceeds(getDocs(query(collection(db,'users/owner/heroes'),where('userId','==','owner'))));
