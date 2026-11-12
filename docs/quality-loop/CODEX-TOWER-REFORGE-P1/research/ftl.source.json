@@ -1,0 +1,9 @@
+{
+  "requested_url": "https://subsetgames.com/ftl.html",
+  "retrieved_utc": "2026-11-12T13:54:36.638209+00:00",
+  "source_type": "official developer",
+  "default_sandbox_attempt": "URLError Operation not permitted",
+  "error_type": "HTTPError",
+  "error": "HTTP Error 403: Forbidden",
+  "status": 403
+}

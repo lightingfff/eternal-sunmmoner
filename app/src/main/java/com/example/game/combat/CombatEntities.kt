@@ -97,6 +97,8 @@ data class CombatProjectile(
   val radius: Float = 6f,
   var remainingLife: Float = 1.6f,
   val isAoEOnHit: Boolean = false,
+  val visual: ProjectileVisual = ProjectileVisual.BOLT,
+  val sourceId: String? = null,
 )
 
 data class CombatAoEEffect(
@@ -106,6 +108,8 @@ data class CombatAoEEffect(
   val color: Color,
   var elapsed: Float = 0f,
   val duration: Float = 0.55f,
+  val style: CombatFxStyle = CombatFxStyle.GROUND_RING,
+  val sourceId: String? = null,
 )
 
 data class FloatingCombatText(

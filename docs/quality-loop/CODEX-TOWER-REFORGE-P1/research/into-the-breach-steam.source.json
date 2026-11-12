@@ -1,0 +1,24 @@
+{
+  "requested_url": "https://store.steampowered.com/app/590380/Into_the_Breach/",
+  "retrieved_utc": "2026-11-12T13:55:14.961437+00:00",
+  "source_type": "developer/publisher Steam description",
+  "status": 200,
+  "final_url": "https://store.steampowered.com/app/590380/Into_the_Breach/",
+  "bytes": 139152,
+  "content_type": "text/html; charset=UTF-8",
+  "extract_file": "into-the-breach-steam.txt",
+  "verified_facts": [
+    "Developer/publisher listing identifies Subset Games.",
+    "About This Game states all enemy attacks are telegraphed in turn-based combat.",
+    "Civilian buildings power the mechs and must be defended; weapons and pilots can be found.",
+    "Defeat can lead to sending help back through time for another timeline."
+  ],
+  "relevant_extract_lines": [
+    295,
+    297,
+    298,
+    299,
+    300
+  ],
+  "interpretation_limit": "Descriptive source facts, not measured player enjoyment or retention. No user or critic review quoted as evidence."
+}

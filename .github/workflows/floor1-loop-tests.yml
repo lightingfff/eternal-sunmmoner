@@ -67,6 +67,18 @@ jobs:
         run: |
           mkdir -p app/build/floor1-test-results/living
           cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/living/
+      - name: Tower reforge controls, actual execution and native art
+        run: >-
+          gradle :app:testDebugUnitTest
+          --tests com.example.TowerEncounterFramingTest
+          --tests com.example.TowerTrustAndFeedbackTest
+          --tests com.example.TowerCombatArtEvidenceTest
+          --console=plain
+      - name: Retain Tower reforge results
+        if: always()
+        run: |
+          mkdir -p app/build/floor1-test-results/reforge
+          cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/reforge/
       - name: Physical UI input and retry regressions
         run: >-
           gradle :app:testDebugUnitTest
@@ -117,6 +129,7 @@ jobs:
           path: |
             app/build/visual_screenshots/floor1*
             app/build/visual_screenshots/living-expedition/
+            app/build/visual_screenshots/tower-reforge/
             app/build/visual_screenshots/p05/
             app/build/test-results/testDebugUnitTest/
             app/build/floor1-test-results/
