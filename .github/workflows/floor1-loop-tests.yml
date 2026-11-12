@@ -49,14 +49,28 @@ jobs:
           --tests com.example.data.ExpeditionSettlementLedgerTest
           --tests com.example.data.ExpeditionLaunchVmTest
           --console=plain
-      - name: Retain route test results
+      - name: Retain legacy route test results
         if: always()
         run: |
           mkdir -p app/build/floor1-test-results/routes
           cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/routes/
+      - name: Living expedition mechanics and actual alternate routes
+        run: >-
+          gradle :app:testDebugUnitTest
+          --tests com.example.LivingExpeditionPlaythroughTest
+          --tests com.example.LivingExpeditionMechanicsTest
+          --tests com.example.LivingExpeditionControlTest
+          --tests com.example.LivingNpcCombatTest
+          --console=plain
+      - name: Retain living expedition results
+        if: always()
+        run: |
+          mkdir -p app/build/floor1-test-results/living
+          cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/living/
       - name: Physical UI input and retry regressions
         run: >-
           gradle :app:testDebugUnitTest
+          --tests com.example.ui.LivingExpeditionUiTest
           --tests com.example.ui.Floor1InputOwnershipTest
           --tests com.example.ui.Floor1SettlementRecoveryUiTest
           --tests com.example.RescueTacticalCommandsTest
@@ -70,6 +84,17 @@ jobs:
         run: |
           mkdir -p app/build/floor1-test-results/ui
           cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/ui/
+      - name: Original escort world and narrow-screen compatibility
+        run: >-
+          gradle :app:testDebugUnitTest
+          --tests com.example.LostCourierVisualTest
+          --tests 'com.example.ui.LayoutResponsivenessRobolectricTest.*tower battle HUD*'
+          --console=plain
+      - name: Retain world compatibility results
+        if: always()
+        run: |
+          mkdir -p app/build/floor1-test-results/world
+          cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/world/
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -91,6 +116,8 @@ jobs:
           name: floor1-playthrough-${{ github.event.pull_request.head.sha || github.sha }}
           path: |
             app/build/visual_screenshots/floor1*
+            app/build/visual_screenshots/living-expedition/
+            app/build/visual_screenshots/p05/
             app/build/test-results/testDebugUnitTest/
             app/build/floor1-test-results/
           if-no-files-found: warn

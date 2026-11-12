@@ -19,6 +19,7 @@ import kotlin.math.roundToInt
 import kotlin.random.Random
 
 private const val COURIER_TARGET_ID = "__lost_courier__"
+private const val WITNESS_TARGET_ID = ExpeditionWitness.TARGET_ID
 
 enum class MissionStage {
   INTRO_DIALOGUE,
@@ -37,6 +38,7 @@ class TowerCombatEngine(
   enableLostCourier: Boolean = false,
   private val random: Random = Random.Default,
   enableRescueJourney: Boolean = false,
+  enableLivingExploration: Boolean = false,
 ) {
   val mapLayout: GeneratedMapLayout = TowerFloorCatalog.buildTowerFloorMap(floorSpec)
   private val criticalHitChanceByHeroId = squadRecords.associate { it.id to it.criticalHitChance.coerceIn(0f, 1f) }
@@ -175,7 +177,7 @@ class TowerCombatEngine(
   val aoeEffects: MutableList<CombatAoEEffect> = mutableListOf()
   val floatingTexts: MutableList<FloatingCombatText> = mutableListOf()
   val lostCourier: LostCourierEncounter? = if (enableLostCourier && floorSpec.floorNumber == 1) {
-    LostCourierEncounter(this, squadRecords, enableRescueJourney)
+    LostCourierEncounter(this, squadRecords, enableRescueJourney, enableLivingExploration)
   } else null
 
   init {
@@ -189,7 +191,7 @@ class TowerCombatEngine(
       }
     }
 
-    mapLayout.obstacles.forEach { obs ->
+    mapLayout.obstacles.takeIf { lostCourier?.livingExpedition == null }.orEmpty().forEach { obs ->
       when (obs.id) {
         "f1_discovery_chest_north" -> discoveryNodes += BattleDiscoveryNode(
           id = "f1_chest_north",
@@ -260,7 +262,7 @@ class TowerCombatEngine(
     discoveryNodes.any { it.obstacleId == obstacleId && it.discovered }
 
   fun discoveredNodeIds(): Set<String> =
-    discoveryNodes.filter { it.discovered }.map { it.id }.toSet() + lostCourier?.journey?.completedIds.orEmpty()
+    discoveryNodes.filter { it.discovered }.map { it.id }.toSet() + lostCourier?.journey?.completedIds.orEmpty() + lostCourier?.livingExpedition?.completedIds.orEmpty()
 
   private fun claimDiscovery(node: BattleDiscoveryNode) {
     if (node.discovered) return
@@ -331,7 +333,34 @@ class TowerCombatEngine(
     }
   }
 
+  private var preservingExplorationOrder = false
+
+  fun resumeLivingExploration(siteId: String? = null): Boolean {
+    val expedition = lostCourier?.livingExpedition ?: return false
+    if (stage != MissionStage.IN_PROGRESS || !expedition.explore(siteId)) return false
+    issueExplorationOrder()
+    return true
+  }
+
+  fun chooseLivingExpedition(optionId: String): Boolean {
+    val expedition = lostCourier?.livingExpedition ?: return false
+    if (stage != MissionStage.IN_PROGRESS) return false
+    if (!expedition.choose(optionId)) {
+      postFeedback("Lựa chọn chưa thể thực hiện. Đưa Anh hùng tới hiện trường hoặc tiếp tục việc đang làm.")
+      return false
+    }
+    issueExplorationOrder()
+    return true
+  }
+
+  private fun issueExplorationOrder() {
+    preservingExplorationOrder = true
+    try { issueTacticalOrder(TacticalOrder.PROTECT_ALLY) }
+    finally { preservingExplorationOrder = false }
+  }
+
   fun issueTacticalOrder(order: TacticalOrder) {
+    if (!preservingExplorationOrder) lostCourier?.livingExpedition?.suspendAutomation()
     supplyNavigation = emptyList()
     // A cancelled retreat must calculate a fresh route if ordered again later.
     if (order != TacticalOrder.RETREAT && activeOrder == TacticalOrder.RETREAT) {
@@ -375,7 +404,8 @@ class TowerCombatEngine(
 
       TacticalOrder.RETREAT -> {
         if (journeyRetreatWaypoints.isEmpty()) {
-          journeyRetreatWaypoints = lostCourier?.journey?.takeIf { it.active }?.retreatWaypoints().orEmpty()
+          journeyRetreatWaypoints = lostCourier?.livingExpedition?.takeIf { it.active }?.retreatWaypoints()
+            ?: lostCourier?.journey?.takeIf { it.active }?.retreatWaypoints().orEmpty()
           journeyRetreatIndex = 0
         }
         awaitingMoveToTap = false
@@ -405,7 +435,11 @@ class TowerCombatEngine(
     }
   }
 
+  private val revealedEnemyIds = hashSetOf<String>()
+  fun isEnemyRevealed(enemy: EnemyCombatUnit): Boolean = lostCourier?.livingExpedition == null || enemy.id in revealedEnemyIds
+
   fun onBattlefieldTapped(worldX: Float, worldY: Float) {
+    lostCourier?.livingExpedition?.suspendAutomation()
     supplyNavigation = emptyList()
     // 1. If explicitly awaiting a Move-To tap, always place the Move-To tactical beacon!
     if (awaitingMoveToTap) {
@@ -446,7 +480,7 @@ class TowerCombatEngine(
 
     // 3. Check if player tapped on a living enemy to select/focus target!
     val tappedEnemy = enemies
-      .filter { !it.dead && hypot(it.x - worldX, it.y - worldY) <= 58f * it.archetype.scale }
+      .filter { !it.dead && isEnemyRevealed(it) && hypot(it.x - worldX, it.y - worldY) <= 58f * it.archetype.scale }
       .minByOrNull { hypot(it.x - worldX, it.y - worldY) }
 
     if (tappedEnemy != null) {
@@ -638,16 +672,23 @@ class TowerCombatEngine(
     }
     // 3. Step Autonomous Squad Heroes
     heroes.forEach { hero ->
+      val expeditionDirective = lostCourier?.livingExpedition?.takeIf {
+        it.active && it.automationEnabled && activeOrder != TacticalOrder.RETREAT
+      }?.directiveFor(hero)
+      val explorationTarget = expeditionDirective?.destination
+      val formationOffset = if (explorationTarget != null) AutonomousHeroAi.formationSlotAround(0f, 0f, hero) else null
+      val exactBeacon = if (explorationTarget != null && formationOffset != null)
+        (explorationTarget.first-formationOffset.first) to (explorationTarget.second-formationOffset.second) else moveBeacon
       AutonomousHeroAi.updateHeroUnit(
         hero = hero,
         dt = dt,
         allHeroes = heroes,
         enemies = enemies,
-        masterX = commandX,
-        masterY = commandY,
-        order = activeOrder,
+        masterX = explorationTarget?.first ?: commandX,
+        masterY = explorationTarget?.second ?: commandY,
+        order = expeditionDirective?.order ?: activeOrder,
         designatedTargetId = designatedTargetId,
-        moveBeacon = moveBeacon,
+        moveBeacon = exactBeacon,
         mapLayout = mapLayout,
         spawnProjectile = { projectile ->
           projectiles += projectile.copy(damage = rollHeroAttackDamage(hero.id, projectile.damage))
@@ -657,14 +698,21 @@ class TowerCombatEngine(
         dealDamageToEnemy = { enemy, rawDmg, isSkill ->
           applyDamageToEnemy(enemy, rollHeroAttackDamage(hero.id, rawDmg), isSkill)
         },
-        protectedAllyPosition = lostCourier?.let { mission ->
+        protectedAllyPosition = explorationTarget ?: lostCourier?.let { mission ->
           mission.journey?.takeIf { it.active }?.let { it.targetX to it.targetY }
             ?: (mission.courier.x to mission.courier.y)
         },
       )
+      if (expeditionDirective != null && !hero.knockedOut) hero.aiIntentLabelVi = expeditionDirective.intentVi
       if (hero.fearSecondsRemaining > 0f) hero.aiIntentLabelVi = "Lo sợ • -20% sát thương / -15% tốc độ"
     }
 
+    if (lostCourier?.livingExpedition != null) {
+      enemies.forEach { enemy ->
+        if (enemy.id !in revealedEnemyIds && heroes.any { !it.knockedOut && hypot(it.x-enemy.x,it.y-enemy.y) <= 480f })
+          revealedEnemyIds += enemy.id
+      }
+    }
     // 4. Step Differentiated Enemy AI & Defeat Collapse Animation
     // A scout call can append reinforcements. Visit only the roster present at tick start.
     val enemyCountAtTickStart = enemies.size
@@ -708,7 +756,10 @@ class TowerCombatEngine(
         if (hitHero != null) {
           applyDamageToHero(hitHero, proj.damage)
           projIter.remove()
-        } else if (lostCourier != null && hypot(lostCourier.courier.x - proj.x, lostCourier.courier.y - proj.y) <= 24f) {
+        } else if (livingWitness()?.let { hypot(it.x-proj.x,it.y-proj.y) <= 24f } == true) {
+          lostCourier?.livingExpedition?.damageWitness(proj.damage)
+          projIter.remove()
+        } else if (lostCourier != null && lostCourier.livingExpedition?.active != true && hypot(lostCourier.courier.x - proj.x, lostCourier.courier.y - proj.y) <= 24f) {
           lostCourier.damageCourier(proj.damage)
           projIter.remove()
         }
@@ -753,6 +804,8 @@ class TowerCombatEngine(
     }
   }
 
+  private fun livingWitness(): ExpeditionWitness? = lostCourier?.livingExpedition?.witness?.takeIf { it.alive && !it.rescued }
+
   private fun updateEnemyAi(enemy: EnemyCombatUnit, dt: Float) {
     enemy.attackCooldown = (enemy.attackCooldown - dt).coerceAtLeast(0f)
     enemy.attackAnim = (enemy.attackAnim - dt * 2.6f).coerceAtLeast(0f)
@@ -769,6 +822,11 @@ class TowerCombatEngine(
             if (hypot(mission.courier.x-enemy.x,mission.courier.y-enemy.y) <= enemy.archetype.attackRange+12f)
               mission.damageCourier(enemy.pendingAttackDamage)
           }
+        } else if (targetId == WITNESS_TARGET_ID) {
+          livingWitness()?.let { witness ->
+            if (hypot(witness.x-enemy.x,witness.y-enemy.y) <= enemy.archetype.attackRange+12f)
+              lostCourier?.livingExpedition?.damageWitness(enemy.pendingAttackDamage)
+          }
         } else if (targetId != null) {
           val hero = heroes.firstOrNull { it.id == targetId && !it.knockedOut }
           if (hero != null && hypot(hero.x-enemy.x,hero.y-enemy.y) <= enemy.archetype.attackRange+12f)
@@ -779,13 +837,23 @@ class TowerCombatEngine(
       return
     }
 
-    data class PotentialTarget(val x: Float, val y: Float, val hero: HeroCombatUnit?, val courier: Boolean = false)
+    data class PotentialTarget(val x: Float, val y: Float, val hero: HeroCombatUnit?, val npcId: String? = null)
 
     val livingHeroes = heroes.filter { !it.knockedOut }
     val potentials = buildList {
       livingHeroes.forEach { add(PotentialTarget(it.x, it.y, it)) }
       val mission = lostCourier
-      if (mission != null) add(PotentialTarget(mission.courier.x, mission.courier.y, null, courier = true))
+      if (mission != null && mission.livingExpedition?.active != true)
+        add(PotentialTarget(mission.courier.x, mission.courier.y, null, COURIER_TARGET_ID))
+      livingWitness()?.let { witness ->
+        // A nearby guardian draws melee attackers away from the vulnerable witness.
+        // Projectiles still collide with actual field actors, so positioning continues to matter.
+        val guardian = livingHeroes.firstOrNull {
+          (it.heroClass == HeroClassType.KNIGHT || livingHeroes.size == 1) &&
+            hypot(it.x-witness.x,it.y-witness.y) <= 145f
+        }
+        if (guardian == null || enemy.archetype.isRanged) add(PotentialTarget(witness.x, witness.y, null, WITNESS_TARGET_ID))
+      }
     }
 
     // Differentiated Archetype Target Priority:
@@ -795,6 +863,7 @@ class TowerCombatEngine(
       val d = hypot(p.x - enemy.x, p.y - enemy.y)
       val h = p.hero
       when {
+        p.npcId == WITNESS_TARGET_ID && enemy.id.startsWith("expedition_south_") -> d * .45f
         enemy.archetype == EnemyArchetype.DIRE_WOLF && h != null -> {
           val isBackline = h.heroClass == HeroClassType.ARCHER ||
             h.heroClass == HeroClassType.MAGE ||
@@ -904,7 +973,7 @@ class TowerCombatEngine(
           )
         } else {
           if (enemy.archetype == EnemyArchetype.FIELD_GOBLIN_RAIDER) {
-            enemy.contactAttack.start(if (nearest.courier) COURIER_TARGET_ID else nearest.hero?.id)
+            enemy.contactAttack.start(nearest.npcId ?: nearest.hero?.id)
             enemy.pendingAttackDamage = effectiveAttack
             return
           }
@@ -913,8 +982,10 @@ class TowerCombatEngine(
           }
           if (nearest.hero != null) {
             applyDamageToHero(nearest.hero, effectiveAttack)
-          } else if (nearest.courier) {
+          } else if (nearest.npcId == COURIER_TARGET_ID) {
             lostCourier?.damageCourier(effectiveAttack)
+          } else if (nearest.npcId == WITNESS_TARGET_ID) {
+            lostCourier?.livingExpedition?.damageWitness(effectiveAttack)
           }
         }
       }

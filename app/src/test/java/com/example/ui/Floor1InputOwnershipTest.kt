@@ -83,30 +83,21 @@ class Floor1InputOwnershipTest {
     start(SummonerUiState(isBootstrapping = false, profile = initial.profile,
       selectedFloor = TowerFloorCatalog.FLOORS.first(), heroes = initial.heroes,
       equipment = initial.equipment))
-    rule.onNodeWithTag("rescue_journey_follow").performTouchInput { click() }
-    rule.mainClock.advanceTimeBy(6_000L)
-    // A real starter party must clear the path guards. Allow their last attack
-    // contact to finish rather than bypassing actors or injecting encounter flags.
-    repeat(3) {
-      if (rule.onAllNodesWithTag("rescue_field_interact").fetchSemanticsNodes().isEmpty()) {
-        rule.mainClock.advanceTimeBy(2_000L)
+    rule.onNodeWithTag("living_lead_north").performTouchInput { click() }
+    var pending=false
+    repeat(30) {
+      if (!pending) {
+        rule.mainClock.advanceTimeBy(1_000L)
+        pending=rule.onAllNodesWithTag("living_decision_north_scout").fetchSemanticsNodes().isNotEmpty()
       }
     }
-    capture("05_watchpost_field_action")
-    rule.onNodeWithTag("rescue_field_interact").assertIsEnabled().performTouchInput { click() }
-    rule.mainClock.advanceTimeBy(64L)
-    rule.onNodeWithTag("rescue_journey_interact").assertIsEnabled().performTouchInput { click() }
-    rule.mainClock.advanceTimeBy(64L)
-    rule.onNodeWithText("Thu hồi bản đồ ở rương Bắc", substring = true).assertExists()
-    rule.onNodeWithTag("rescue_journey_follow").performTouchInput { click() }
-    rule.mainClock.advanceTimeBy(15_000L)
-    capture("06_lookout_live_fieldwork")
-    val top = rule.onNodeWithTag("tower_battle_top_hud").fetchSemanticsNode().boundsInRoot
-    val joystick = rule.onNodeWithTag("virtual_joystick").fetchSemanticsNode().boundsInRoot
-    assertTrue("Fieldwork actions must leave an exposed world area", top.bottom + 32f < joystick.top)
-    rule.onNodeWithTag("rescue_journey_objective").assertIsDisplayed()
-    rule.onNodeWithTag("rescue_journey_follow").assertIsDisplayed()
-    rule.onNodeWithText("Thu hồi bản đồ ở rương Bắc", substring = true).assertExists()
+    assertTrue("Actual starter party must discover a northern choice",pending)
+    capture("06_living_north_decision")
+    val top=rule.onNodeWithTag("tower_battle_top_hud").fetchSemanticsNode().boundsInRoot
+    val joystick=rule.onNodeWithTag("virtual_joystick").fetchSemanticsNode().boundsInRoot
+    assertTrue("Exploration must leave the real world visible",top.bottom+96f<joystick.top)
+    rule.onNodeWithTag("living_decision_north_scout").assertIsEnabled()
+    rule.onNodeWithTag("living_decision_north_assault").assertIsEnabled()
   }
 
   private fun verifyInputOwnership() {
@@ -114,9 +105,9 @@ class Floor1InputOwnershipTest {
     val top = rule.onNodeWithTag("tower_battle_top_hud").fetchSemanticsNode().boundsInRoot
     val joystick = rule.onNodeWithTag("virtual_joystick").fetchSemanticsNode().boundsInRoot
     assertTrue("Objective HUD must leave an exposed world area above controls", top.bottom + 32f < joystick.top)
-    rule.onNodeWithTag("rescue_journey_objective").assertIsDisplayed()
-    rule.onNodeWithTag("rescue_journey_follow").assertIsDisplayed()
-    rule.onNodeWithTag("rescue_journey_interact").assertIsDisplayed()
+    rule.onNodeWithTag("living_expedition_objective").assertIsDisplayed()
+    rule.onNodeWithTag("living_resume").assertIsDisplayed()
+    rule.onNodeWithTag("living_lead_north").assertIsDisplayed()
     capture("01_objective")
     val clockBefore = rule.mainClock.currentTime
     rule.onNodeWithTag("order_hold_position").performTouchInput { click() }
@@ -152,7 +143,7 @@ class Floor1InputOwnershipTest {
       if (bounds.height <= 400f) "landscape_short" else "landscape"
     } else "portrait"
     val output = File("build/visual_screenshots/floor1/${orientation}_$moment")
-    val tags = listOf("tower_battle_top_hud", "rescue_journey_hud", "rescue_journey_follow",
+    val tags = listOf("tower_battle_top_hud", "living_expedition_hud", "living_resume",
       "rescue_journey_interact", "rescue_field_interact", "rescue_field_travel", "virtual_joystick", "order_hold_position", "retreat_mission_button")
     val rows = tags.mapNotNull { tag ->
       val node = rule.onAllNodesWithTag(tag).fetchSemanticsNodes().firstOrNull() ?: return@mapNotNull null

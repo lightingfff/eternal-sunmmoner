@@ -20,6 +20,8 @@ import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.onNodeWithText
@@ -280,13 +282,33 @@ class LostCourierVisualTest {
     compose.mainClock.advanceTimeByFrame()
     compose.waitForIdle()
     if (advanceToScout) {
-      compose.mainClock.advanceTimeBy(20_500L)
-      compose.waitForIdle()
-      saveView(host!!, name)
-      compose.onNodeWithText("Trinh sát gọi viện sau", substring = true).assertExists()
+      fun chooseAfterTravel(tag:String) {
+        var reached=false
+        repeat(90) {
+          if (!reached) {
+            compose.mainClock.advanceTimeBy(1_000L)
+            reached=compose.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty()
+          }
+        }
+        assertTrue("Actual explorers must reach $tag before escort",reached)
+        compose.onNodeWithTag(tag).performClick()
+        compose.mainClock.advanceTimeBy(64L)
+      }
+      chooseAfterTravel("living_decision_north_scout")
+      chooseAfterTravel("living_decision_south_medicine")
+      chooseAfterTravel("living_decision_evacuate")
+      var scoutVisible=false
+      repeat(90) {
+        if (!scoutVisible) {
+          compose.mainClock.advanceTimeBy(500L)
+          scoutVisible=compose.onAllNodesWithText("Trinh sát gọi viện sau",substring=true).fetchSemanticsNodes().isNotEmpty()
+        }
+      }
+      saveView(host!!,name)
+      assertTrue("The original scout warning must follow actual exploration and evacuation",scoutVisible)
       compose.onNodeWithTag("courier_intercept_order").assertIsEnabled()
     }
-    val mission = compose.onNodeWithTag("courier_mission_hud").fetchSemanticsNode().boundsInRoot
+    val mission = compose.onNodeWithTag(if(advanceToScout) "courier_mission_hud" else "living_expedition_hud").fetchSemanticsNode().boundsInRoot
     val command = compose.onNodeWithTag("order_follow").fetchSemanticsNode().boundsInRoot
     assertTrue("Mission HUD must leave battlefield space above the command strip", command.top - mission.bottom >= 60f)
     saveView(host!!, name)
