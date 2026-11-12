@@ -1,0 +1,102 @@
+{
+  "source_url": "https://github.com/0x0funky/agent-sprite-forge",
+  "source_commit": "6b3da5c444363378e20f3fce130ebecc22f343dd",
+  "license": "MIT Copyright(c)2026 0x0funky",
+  "installed_skills": [
+    "codeart2d",
+    "generate2dmap",
+    "generate2dmedia",
+    "generate2dsprite",
+    "video2dsprite"
+  ],
+  "upstream_files": 171,
+  "upstream_hash_check": "in-sync",
+  "python_syntax_parsed": 83,
+  "json_parsed": 24,
+  "host_tools_declared": [
+    "image_gen",
+    "image_edit"
+  ],
+  "offline_doctor_overall": "OK",
+  "optional_missing_or_unverified": [
+    {
+      "id": "deps.resvg-py",
+      "status": "MISSING",
+      "detail": "not installed; needed for codeart2d SVG rendering (PixelSpec needs only numpy and Pillow)",
+      "remedy": "\"/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python\" -m pip install \"resvg-py>=0.5,<0.6\""
+    },
+    {
+      "id": "ffmpeg",
+      "status": "UNKNOWN",
+      "detail": "found on PATH; version not read (--no-exec)"
+    },
+    {
+      "id": "media.api.openai",
+      "status": "MISSING",
+      "detail": "OPENAI_API_KEY is not configured",
+      "remedy": "optional: set OPENAI_API_KEY in the environment or in the user config file to make the OpenAI API an image route (GPT Image)"
+    },
+    {
+      "id": "media.api.gemini",
+      "status": "MISSING",
+      "detail": "GOOGLE_API_KEY or GEMINI_API_KEY is not configured",
+      "remedy": "optional: set GOOGLE_API_KEY or GEMINI_API_KEY in the environment or in the user config file to make the Google Gemini API an image route (Gemini image models)"
+    },
+    {
+      "id": "media.api.xai",
+      "status": "MISSING",
+      "detail": "XAI_API_KEY is not configured",
+      "remedy": "optional: set XAI_API_KEY in the environment or in the user config file to make the xAI API an image and video route (Grok Imagine)"
+    },
+    {
+      "id": "media.api.byteplus",
+      "status": "MISSING",
+      "detail": "ARK_API_KEY is not configured",
+      "remedy": "optional: set ARK_API_KEY in the environment or in the user config file to make the BytePlus ModelArk API an image and video route (Seedream, Seedance)"
+    },
+    {
+      "id": "media.api.fal",
+      "status": "MISSING",
+      "detail": "FAL_KEY is not configured",
+      "remedy": "optional: set FAL_KEY in the environment or in the user config file to make the fal.ai API a reference-edit and video route (Kling, Veo, Luma, MiniMax, Wan, Vidu, LTX)"
+    },
+    {
+      "id": "cli.grok",
+      "status": "MISSING",
+      "detail": "Grok Build CLI not found on PATH or in $GROK_HOME/bin",
+      "remedy": "optional: install the Grok Build CLI and sign in, then verify a route"
+    },
+    {
+      "id": "route.codex-cli:image_gen",
+      "status": "UNKNOWN",
+      "detail": "PRESENT: no proof for this version",
+      "remedy": "nothing to do: the route's first successful route_media.py run records the proof; to verify ahead of time (one quota call; repeat after a CLI update): python \"<skill-dir>/scripts/forge_doctor.py\" --verify-route codex-cli --execute"
+    }
+  ],
+  "asset_smoke_test": {
+    "command": "python .agents/skills/generate2dsprite/scripts/sheet_qc.py spill --input app/src/main/assets/tower_combat_v1/raider.png --rows 1 --cols 12 --output-dir build/forge-skill-check/raider-spill --safe-margin 0.05",
+    "status": "pass",
+    "limitations": "Spill-only smoke check on the already shipped normalized atlas, not new art or complete animation quality. Safe margin explicitly5%, not upstreamdefault15%. No original game asset modified."
+  },
+  "generated_media": false,
+  "remote_media_requests": false,
+  "runtime_changes": false,
+  "apk_rebuild_required": false,
+  "upstream_whitespace_notes": [
+    {
+      "path": ".agents/skills/codeart2d/scripts/forge_schema.py",
+      "line": 526,
+      "message": "new blank line at EOF (upstream bytes retained for hash fidelity)"
+    },
+    {
+      "path": ".agents/skills/generate2dmap/scripts/forge_schema.py",
+      "line": 526,
+      "message": "new blank line at EOF (upstream bytes retained for hash fidelity)"
+    },
+    {
+      "path": ".agents/skills/video2dsprite/scripts/forge_schema.py",
+      "line": 526,
+      "message": "new blank line at EOF (upstream bytes retained for hash fidelity)"
+    }
+  ]
+}
