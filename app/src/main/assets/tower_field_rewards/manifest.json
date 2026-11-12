@@ -1,0 +1,87 @@
+{
+  "art_source": "host_image",
+  "source_file": "source-icons.png",
+  "source_sha256": "2c56a38abfa3836127d1c375acc769120fbd366d23b9211c6178304decec5e38",
+  "provider": "session image_gen",
+  "model": "not exposed by tool",
+  "cost": "not reported by tool",
+  "source_dimensions": [
+    1254,
+    1254
+  ],
+  "source_grid": [
+    2,
+    2
+  ],
+  "forge_source_commit": "6b3da5c444363378e20f3fce130ebecc22f343dd",
+  "processor": "generate2dsprite.py process",
+  "processor_args": "--target asset --mode sheet --rows 2 --cols 2 --background-mode native_alpha --cell-size 64 --anchor-mode center --align center --fit-scale 0.85 --component-mode all --resampler lanczos --strict-qc",
+  "notes": "Static UI icons, not character frames. Independent fit scale is intentional. No animation, collision or world anchors changed. Source alpha hygiene removes only alpha<=7 haze/specks; no largest-component filtering. Downsampled illustration, not claimed hand-authored 1px grid.",
+  "runtime_total_decoded_bytes": 65536,
+  "icons": [
+    {
+      "id": "readiness",
+      "path": "tower_field_rewards/readiness.png",
+      "size": [
+        64,
+        64
+      ],
+      "rgba_bytes": 16384,
+      "sha256": "9b72adc47a4125126b9f133407c5e82428b893c64aabbd418bb6668e1ab2ebba",
+      "alpha_bbox": [
+        5,
+        6,
+        60,
+        59
+      ]
+    },
+    {
+      "id": "ward",
+      "path": "tower_field_rewards/ward.png",
+      "size": [
+        64,
+        64
+      ],
+      "rgba_bytes": 16384,
+      "sha256": "66b2b63ec56eea99f4f85a1b560d8e8c42efcb0a7075daff571bc55116ed7589",
+      "alpha_bbox": [
+        8,
+        5,
+        56,
+        59
+      ]
+    },
+    {
+      "id": "healing",
+      "path": "tower_field_rewards/healing.png",
+      "size": [
+        64,
+        64
+      ],
+      "rgba_bytes": 16384,
+      "sha256": "9b1e6e6c1f85cac66b74af7cabe5c05b0651e6fa49d83dbeb9c1afa70f9114e3",
+      "alpha_bbox": [
+        5,
+        7,
+        59,
+        56
+      ]
+    },
+    {
+      "id": "valuables",
+      "path": "tower_field_rewards/valuables.png",
+      "size": [
+        64,
+        64
+      ],
+      "rgba_bytes": 16384,
+      "sha256": "5fcd3dbfd4be24dbd5454569f472af9ab3868a6409bb2ffb0b15817a028dde4c",
+      "alpha_bbox": [
+        5,
+        10,
+        59,
+        54
+      ]
+    }
+  ]
+}
