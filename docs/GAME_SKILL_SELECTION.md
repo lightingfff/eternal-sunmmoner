@@ -55,3 +55,26 @@ Xem từng tên và phân loại trong [CATALOG.md](skill-library/scenario/CATAL
 Kotlin/Compose hiện có.” Sprite work kết hợp thêm `ai-game-spritesheets` đã lưu trước đó.
 Chỉ đọc nguồn liên quan. Giữ license và nguồn gốc khi tái sử dụng; không cần dịch vụ trả
 phí để đọc hướng dẫn. Các file này là bộ nhớ trong repository, không phải huấn luyện mô hình.
+
+## Thư viện gameplay và systems bổ sung (2026-11-13)
+
+[gamedev-agent-skills adapter](../.agents/skills/gamedev-agent-skills/SKILL.md) bổ sung
+[79 skill chuyên môn và router](skill-library/gamedev-agent-skills/CATALOG.md), nguồn
+gamedev-skills/awesome-gamedev-agent-skills, Apache-2.0, commit
+`c6ca6c41c839b68319ffc08430b99ab768debc32`. Đã đọc 10 entrypoint phù hợp; phần còn lại
+được lập danh mục và lưu nguyên bản để đọc theo nhiệm vụ, không nạp toàn bộ cùng lúc.
+
+| Việc | Chọn hướng dẫn |
+|---|---|
+| Tower ít khám phá, nhánh không có hệ quả | `level-design`: đồ thị đường đi/gate, nhịp căng-nghỉ, teach/develop/twist/test |
+| Phần thưởng và ván tiếp theo thiếu hấp dẫn | `roguelike` hoặc `rpg`: lựa chọn có đánh đổi, mở thêm cách chơi, seeded content/loot, progression kiểm chứng bằng bảng số |
+| Đòn đánh/skill thiếu lực | `game-feel` kết hợp pipeline sprite đã có: anticipation/contact/recovery, VFX theo hit thật, giảm shake/flash |
+| Hero/quái thiếu chủ động | `game-ai`; thêm `ai-behavior-trees-utility-ai` khi cần: perception/intent/path/steer, hysteresis, abort, cooldown |
+| Tap/drag/UI xung đột | `input-systems` + `game-ui-ux`: action một lần, modal priority, safe area và touch target |
+| Save/retry/nhận thưởng lặp | `save-systems`: schema/migration, dữ liệu thật, atomic update, idempotency và khôi phục |
+| FPS/stutter/bộ nhớ | `performance-optimization`: đo bottleneck, cache/cull, frame-time percentiles trên cùng cảnh/máy |
+
+Áp dụng nguyên tắc bằng Kotlin/Compose và camera .72. Không chuyển engine, xóa save theo
+ví dụ permadeath, thay công thức combat, gọi dịch vụ hoặc báo số FPS chỉ vì upstream gợi ý.
+Tài liệu không chứng minh game đã vui hơn; cần gameplay thật, kiểm thử đúng phạm vi và
+review độc lập trên SHA khi triển khai. Library này bổ trợ các skill art đã lưu.
