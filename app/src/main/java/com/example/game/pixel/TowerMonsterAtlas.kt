@@ -132,4 +132,3 @@ internal object TowerMonsterAtlas {
     return frames[clip.index(elapsed)]
   }
 }
-

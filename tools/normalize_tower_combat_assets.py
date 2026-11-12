@@ -154,4 +154,3 @@ if __name__ == "__main__":
     normalize(a.source,a.output,a.evidence)
     if a.vfx_source:
         normalize_vfx(a.vfx_source,a.output,a.evidence)
-

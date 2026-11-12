@@ -169,4 +169,3 @@ internal object TowerCombatVfxRenderer {
     }
   }
 }
-

@@ -34,4 +34,3 @@ internal object TowerEncounterFraming {
     return Bounds(left,top,right,bottom)
   }
 }
-

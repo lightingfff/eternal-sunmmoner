@@ -69,4 +69,3 @@ internal object TowerCombatFxAtlas {
     return pack[row][(progress.coerceIn(0f,.99999f)*8).toInt()]
   }
 }
-

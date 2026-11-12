@@ -144,4 +144,3 @@ class TowerTrustAndFeedbackTest {
       engine.floatingTexts.any { it.text.startsWith("-") })
   }
 }
-

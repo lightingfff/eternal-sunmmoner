@@ -17,4 +17,3 @@ enum class CombatFxStyle {
   }
 }
 enum class ProjectileVisual { BOLT, ARROW, ARCANE, HOLY, HOSTILE_ARROW }
-

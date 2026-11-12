@@ -54,4 +54,3 @@ class TowerEncounterFramingTest {
     assertEquals(engine.heroes.single().x,TowerEncounterFraming.bounds(engine)!!.right,0f)
   }
 }
-
