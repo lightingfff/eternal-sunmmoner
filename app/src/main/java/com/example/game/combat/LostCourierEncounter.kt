@@ -196,7 +196,7 @@ class LostCourierEncounter internal constructor(
       }
       phase = CourierPhase.GATE_GUARD
       engine.eventWaveTriggeredForCourier()
-      statusVi = "Kraag chắn cổng! ĐIỂM ĐẾN để né vòng đỏ (1,5s), rồi DỒN HỎA LỰC khi hắn hồi sức: +35% sát thương."
+      statusVi = "Kraag chắn cổng! DI CHUYỂN rồi chạm ngoài vòng đỏ (1,5s); DỒN HỎA LỰC khi hắn hồi sức: +35% sát thương."
       engine.postFeedback(statusVi)
     }
   }
@@ -270,7 +270,8 @@ class LostCourierEncounter internal constructor(
         }
         if (hypot(courier.x - warning.x, courier.y - warning.y) <= warning.radius) damageCourier(48)
         engine.aoeEffects += CombatAoEEffect(warning.x, warning.y, warning.radius,
-          androidx.compose.ui.graphics.Color(0xFFEF4444), duration = 0.35f)
+          androidx.compose.ui.graphics.Color(0xFFEF4444), duration = 0.35f,
+          style = CombatFxStyle.SLAM, sourceId = enemy.id)
         eliteTelegraph = null
         eliteRecoveryRemaining = 1.8f
         enemy.attackCooldown = 4.5f
@@ -288,7 +289,7 @@ class LostCourierEncounter internal constructor(
       enemy.aggroed = true
       if (enemy.attackCooldown <= 0f) {
         eliteTelegraph = CourierTelegraph(tx, ty)
-        engine.postFeedback("VÒNG ĐỎ: 1,5s! Dùng ĐIỂM ĐẾN né, rồi DỒN HỎA LỰC phản công.")
+        engine.postFeedback("VÒNG ĐỎ: DI CHUYỂN → chạm ngoài vòng! DỒN HỎA LỰC lúc Kraag hồi sức.")
       }
     }
   }

@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "file": "vfx.png",
+  "sha256": "b8e97139e0283e7ce62eca59e0572f3339bff77bdaa6ab95b303c451d33941f7",
+  "source_sha256": "07b0a657c4b12a17389a979e63af31829f0a3745df0c34eab866112ac330b5d5",
+  "frame": [
+    96,
+    96
+  ],
+  "pivot": [
+    48,
+    84
+  ],
+  "columns": 8,
+  "rows": [
+    "guard",
+    "arcane",
+    "cleave",
+    "holy"
+  ],
+  "source_scale": 0.4,
+  "rgba_bytes": 1179648,
+  "styles": [
+    {
+      "style": "guard",
+      "unique_frames": 8
+    },
+    {
+      "style": "arcane",
+      "unique_frames": 8
+    },
+    {
+      "style": "cleave",
+      "unique_frames": 8
+    },
+    {
+      "style": "holy",
+      "unique_frames": 8
+    }
+  ]
+}

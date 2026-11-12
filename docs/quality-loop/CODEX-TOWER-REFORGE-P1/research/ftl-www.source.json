@@ -1,0 +1,9 @@
+{
+  "requested_url": "https://www.subsetgames.com/ftl.html",
+  "retrieved_utc": "2026-11-12T13:55:14.960880+00:00",
+  "source_type": "official developer",
+  "error_type": "HTTPError",
+  "error": "HTTP Error 403: Forbidden",
+  "status": 403,
+  "error_body_excerpt": "<!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><meta http-equiv=\"X-UA-Compatible\" content=\"IE=Edge\"><meta name=\"robots\" content=\"noindex,nofollow\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta http-equiv=\"content-security-policy\" content=\"default-src &#39;none&#39;; script-src &#39;nonce-WfeH7SLAaVN1BMl4k6mHle&#39; &#39;unsafe-eval&#39; https://challenges.cloudflare.com; script-src-attr &#39;none&#39;; style-src &#39;unsafe-inline&#39;; img-src &#39;self&#39; https://challenges.cloudflare.com; connect-src &#39;self&#39; https://challenges.cloudflare.com; frame-src &#39;self&#39; https://challenges.cloudflare.com blob:; child-src &#39;self&#39; https://challenges.cloudflare."
+}

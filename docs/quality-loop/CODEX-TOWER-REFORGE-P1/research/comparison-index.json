@@ -1,0 +1,52 @@
+{
+  "research_scope": "Owner requested comparative gameplay research, no production edits or build",
+  "sources": [
+    "despots-game-steam.source.json",
+    "ftl-steam.source.json",
+    "ftl-www.source.json",
+    "ftl.source.json",
+    "hades-faq.source.json",
+    "hades.source.json",
+    "into-the-breach-steam.source.json",
+    "into-the-breach-www.source.json",
+    "into-the-breach.source.json",
+    "pick-me-up-tapas.source.json"
+  ],
+  "proposed_design_lessons": [
+    {
+      "lesson": "Make Master interventions intelligible and accessible before the danger resolves.",
+      "sources": [
+        "into-the-breach-steam",
+        "ftl-steam",
+        "despots-game-steam"
+      ],
+      "proposal": "Show target, danger footprint and protected NPC consequence; keep Move/Protect/Focus visible. Teach first dodge safely. Consider an optional tactical pause or first-encounter planning beat only if owner accepts it; do not silently migrate to turn-based combat.",
+      "acceptance": "A fresh portrait user identifies the threatened hero/NPC and uses a visible movement response; inspection preserves autonomy."
+    },
+    {
+      "lesson": "Give each route a useful benefit with a different cost, then make the autonomous party visibly enact it.",
+      "sources": [
+        "ftl-steam",
+        "despots-game-steam"
+      ],
+      "proposal": "Scout trades split-party exposure for alarm removal; assault must offer a tangible faster/valuable opportunity, rather than simply more enemies. Rescue, medicine and supplies should create distinct next encounters and tangible equipment/support choices.",
+      "acceptance": "Two approaches remain defensible in different roster/HP/resource states, with outcome differences demonstrated through production commands."
+    },
+    {
+      "lesson": "Make a failed rescue and a successful rescue each create a reason to return.",
+      "sources": [
+        "hades-faq",
+        "into-the-breach-steam",
+        "pick-me-up-tapas"
+      ],
+      "proposal": "Use original hero memories of witnessed decisions, show one useful retained discovery and one concrete next-run preparation. Present loot comparisons/equip and explicit recovery requirements. Keep canonical injury rules unless separately approved.",
+      "acceptance": "After result/restart player can name a changed relationship or useful capability and a different intended next-run choice."
+    }
+  ],
+  "existing_pick_me_up_research": {
+    "path": "/workspace/pickmeup-research/PICK_ME_UP_WIKI_VI.md",
+    "read": true,
+    "fresh_verification": false,
+    "limits": "Previously compiled NamuWiki community summaries and publisher source. Previously inaccessible Fandom pages remain unverified. Do not treat game-specific numerical formulas as manhwa canon."
+  }
+}

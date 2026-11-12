@@ -439,10 +439,9 @@ class TowerCombatEngine(
   fun isEnemyRevealed(enemy: EnemyCombatUnit): Boolean = lostCourier?.livingExpedition == null || enemy.id in revealedEnemyIds
 
   fun onBattlefieldTapped(worldX: Float, worldY: Float) {
-    lostCourier?.livingExpedition?.suspendAutomation()
-    supplyNavigation = emptyList()
     // 1. If explicitly awaiting a Move-To tap, always place the Move-To tactical beacon!
     if (awaitingMoveToTap) {
+      claimManualNavigation()
       val clamped = CollisionPhysics.resolvePosition(
         targetX = worldX,
         targetY = worldY,
@@ -465,6 +464,7 @@ class TowerCombatEngine(
       !it.discovered && hypot(it.x - worldX, it.y - worldY) <= 74f
     }
     if (tappedDiscovery != null) {
+      claimManualNavigation()
       val squadClose = hypot(masterX - tappedDiscovery.x, masterY - tappedDiscovery.y) <= 260f ||
         heroes.any { !it.knockedOut && hypot(it.x - tappedDiscovery.x, it.y - tappedDiscovery.y) <= 260f }
       if (squadClose) {
@@ -483,7 +483,20 @@ class TowerCombatEngine(
       .filter { !it.dead && isEnemyRevealed(it) && hypot(it.x - worldX, it.y - worldY) <= 58f * it.archetype.scale }
       .minByOrNull { hypot(it.x - worldX, it.y - worldY) }
 
+    // In melee both hit circles can overlap. The nearer actor owns the tap, so
+    // inspecting an ally never silently becomes a command to an adjacent enemy.
+    val tappedHero = heroes
+      .filter { !it.knockedOut && hypot(it.x - worldX, it.y - worldY) <= 48f }
+      .minByOrNull { hypot(it.x - worldX, it.y - worldY) }
+    if (tappedHero != null && (tappedEnemy == null ||
+        hypot(tappedHero.x-worldX,tappedHero.y-worldY) <= hypot(tappedEnemy.x-worldX,tappedEnemy.y-worldY))) {
+      selectedHeroId = tappedHero.id
+      postFeedback("${tappedHero.name}: ${tappedHero.aiIntentLabelVi} (HP ${tappedHero.hp}/${tappedHero.maxHp})")
+      return
+    }
+
     if (tappedEnemy != null) {
+      claimManualNavigation()
       designatedTargetId = tappedEnemy.id
       if (activeOrder != TacticalOrder.FOCUS_FIRE) {
         activeOrder = TacticalOrder.ATTACK_TARGET
@@ -499,18 +512,9 @@ class TowerCombatEngine(
       return
     }
 
-    // 4. Check if player tapped on an allied Hero to inspect live AI intent
-    val tappedHero = heroes
-      .filter { !it.knockedOut && hypot(it.x - worldX, it.y - worldY) <= 48f }
-      .minByOrNull { hypot(it.x - worldX, it.y - worldY) }
-    if (tappedHero != null) {
-      selectedHeroId = tappedHero.id
-      postFeedback("${tappedHero.name}: ${tappedHero.aiIntentLabelVi} (HP ${tappedHero.hp}/${tappedHero.maxHp})")
-      return
-    }
-
     // 5. Otherwise update Move-To tactical beacon if currently in MOVE_TO mode
     if (activeOrder == TacticalOrder.MOVE_TO) {
+      claimManualNavigation()
       val clamped = CollisionPhysics.resolvePosition(
         targetX = worldX,
         targetY = worldY,
@@ -524,6 +528,12 @@ class TowerCombatEngine(
       aoeEffects += CombatAoEEffect(clamped.first, clamped.second, 55f, Color(0xFFF5B841))
       postFeedback("Đã cập nhật tọa độ cờ điều quân!")
     }
+  }
+
+  /** Inspection never takes steering ownership. Only a command-producing tap does. */
+  private fun claimManualNavigation() {
+    lostCourier?.livingExpedition?.suspendAutomation()
+    supplyNavigation = emptyList()
   }
 
   fun triggerHeroManualSkill(heroId: String) {
@@ -691,12 +701,18 @@ class TowerCombatEngine(
         moveBeacon = exactBeacon,
         mapLayout = mapLayout,
         spawnProjectile = { projectile ->
-          projectiles += projectile.copy(damage = rollHeroAttackDamage(hero.id, projectile.damage))
+          projectiles += projectile.copy(damage = rollHeroAttackDamage(hero.id, projectile.damage),
+            sourceId = hero.id, visual = when(hero.heroClass) {
+              HeroClassType.ARCHER -> ProjectileVisual.ARROW
+              HeroClassType.MAGE -> ProjectileVisual.ARCANE
+              HeroClassType.PRIEST -> ProjectileVisual.HOLY
+              else -> ProjectileVisual.BOLT
+            })
         },
-        spawnAoE = { aoeEffects += it },
+        spawnAoE = { aoeEffects += it.copy(style = CombatFxStyle.skill(hero.heroClass), sourceId = hero.id) },
         spawnText = { floatingTexts += it },
         dealDamageToEnemy = { enemy, rawDmg, isSkill ->
-          applyDamageToEnemy(enemy, rollHeroAttackDamage(hero.id, rawDmg), isSkill)
+          applyDamageToEnemy(enemy, rollHeroAttackDamage(hero.id, rawDmg), isSkill, hero.id)
         },
         protectedAllyPosition = explorationTarget ?: lostCourier?.let { mission ->
           mission.journey?.takeIf { it.active }?.let { it.targetX to it.targetY }
@@ -741,12 +757,13 @@ class TowerCombatEngine(
         val hitEnemy = enemies.firstOrNull { !it.dead && hypot(it.x - proj.x, it.y - proj.y) <= 28f * it.archetype.scale }
         if (hitEnemy != null) {
           if (proj.isAoEOnHit) {
-            aoeEffects += CombatAoEEffect(hitEnemy.x, hitEnemy.y, 70f, proj.color)
+            aoeEffects += CombatAoEEffect(hitEnemy.x, hitEnemy.y, 70f, proj.color,
+              style = CombatFxStyle.ARCANE, sourceId = proj.sourceId)
             enemies.filter { !it.dead && hypot(it.x - hitEnemy.x, it.y - hitEnemy.y) <= 72f }.forEach { e ->
-              applyDamageToEnemy(e, (proj.damage * 0.85f).toInt(), false)
+              applyDamageToEnemy(e, (proj.damage * 0.85f).toInt(), false, proj.sourceId)
             }
           } else {
-            applyDamageToEnemy(hitEnemy, proj.damage, false)
+            applyDamageToEnemy(hitEnemy, proj.damage, false, proj.sourceId)
           }
           projIter.remove()
         }
@@ -773,6 +790,8 @@ class TowerCombatEngine(
       fx.elapsed += dt
       if (fx.elapsed >= fx.duration) aoeIter.remove()
     }
+    // Presentation has a strict bound even when many actors hit on one simulation tick.
+    while (aoeEffects.size > 64) aoeEffects.removeAt(0)
 
     val txtIter = floatingTexts.iterator()
     while (txtIter.hasNext()) {
@@ -937,6 +956,8 @@ class TowerCombatEngine(
           vy = (dy / dist) * 300f,
           damage = effectiveAttack,
           color = Color(enemy.archetype.accentColor),
+          sourceId = enemy.id,
+          visual = if (enemy.archetype == EnemyArchetype.FIELD_GOBLIN_ARCHER) ProjectileVisual.HOSTILE_ARROW else ProjectileVisual.BOLT,
         )
       }
       return
@@ -970,6 +991,8 @@ class TowerCombatEngine(
             vy = (dy / dist) * 300f,
             damage = effectiveAttack,
             color = Color(enemy.archetype.accentColor),
+          sourceId = enemy.id,
+          visual = if (enemy.archetype == EnemyArchetype.FIELD_GOBLIN_ARCHER) ProjectileVisual.HOSTILE_ARROW else ProjectileVisual.BOLT,
           )
         } else {
           if (enemy.archetype == EnemyArchetype.FIELD_GOBLIN_RAIDER) {
@@ -998,7 +1021,7 @@ class TowerCombatEngine(
     return (rawDamage.toLong() * 3L / 2L).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
   }
 
-  private fun applyDamageToEnemy(enemy: EnemyCombatUnit, rawDmg: Int, isSkill: Boolean) {
+  private fun applyDamageToEnemy(enemy: EnemyCombatUnit, rawDmg: Int, isSkill: Boolean, sourceId: String? = null) {
     if (enemy.dead) return
     enemy.aggroed = true
     val variance = 0.92f + random.nextFloat() * 0.16f
@@ -1008,7 +1031,8 @@ class TowerCombatEngine(
     val mitigated = ((rawDmg * variance * counterMult).toInt() - enemy.defense / 2).coerceAtLeast(6)
     enemy.hp = (enemy.hp - mitigated).coerceAtLeast(0)
     enemy.hurtFlash = 1f
-    aoeEffects += CombatAoEEffect(enemy.x, enemy.y - 12f, if (isSkill) 36f else 22f, Color(0xFFFEF08A), duration = 0.25f)
+    aoeEffects += CombatAoEEffect(enemy.x, enemy.y - 12f, if (isSkill) 36f else 22f,
+      Color(0xFFFEF08A), duration = 0.25f, style = CombatFxStyle.IMPACT, sourceId = sourceId)
     floatingTexts += FloatingCombatText(
       x = enemy.x + Random.nextFloat() * 18f - 9f,
       y = enemy.y - 36f,
@@ -1032,6 +1056,8 @@ class TowerCombatEngine(
       val absorbed = minOf(hero.shieldHp, mitigated)
       hero.shieldHp -= absorbed
       mitigated -= absorbed
+      if (absorbed > 0) aoeEffects += CombatAoEEffect(hero.x, hero.y, 32f, Color(0xFF7DD3FC),
+        duration = .22f, style = CombatFxStyle.SHIELD_IMPACT, sourceId = hero.id)
     }
     hero.hp = (hero.hp - mitigated).coerceAtLeast(0)
     hero.hurtFlash = 1f

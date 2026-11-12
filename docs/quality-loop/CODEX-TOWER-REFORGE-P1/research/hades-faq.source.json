@@ -1,0 +1,24 @@
+{
+  "requested_url": "https://www.supergiantgames.com/blog/hades-faq/",
+  "retrieved_utc": "2026-11-12T13:55:14.962609+00:00",
+  "source_type": "official developer",
+  "status": 200,
+  "final_url": "https://www.supergiantgames.com/blog/hades-faq/",
+  "bytes": 119277,
+  "content_type": "text/html; charset=UTF-8",
+  "extract_file": "hades-faq.txt",
+  "verified_facts": [
+    "Developer FAQ describes permanent progression and configurable difficulty, including optional God Mode.",
+    "Developer FAQ describes story interactions with characters who remember the player across attempts.",
+    "Developer FAQ describes varying challenges and combinations of Olympian powers between runs."
+  ],
+  "relevant_extract_lines": [
+    17,
+    19,
+    41,
+    44,
+    57,
+    58
+  ],
+  "interpretation_limit": "Descriptive source facts, not measured player enjoyment or retention. No user or critic review quoted as evidence."
+}

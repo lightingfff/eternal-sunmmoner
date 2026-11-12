@@ -1,0 +1,22 @@
+{
+  "requested_url": "https://store.steampowered.com/app/1227280/Despots_Game_Dystopian_Battle_Simulator/",
+  "retrieved_utc": "2026-11-12T13:55:14.963055+00:00",
+  "source_type": "developer/publisher Steam description",
+  "status": 200,
+  "final_url": "https://store.steampowered.com/app/1227280/Despots_Game_Dystopian_Battle_Simulator/",
+  "bytes": 175719,
+  "content_type": "text/html; charset=UTF-8",
+  "extract_file": "despots-game-steam.txt",
+  "verified_facts": [
+    "Listing identifies developer Konfa Games and publisher tinyBuild.",
+    "About This Game says the player prepares warriors who fight on their own.",
+    "Equipment, perks and class combinations support different army builds.",
+    "The description says dungeons are generated again for each attempt."
+  ],
+  "relevant_extract_lines": [
+    244,
+    248,
+    250
+  ],
+  "interpretation_limit": "Descriptive source facts, not measured player enjoyment or retention. No user or critic review quoted as evidence."
+}

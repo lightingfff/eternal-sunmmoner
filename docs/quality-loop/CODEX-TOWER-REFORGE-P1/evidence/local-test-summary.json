@@ -1,0 +1,39 @@
+{
+  "scope": "distinct local JUnit cases across retained source-verification batches; CI exact commit results reported separately",
+  "distinct_cases": 92,
+  "failures_errors_skips": [],
+  "batches": {
+    "verified-gameplay": 54,
+    "verified-final-native": 16,
+    "verified-world": 11,
+    "verified-framing-art": 21,
+    "verified-framing-edge": 4
+  },
+  "classes": [
+    "com.example.CourierSupplyDiversionTest",
+    "com.example.Floor1RuntimeBudgetTest",
+    "com.example.HeroAgencyTest",
+    "com.example.LivingExpeditionControlTest",
+    "com.example.LivingExpeditionMechanicsTest",
+    "com.example.LivingExpeditionPlaythroughTest",
+    "com.example.LivingNpcCombatTest",
+    "com.example.LostCourierVisualTest",
+    "com.example.RescueEnemyTargetingTest",
+    "com.example.RescueJourneyFieldworkTest",
+    "com.example.RescueJourneyStarterPartyTest",
+    "com.example.RescueTacticalCommandsTest",
+    "com.example.TowerCombatArtEvidenceTest",
+    "com.example.TowerEncounterFramingTest",
+    "com.example.TowerTrustAndFeedbackTest",
+    "com.example.data.ExpeditionLaunchVmTest",
+    "com.example.data.ExpeditionSettlementLedgerTest",
+    "com.example.ui.Floor1InputOwnershipTest",
+    "com.example.ui.Floor1SettlementRecoveryUiTest",
+    "com.example.ui.HeroAgencyAlertUiTest",
+    "com.example.ui.LayoutResponsivenessRobolectricTest",
+    "com.example.ui.LivingExpeditionUiTest",
+    "com.example.ui.RescueRetryFlowTest"
+  ],
+  "physical_device": false,
+  "human_five_minute_playtest": false
+}

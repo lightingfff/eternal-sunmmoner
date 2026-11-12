@@ -98,7 +98,6 @@ import com.example.game.map.ObliqueCamera
 import com.example.game.map.PropKind
 import com.example.game.map.WorldObstacle
 import com.example.game.pixel.PixelSpriteRenderer.drawCharacterSprite
-import com.example.game.pixel.PixelSpriteRenderer.drawEnemySprite
 import com.example.game.pixel.PixelSpriteRenderer.drawForegroundAtmosphere
 import com.example.game.pixel.PixelSpriteRenderer.drawProp
 import com.example.game.pixel.PixelSpriteRenderer.drawActorCanopyOcclusion
@@ -282,13 +281,21 @@ fun TowerBattleScreen(
       com.example.game.story.DialogueBeat("Người đưa tin", "Người đưa tin thất lạc", "Bị thương", com.example.data.model.HeroClassType.PRIEST,
         "Tôi chờ ở trại. Phía Bắc có dấu lính gác, phía Nam có tiếng kêu, còn phía Đông là cổng đá lạ. Xin tìm hiểu hai nơi để biết đường thoát."),
       com.example.game.story.DialogueBeat("Kaelen", "Khiên thép tiền phong", "Cảnh giác", com.example.data.model.HeroClassType.KNIGHT,
-        "Để chúng tôi tự dò đường và chia việc. Khi gặp điều nguy hiểm, chúng tôi sẽ báo Master. Ngài có thể đổi hướng, ra lệnh chiến thuật hoặc rút lui bất cứ lúc nào.")
+        "Chúng tôi tự dò đường và chia việc. Muốn né nguy hiểm: bấm Di chuyển, rồi chạm vị trí trên mặt đất. Lệnh của ngài được giữ cho tới khi bấm Tự thám hiểm. Chạm nhân vật chỉ để xem, không ngắt khám phá.")
     ) else ManhwaStoryData.floorIntroBeats(state.selectedFloor.floorNumber)
   }
   var introIndex by remember(combatEngine) { mutableIntStateOf(0) }
   var showRetreatConfirm by remember(combatEngine) { mutableStateOf(false) }
   var settlementDispatched by remember(combatEngine) { mutableStateOf(false) }
   var introDismissed by remember(combatEngine) { mutableStateOf(false) }
+
+  val artContext = androidx.compose.ui.platform.LocalContext.current.applicationContext
+  LaunchedEffect(artContext, state.selectedFloor.floorNumber) {
+    if (state.selectedFloor.floorNumber == 1) kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+      com.example.game.pixel.TowerMonsterAtlas.preload(artContext)
+      com.example.game.pixel.TowerCombatFxAtlas.preload(artContext)
+    }
+  }
 
   val textMeasurer = rememberTextMeasurer()
   val focusRequester = remember { FocusRequester() }
@@ -433,13 +440,10 @@ fun TowerBattleScreen(
     val framingMinimumWorldHeight=with(framingDensity) { 96.dp.toPx() }
     fun explorationZoom(viewportW:Float,viewportH:Float):Float {
       if (!frameExploringParty || combatEngine.lostCourier?.livingExpedition?.active != true) return zoom
-      val standing=combatEngine.heroes.filter { !it.knockedOut }
-      if (standing.isEmpty()) return zoom
-      val spanX=standing.maxOf { it.x }-standing.minOf { it.x }
-      val spanY=standing.maxOf { it.y }-standing.minOf { it.y }
+      val bounds=com.example.ui.components.TowerEncounterFraming.bounds(combatEngine) ?: return zoom
       val worldHeight=(viewportH-topHudHeightPx-framingBottomPadding).coerceAtLeast(framingMinimumWorldHeight)
-      return minOf(zoom,(viewportW-framingSidePadding)/(spanX+180f),
-        worldHeight/(spanY*ObliqueCamera.OBLIQUE_Y_SCALE+180f)).coerceAtLeast(.45f)
+      return minOf(zoom,(viewportW-framingSidePadding)/(bounds.width+180f),
+        worldHeight/(bounds.height*ObliqueCamera.OBLIQUE_Y_SCALE+180f)).coerceAtLeast(.45f)
     }
 
     fun computeBattleCam(viewportHalfW: Float, viewportHalfH: Float, projectionZoom:Float=zoom): Pair<Float, Float> {
@@ -462,9 +466,10 @@ fun TowerBattleScreen(
         focusY = if (living > 0) mission.courier.y * courierWeight + squadY / living * (1f-courierWeight) else mission.courier.y
         if (living > 0 && mission.livingExpedition?.active == true) {
           // Split investigators need equal framing; a centroid favors a stationary pair over its scout.
-          val standing=combatEngine.heroes.filter { !it.knockedOut }
-          focusX=(standing.minOf { it.x }+standing.maxOf { it.x })*.5f
-          focusY=(standing.minOf { it.y }+standing.maxOf { it.y })*.5f
+          com.example.ui.components.TowerEncounterFraming.bounds(combatEngine,frameExploringParty)?.let { bounds ->
+            focusX=bounds.centerX
+            focusY=bounds.centerY
+          }
         }
       }
       val cx = ObliqueCamera.clampCamX(
@@ -540,24 +545,8 @@ fun TowerBattleScreen(
         paths = layout.paths,
       )
 
-      // Foreshortened 3/4 Elliptical Ground AoE Spells, Shockwaves & Heal Rings
-      combatEngine.aoeEffects.forEach { fx ->
-        val progress = (fx.elapsed / fx.duration).coerceIn(0f, 1f)
-        val sx = ObliqueCamera.worldToScreenX(fx.x, camX, zoom, halfW)
-        val sy = ObliqueCamera.worldToScreenY(fx.y, camY, zoom, halfH)
-        val rx = fx.maxRadius * (0.35f + 0.65f * progress) * zoom
-        val ry = rx * ObliqueCamera.GROUND_ELLIPSE_RATIO
-        drawOval(
-          color = fx.color.copy(alpha = (1f - progress) * 0.35f),
-          topLeft = Offset(sx - rx, sy - ry),
-          size = Size(rx * 2f, ry * 2f),
-        )
-        drawOval(
-          color = fx.color.copy(alpha = (1f - progress) * 0.9f),
-          topLeft = Offset(sx - rx, sy - ry),
-          size = Size(rx * 2f, ry * 2f),
-          style = Stroke(width = 3f * zoom),
-        )
+      with(com.example.game.pixel.TowerCombatVfxRenderer) {
+        combatEngine.aoeEffects.forEach { drawExecutionFx(it,camX,camY,zoom,foreground=false) }
       }
 
       // Foreshortened 3/4 Tactical Move-To Flag Beacon
@@ -702,7 +691,7 @@ fun TowerBattleScreen(
               isInjuredResting = false,
               timeSec = animTimeSec,
               heroName = h.name,
-              skillAnimation = h.premiumSample && h.contactAttack.skill,
+              skillAnimation = h.premiumSample && h.contactAttack.active && h.contactAttack.skill,
               emotion = when {
                 combatEngine.stage == MissionStage.VICTORY -> "victory"
                 h.fearSecondsRemaining > 0f || combatEngine.activeOrder == TacticalOrder.RETREAT || h.hp < h.maxHp*.25f -> "fear"
@@ -714,45 +703,22 @@ fun TowerBattleScreen(
           }
           is BattleDrawable.Enemy -> {
             val e = item.unit
-            drawEnemySprite(
-              worldX = e.x,
-              worldY = e.y,
-              camX = camX,
-              camY = camY,
-              zoom = zoom,
-              archetype = e.archetype,
-              facingRight = e.facingRight,
-              isMoving = e.isMoving,
-              attackAnimProgress = e.attackAnim,
-              hurtFlash = e.hurtFlash,
-              hpFraction = e.hp.toFloat() / e.maxHp.coerceAtLeast(1),
-              isTargetMarked = !e.dead && combatEngine.designatedTargetId == e.id,
-              timeSec = animTimeSec,
-              deathAnimProgress = if (e.dead) e.deathAnimProgress else 0f,
-            )
+            with(com.example.game.pixel.TowerMonsterRenderer) {
+              val mission = combatEngine.lostCourier
+              drawTowerMonster(e,camX,camY,zoom,animTimeSec,
+                marked = !e.dead && combatEngine.designatedTargetId == e.id,
+                authored = combatEngine.floorSpec.floorNumber == 1,
+                charging = mission?.eliteEnemyId == e.id && mission.eliteTelegraph != null,
+                recovering = mission?.eliteEnemyId == e.id && mission.eliteRecoveryRemaining > 0f)
+            }
             drawActorCanopyOcclusion(layout.obstacles,e.x,e.y,camX,camY,zoom,animTimeSec)
           }
         }
       }
 
-      // Walk-behind upper forest canopy occlusion pass
-      // 3/4 Elevated Projectiles (flying at torso height above ground shadow)
-      combatEngine.projectiles.forEach { p ->
-        val px = ObliqueCamera.worldToScreenX(p.x, camX, zoom, halfW)
-        val py = ObliqueCamera.worldToScreenY(p.y, camY, zoom, halfH, elevationZ = 28f)
-        val tailX = ObliqueCamera.worldToScreenX(p.x - p.vx * 0.045f, camX, zoom, halfW)
-        val tailY = ObliqueCamera.worldToScreenY(p.y - p.vy * 0.045f, camY, zoom, halfH, elevationZ = 28f)
-        drawLine(
-          color = p.color.copy(alpha = 0.55f),
-          start = Offset(tailX, tailY),
-          end = Offset(px, py),
-          strokeWidth = (p.radius * 1.4f) * zoom,
-        )
-        drawCircle(
-          color = p.color,
-          radius = p.radius * zoom,
-          center = Offset(px, py),
-        )
+      with(com.example.game.pixel.TowerCombatVfxRenderer) {
+        combatEngine.projectiles.forEach { drawCombatProjectile(it,camX,camY,zoom) }
+        combatEngine.aoeEffects.forEach { drawExecutionFx(it,camX,camY,zoom,foreground=true) }
       }
 
       // Overhead 3/4 Hero Labels + Live Observable AI Intent Tag & Boss Nameplate (Exact Rect non-overlap!)
@@ -1196,7 +1162,7 @@ fun TowerBattleScreen(
             modifier = Modifier.align(Alignment.CenterHorizontally),
           ) {
             Text(
-              text = "📍 Chạm lên bản đồ để cắm cờ điều quân!",
+              text = "Di chuyển: chạm vị trí trên mặt đất để điều quân",
               style = MaterialTheme.typography.labelSmall,
               color = ObsidianVoid,
               maxLines = 1,
@@ -1283,14 +1249,41 @@ fun TowerBattleScreen(
         )
 
         Row(
-          modifier = Modifier
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(5.dp),
+          verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Surface(
+            shape = RoundedCornerShape(9.dp),
+            color = if (combatEngine.awaitingMoveToTap || combatEngine.activeOrder == TacticalOrder.MOVE_TO)
+              SummonerGold else Color(0xEE17364A),
+            modifier = Modifier.width(86.dp).heightIn(min = 56.dp)
+              .border(1.dp, SummonerGold, RoundedCornerShape(9.dp))
+              .testTag("order_move_to")
+              .clickable(enabled = battleInputEnabled) {
+                acknowledgeBattleInput { combatEngine.issueTacticalOrder(TacticalOrder.MOVE_TO) }
+              },
+          ) {
+            val ink = if (combatEngine.awaitingMoveToTap || combatEngine.activeOrder == TacticalOrder.MOVE_TO)
+              ObsidianVoid else SummonerGold
+            Column(Modifier.padding(horizontal = 5.dp, vertical = 6.dp),
+              horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.Center) {
+              Text("Di chuyển", style = MaterialTheme.typography.labelSmall,
+                color = ink, fontWeight = FontWeight.Bold, maxLines = 1)
+              Text("Chạm vị trí", style = MaterialTheme.typography.labelSmall,
+                color = ink, maxLines = 1)
+            }
+          }
+          Row(
+          modifier = Modifier.weight(1f)
             .horizontalScroll(rememberScrollState())
             .background(Color(0x8812223A), RoundedCornerShape(12.dp))
             .border(1.dp, SummonerGold.copy(alpha = 0.58f), RoundedCornerShape(12.dp))
             .padding(4.dp),
           horizontalArrangement = Arrangement.spacedBy(5.dp),
         ) {
-          TacticalOrder.entries.forEach { order ->
+          TacticalOrder.entries.filter { it != TacticalOrder.MOVE_TO }.forEach { order ->
             val isSelected = combatEngine.activeOrder == order
             Surface(
               shape = RoundedCornerShape(9.dp),
@@ -1339,6 +1332,7 @@ fun TowerBattleScreen(
               }
             }
           }
+        }
         }
       }
     }

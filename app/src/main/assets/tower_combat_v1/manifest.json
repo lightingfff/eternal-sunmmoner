@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "source_sha256": "44c9b3cc13e0a5759376fca987b0f5c71ee7321295c5f62c3e28455b2cc6352d",
+  "source_dimensions": [
+    1774,
+    887
+  ],
+  "frame": [
+    128,
+    144
+  ],
+  "pivot": [
+    64,
+    132
+  ],
+  "facing": "right",
+  "direction_policy": "Left is runtime mirrored; shadows use fixed SanctuaryLight. No claimed separately authored four-direction atlas.",
+  "clips": {
+    "idle": {
+      "frames": [
+        0,
+        1
+      ],
+      "seconds": [
+        0.35,
+        0.35
+      ],
+      "loop": true
+    },
+    "walk": {
+      "frames": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "seconds": [
+        0.1,
+        0.1,
+        0.1,
+        0.1
+      ],
+      "loop": true
+    },
+    "contact": {
+      "frames": [
+        6,
+        6,
+        7,
+        8
+      ],
+      "seconds": [
+        0.11,
+        0.11,
+        0.1,
+        0.16
+      ],
+      "loop": false,
+      "contact_seconds": 0.22
+    },
+    "instant_attack": {
+      "frames": [
+        7,
+        8,
+        0
+      ],
+      "seconds": [
+        0.08,
+        0.17,
+        0.135
+      ],
+      "loop": false
+    },
+    "hurt": {
+      "frames": [
+        9
+      ],
+      "seconds": [
+        0.18
+      ],
+      "loop": false
+    },
+    "defeat": {
+      "frames": [
+        10,
+        11
+      ],
+      "seconds": [
+        0.18,
+        0.275
+      ],
+      "loop": false
+    }
+  },
+  "actors": {
+    "FIELD_GOBLIN_RAIDER": {
+      "file": "raider.png",
+      "world_scale": 1.0,
+      "sha256": "e999af8ce7de6dc1b391c96c190f3e5292b20016975d63117ef1224807ec85fe",
+      "source_scale": 0.53,
+      "source_foot": 210.0
+    },
+    "FIELD_GOBLIN_ARCHER": {
+      "file": "archer.png",
+      "world_scale": 1.0,
+      "sha256": "e21ba61f0417d51310811540f299fd9cd4c01627959b08b9efed9662d0ea88ef",
+      "source_scale": 0.55,
+      "source_foot": 436.0
+    },
+    "DIRE_WOLF": {
+      "file": "wolf.png",
+      "world_scale": 1.0,
+      "sha256": "3b108a6f51b32e51683d9be0f4d1674e14ffc33a8eaa9b46770ddf3bf0282e58",
+      "source_scale": 0.62,
+      "source_foot": 628.0
+    },
+    "GOBLIN_WAR_CAPTAIN": {
+      "file": "kraag.png",
+      "world_scale": 1.1,
+      "sha256": "34f03079d0782160442194927a4351e569bbc28847790d11d6833f297c619a2d",
+      "source_scale": 0.6,
+      "source_foot": 867.0
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "requested_url": "https://www.supergiantgames.com/games/hades/",
+  "retrieved_utc": "2026-11-12T13:54:36.636716+00:00",
+  "source_type": "official developer",
+  "default_sandbox_attempt": "URLError Operation not permitted",
+  "status": 200,
+  "final_url": "https://www.supergiantgames.com/games/hades/",
+  "bytes": 218502,
+  "content_type": "text/html; charset=UTF-8",
+  "extract_file": "hades.txt"
+}
