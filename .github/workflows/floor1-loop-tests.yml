@@ -74,6 +74,7 @@ jobs:
           gradle :app:testDebugUnitTest
           --tests com.example.TowerEncounterFramingTest
           --tests com.example.TowerTrustAndFeedbackTest
+          --tests com.example.game.combat.TowerCombatReforgeTest
           --tests com.example.TowerCombatArtEvidenceTest
           --console=plain
       - name: Retain Tower reforge results
@@ -88,6 +89,7 @@ jobs:
           --tests com.example.ui.ExpeditionFieldRewardUiTest
           --tests com.example.ui.ExpeditionRewardIconFailureTest
           --tests com.example.ui.Floor1InputOwnershipTest
+          --tests com.example.ui.PinnedDodgeInputOwnershipTest
           --tests com.example.ui.Floor1SettlementRecoveryUiTest
           --tests com.example.RescueTacticalCommandsTest
           --tests com.example.RescueEnemyTargetingTest

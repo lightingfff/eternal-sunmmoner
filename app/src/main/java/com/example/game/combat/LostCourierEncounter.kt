@@ -153,14 +153,7 @@ class LostCourierEncounter internal constructor(
         } else {
           val kraag = engine.enemies.firstOrNull { it.id == eliteEnemyId && !it.dead }
           if (kraag != null) {
-            kraag.hp = (kraag.hp - 12).coerceAtLeast(0)
-            kraag.hurtFlash = 0.8f
-            engine.floatingTexts += FloatingCombatText(
-              kraag.x,
-              kraag.y - 38f,
-              "-12",
-              androidx.compose.ui.graphics.Color(0xFF38BDF8),
-            )
+            engine.applyCourierSupportDamage(kraag, 12)
             engine.postFeedback("Người đưa thư bắn yểm trợ quấy rối Kraag!")
           }
         }
@@ -201,7 +194,11 @@ class LostCourierEncounter internal constructor(
       val distance = hypot(tx - courier.x, ty - courier.y)
       if (distance <= 8f) waypointIndex++ else {
         val hasAggroedThreat = engine.enemies.any { !it.dead && it.aggroed }
-        val escortSpeed = if (hasAggroedThreat) 44f else 66f
+        val guardedMarch = engine.activeOrder == TacticalOrder.PROTECT_ALLY &&
+          !engine.navigatingCourierSupplies && engine.heroes.any {
+            !it.knockedOut && hypot(it.x - courier.x, it.y - courier.y) <= 165f
+          }
+        val escortSpeed = if (!hasAggroedThreat && guardedMarch) 66f else 44f
         val step = minOf(distance, escortSpeed * dt)
         val pos = CollisionPhysics.resolvePosition(courier.x + (tx - courier.x) / distance * step,
           courier.y + (ty - courier.y) / distance * step, 18f, engine.mapLayout.width,
@@ -366,10 +363,10 @@ class LostCourierEncounter internal constructor(
     if (!scoutResolved && scoutEnemyId != null && engine.enemies.any { it.id == scoutEnemyId && it.dead }) {
       scoutResolved = true
       scoutWarningRemaining = 0f
-      statusVi = "Đã chặn trinh sát trước tiếng tù và! Thu được [Lối tắt trinh sát]: Hồi 25% Mana toàn đội."
+      statusVi = "Đã chặn trinh sát trước tiếng tù và! Lối tắt trinh sát: giảm hồi kỹ năng bằng 25% hồi tối đa cho đội còn sống."
       engine.postFeedback(statusVi)
       engine.heroes.filter { !it.knockedOut }.forEach {
-        it.mana = (it.mana + it.maxMana * 0.25f).coerceAtMost(it.maxMana.toFloat())
+        it.skillCooldown = (it.skillCooldown - it.maxSkillCooldown * 0.25f).coerceAtLeast(0f)
       }
       if (phase == CourierPhase.SCOUT_ALARM) phase = CourierPhase.ESCORT
     }
