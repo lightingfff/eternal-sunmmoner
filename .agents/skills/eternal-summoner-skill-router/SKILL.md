@@ -9,6 +9,10 @@ For future game implementation tasks, announce the relevant skill names in the o
 chat update, then read only the selected sources. Usually one to three are enough.
 Suggested wording: “Tôi sẽ dùng [tên skill] cho [phần việc], giữ camera 2.5D và pipeline Kotlin/Compose hiện có.”
 For sprite work, also use the user's `ai-game-spritesheets` adapter and its templates.
+For sprite, animation and map-art work, read the project
+[Agent Sprite Forge adapter](../agent-sprite-forge/SKILL.md) before selecting its upstream
+skills. This preserves the camera/runtime and checks actual media capabilities; the
+upstream HD/API-first defaults do not override project pixel style or user authorization.
 
 Read [the selection guide](../../../docs/GAME_SKILL_SELECTION.md) for exact task mappings.
 The full [catalog](../../../docs/skill-library/scenario/CATALOG.md) covers 174 supplied

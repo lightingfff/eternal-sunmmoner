@@ -11,6 +11,7 @@ dụng; thao tác MCP chưa dùng được vì phiên rà soát không có conne
 
 | Việc cần làm | Skill | Áp dụng vào game |
 |---|---|---|
+| Sprite/animation/map với Agent Sprite Forge | [Project adapter](../.agents/skills/agent-sprite-forge/SKILL.md), rồi chọn `generate2dsprite`, `video2dsprite` hoặc `generate2dmap` | Master nhất quán, đăng ký chân/scale, QC spill/alpha/loop và export PNG. Giữ Kotlin/Compose, camera .72; không tự bật API/video hoặc đổi engine. |
 | Hero/Goblin, idle/walk/attack/skill | `ai-game-spritesheets`, [scenario-sprite-animation](skill-library/scenario/upstream/skills/scenario-sprite-animation/SKILL.md) | Anchor trước, đếm pose thực, giữ hướng/pivot, kiểm tra frame order và loop seam, hit marker khớp damage. |
 | Props, nhà, cây và lớp cảnh | [scenario-game-assets](skill-library/scenario/upstream/skills/scenario-game-assets/SKILL.md) | Tách geometry/style reference, alpha thật, footprint khác silhouette, thử một vùng nhỏ trước. |
 | Cỏ, đất, đá, gỗ, nền seamless | [scenario-textures](skill-library/scenario/upstream/skills/scenario-textures/SKILL.md) | Kiểm tra hai trục seam và preview 2×2, giữ mật độ pixel; không thêm pipeline PBR vào Canvas chỉ vì tài liệu có ví dụ. |
