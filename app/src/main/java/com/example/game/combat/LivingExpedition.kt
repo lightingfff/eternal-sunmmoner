@@ -5,6 +5,7 @@ import com.example.data.model.TacticalOrder
 import com.example.game.map.CollisionPhysics
 import com.example.game.map.EnemyArchetype
 import kotlin.math.hypot
+import kotlin.math.ceil
 
 /** Exploration directs the existing actors and combat AI; it never simulates a second battle. */
 class LivingExpedition internal constructor(
@@ -40,6 +41,11 @@ class LivingExpedition internal constructor(
     private set
   var alarmSilenced = false
     private set
+  /** This is a real tactical deadline, not an artificial wait to lengthen the route. */
+  var northAlarmRaised = false
+    private set
+  var northAlarmRemainingSeconds = 0f
+    private set
   var gateForced = false
     private set
   var gateSecured = false
@@ -49,6 +55,10 @@ class LivingExpedition internal constructor(
   val objectiveVi: String get() = when {
     !active -> "Đã về trại • bắt đầu hộ tống"
     activity == Activity.RETURN -> "Đưa toàn đội về trại để hộ tống"
+    activity == Activity.SCOUT && !scoutActivated && !northAlarmRaised ->
+      "Cắt tù và trong ${ceil(northAlarmRemainingSeconds.toDouble()).toInt()}s • tránh báo động"
+    activity == Activity.SCOUT && !scoutActivated && northAlarmRaised ->
+      "Báo động đã vang • cắt tín hiệu và tập hợp"
     readyToExtract && decision?.id == "extraction" -> "Đã có hai nguồn tin • rút về hay khám phá tiếp?"
     else -> "Khám phá đồng cỏ • ${resolved.size}/2 nguồn tin"
   }
@@ -117,8 +127,9 @@ class LivingExpedition internal constructor(
     when (optionId) {
       "north_scout" -> {
         activity = Activity.SCOUT
+        northAlarmRemainingSeconds = 12f
         spawnNorth(false)
-        say(scout()?.id, "Tôi luồn tới dây tù và. Mọi người giữ chân lính gác, rồi tập hợp ở trạm!")
+        say(scout()?.id, "Có 12 giây trước khi lính thổi tù và! Giữ chân họ; tôi cắt tín hiệu ngay!")
       }
       "north_assault" -> {
         activity = Activity.ASSAULT
@@ -221,14 +232,35 @@ class LivingExpedition internal constructor(
     }
     when (activity) {
       Activity.SCOUT -> {
-        if (!scoutActivated && living.any { it.id == scout()?.id && distance(it.x to it.y, LivingExpeditionContent.northSwitch) <= 70f }) {
+        // Physical interaction wins the same frame if the scout reaches the switch at the deadline.
+        // Time keeps moving during Master override; it is an actual tactical tradeoff.
+        val reachedSwitch = !scoutActivated && living.any {
+          it.id == scout()?.id && distance(it.x to it.y, LivingExpeditionContent.northSwitch) <= 70f
+        }
+        if (reachedSwitch) {
           scoutActivated = true
-          alarmSilenced = true
-          completed += "living_alarm_silenced"
-          say(scout()?.id, "Đã cắt dây tù và. Tôi quay về che đội; đường hộ tống sẽ bớt một xạ thủ.")
+          northAlarmRemainingSeconds = 0f
+          if (!northAlarmRaised) {
+            alarmSilenced = true
+            completed += "living_alarm_silenced"
+            say(scout()?.id, "Đã cắt tù và trước khi họ báo động! Đường hộ tống sẽ bớt một xạ thủ.")
+          } else {
+            completed += "living_alarm_cut_late"
+            say(scout()?.id, "Tôi đã cắt dây, nhưng tù và đã vang. Đội vẫn phải đối mặt với quân tiếp viện.")
+          }
+        } else if (!scoutActivated && !northAlarmRaised && living.isNotEmpty()) {
+          northAlarmRemainingSeconds = (northAlarmRemainingSeconds - dt).coerceAtLeast(0f)
+          if (northAlarmRemainingSeconds <= 0f) {
+            northAlarmRaised = true
+            completed += "living_alarm_raised"
+            say(null, "Lính gác: BÁO ĐỘNG! Xạ thủ tiếp viện đang tới cổng!")
+            announce("Tù và đã vang. Cắt tín hiệu lúc này vẫn cần thiết, nhưng không xóa được quân tiếp viện.")
+          }
         }
         if (scoutActivated && living.isNotEmpty() && living.all { distance(it.x to it.y, sitePoint) <= 170f })
-          resolve("north", "Bản đồ trạm Bắc chỉ ra đường cổng và điểm phục kích. Tín hiệu đã tắt.")
+          resolve("north", if (northAlarmRaised)
+            "Đã thu thập bản đồ trạm Bắc, nhưng báo động đã vang. Sẽ có thêm xạ thủ lúc hộ tống."
+            else "Bản đồ trạm Bắc chỉ ra đường cổng và điểm phục kích. Tín hiệu đã tắt kịp thời.")
       }
       Activity.RESCUE -> moveWitness(dt)
       Activity.PLATES -> observePlates()
@@ -274,7 +306,7 @@ class LivingExpedition internal constructor(
       "north" -> {
         say(scout()?.id, "Có dây tù và phía sau trạm. Tôi có thể luồn qua, nhưng cần người giữ chân lính gác.")
         decision = ExpeditionDecision("north_approach", "Xử lý trạm gác bằng cách nào?", listOf(
-          ExpeditionOption("north_scout", "Luồn cắt tín hiệu", "Chia đội giữ 2 lính, cắt tù và để bớt xạ thủ đường về."),
+          ExpeditionOption("north_scout", "Luồn cắt tín hiệu", "Cắt trong 12 giây để tránh xạ thủ tiếp viện; chậm thì báo động."),
           ExpeditionOption("north_assault", "Đánh thẳng vào trạm", "Đánh 3 địch; để nguyên tù và, đường về có thêm xạ thủ.")))
       }
       "south" -> {

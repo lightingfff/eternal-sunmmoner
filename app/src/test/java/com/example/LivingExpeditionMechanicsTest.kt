@@ -191,4 +191,58 @@ class LivingExpeditionMechanicsTest {
     assertFalse(expedition.active)
     assertTrue("living_returned_to_camp" in expedition.completedIds)
   }
+
+  @Test fun northScoutCutBeforeCountdownStopsAlarmWithoutRemovingRealGuards() {
+    val (engine, expedition) = fixture()
+    reveal(engine, expedition, "north")
+    assertTrue(expedition.choose("north_scout"))
+    assertEquals(12f, expedition.northAlarmRemainingSeconds, 0.01f)
+    expedition.step(5f)
+    assertFalse(expedition.northAlarmRaised)
+    val scout = engine.heroes.first { it.heroClass == HeroClassType.ARCHER }
+    scout.x = LivingExpeditionContent.northSwitch.first
+    scout.y = LivingExpeditionContent.northSwitch.second
+    expedition.step(.02f)
+    assertTrue(expedition.alarmSilenced)
+    assertFalse(expedition.northAlarmRaised)
+    assertTrue("living_alarm_silenced" in expedition.completedIds)
+    expedition.step(30f)
+    assertFalse("A cut signal never expires later", expedition.northAlarmRaised)
+    assertEquals(0f, expedition.northAlarmRemainingSeconds, 0.01f)
+    assertEquals(2, engine.enemies.count { it.id.startsWith("expedition_north_") })
+  }
+
+  @Test fun overdueNorthScoutCannotUndoHeardAlarmButCanFinishTheMission() {
+    val (engine, expedition) = fixture()
+    reveal(engine, expedition, "north")
+    assertTrue(expedition.choose("north_scout"))
+    expedition.suspendAutomation()
+    expedition.step(11.5f)
+    assertFalse(expedition.northAlarmRaised)
+    expedition.step(.6f)
+    assertTrue(expedition.northAlarmRaised)
+    assertFalse(expedition.alarmSilenced)
+    assertEquals(0f, expedition.northAlarmRemainingSeconds, 0.01f)
+    repeat(5) { expedition.step(3f) }
+    assertEquals("Alarm must sound only once", 1,
+      expedition.completedIds.count { it == "living_alarm_raised" })
+    assertFalse("No automatic victory from an expired alarm", expedition.readyToExtract)
+
+    // Focused spatial interaction fixture: the player can still finish cutting the switch.
+    val scout = engine.heroes.first { it.heroClass == HeroClassType.ARCHER }
+    scout.x = LivingExpeditionContent.northSwitch.first
+    scout.y = LivingExpeditionContent.northSwitch.second
+    expedition.step(.02f)
+    assertFalse("A late cut must not erase the original escort archer", expedition.alarmSilenced)
+    assertTrue("living_alarm_cut_late" in expedition.completedIds)
+    assertFalse("living_alarm_silenced" in expedition.completedIds)
+    val site = expedition.sites.first { it.id == "north" }
+    engine.heroes.forEach { it.x = site.x; it.y = site.y }
+    expedition.step(.02f)
+    assertEquals(ExpeditionSiteState.RESOLVED, expedition.sites.first { it.id == "north" }.state)
+    assertTrue("living_site_north" in expedition.completedIds)
+    assertFalse("A single lead does not award an extraction", expedition.readyToExtract)
+    assertEquals(2, engine.enemies.count { it.id.startsWith("expedition_north_") })
+  }
+
 }
