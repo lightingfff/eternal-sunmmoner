@@ -120,7 +120,7 @@ class TowerCombatReforgeTest {
     recoveryField.setFloat(mission, 1.5f)
 
     // Player orders FOCUS_FIRE on Kraag
-    engine.activeOrder = TacticalOrder.FOCUS_FIRE
+    engine.issueTacticalOrder(TacticalOrder.FOCUS_FIRE)
     val hpBefore = kraag.hp
 
     // Execute hero attack
@@ -161,8 +161,8 @@ class TowerCombatReforgeTest {
 
     assertTrue("Courier must provide field bandage healing to injured hero", hero.hp > hpBefore)
     assertTrue(
-      "Engine must post feedback about courier support",
-      engine.feedbackEvents.any { it.contains("Người đưa thư sơ cứu") || it.contains("Người đưa thư") },
+      "Courier support must produce visible healing feedback",
+      engine.floatingTexts.any { it.text == "+14 HP" },
     )
   }
 }
