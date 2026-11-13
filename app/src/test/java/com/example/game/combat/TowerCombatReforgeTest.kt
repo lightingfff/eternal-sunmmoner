@@ -137,4 +137,31 @@ class TowerCombatReforgeTest {
       engine.floatingTexts.any { it.text.contains("VỠ GIÁP") },
     )
   }
+
+  @Test
+  fun courierActivelySupportsHeroesDuringKraagGateBattle() {
+    val engine = battle()
+    val mission = engine.lostCourier!!
+    clearPath(engine)
+
+    // Advance courier to Kraag gate
+    mission.courier.x = 2240f
+    val hero = engine.heroes.single().apply {
+      x = 2200f; y = 1049f
+      hp = maxHp / 2 // Injured hero
+    }
+    engine.step(0.05f, 0f, 0f)
+
+    assertEquals(CourierPhase.GATE_GUARD, mission.phase)
+
+    // Advance 4 seconds to trigger courier support
+    val hpBefore = hero.hp
+    repeat(80) { engine.step(0.05f, 0f, 0f) }
+
+    assertTrue("Courier must provide field bandage healing to injured hero", hero.hp > hpBefore)
+    assertTrue(
+      "Engine must post feedback about courier support",
+      engine.feedbackEvents.any { it.contains("Người đưa thư sơ cứu") || it.contains("Người đưa thư") },
+    )
+  }
 }

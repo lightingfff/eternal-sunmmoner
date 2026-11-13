@@ -1504,17 +1504,63 @@ fun TowerBattleScreen(
                       color = EmeraldVitality,
                     )
                   }
-                  if (settlement.injuredHeroNames.isNotEmpty()) {
+                  if (!isWin) {
+                    Surface(
+                      shape = RoundedCornerShape(10.dp),
+                      color = ObsidianVoid.copy(alpha = 0.88f),
+                      modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, if (isTacticalRetreat) PortalCyan.copy(alpha = 0.6f) else CrimsonBlood.copy(alpha = 0.6f), RoundedCornerShape(10.dp))
+                        .padding(vertical = 4.dp),
+                    ) {
+                      Column(
+                        modifier = Modifier.padding(10.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                      ) {
+                        Text(
+                          text = if (isTacticalRetreat) "⚑ BẢO TOÀN CHIẾN LỢI PHẨM THỰC ĐỊA" else "⚠ HƯỚNG DẪN HỒI SỨC & CHUẨN BỊ LƯỢT MỚI",
+                          style = MaterialTheme.typography.titleSmall,
+                          color = if (isTacticalRetreat) PortalCyan else WarningAmber,
+                          fontWeight = FontWeight.Bold,
+                        )
+                        if (isTacticalRetreat) {
+                          Text(
+                            text = "✓ Nhờ quyết định rút lui chính xác, 100% tài nguyên và điểm kinh nghiệm thu thập đã được bảo toàn!",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = ParchmentLight,
+                          )
+                        }
+                        if (settlement.injuredHeroNames.isNotEmpty()) {
+                          Text(
+                            text = "🩹 Anh hùng trọng thương: ${settlement.injuredHeroNames.joinToString(", ")}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = CrimsonBlood,
+                            fontWeight = FontWeight.Bold,
+                          )
+                          Text(
+                            text = "✦ Bệnh xá Thánh Địa: Xuất viện miễn phí sau 75 giây (hoặc trị thương ngay bằng 2 Khẩu phần + 15 Mana).",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = ParchmentLight,
+                          )
+                          Text(
+                            text = "✦ Nhà ăn: Súp nóng (20 Vàng) hồi phục 35 Tinh thần cho toàn đội ngũ.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = ParchmentLight,
+                          )
+                        } else {
+                          Text(
+                            text = "✓ Toàn bộ đội hình đều lành lặn và sẵn sàng cho lượt thám hiểm tiếp theo!",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = EmeraldVitality,
+                          )
+                        }
+                      }
+                    }
+                  } else if (settlement.injuredHeroNames.isNotEmpty()) {
                     Text(
                       text = "🩹 Đưa về giường Khu Nghỉ Ngơi để hồi phục: ${settlement.injuredHeroNames.joinToString(", ")}",
                       style = MaterialTheme.typography.bodySmall,
                       color = WarningAmber,
-                    )
-                  } else if (isTacticalRetreat) {
-                    Text(
-                      text = "✓ Nhờ lệnh rút lui chiến thuật kịp thời, toàn bộ Anh hùng còn đứng vững đều bảo toàn thể trạng!",
-                      style = MaterialTheme.typography.bodySmall,
-                      color = PortalCyan,
                     )
                   }
                 }
