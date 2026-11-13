@@ -537,17 +537,7 @@ class TowerCombatEngine(
       return
     }
 
-    // 4. Check if player tapped on an allied Hero to inspect live AI intent
-    val tappedHero = heroes
-      .filter { !it.knockedOut && hypot(it.x - worldX, it.y - worldY) <= 48f }
-      .minByOrNull { hypot(it.x - worldX, it.y - worldY) }
-    if (tappedHero != null) {
-      selectedHeroId = tappedHero.id
-      postFeedback("${tappedHero.name}: ${tappedHero.aiIntentLabelVi} (HP ${tappedHero.hp}/${tappedHero.maxHp})")
-      return
-    }
-
-    // 5. Otherwise update Move-To tactical beacon if currently in MOVE_TO mode OR during active boss telegraph hazard!
+    // 4. Otherwise update Move-To tactical beacon if currently in MOVE_TO mode OR during active boss telegraph hazard!
     val isTelegraphHazard = lostCourier?.eliteTelegraph != null
     if (activeOrder == TacticalOrder.MOVE_TO || isTelegraphHazard) {
       claimManualNavigation()
