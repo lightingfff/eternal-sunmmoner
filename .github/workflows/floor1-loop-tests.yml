@@ -58,6 +58,30 @@ jobs:
           else
             echo 'No JUnit XML was generated before the route test step failed.' >> "$GITHUB_STEP_SUMMARY"
           fi
+          # Keep actionable test failures in check annotations as well as the artifact;
+          # this makes results diagnosable even when the Actions log archive is unavailable.
+          python3 - <<'PY'
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+
+          result_dir = Path("app/build/test-results/testDebugUnitTest")
+          for result_file in sorted(result_dir.glob("*.xml")):
+              try:
+                  suite = ET.parse(result_file).getroot()
+              except ET.ParseError as error:
+                  print(f"::warning title=Invalid JUnit XML::{result_file.name}: {error}")
+                  continue
+              for case in suite.iter("testcase"):
+                  for result in case:
+                      if result.tag.rsplit("}", 1)[-1] not in {"failure", "error"}:
+                          continue
+                      detail = result.attrib.get("message", "") or (result.text or "")
+                      detail = " ".join(detail.split())[:2000]
+                      label = f"{case.attrib.get('classname', result_file.stem)}#{case.attrib.get('name', 'unknown')}"
+                      message = f"{label}: {detail or 'test failed without a message'}"
+                      message = message.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+                      print(f"::error title=Floor 1 route test failure::{message}")
+          PY
       - name: Living expedition mechanics and actual alternate routes
         run: >-
           gradle :app:testDebugUnitTest
