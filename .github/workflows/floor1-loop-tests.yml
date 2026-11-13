@@ -61,6 +61,8 @@ jobs:
           --tests com.example.LivingExpeditionMechanicsTest
           --tests com.example.LivingExpeditionControlTest
           --tests com.example.LivingNpcCombatTest
+          --tests com.example.ExpeditionFieldRewardsTest
+          --tests com.example.ExpeditionFieldRewardsIntegrationTest
           --console=plain
       - name: Retain living expedition results
         if: always()
@@ -83,6 +85,8 @@ jobs:
         run: >-
           gradle :app:testDebugUnitTest
           --tests com.example.ui.LivingExpeditionUiTest
+          --tests com.example.ui.ExpeditionFieldRewardUiTest
+          --tests com.example.ui.ExpeditionRewardIconFailureTest
           --tests com.example.ui.Floor1InputOwnershipTest
           --tests com.example.ui.Floor1SettlementRecoveryUiTest
           --tests com.example.RescueTacticalCommandsTest

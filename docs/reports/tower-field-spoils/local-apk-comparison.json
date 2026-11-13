@@ -1,0 +1,48 @@
+{
+  "result": "PASS",
+  "baseline_context": "previous Part1 local APK; not a physical-device install and not a CI APK comparison",
+  "apks": [
+    {
+      "path": "/workspace/tower-reforge-p1/app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "00082b25aaee23fe891e651dd9f9cc70392b04b3322d440d7d17e8dd1b3df3fc",
+      "bytes": 40729287,
+      "identity": [
+        "package: name='com.aistudio.eternalsummoner.kvrpzm' versionCode='1' versionName='1.0' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+        "sdkVersion:'24'",
+        "targetSdkVersion:'36'",
+        "launchable-activity: name='com.example.MainActivity'  label='Eternal Summoner' icon=''",
+        "native-code: 'arm64-v8a' 'armeabi-v7a' 'x86' 'x86_64'"
+      ],
+      "signing": [
+        "Verified using v1 scheme (JAR signing): false",
+        "Verified using v2 scheme (APK Signature Scheme v2): true",
+        "Verified using v3 scheme (APK Signature Scheme v3): false",
+        "Verified using v3.1 scheme (APK Signature Scheme v3.1): false",
+        "Verified using v4 scheme (APK Signature Scheme v4): false",
+        "Signer #1 certificate SHA-256 digest: 5d6c1e109e50cf7ae057ea4728602447fe50e68b43385c50cb04aa743d9193f8"
+      ],
+      "zip_crc": "PASS"
+    },
+    {
+      "path": "app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "096e3267b969816ec88bdc1487cb342d3c0313c1755734efc7a330260a9a4a1c",
+      "bytes": 40434468,
+      "identity": [
+        "package: name='com.aistudio.eternalsummoner.kvrpzm' versionCode='1' versionName='1.0' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+        "sdkVersion:'24'",
+        "targetSdkVersion:'36'",
+        "launchable-activity: name='com.example.MainActivity'  label='Eternal Summoner' icon=''",
+        "native-code: 'arm64-v8a' 'armeabi-v7a' 'x86' 'x86_64'"
+      ],
+      "signing": [
+        "Verified using v1 scheme (JAR signing): false",
+        "Verified using v2 scheme (APK Signature Scheme v2): true",
+        "Verified using v3 scheme (APK Signature Scheme v3): false",
+        "Verified using v3.1 scheme (APK Signature Scheme v3.1): false",
+        "Verified using v4 scheme (APK Signature Scheme v4): false",
+        "Signer #1 certificate SHA-256 digest: 5d6c1e109e50cf7ae057ea4728602447fe50e68b43385c50cb04aa743d9193f8"
+      ],
+      "zip_crc": "PASS"
+    }
+  ]
+}

@@ -76,6 +76,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -288,12 +290,14 @@ fun TowerBattleScreen(
   var showRetreatConfirm by remember(combatEngine) { mutableStateOf(false) }
   var settlementDispatched by remember(combatEngine) { mutableStateOf(false) }
   var introDismissed by remember(combatEngine) { mutableStateOf(false) }
+  var showFieldRewards by remember(combatEngine) { mutableStateOf(false) }
 
   val artContext = androidx.compose.ui.platform.LocalContext.current.applicationContext
   LaunchedEffect(artContext, state.selectedFloor.floorNumber) {
     if (state.selectedFloor.floorNumber == 1) kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
       com.example.game.pixel.TowerMonsterAtlas.preload(artContext)
       com.example.game.pixel.TowerCombatFxAtlas.preload(artContext)
+      com.example.ui.components.ExpeditionRewardIcons.preload(artContext)
     }
   }
 
@@ -1005,6 +1009,27 @@ fun TowerBattleScreen(
             }
           }
 
+          val offers = combatEngine.fieldRewardOffers
+          if (offers.isNotEmpty()) {
+            val urgentDecision = combatEngine.lostCourier?.livingExpedition?.decision?.id?.let { it != "extraction" } == true
+            IconButton(onClick = { showFieldRewards = !showFieldRewards }, enabled = battleInputEnabled && !urgentDecision,
+              modifier = Modifier.size(48.dp).testTag("field_reward_open").semantics {
+                contentDescription = "Chiến lợi phẩm: ${offers.size} túi chưa chọn"
+              }) {
+              Box(Modifier.size(46.dp)) {
+                val icon = com.example.ui.components.ExpeditionRewardIcons.image(com.example.game.combat.FieldRewardKind.VALUABLES)
+                if (icon != null) {
+                  Image(icon, contentDescription = null, modifier = Modifier.size(40.dp),
+                    filterQuality = androidx.compose.ui.graphics.FilterQuality.None)
+                } else {
+                  Text("Túi", color = SummonerGold, modifier = Modifier.align(Alignment.Center))
+                }
+                Text("${offers.size}", color = SummonerGold, style = MaterialTheme.typography.labelLarge,
+                  modifier = Modifier.align(Alignment.TopEnd))
+              }
+            }
+          }
+
           IconButton(
             onClick = { showRetreatConfirm = true },
             modifier = Modifier
@@ -1034,7 +1059,18 @@ fun TowerBattleScreen(
           }
           val journey = mission.journey
           val expedition = mission.livingExpedition
-          if (expedition != null && expedition.active) {
+          val offer = combatEngine.fieldRewardOffers.firstOrNull()
+          val urgentDecision = expedition?.decision?.id?.let { it != "extraction" } == true
+          if (showFieldRewards && offer != null && !urgentDecision) {
+            com.example.ui.components.ExpeditionFieldRewardHud(offer, combatEngine.fieldRewardOffers.size,
+              enabled = battleInputEnabled,
+              canClaim = { id -> combatEngine.canClaimFieldReward(offer.siteId, id) },
+              onClaim = { id -> acknowledgeBattleInput {
+                if (combatEngine.claimFieldReward(offer.siteId, id)) showFieldRewards = false
+              } },
+              onClose = { showFieldRewards = false }, modifier = Modifier.fillMaxWidth(),
+              compact = isWideScreen && isShortHeight)
+          } else if (expedition != null && expedition.active) {
             val line=expedition.conversations.lastOrNull { it.remainingSeconds>0f }
             val speaker=line?.speakerHeroId?.let { id -> combatEngine.heroes.firstOrNull { it.id==id && !it.knockedOut }?.name }
             val headline=if(line!=null) "${expedition.sites.count { it.state == com.example.game.combat.ExpeditionSiteState.RESOLVED }}/2 • ${speaker?.let { "$it: " }.orEmpty()}${line.textVi}"

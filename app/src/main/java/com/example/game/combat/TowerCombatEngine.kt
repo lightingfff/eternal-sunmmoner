@@ -180,6 +180,26 @@ class TowerCombatEngine(
     LostCourierEncounter(this, squadRecords, enableRescueJourney, enableLivingExploration)
   } else null
 
+  private val fieldRewards = ExpeditionFieldRewards()
+  val fieldRewardOffers: List<FieldRewardOffer>
+    get() = if (stage == MissionStage.IN_PROGRESS) fieldRewards.pendingOffers else emptyList()
+
+  fun canClaimFieldReward(siteId: String, optionId: String): Boolean =
+    fieldRewards.canClaim(siteId, optionId, heroes, stage)
+
+  /** A secondary, nonmodal action: never replaces navigation or resumes a held order. */
+  fun claimFieldReward(siteId: String, optionId: String): Boolean {
+    val claim = fieldRewards.claim(siteId, optionId, heroes, stage) ?: return false
+    bonusDiscoveryGold += claim.gold
+    bonusDiscoveryMana += claim.mana
+    postFeedback(when (claim.option.kind) {
+      FieldRewardKind.VALUABLES -> "Đã giữ +${claim.gold} Vàng • +${claim.mana} Mana cho tổng kết chuyến, kể cả rút lui hoặc thất bại."
+      FieldRewardKind.HEALING -> "Đã băng bó cho ${claim.affectedHeroIds.size} Anh hùng; HP còn lại được ghi nhận khi tổng kết."
+      else -> "${claim.option.titleVi}: đã dùng cho ${claim.affectedHeroIds.size} Anh hùng; lợi thế chỉ dành cho chuyến này."
+    })
+    return true
+  }
+
   init {
     selectedHeroId = heroes.firstOrNull()?.id
     if (lostCourier != null) {
@@ -262,7 +282,7 @@ class TowerCombatEngine(
     discoveryNodes.any { it.obstacleId == obstacleId && it.discovered }
 
   fun discoveredNodeIds(): Set<String> =
-    discoveryNodes.filter { it.discovered }.map { it.id }.toSet() + lostCourier?.journey?.completedIds.orEmpty() + lostCourier?.livingExpedition?.completedIds.orEmpty()
+    discoveryNodes.filter { it.discovered }.map { it.id }.toSet() + lostCourier?.journey?.completedIds.orEmpty() + lostCourier?.livingExpedition?.completedIds.orEmpty() + fieldRewards.claimedIds
 
   private fun claimDiscovery(node: BattleDiscoveryNode) {
     if (node.discovered) return
@@ -804,6 +824,9 @@ class TowerCombatEngine(
     // 7. Check Mission Victory / Tactical Retreat / Defeat Conditions
     val livingHeroes = heroes.filter { !it.knockedOut }
     lostCourier?.afterStep()
+    if (stage == MissionStage.IN_PROGRESS) {
+      lostCourier?.livingExpedition?.takeIf { it.active }?.let { fieldRewards.observe(it.sites) }
+    }
     if (lostCourier != null) {
       if (activeOrder == TacticalOrder.RETREAT && livingHeroes.isNotEmpty() &&
         livingHeroes.all { hypot(it.x - floorSpec.spawnX, it.y - floorSpec.spawnY) <= 185f }) confirmTacticalRetreat()
