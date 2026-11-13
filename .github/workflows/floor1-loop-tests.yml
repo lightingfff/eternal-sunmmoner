@@ -40,6 +40,7 @@ jobs:
           <resources><string name="default_web_client_id" translatable="false">debug-placeholder.apps.googleusercontent.com</string></resources>
           XML
       - name: Actual routes, incident choices and local save
+        id: actual_routes
         run: >-
           gradle :app:testDebugUnitTest
           --tests com.example.RescueJourneyStarterPartyTest
@@ -52,6 +53,10 @@ jobs:
       - name: Retain legacy route test results
         if: always()
         run: |
+          if [ "${{ steps.actual_routes.outcome }}" = "skipped" ]; then
+            echo 'Route test results not retained because that test group was skipped.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           mkdir -p app/build/floor1-test-results/routes
           if compgen -G 'app/build/test-results/testDebugUnitTest/*.xml' > /dev/null; then
             cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/routes/
@@ -60,8 +65,11 @@ jobs:
           fi
           # Keep actionable test failures in check annotations as well as the artifact;
           # this makes results diagnosable even when the Actions log archive is unavailable.
-          python3 tools/annotate_junit_failures.py app/build/test-results/testDebugUnitTest --title "Floor 1 route test failure"
+          if [ "${{ steps.actual_routes.outcome }}" = "failure" ]; then
+            python3 tools/annotate_junit_failures.py app/build/floor1-test-results/routes --title "Floor 1 route test failure"
+          fi
       - name: Living expedition mechanics and actual alternate routes
+        id: living_expedition_tests
         run: >-
           gradle :app:testDebugUnitTest
           --tests com.example.LivingExpeditionPlaythroughTest
@@ -74,14 +82,21 @@ jobs:
       - name: Retain living expedition results
         if: always()
         run: |
+          if [ "${{ steps.living_expedition_tests.outcome }}" = "skipped" ]; then
+            echo 'Living-expedition results not retained because that test group was skipped.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           mkdir -p app/build/floor1-test-results/living
           if compgen -G 'app/build/test-results/testDebugUnitTest/*.xml' > /dev/null; then
             cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/living/
           else
             echo 'No JUnit XML was generated before the living-expedition test step failed.' >> "$GITHUB_STEP_SUMMARY"
           fi
-          python3 tools/annotate_junit_failures.py app/build/test-results/testDebugUnitTest --title "Floor 1 living-expedition test failure"
+          if [ "${{ steps.living_expedition_tests.outcome }}" = "failure" ]; then
+            python3 tools/annotate_junit_failures.py app/build/floor1-test-results/living --title "Floor 1 living-expedition test failure"
+          fi
       - name: Tower reforge controls, actual execution and native art
+        id: tower_reforge_tests
         run: >-
           gradle :app:testDebugUnitTest
           --tests com.example.TowerEncounterFramingTest
@@ -91,14 +106,21 @@ jobs:
       - name: Retain Tower reforge results
         if: always()
         run: |
+          if [ "${{ steps.tower_reforge_tests.outcome }}" = "skipped" ]; then
+            echo 'Tower-reforge results not retained because that test group was skipped.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           mkdir -p app/build/floor1-test-results/reforge
           if compgen -G 'app/build/test-results/testDebugUnitTest/*.xml' > /dev/null; then
             cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/reforge/
           else
             echo 'No JUnit XML was generated before the Tower reforge test step failed.' >> "$GITHUB_STEP_SUMMARY"
           fi
-          python3 tools/annotate_junit_failures.py app/build/test-results/testDebugUnitTest --title "Floor 1 reforge test failure"
+          if [ "${{ steps.tower_reforge_tests.outcome }}" = "failure" ]; then
+            python3 tools/annotate_junit_failures.py app/build/floor1-test-results/reforge --title "Floor 1 reforge test failure"
+          fi
       - name: Physical UI input and retry regressions
+        id: ui_regression_tests
         run: >-
           gradle :app:testDebugUnitTest
           --tests com.example.ui.LivingExpeditionUiTest
@@ -115,14 +137,21 @@ jobs:
       - name: Retain UI test results
         if: always()
         run: |
+          if [ "${{ steps.ui_regression_tests.outcome }}" = "skipped" ]; then
+            echo 'UI-regression results not retained because that test group was skipped.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           mkdir -p app/build/floor1-test-results/ui
           if compgen -G 'app/build/test-results/testDebugUnitTest/*.xml' > /dev/null; then
             cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/ui/
           else
             echo 'No JUnit XML was generated before the UI regression step failed.' >> "$GITHUB_STEP_SUMMARY"
           fi
-          python3 tools/annotate_junit_failures.py app/build/test-results/testDebugUnitTest --title "Floor 1 UI test failure"
+          if [ "${{ steps.ui_regression_tests.outcome }}" = "failure" ]; then
+            python3 tools/annotate_junit_failures.py app/build/floor1-test-results/ui --title "Floor 1 UI test failure"
+          fi
       - name: Original escort world and narrow-screen compatibility
+        id: world_compatibility_tests
         run: >-
           gradle :app:testDebugUnitTest
           --tests com.example.LostCourierVisualTest
@@ -131,13 +160,19 @@ jobs:
       - name: Retain world compatibility results
         if: always()
         run: |
+          if [ "${{ steps.world_compatibility_tests.outcome }}" = "skipped" ]; then
+            echo 'World-compatibility results not retained because that test group was skipped.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           mkdir -p app/build/floor1-test-results/world
           if compgen -G 'app/build/test-results/testDebugUnitTest/*.xml' > /dev/null; then
             cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/world/
           else
             echo 'No JUnit XML was generated before the world compatibility step failed.' >> "$GITHUB_STEP_SUMMARY"
           fi
-          python3 tools/annotate_junit_failures.py app/build/test-results/testDebugUnitTest --title "Floor 1 world test failure"
+          if [ "${{ steps.world_compatibility_tests.outcome }}" = "failure" ]; then
+            python3 tools/annotate_junit_failures.py app/build/floor1-test-results/world --title "Floor 1 world test failure"
+          fi
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
