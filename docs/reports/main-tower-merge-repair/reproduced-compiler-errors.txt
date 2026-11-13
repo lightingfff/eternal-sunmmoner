@@ -1,0 +1,7 @@
+e: file:///workspace/main-tower-merge-fix/app/src/main/java/com/example/game/combat/LostCourierEncounter.kt:372:12 Unresolved reference 'mana'.
+e: file:///workspace/main-tower-merge-fix/app/src/main/java/com/example/game/combat/LostCourierEncounter.kt:372:23 Unresolved reference 'mana'.
+e: file:///workspace/main-tower-merge-fix/app/src/main/java/com/example/game/combat/LostCourierEncounter.kt:372:33 Unresolved reference 'maxMana'.
+e: file:///workspace/main-tower-merge-fix/app/src/main/java/com/example/game/combat/LostCourierEncounter.kt:372:66 Unresolved reference 'maxMana'.
+e: file:///workspace/main-tower-merge-fix/app/src/main/java/com/example/game/combat/TowerCombatEngine.kt:508:9 Conflicting declarations:
+e: file:///workspace/main-tower-merge-fix/app/src/main/java/com/example/game/combat/TowerCombatEngine.kt:536:9 Conflicting declarations:
+e: file:///workspace/main-tower-merge-fix/app/src/test/java/com/example/game/combat/TowerCombatReforgeTest.kt:126:12 Cannot access 'activeOrder': it is private in 'com/example/game/combat/TowerCombatEngine'.

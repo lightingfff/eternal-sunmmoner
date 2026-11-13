@@ -1304,7 +1304,9 @@ fun TowerBattleScreen(
               RoundedCornerShape(10.dp),
             )
             .testTag("pinned_dodge_move_button")
-            .clickable { combatEngine.issueTacticalOrder(TacticalOrder.MOVE_TO) },
+            .clickable(enabled = battleInputEnabled) {
+              acknowledgeBattleInput { combatEngine.issueTacticalOrder(TacticalOrder.MOVE_TO) }
+            },
         ) {
           Column(
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
