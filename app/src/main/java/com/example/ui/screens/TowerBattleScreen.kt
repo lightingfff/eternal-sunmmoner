@@ -85,6 +85,8 @@ import androidx.compose.ui.unit.sp
 import com.example.data.FeastBuffHelper
 import com.example.data.GameSettings
 import com.example.data.firebase.ExpeditionOutcomeType
+import com.example.data.model.EquipmentRecord
+import com.example.data.model.HeroRecord
 import com.example.data.model.TacticalOrder
 import com.example.game.combat.DiscoveryNodeKind
 import com.example.game.combat.EnemyCombatUnit
@@ -196,6 +198,7 @@ fun TowerBattleScreen(
   settings: GameSettings = GameSettings(),
   sceneActive: Boolean = true,
   onFinishExpeditionDetailed: ((Boolean, Set<String>, Boolean, Long, Long, Set<String>, com.example.data.model.CourierOutcome?, String?) -> Unit)? = null,
+  onEquipItem: ((HeroRecord, EquipmentRecord) -> Unit)? = null,
 ) {
   val nowSec = remember { System.currentTimeMillis() / 1000L }
   val feastBuffActive = remember(state.profile?.storyFlags) {
@@ -1049,6 +1052,57 @@ fun TowerBattleScreen(
           horizontal = true,
         )
 
+        val isHazardAlert = combatEngine.lostCourier?.eliteTelegraph != null
+        val isMoveActive = combatEngine.activeOrder == TacticalOrder.MOVE_TO || combatEngine.awaitingMoveToTap
+        Surface(
+          shape = RoundedCornerShape(10.dp),
+          color = when {
+            isHazardAlert -> CrimsonBlood
+            isMoveActive -> SummonerGold
+            else -> SanctuaryStone.copy(alpha = 0.94f)
+          },
+          modifier = Modifier
+            .heightIn(min = 48.dp)
+            .border(
+              1.dp,
+              if (isHazardAlert || isMoveActive) Color.White else BorderRune,
+              RoundedCornerShape(10.dp),
+            )
+            .testTag("pinned_dodge_move_button")
+            .clickable { combatEngine.issueTacticalOrder(TacticalOrder.MOVE_TO) },
+        ) {
+          Column(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+          ) {
+            Row(
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+              Icon(
+                imageVector = Icons.Default.Bolt,
+                contentDescription = null,
+                tint = if (isHazardAlert || isMoveActive) ObsidianVoid else PortalCyan,
+                modifier = Modifier.size(12.dp),
+              )
+              Text(
+                text = if (isHazardAlert) "⚠ NÉ NGAY!" else "[8] Di Chuyển",
+                style = MaterialTheme.typography.labelSmall,
+                color = if (isHazardAlert || isMoveActive) ObsidianVoid else SummonerGold,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+              )
+            }
+            Text(
+              text = if (isHazardAlert) "Chạm né vòng đỏ" else "Chạm đất di chuyển",
+              style = MaterialTheme.typography.labelSmall,
+              color = if (isHazardAlert || isMoveActive) ObsidianVoid else ParchmentLight,
+              maxLines = 1,
+            )
+          }
+        }
+
         Row(
           modifier = Modifier
             .horizontalScroll(rememberScrollState())
@@ -1360,11 +1414,82 @@ fun TowerBattleScreen(
                     )
                   }
                   if (settlement.lootedItemName != null) {
-                    Text(
-                      text = "🗡 Chiến lợi phẩm đặc biệt: [${settlement.lootedItemName}]!",
-                      style = MaterialTheme.typography.labelLarge,
-                      color = ArcaneViolet,
-                    )
+                    val droppedEquip = state.equipment.firstOrNull { it.name == settlement.lootedItemName }
+                    val targetHero = state.heroes.firstOrNull { it.id == droppedEquip?.equippedByHeroId }
+                      ?: state.heroes.firstOrNull { it.name == "Kaelen" }
+                      ?: activeSquadRecords.firstOrNull()
+
+                    Surface(
+                      shape = RoundedCornerShape(10.dp),
+                      color = ObsidianVoid.copy(alpha = 0.88f),
+                      modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, ArcaneViolet.copy(alpha = 0.7f), RoundedCornerShape(10.dp))
+                        .padding(vertical = 4.dp),
+                    ) {
+                      Column(
+                        modifier = Modifier.padding(10.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                      ) {
+                        Row(
+                          verticalAlignment = Alignment.CenterVertically,
+                          horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                          Text(
+                            text = "🗡 Chiến lợi phẩm: [${settlement.lootedItemName}]",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = SummonerGold,
+                            fontWeight = FontWeight.Bold,
+                          )
+                          if (droppedEquip != null) {
+                            Surface(
+                              shape = RoundedCornerShape(4.dp),
+                              color = ArcaneViolet.copy(alpha = 0.35f),
+                            ) {
+                              Text(
+                                text = " ${droppedEquip.rarity}★ ${droppedEquip.slot} ",
+                                color = ArcaneViolet,
+                                style = MaterialTheme.typography.labelSmall,
+                              )
+                            }
+                          }
+                        }
+                        if (droppedEquip != null) {
+                          Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            if (droppedEquip.bonusAttack > 0) Text("+${droppedEquip.bonusAttack} ATK", color = EmeraldVitality, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                            if (droppedEquip.bonusHp > 0) Text("+${droppedEquip.bonusHp} HP", color = EmeraldVitality, style = MaterialTheme.typography.labelMedium)
+                            if (droppedEquip.bonusDefense > 0) Text("+${droppedEquip.bonusDefense} DEF", color = EmeraldVitality, style = MaterialTheme.typography.labelMedium)
+                          }
+                        }
+                        Text(
+                          text = "✦ Tăng mạnh chỉ số so với vũ khí cơ bản (+10 ATK). Trang bị ngay để chinh phục Tầng 2!",
+                          color = ParchmentLight,
+                          style = MaterialTheme.typography.bodySmall,
+                        )
+                        if (targetHero != null && droppedEquip != null && onEquipItem != null) {
+                          val isAlreadyEquipped = droppedEquip.equippedByHeroId == targetHero.id
+                          Button(
+                            onClick = { if (!isAlreadyEquipped) onEquipItem(targetHero, droppedEquip) },
+                            enabled = !isAlreadyEquipped && !state.isBusyAction,
+                            colors = FantasySkin.buttonColors(
+                              containerColor = if (isAlreadyEquipped) EmeraldVitality else PortalCyan,
+                              contentColor = ObsidianVoid,
+                            ),
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier
+                              .fillMaxWidth()
+                              .heightIn(min = 40.dp)
+                              .testTag("direct_equip_button"),
+                          ) {
+                            Text(
+                              text = if (isAlreadyEquipped) "✓ Đã Trang Bị Cho ${targetHero.name}" else "⚔ Trang Bị Ngay Cho ${targetHero.name}",
+                              fontWeight = FontWeight.Bold,
+                              style = MaterialTheme.typography.labelMedium,
+                            )
+                          }
+                        }
+                      }
+                    }
                   }
                   if(settlement.courierOutcome!=null) {
                     Text(if(settlement.courierOutcome==com.example.data.model.CourierOutcome.RESCUED)

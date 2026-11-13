@@ -404,8 +404,9 @@ class TowerCombatEngine(
       return
     }
 
-    // 5. Otherwise update Move-To tactical beacon if currently in MOVE_TO mode
-    if (activeOrder == TacticalOrder.MOVE_TO) {
+    // 5. Otherwise update Move-To tactical beacon if currently in MOVE_TO mode OR during active boss telegraph hazard!
+    val isTelegraphHazard = lostCourier?.eliteTelegraph != null
+    if (activeOrder == TacticalOrder.MOVE_TO || isTelegraphHazard) {
       val clamped = CollisionPhysics.resolvePosition(
         targetX = worldX,
         targetY = worldY,
@@ -416,8 +417,11 @@ class TowerCombatEngine(
         obstacles = mapLayout.obstacles,
       )
       moveBeacon = clamped
-      aoeEffects += CombatAoEEffect(clamped.first, clamped.second, 55f, Color(0xFFF5B841))
-      postFeedback("Đã cập nhật tọa độ cờ điều quân!")
+      activeOrder = TacticalOrder.MOVE_TO
+      awaitingMoveToTap = false
+      val beaconColor = if (isTelegraphHazard) Color(0xFF38BDF8) else Color(0xFFF5B841)
+      aoeEffects += CombatAoEEffect(clamped.first, clamped.second, 55f, beaconColor)
+      postFeedback(if (isTelegraphHazard) "NÉ ĐÒN KHẨN CẤP! Toàn đội dạt sang vị trí mới!" else "Đã cập nhật tọa độ cờ điều quân!")
     }
   }
 
@@ -831,6 +835,16 @@ class TowerCombatEngine(
     val mitigated = ((rawDmg * variance * counterMult).toInt() - enemy.defense / 2).coerceAtLeast(6)
     enemy.hp = (enemy.hp - mitigated).coerceAtLeast(0)
     enemy.hurtFlash = 1f
+    if (counterMult > 1f) {
+      floatingTexts += FloatingCombatText(
+        x = enemy.x,
+        y = enemy.y - 54f,
+        text = "VỠ GIÁP +35%!",
+        color = Color(0xFFFFD700),
+        isLarge = true,
+        duration = 1.2f,
+      )
+    }
     aoeEffects += CombatAoEEffect(enemy.x, enemy.y - 12f, if (isSkill) 36f else 22f, Color(0xFFFEF08A), duration = 0.25f)
     floatingTexts += FloatingCombatText(
       x = enemy.x + Random.nextFloat() * 18f - 9f,

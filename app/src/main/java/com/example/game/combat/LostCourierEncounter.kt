@@ -101,7 +101,9 @@ class LostCourierEncounter internal constructor(
       val (tx, ty) = waypoints[waypointIndex]
       val distance = hypot(tx - courier.x, ty - courier.y)
       if (distance <= 8f) waypointIndex++ else {
-        val step = minOf(distance, 44f * dt)
+        val hasAggroedThreat = engine.enemies.any { !it.dead && it.aggroed }
+        val escortSpeed = if (hasAggroedThreat) 44f else 66f
+        val step = minOf(distance, escortSpeed * dt)
         val pos = CollisionPhysics.resolvePosition(courier.x + (tx - courier.x) / distance * step,
           courier.y + (ty - courier.y) / distance * step, 18f, engine.mapLayout.width,
           engine.mapLayout.height, engine.mapLayout.wallMargin, engine.mapLayout.obstacles)
@@ -256,8 +258,11 @@ class LostCourierEncounter internal constructor(
     if (!scoutResolved && scoutEnemyId != null && engine.enemies.any { it.id == scoutEnemyId && it.dead }) {
       scoutResolved = true
       scoutWarningRemaining = 0f
-      statusVi = "Đã chặn trinh sát trước tiếng tù và! Không có viện binh."
+      statusVi = "Đã chặn trinh sát trước tiếng tù và! Thu được [Lối tắt trinh sát]: Hồi 25% Mana toàn đội."
       engine.postFeedback(statusVi)
+      engine.heroes.filter { !it.knockedOut }.forEach {
+        it.mana = (it.mana + it.maxMana * 0.25f).coerceAtMost(it.maxMana.toFloat())
+      }
       if (phase == CourierPhase.SCOUT_ALARM) phase = CourierPhase.ESCORT
     }
     if (courier.hp <= 0 || engine.heroes.none { !it.knockedOut }) {

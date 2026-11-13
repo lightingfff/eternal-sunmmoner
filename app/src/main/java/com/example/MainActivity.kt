@@ -335,6 +335,7 @@ fun EternalSummonerRootApp() {
           onFinishExpedition = { victory, fallen -> vm.finishTowerExpedition(victory, fallen) },
           onReturnToSanctuary = vm::returnToSanctuaryLobby,
           onFinishExpeditionDetailed = vm::finishTowerExpedition,
+          onEquipItem = vm::equipItem,
         )
       }
     }
