@@ -17,6 +17,14 @@ Their original SHA-256 hashes, category and source path are in `inventory.json` 
 Only the core art/process folders and Scenario setup folder include their local supporting
 files; other skills' ancillary scripts/references are not fully vendored.
 
+## MengTo game/design methods
+
+For combat animation/VFX, monster identity/AI, level readability or evidence-based HUD
+review, read the [MengTo project adapter](../mengto-game-design/SKILL.md). It routes the
+relevant methods without adopting browser/Three.js, source-specific accounts or 3D rig
+requirements. Keep existing sprite guidance, select only the narrow task, and judge actual
+native runtime evidence rather than importing example scores or taste claims.
+
 ## Preferred guidance, when relevant
 
 - Character frames: `ai-game-spritesheets` + `scenario-sprite-animation`.

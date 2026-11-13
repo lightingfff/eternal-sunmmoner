@@ -8,6 +8,16 @@ Use shared sprite bounds/scale/anchors for visible feet and projected shadows; u
 
 For graphics changes, build the APK and capture real runtime overview/gameplay, architecture, partial canopy occlusion and multiple zoom screenshots. Inspect the images; passing tests alone does not establish visual quality. Do not claim physical-device FPS without profiling.
 
+## MengTo game/design reference preference (2026-11-14)
+
+For authorized level-readability, monster/AI, combat-animation/VFX, UI-clarity or visual
+review tasks, read `.agents/skills/mengto-game-design/SKILL.md` and select only relevant
+guidance. The MIT source is pinned under `docs/skill-library/mengto/`;183entrypoints are
+references, not blanket activation. Keep Kotlin/Compose, original pixel art/.72camera,
+simulation/contact timing, input/save compatibility and owner-only review/merge rules.
+Upstream Three.js examples, personal accounts/paths, score histories and project-specific
+constraints are not this user's APIs/preferences or this game's measured results.
+
 ## User's game-development skill preference
 
 For future game implementation tasks in this repository, read
