@@ -1,0 +1,71 @@
+{
+  "version": "1.0.0",
+  "task": "ES-A12-001",
+  "role": "A12",
+  "generatedAt": "2026-11-08",
+  "status": "SPEC — NOT YET SHIPPED",
+  "note": "This manifest lists planned audio assets. Actual OGG files are NOT included in this commit. Assets require owner authorization for sourcing/composition before implementation.",
+  "channels": {
+    "bgm": { "volume": 0.6, "type": "streaming", "engine": "MediaPlayer" },
+    "sfx_combat": { "volume": 1.0, "type": "memory", "engine": "SoundPool" },
+    "sfx_ui": { "volume": 0.5, "type": "memory", "engine": "SoundPool" },
+    "sfx_ambient": { "volume": 0.3, "type": "memory", "engine": "SoundPool" },
+    "sfx_event": { "volume": 0.9, "type": "memory", "engine": "SoundPool" }
+  },
+  "assets": {
+    "bgm": [
+      { "id": "bgm_sanctuary_day", "file": "bgm/sanctuary_day.ogg", "duration": 120, "loop": true, "license": "PENDING", "phase": "B" },
+      { "id": "bgm_sanctuary_night", "file": "bgm/sanctuary_night.ogg", "duration": 120, "loop": true, "license": "PENDING", "phase": "D" },
+      { "id": "bgm_floor1_meadow_combat", "file": "bgm/floor1_meadow_combat.ogg", "duration": 100, "loop": true, "license": "PENDING", "phase": "A" },
+      { "id": "bgm_floor1_boss_encounter", "file": "bgm/floor1_boss_encounter.ogg", "duration": 100, "loop": true, "license": "PENDING", "phase": "C" },
+      { "id": "bgm_victory", "file": "bgm/victory_result.ogg", "duration": 15, "loop": false, "license": "PENDING", "phase": "A" }
+    ],
+    "sfx_combat": [
+      { "id": "melee_hit_light", "file": "sfx/combat/melee_hit_light.ogg", "duration": 0.3, "pool": 4, "license": "PENDING", "phase": "A" },
+      { "id": "melee_hit_heavy", "file": "sfx/combat/melee_hit_heavy.ogg", "duration": 0.5, "pool": 2, "license": "PENDING", "phase": "A" },
+      { "id": "arrow_release", "file": "sfx/combat/arrow_release.ogg", "duration": 0.6, "pool": 3, "license": "PENDING", "phase": "A" },
+      { "id": "wolf_bite", "file": "sfx/combat/wolf_bite.ogg", "duration": 0.3, "pool": 3, "license": "PENDING", "phase": "A" },
+      { "id": "boss_cleave", "file": "sfx/combat/boss_cleave.ogg", "duration": 0.6, "pool": 2, "license": "PENDING", "phase": "C" },
+      { "id": "enemy_death_goblin", "file": "sfx/combat/enemy_death_goblin.ogg", "duration": 0.8, "pool": 3, "license": "PENDING", "phase": "B" },
+      { "id": "enemy_death_wolf", "file": "sfx/combat/enemy_death_wolf.ogg", "duration": 0.7, "pool": 2, "license": "PENDING", "phase": "B" },
+      { "id": "hero_skill_activate", "file": "sfx/combat/hero_skill_activate.ogg", "duration": 0.8, "pool": 3, "license": "PENDING", "phase": "A" },
+      { "id": "hero_hit", "file": "sfx/combat/hero_hit.ogg", "duration": 0.4, "pool": 4, "license": "PENDING", "phase": "A" },
+      { "id": "master_hit", "file": "sfx/combat/master_hit.ogg", "duration": 0.5, "pool": 2, "license": "PENDING", "phase": "A" },
+      { "id": "enemy_aggro_goblin", "file": "sfx/combat/enemy_aggro_goblin.ogg", "duration": 0.8, "pool": 2, "license": "PENDING", "phase": "B" },
+      { "id": "enemy_aggro_wolf", "file": "sfx/combat/enemy_aggro_wolf.ogg", "duration": 1.2, "pool": 2, "license": "PENDING", "phase": "B" }
+    ],
+    "sfx_ui": [
+      { "id": "order_follow", "file": "sfx/ui/order_follow.ogg", "duration": 0.3, "pool": 2, "license": "PENDING", "phase": "D" },
+      { "id": "order_aggressive", "file": "sfx/ui/order_aggressive.ogg", "duration": 0.3, "pool": 2, "license": "PENDING", "phase": "D" },
+      { "id": "order_defensive", "file": "sfx/ui/order_defensive.ogg", "duration": 0.3, "pool": 2, "license": "PENDING", "phase": "D" },
+      { "id": "retreat_horn", "file": "sfx/ui/retreat_horn.ogg", "duration": 1.5, "pool": 1, "license": "PENDING", "phase": "D" },
+      { "id": "discovery_chime", "file": "sfx/ui/discovery_chime.ogg", "duration": 0.6, "pool": 2, "license": "PENDING", "phase": "B" },
+      { "id": "gold_pickup", "file": "sfx/ui/gold_pickup.ogg", "duration": 0.3, "pool": 2, "license": "PENDING", "phase": "B" },
+      { "id": "ui_tap", "file": "sfx/ui/ui_tap.ogg", "duration": 0.15, "pool": 3, "license": "PENDING", "phase": "D" }
+    ],
+    "sfx_events": [
+      { "id": "war_horn_alarm", "file": "sfx/events/war_horn_alarm.ogg", "duration": 3.0, "pool": 1, "license": "PENDING", "phase": "C" },
+      { "id": "boss_spawn_fanfare", "file": "sfx/events/boss_spawn_fanfare.ogg", "duration": 10.0, "pool": 1, "license": "PENDING", "phase": "C" },
+      { "id": "boss_spawn_roar", "file": "sfx/events/boss_spawn_roar.ogg", "duration": 2.0, "pool": 1, "license": "PENDING", "phase": "C" },
+      { "id": "boss_death", "file": "sfx/events/boss_death.ogg", "duration": 2.0, "pool": 1, "license": "PENDING", "phase": "C" },
+      { "id": "courier_encounter_start", "file": "sfx/events/courier_encounter_start.ogg", "duration": 1.0, "pool": 1, "license": "PENDING", "phase": "D" },
+      { "id": "telegraph_warning", "file": "sfx/events/telegraph_warning.ogg", "duration": 1.5, "pool": 2, "license": "PENDING", "phase": "D" },
+      { "id": "scout_alarm", "file": "sfx/events/scout_alarm.ogg", "duration": 0.8, "pool": 1, "license": "PENDING", "phase": "D" },
+      { "id": "courier_rescued", "file": "sfx/events/courier_rescued.ogg", "duration": 1.5, "pool": 1, "license": "PENDING", "phase": "D" },
+      { "id": "courier_failed", "file": "sfx/events/courier_failed.ogg", "duration": 1.0, "pool": 1, "license": "PENDING", "phase": "D" },
+      { "id": "victory_chime", "file": "sfx/events/victory_chime.ogg", "duration": 0.5, "pool": 1, "license": "PENDING", "phase": "A" }
+    ],
+    "sfx_ambient": [
+      { "id": "meadow_wind", "file": "sfx/ambient/meadow_wind.ogg", "duration": 60, "loop": true, "pool": 1, "license": "PENDING", "phase": "B" },
+      { "id": "grass_rustle", "file": "sfx/ambient/grass_rustle.ogg", "duration": 0.3, "pool": 4, "license": "PENDING", "phase": "B" },
+      { "id": "tower_descent", "file": "sfx/ambient/tower_descent.ogg", "duration": 1.5, "pool": 1, "license": "PENDING", "phase": "D" },
+      { "id": "return_to_sanctuary", "file": "sfx/ambient/return_to_sanctuary.ogg", "duration": 2.0, "pool": 1, "license": "PENDING", "phase": "D" },
+      { "id": "defeat_sting", "file": "sfx/ambient/defeat_sting.ogg", "duration": 10.0, "pool": 1, "license": "PENDING", "phase": "A" }
+    ]
+  },
+  "totalAssets": 41,
+  "estimatedTotalSizeMB": 7,
+  "format": "OGG Vorbis",
+  "bgmBitrate": "64kbps",
+  "sfxBitrate": "96kbps"
+}
