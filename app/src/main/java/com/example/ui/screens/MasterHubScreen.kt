@@ -58,6 +58,7 @@ fun MasterHubScreen(
   onClose: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
+  androidx.activity.compose.BackHandler(onBack = onClose)
   val profile = state.profile
   Box(
     modifier = modifier

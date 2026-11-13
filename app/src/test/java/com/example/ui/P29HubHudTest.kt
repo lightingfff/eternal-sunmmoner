@@ -47,6 +47,7 @@ class P29HubHudTest {
     val profile = MasterProfile(
       id = "u_master_test", masterName = "Thống Lĩnh Lokir", masterLevel = 12,
       highestClearedFloor = 1, gold = 14850, manaCrystals = 640, soulShards = 125,
+      storyFlags = listOf(com.example.game.story.ManhwaStoryData.FLAG_PROLOGUE_SEEN),
     )
     val hero = HeroRecord(
       id = "h1", name = "Kaelen Vệ Thần", heroClass = HeroClassType.KNIGHT.name,
@@ -111,6 +112,59 @@ class P29HubHudTest {
     assertTrue(settingsOpened)
     rule.onNodeWithTag("master_hub_close").performClick()
     assertTrue(closed)
+  }
+
+
+  @Test
+  fun masterModalDismissedByAndroidBack() {
+    rule.mainClock.autoAdvance = false
+    var owner: androidx.activity.OnBackPressedDispatcherOwner? = null
+    rule.setContent {
+      owner = androidx.activity.compose.LocalOnBackPressedDispatcherOwner.current
+      EternalSummonerTheme {
+        SanctuaryLobbyScreen(
+          state = sampleState(),
+          sceneActive = false,
+          onOpenFacility = {}, onCloseFacility = {}, onSummonHero = {},
+          onTrainHero = { _, _ -> }, onEquipItem = { _, _ -> }, onSynthesizeGear = {},
+          onEnhanceGear = {}, onRecoverHero = { _, _ -> }, onHostMeal = {},
+          onToggleSquad = {}, onCompletePrologue = {}, onSignOut = {}, onOpenSettings = {},
+        )
+      }
+    }
+    rule.mainClock.advanceTimeBy(200L)
+    rule.waitForIdle()
+    rule.onNodeWithTag("master_chip").performClick()
+    rule.mainClock.advanceTimeBy(120L)
+    rule.waitForIdle()
+    rule.onNodeWithTag("master_hub_screen").assertExists()
+    rule.runOnIdle { owner?.onBackPressedDispatcher?.onBackPressed() }
+    rule.mainClock.advanceTimeBy(200L)
+    rule.waitForIdle()
+    rule.onNodeWithTag("master_hub_screen").assertDoesNotExist()
+  }
+
+  @Test
+  fun collapsedNavHasAccessibleDestinationNames() {
+    rule.mainClock.autoAdvance = false
+    rule.setContent {
+      EternalSummonerTheme {
+        SanctuaryLobbyScreen(
+          state = sampleState(),
+          sceneActive = false,
+          onOpenFacility = {}, onCloseFacility = {}, onSummonHero = {},
+          onTrainHero = { _, _ -> }, onEquipItem = { _, _ -> }, onSynthesizeGear = {},
+          onEnhanceGear = {}, onRecoverHero = { _, _ -> }, onHostMeal = {},
+          onToggleSquad = {}, onCompletePrologue = {}, onSignOut = {}, onOpenSettings = {},
+        )
+      }
+    }
+    rule.mainClock.advanceTimeBy(200L)
+    rule.waitForIdle()
+    val node = rule.onNodeWithTag("nav_heroes").fetchSemanticsNode()
+    val desc = node.config.getOrElse(androidx.compose.ui.semantics.SemanticsProperties.ContentDescription) { emptyList() }
+    val text = node.config.getOrElse(androidx.compose.ui.semantics.SemanticsProperties.Text) { emptyList() }
+    assertTrue(desc.any { it.isNotBlank() } || text.any { it.text.isNotBlank() })
   }
 
   @Test @Config(qualifiers = "w800dp-h360dp-land-xhdpi")

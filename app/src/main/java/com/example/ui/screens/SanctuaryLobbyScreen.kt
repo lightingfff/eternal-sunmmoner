@@ -321,10 +321,11 @@ fun SanctuaryLobbyScreen(
   }
 
   BackHandler(
-    enabled = (insideInterior || showPauseMapModal || showChronicleModal || showExpansionModal || inspectingHeroId != null || promptedFacility != null) &&
+    enabled = (showMasterHub || insideInterior || showPauseMapModal || showChronicleModal || showExpansionModal || inspectingHeroId != null || promptedFacility != null) &&
       state.activeFacilityModal == null
   ) {
     when {
+      showMasterHub -> showMasterHub = false
       inspectingHeroId != null -> inspectingHeroId = null
       showExpansionModal -> showExpansionModal = false
       showPauseMapModal -> showPauseMapModal = false
@@ -344,7 +345,7 @@ fun SanctuaryLobbyScreen(
 
   LaunchedEffect(Unit) { focusRequester.requestFocus() }
   SceneFrameLoop(
-    active = sceneActive && state.activeFacilityModal == null && managementMode == null &&
+    active = sceneActive && !showMasterHub && state.activeFacilityModal == null && managementMode == null &&
       !showPauseMapModal && !showChronicleModal && !showExpansionModal && inspectingHeroId == null && !showPrologue,
     targetFps = settings.performanceMode.targetFps,
   ) { elapsed, nanos ->

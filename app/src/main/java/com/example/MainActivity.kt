@@ -345,6 +345,7 @@ fun EternalSummonerRootApp() {
           onReturnToSanctuary = vm::returnToSanctuaryLobby,
           onPrepareRetry = vm::retryTowerExpedition,
           onFinishExpeditionDetailed = vm::finishTowerExpedition,
+          onEquipItem = vm::equipItem,
         )
       }
     }

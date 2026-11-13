@@ -107,6 +107,8 @@ class LostCourierEncounter internal constructor(
     private set
   var eliteRecoveryRemaining = 0f
     private set
+  var courierSupportCooldown = 3.5f
+    private set
   private var waypointIndex = 0
   private var scoutResolved = false
 
@@ -131,6 +133,39 @@ class LostCourierEncounter internal constructor(
     }
     engine.heroes.forEach { it.fearSecondsRemaining = (it.fearSecondsRemaining - dt * reassurance).coerceAtLeast(0f) }
     eliteRecoveryRemaining = (eliteRecoveryRemaining - dt).coerceAtLeast(0f)
+    if (phase == CourierPhase.GATE_GUARD && courier.hp > 0 && outcome == null) {
+      courierSupportCooldown -= dt
+      if (courierSupportCooldown <= 0f) {
+        courierSupportCooldown = 3.8f
+        val woundedHero = engine.heroes.filter { !it.knockedOut && it.hp < it.maxHp }.minByOrNull { it.hp.toFloat() / it.maxHp }
+        if (woundedHero != null) {
+          val healAmount = 14
+          woundedHero.hp = (woundedHero.hp + healAmount).coerceAtMost(woundedHero.maxHp)
+          engine.floatingTexts += FloatingCombatText(
+            woundedHero.x,
+            woundedHero.y - 42f,
+            "+$healAmount HP",
+            androidx.compose.ui.graphics.Color(0xFF34D399),
+            isLarge = true,
+          )
+          engine.aoeEffects += CombatAoEEffect(woundedHero.x, woundedHero.y, 35f, androidx.compose.ui.graphics.Color(0xFF34D399), duration = 0.4f)
+          engine.postFeedback("Người đưa thư sơ cứu cho ${woundedHero.name}: +$healAmount HP!")
+        } else {
+          val kraag = engine.enemies.firstOrNull { it.id == eliteEnemyId && !it.dead }
+          if (kraag != null) {
+            kraag.hp = (kraag.hp - 12).coerceAtLeast(0)
+            kraag.hurtFlash = 0.8f
+            engine.floatingTexts += FloatingCombatText(
+              kraag.x,
+              kraag.y - 38f,
+              "-12",
+              androidx.compose.ui.graphics.Color(0xFF38BDF8),
+            )
+            engine.postFeedback("Người đưa thư bắn yểm trợ quấy rối Kraag!")
+          }
+        }
+      }
+    }
     if (phase == CourierPhase.CLEAR_PATH && engine.enemies.filter { it.id.startsWith("courier_path_") }.all { it.dead }) {
       phase = CourierPhase.ESCORT
       statusVi = "Người đưa thư: Cảm ơn! Hãy đi gần tôi. Bảo vệ sẽ giữ đội hình quanh tôi."
@@ -165,7 +200,9 @@ class LostCourierEncounter internal constructor(
       val (tx, ty) = waypoints[waypointIndex]
       val distance = hypot(tx - courier.x, ty - courier.y)
       if (distance <= 8f) waypointIndex++ else {
-        val step = minOf(distance, 44f * dt)
+        val hasAggroedThreat = engine.enemies.any { !it.dead && it.aggroed }
+        val escortSpeed = if (hasAggroedThreat) 44f else 66f
+        val step = minOf(distance, escortSpeed * dt)
         val pos = CollisionPhysics.resolvePosition(courier.x + (tx - courier.x) / distance * step,
           courier.y + (ty - courier.y) / distance * step, 18f, engine.mapLayout.width,
           engine.mapLayout.height, engine.mapLayout.wallMargin, engine.mapLayout.obstacles)
@@ -329,8 +366,11 @@ class LostCourierEncounter internal constructor(
     if (!scoutResolved && scoutEnemyId != null && engine.enemies.any { it.id == scoutEnemyId && it.dead }) {
       scoutResolved = true
       scoutWarningRemaining = 0f
-      statusVi = "Đã chặn trinh sát trước tiếng tù và! Không có viện binh."
+      statusVi = "Đã chặn trinh sát trước tiếng tù và! Thu được [Lối tắt trinh sát]: Hồi 25% Mana toàn đội."
       engine.postFeedback(statusVi)
+      engine.heroes.filter { !it.knockedOut }.forEach {
+        it.mana = (it.mana + it.maxMana * 0.25f).coerceAtMost(it.maxMana.toFloat())
+      }
       if (phase == CourierPhase.SCOUT_ALARM) phase = CourierPhase.ESCORT
     }
     if (courier.hp <= 0 || engine.heroes.none { !it.knockedOut }) {
