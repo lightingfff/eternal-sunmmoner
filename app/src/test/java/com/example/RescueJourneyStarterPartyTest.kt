@@ -135,6 +135,16 @@ class RescueJourneyStarterPartyTest {
       if (choice == CourierChoice.RECOVER_SUPPLIES && mission.choice != null && !supplyTripFinished &&
         !(intercepted && !protectedAfterScout)) {
         if (!mission.suppliesRecovered) {
+          // Don't abandon the escort while the crossing ambush is still in striking
+          // distance. Combat orders interrupt the supply trail; clear the threat, then
+          // resume the same physical route and collection action.
+          val threatNearCourier = engine.enemies.any { enemy ->
+            !enemy.dead && hypot(enemy.x - mission.courier.x, enemy.y - mission.courier.y) <= 500f
+          }
+          if (threatNearCourier) {
+            focusThreat()
+            continue
+          }
           if (!engine.navigatingCourierSupplies && engine.navigateToCourierSupplies()) record("START_SUPPLY_TRAIL")
           if (engine.collectCourierSupplies()) record("SUPPLIES_PICKED_UP")
         } else if (!engine.navigatingCourierSupplies) {
