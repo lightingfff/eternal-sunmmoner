@@ -60,33 +60,7 @@ jobs:
           fi
           # Keep actionable test failures in check annotations as well as the artifact;
           # this makes results diagnosable even when the Actions log archive is unavailable.
-          python3 - <<'PY'
-          from pathlib import Path
-          from xml.etree import ElementTree as ET
-
-          result_dir = Path("app/build/test-results/testDebugUnitTest")
-          for result_file in sorted(result_dir.glob("*.xml")):
-              try:
-                  suite = ET.parse(result_file).getroot()
-              except ET.ParseError as error:
-                  print(f"::warning title=Invalid JUnit XML::{result_file.name}: {error}")
-                  continue
-              for case in suite.iter("testcase"):
-                  for result in case:
-                      if result.tag.rsplit("}", 1)[-1] not in {"failure", "error"}:
-                          continue
-                      detail = result.attrib.get("message", "") or (result.text or "")
-                      detail = " ".join(detail.split())
-                      if len(detail) > 8000:
-                          detail = "...[leading test output truncated]... " + detail[-8000:]
-                      label = f"{case.attrib.get('classname', result_file.stem)}#{case.attrib.get('name', 'unknown')}"
-                      message = f"{label}: {detail or 'test failed without a message'}"
-                      chunks = [message[offset:offset + 1200] for offset in range(0, len(message), 1200)]
-                      for index, chunk in enumerate(chunks, start=1):
-                          chunk = chunk.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
-                          title = f"Floor 1 route test failure [{index}/{len(chunks)}]"
-                          print(f"::error title={title}::{chunk}")
-          PY
+          python3 tools/annotate_junit_failures.py app/build/test-results/testDebugUnitTest --title "Floor 1 route test failure"
       - name: Living expedition mechanics and actual alternate routes
         run: >-
           gradle :app:testDebugUnitTest
@@ -106,6 +80,7 @@ jobs:
           else
             echo 'No JUnit XML was generated before the living-expedition test step failed.' >> "$GITHUB_STEP_SUMMARY"
           fi
+          python3 tools/annotate_junit_failures.py app/build/test-results/testDebugUnitTest --title "Floor 1 living-expedition test failure"
       - name: Tower reforge controls, actual execution and native art
         run: >-
           gradle :app:testDebugUnitTest
@@ -122,6 +97,7 @@ jobs:
           else
             echo 'No JUnit XML was generated before the Tower reforge test step failed.' >> "$GITHUB_STEP_SUMMARY"
           fi
+          python3 tools/annotate_junit_failures.py app/build/test-results/testDebugUnitTest --title "Floor 1 reforge test failure"
       - name: Physical UI input and retry regressions
         run: >-
           gradle :app:testDebugUnitTest
@@ -145,6 +121,7 @@ jobs:
           else
             echo 'No JUnit XML was generated before the UI regression step failed.' >> "$GITHUB_STEP_SUMMARY"
           fi
+          python3 tools/annotate_junit_failures.py app/build/test-results/testDebugUnitTest --title "Floor 1 UI test failure"
       - name: Original escort world and narrow-screen compatibility
         run: >-
           gradle :app:testDebugUnitTest
@@ -160,6 +137,7 @@ jobs:
           else
             echo 'No JUnit XML was generated before the world compatibility step failed.' >> "$GITHUB_STEP_SUMMARY"
           fi
+          python3 tools/annotate_junit_failures.py app/build/test-results/testDebugUnitTest --title "Floor 1 world test failure"
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
