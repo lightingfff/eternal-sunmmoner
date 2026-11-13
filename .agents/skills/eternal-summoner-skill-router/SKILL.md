@@ -61,3 +61,12 @@ that needs them. Marketing, team administration, monetization, multiplayer and m
 of the upstream skill repository are not default game requirements. Do not preload or
 execute all 174 skills each turn. This saved project guidance does not guarantee memory
 in a different repository or unrelated chat.
+
+## Gameplay and systems reference library
+
+For Tower layout/pacing, replay rewards, combat feedback, autonomy, touch, persistence or
+performance, read the [gamedev-agent-skills adapter](../gamedev-agent-skills/SKILL.md).
+It maps the pinned library's portable disciplines to this native Android project;
+select one to three relevant skills, retain art guidance when art is in scope, and bind
+implementation to current Kotlin/Compose APIs. Upstream engine defaults, examples and
+progression numbers never override project constraints or task ownership.

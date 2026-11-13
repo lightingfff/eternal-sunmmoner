@@ -35,3 +35,13 @@ For all new agent instances (A01–A12), first read `docs/agents/START_HERE.md`,
 ## Dual-lead execution update — Arena A01 + Gemini 4 Argon High
 
 Read `docs/agents/DUAL_LEAD_WORKFLOW.md` before substantial task implementation/review. A01 Arena is the technical/integration co-lead; Gemini 4 Argon High is creative/production co-lead that may create **original verified PNG/animation assets and scoped noncritical code** under its own owner-approved ARGON-WORK issue and branch. A01–A12 original responsibilities/Issue #52–#63 remain. Argon and Codex independently review **all substantive PRs** (full for core critical, lightweight for art/docs as appropriate), A09 tests; reviewers are read-only until `[FIX_PLAN]` assigns exactly one corrective writer per file. A reviewer who fixes cannot self-approve. New SHA requires fresh review. Do not allow concurrent updates to the same PR branch/file. All merges by user. Actual GitHub/app/API capabilities must be verified; no fabricated running agent or CI.
+
+## Game-development discipline library (2026-11-13)
+
+For gameplay, level design, AI, input, rewards, saves or performance tasks, read
+`.agents/skills/gamedev-agent-skills/SKILL.md` and select relevant upstream disciplines/genre.
+The pinned Apache-2.0 catalog contains 79 specialized skills plus a router, stored under
+`docs/skill-library/gamedev-agent-skills/`. Keep Kotlin/Compose, the .72 oblique camera
+and all project contracts. Engine examples and suggested numbers are not project APIs or
+measured results. This complements existing art guidance; it does not activate every skill
+or authorize unrelated work, provider calls, engine migration or merges.

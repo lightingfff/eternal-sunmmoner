@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "source_commit": "c6ca6c41c839b68319ffc08430b99ab768debc32",
+  "source_files": 256,
+  "skill_entrypoints": 80,
+  "selected_specialized_entrypoints": 10,
+  "python_syntax": 14,
+  "json_syntax": 3,
+  "bundled_resource_paths": 136,
+  "project_links": 114
+}
