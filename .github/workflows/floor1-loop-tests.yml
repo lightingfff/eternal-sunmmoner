@@ -53,7 +53,11 @@ jobs:
         if: always()
         run: |
           mkdir -p app/build/floor1-test-results/routes
-          cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/routes/
+          if compgen -G 'app/build/test-results/testDebugUnitTest/*.xml' > /dev/null; then
+            cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/routes/
+          else
+            echo 'No JUnit XML was generated before the route test step failed.' >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Living expedition mechanics and actual alternate routes
         run: >-
           gradle :app:testDebugUnitTest
@@ -68,7 +72,11 @@ jobs:
         if: always()
         run: |
           mkdir -p app/build/floor1-test-results/living
-          cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/living/
+          if compgen -G 'app/build/test-results/testDebugUnitTest/*.xml' > /dev/null; then
+            cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/living/
+          else
+            echo 'No JUnit XML was generated before the living-expedition test step failed.' >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Tower reforge controls, actual execution and native art
         run: >-
           gradle :app:testDebugUnitTest
@@ -80,7 +88,11 @@ jobs:
         if: always()
         run: |
           mkdir -p app/build/floor1-test-results/reforge
-          cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/reforge/
+          if compgen -G 'app/build/test-results/testDebugUnitTest/*.xml' > /dev/null; then
+            cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/reforge/
+          else
+            echo 'No JUnit XML was generated before the Tower reforge test step failed.' >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Physical UI input and retry regressions
         run: >-
           gradle :app:testDebugUnitTest
@@ -99,7 +111,11 @@ jobs:
         if: always()
         run: |
           mkdir -p app/build/floor1-test-results/ui
-          cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/ui/
+          if compgen -G 'app/build/test-results/testDebugUnitTest/*.xml' > /dev/null; then
+            cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/ui/
+          else
+            echo 'No JUnit XML was generated before the UI regression step failed.' >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Original escort world and narrow-screen compatibility
         run: >-
           gradle :app:testDebugUnitTest
@@ -110,7 +126,11 @@ jobs:
         if: always()
         run: |
           mkdir -p app/build/floor1-test-results/world
-          cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/world/
+          if compgen -G 'app/build/test-results/testDebugUnitTest/*.xml' > /dev/null; then
+            cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/world/
+          else
+            echo 'No JUnit XML was generated before the world compatibility step failed.' >> "$GITHUB_STEP_SUMMARY"
+          fi
       - uses: actions/setup-node@v4
         with:
           node-version: '22'

@@ -70,32 +70,35 @@ class TowerCombatReforgeTest {
   }
 
   @Test
-  fun scoutInterceptionGrantsManaAndTacticalShortcut() {
+  fun scoutInterceptionAddsExpeditionManaRewardOnce() {
     val engine = battle()
     val mission = engine.lostCourier!!
     clearPath(engine)
 
     // Move to scout trigger point
     mission.courier.x = 1330f
-    val hero = engine.heroes.single()
-    hero.apply {
+    engine.heroes.single().apply {
       x = 1330f; y = mission.courier.y
-      mana = 0f // Empty mana
     }
     engine.step(0.05f, 0f, 0f)
 
     assertNotNull(mission.scoutEnemyId)
     assertTrue(mission.scoutWarningRemaining > 0f)
 
-    // Intercept scout before warning expires
+    // Intercept scout before warning expires; Mana is a player-level expedition reward,
+    // not a per-hero combat resource.
     val scout = engine.enemies.first { it.id == mission.scoutEnemyId }
     scout.hp = 0
     scout.dead = true
     engine.step(0.05f, 0f, 0f)
 
-    assertTrue("Scout interception must grant +25% Mana to living heroes", hero.mana >= hero.maxMana * 0.20f)
+    assertEquals(25L, engine.bonusDiscoveryMana)
     assertEquals(0f, mission.scoutWarningRemaining, 0f)
     assertFalse(mission.scoutCalledReinforcements)
+
+    // Subsequent frames must not award the same interception twice.
+    engine.step(0.05f, 0f, 0f)
+    assertEquals(25L, engine.bonusDiscoveryMana)
   }
 
   @Test
@@ -111,9 +114,7 @@ class TowerCombatReforgeTest {
 
     val kraag = engine.enemies.first { it.id == mission.eliteEnemyId }
 
-    // Kraag finishes slam and enters recovery break window
-    mission.eliteTelegraph = null
-    // Set recovery using reflection or direct update
+    // Place Kraag in its recovery window; the property is intentionally read-only to callers.
     val recoveryField = LostCourierEncounter::class.java.getDeclaredField("eliteRecoveryRemaining")
     recoveryField.isAccessible = true
     recoveryField.setFloat(mission, 1.5f)

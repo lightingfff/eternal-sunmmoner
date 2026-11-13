@@ -366,11 +366,9 @@ class LostCourierEncounter internal constructor(
     if (!scoutResolved && scoutEnemyId != null && engine.enemies.any { it.id == scoutEnemyId && it.dead }) {
       scoutResolved = true
       scoutWarningRemaining = 0f
-      statusVi = "Đã chặn trinh sát trước tiếng tù và! Thu được [Lối tắt trinh sát]: Hồi 25% Mana toàn đội."
+      engine.addExpeditionManaBonus(25L)
+      statusVi = "Đã chặn trinh sát trước tiếng tù và! Thu được [Lối tắt trinh sát]: +25 Mana vào phần thưởng chuyến đi."
       engine.postFeedback(statusVi)
-      engine.heroes.filter { !it.knockedOut }.forEach {
-        it.mana = (it.mana + it.maxMana * 0.25f).coerceAtMost(it.maxMana.toFloat())
-      }
       if (phase == CourierPhase.SCOUT_ALARM) phase = CourierPhase.ESCORT
     }
     if (courier.hp <= 0 || engine.heroes.none { !it.knockedOut }) {

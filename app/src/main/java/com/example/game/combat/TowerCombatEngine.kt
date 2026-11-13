@@ -135,6 +135,11 @@ class TowerCombatEngine(
   var bonusDiscoveryMana: Long = 0L
     private set
 
+  internal fun addExpeditionManaBonus(amount: Long) {
+    require(amount >= 0L) { "Expedition mana bonus cannot be negative." }
+    bonusDiscoveryMana = Math.addExact(bonusDiscoveryMana, amount)
+  }
+
   var stage: MissionStage = MissionStage.INTRO_DIALOGUE
   var eventWaveTriggered: Boolean = false
     private set
