@@ -1,0 +1,1306 @@
+{
+  "reference_sha": "17c99aea77860958346acf59cecab18aa514c9c1",
+  "negative_tests": {
+    "truncated": "REJECTED: missing required chunk or trailing data",
+    "bad_crc": "REJECTED: CRC mismatch b'IHDR'",
+    "wrong_dimensions": "REJECTED: wrong dimensions"
+  },
+  "assets": [
+    {
+      "path": "docs/art/argon_production_v2/batch_01_terrain/terrain_forest_grass_v1_64.png",
+      "sha256": "882b6b3f3028e28a6a0cabceed753cc78500bdf17e4fd7d6806710c27fd96cb1",
+      "expected_sha256": "882b6b3f3028e28a6a0cabceed753cc78500bdf17e4fd7d6806710c27fd96cb1",
+      "sha_matches": true,
+      "bytes": 3678,
+      "bytes_match": true,
+      "dimensions": [
+        64,
+        64
+      ],
+      "rgba_colors": 35,
+      "alpha_zero": 0,
+      "alpha_semi": 0,
+      "alpha_opaque": 4096,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 64
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        4096
+      ],
+      "frame_alpha_bounds": [
+        [
+          0,
+          0,
+          64,
+          64
+        ]
+      ],
+      "adjacent_delta_rgba": [],
+      "edge_delta_lr": 4.52,
+      "edge_delta_tb": 3.03
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_01_terrain/terrain_forest_grass_v2_64.png",
+      "sha256": "0ada6311a939878956a0152b1434ec90c240c0c5df1ce44c1063532fd4175013",
+      "expected_sha256": "0ada6311a939878956a0152b1434ec90c240c0c5df1ce44c1063532fd4175013",
+      "sha_matches": true,
+      "bytes": 3891,
+      "bytes_match": true,
+      "dimensions": [
+        64,
+        64
+      ],
+      "rgba_colors": 36,
+      "alpha_zero": 0,
+      "alpha_semi": 0,
+      "alpha_opaque": 4096,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 64
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        4096
+      ],
+      "frame_alpha_bounds": [
+        [
+          0,
+          0,
+          64,
+          64
+        ]
+      ],
+      "adjacent_delta_rgba": [],
+      "edge_delta_lr": 3.24,
+      "edge_delta_tb": 2.66
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_01_terrain/terrain_forest_grass_v3_64.png",
+      "sha256": "8616a6899cfe0347e5b82cb3fa7d4b75f175614295eb894e091d8a26592d4295",
+      "expected_sha256": "8616a6899cfe0347e5b82cb3fa7d4b75f175614295eb894e091d8a26592d4295",
+      "sha_matches": true,
+      "bytes": 4106,
+      "bytes_match": true,
+      "dimensions": [
+        64,
+        64
+      ],
+      "rgba_colors": 46,
+      "alpha_zero": 0,
+      "alpha_semi": 0,
+      "alpha_opaque": 4096,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 64
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        4096
+      ],
+      "frame_alpha_bounds": [
+        [
+          0,
+          0,
+          64,
+          64
+        ]
+      ],
+      "adjacent_delta_rgba": [],
+      "edge_delta_lr": 5.45,
+      "edge_delta_tb": 8.94
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_01_terrain/terrain_mossy_flagstone_v1_64.png",
+      "sha256": "cc203cb74a572722496d9e3db28020765cb81534c1b104a29ee7112998ebdadd",
+      "expected_sha256": "cc203cb74a572722496d9e3db28020765cb81534c1b104a29ee7112998ebdadd",
+      "sha_matches": true,
+      "bytes": 4358,
+      "bytes_match": true,
+      "dimensions": [
+        64,
+        64
+      ],
+      "rgba_colors": 133,
+      "alpha_zero": 0,
+      "alpha_semi": 0,
+      "alpha_opaque": 4096,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 64
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        4096
+      ],
+      "frame_alpha_bounds": [
+        [
+          0,
+          0,
+          64,
+          64
+        ]
+      ],
+      "adjacent_delta_rgba": [],
+      "edge_delta_lr": 7.61,
+      "edge_delta_tb": 13.9
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_01_terrain/terrain_mossy_flagstone_v2_64.png",
+      "sha256": "fde1d867834c7e29e200105990b583aeaccfe1b6d895b9dcd88eb0bd24d7612e",
+      "expected_sha256": "fde1d867834c7e29e200105990b583aeaccfe1b6d895b9dcd88eb0bd24d7612e",
+      "sha_matches": true,
+      "bytes": 4424,
+      "bytes_match": true,
+      "dimensions": [
+        64,
+        64
+      ],
+      "rgba_colors": 134,
+      "alpha_zero": 0,
+      "alpha_semi": 0,
+      "alpha_opaque": 4096,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 64
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        4096
+      ],
+      "frame_alpha_bounds": [
+        [
+          0,
+          0,
+          64,
+          64
+        ]
+      ],
+      "adjacent_delta_rgba": [],
+      "edge_delta_lr": 8.44,
+      "edge_delta_tb": 12.82
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_01_terrain/terrain_compacted_earth_64.png",
+      "sha256": "5ea9cd385196573281ad1081d06008c8e2985c35906f8826083688e3c05373cc",
+      "expected_sha256": "5ea9cd385196573281ad1081d06008c8e2985c35906f8826083688e3c05373cc",
+      "sha_matches": true,
+      "bytes": 3633,
+      "bytes_match": true,
+      "dimensions": [
+        64,
+        64
+      ],
+      "rgba_colors": 37,
+      "alpha_zero": 0,
+      "alpha_semi": 0,
+      "alpha_opaque": 4096,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 64
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        4096
+      ],
+      "frame_alpha_bounds": [
+        [
+          0,
+          0,
+          64,
+          64
+        ]
+      ],
+      "adjacent_delta_rgba": [],
+      "edge_delta_lr": 5.2,
+      "edge_delta_tb": 5.79
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_01_terrain/terrain_tower_gate_runic_stone_64.png",
+      "sha256": "42f28457c539cb3675d8fe957bbe807e3ccb47d6e7cacbc6782105062e636984",
+      "expected_sha256": "42f28457c539cb3675d8fe957bbe807e3ccb47d6e7cacbc6782105062e636984",
+      "sha_matches": true,
+      "bytes": 3071,
+      "bytes_match": true,
+      "dimensions": [
+        64,
+        64
+      ],
+      "rgba_colors": 32,
+      "alpha_zero": 0,
+      "alpha_semi": 0,
+      "alpha_opaque": 4096,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 64
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        4096
+      ],
+      "frame_alpha_bounds": [
+        [
+          0,
+          0,
+          64,
+          64
+        ]
+      ],
+      "adjacent_delta_rgba": [],
+      "edge_delta_lr": 10.15,
+      "edge_delta_tb": 9.23
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_01_terrain/terrain_grass_stone_transition_64.png",
+      "sha256": "b05ad98be76606b2abc670badd1c4e17869841c7a1489985b98a6dfd8e38fa8e",
+      "expected_sha256": "b05ad98be76606b2abc670badd1c4e17869841c7a1489985b98a6dfd8e38fa8e",
+      "sha_matches": true,
+      "bytes": 4416,
+      "bytes_match": true,
+      "dimensions": [
+        64,
+        64
+      ],
+      "rgba_colors": 154,
+      "alpha_zero": 0,
+      "alpha_semi": 0,
+      "alpha_opaque": 4096,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 64
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        4096
+      ],
+      "frame_alpha_bounds": [
+        [
+          0,
+          0,
+          64,
+          64
+        ]
+      ],
+      "adjacent_delta_rgba": [],
+      "edge_delta_lr": 9.87,
+      "edge_delta_tb": 13.9
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_02_foliage_props/foliage_ancient_pine_96x128.png",
+      "sha256": "9d218b0b9f2e0be12384165656f5cd8d88480cc8f5ef59165dd6176faa389986",
+      "expected_sha256": "9d218b0b9f2e0be12384165656f5cd8d88480cc8f5ef59165dd6176faa389986",
+      "sha_matches": true,
+      "bytes": 1695,
+      "bytes_match": true,
+      "dimensions": [
+        96,
+        128
+      ],
+      "rgba_colors": 9,
+      "alpha_zero": 7868,
+      "alpha_semi": 0,
+      "alpha_opaque": 4420,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        12,
+        8,
+        85,
+        126
+      ],
+      "pivot": {
+        "x": 48,
+        "y": 122
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        4420
+      ],
+      "frame_alpha_bounds": [
+        [
+          12,
+          8,
+          85,
+          126
+        ]
+      ],
+      "adjacent_delta_rgba": []
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_02_foliage_props/foliage_moss_flower_bush_64x64.png",
+      "sha256": "6f933d571f6bb30da45a472c07d237fe627ea677413d6488dda455e410321bfe",
+      "expected_sha256": "6f933d571f6bb30da45a472c07d237fe627ea677413d6488dda455e410321bfe",
+      "sha_matches": true,
+      "bytes": 646,
+      "bytes_match": true,
+      "dimensions": [
+        64,
+        64
+      ],
+      "rgba_colors": 8,
+      "alpha_zero": 2835,
+      "alpha_semi": 0,
+      "alpha_opaque": 1261,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        6,
+        23,
+        59,
+        57
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 56
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        1261
+      ],
+      "frame_alpha_bounds": [
+        [
+          6,
+          23,
+          59,
+          57
+        ]
+      ],
+      "adjacent_delta_rgba": []
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_02_foliage_props/foliage_ashen_violet_shrub_64x64.png",
+      "sha256": "da7da58a047c5b40766c559229d51c866cf92c3733d4cda8c9b4d84d456ce84c",
+      "expected_sha256": "da7da58a047c5b40766c559229d51c866cf92c3733d4cda8c9b4d84d456ce84c",
+      "sha_matches": true,
+      "bytes": 638,
+      "bytes_match": true,
+      "dimensions": [
+        64,
+        64
+      ],
+      "rgba_colors": 7,
+      "alpha_zero": 2882,
+      "alpha_semi": 0,
+      "alpha_opaque": 1214,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        6,
+        23,
+        59,
+        57
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 56
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        1214
+      ],
+      "frame_alpha_bounds": [
+        [
+          6,
+          23,
+          59,
+          57
+        ]
+      ],
+      "adjacent_delta_rgba": []
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_02_foliage_props/foliage_dorm_blossom_clump_64x48.png",
+      "sha256": "9ad3c38322f753db0d964ab07fc2da253eb136c2cebb7a2e351a0d4873f5a393",
+      "expected_sha256": "9ad3c38322f753db0d964ab07fc2da253eb136c2cebb7a2e351a0d4873f5a393",
+      "sha_matches": true,
+      "bytes": 530,
+      "bytes_match": true,
+      "dimensions": [
+        64,
+        48
+      ],
+      "rgba_colors": 12,
+      "alpha_zero": 2160,
+      "alpha_semi": 0,
+      "alpha_opaque": 912,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        11,
+        16,
+        54,
+        43
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 42
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        912
+      ],
+      "frame_alpha_bounds": [
+        [
+          11,
+          16,
+          54,
+          43
+        ]
+      ],
+      "adjacent_delta_rgba": []
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_02_foliage_props/prop_wall_ivy_drape_64x96.png",
+      "sha256": "1c6e9d94dd8650f96303d668a3522f27016926226625300c1729ad9fc7f97615",
+      "expected_sha256": "1c6e9d94dd8650f96303d668a3522f27016926226625300c1729ad9fc7f97615",
+      "sha_matches": true,
+      "bytes": 1211,
+      "bytes_match": true,
+      "dimensions": [
+        64,
+        96
+      ],
+      "rgba_colors": 7,
+      "alpha_zero": 3542,
+      "alpha_semi": 0,
+      "alpha_opaque": 2602,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        9,
+        4,
+        56,
+        88
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 88
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        2602
+      ],
+      "frame_alpha_bounds": [
+        [
+          9,
+          4,
+          56,
+          88
+        ]
+      ],
+      "adjacent_delta_rgba": []
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_02_foliage_props/prop_wooden_bronze_wayfinder_64x96.png",
+      "sha256": "22d71139e34b09464821613625641dc2e61383ce741caba2645a15a988000f9d",
+      "expected_sha256": "22d71139e34b09464821613625641dc2e61383ce741caba2645a15a988000f9d",
+      "sha_matches": true,
+      "bytes": 471,
+      "bytes_match": true,
+      "dimensions": [
+        64,
+        96
+      ],
+      "rgba_colors": 14,
+      "alpha_zero": 4981,
+      "alpha_semi": 0,
+      "alpha_opaque": 1163,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        14,
+        9,
+        59,
+        91
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 90
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        1163
+      ],
+      "frame_alpha_bounds": [
+        [
+          14,
+          9,
+          59,
+          91
+        ]
+      ],
+      "adjacent_delta_rgba": []
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_03_architecture_details/arch_black_slate_roof_moss_96x64.png",
+      "sha256": "70256eeca024cf9c9166a79f658f33f352f8234a3cc23022bae5c82cc98d4d39",
+      "expected_sha256": "70256eeca024cf9c9166a79f658f33f352f8234a3cc23022bae5c82cc98d4d39",
+      "sha_matches": true,
+      "bytes": 2437,
+      "bytes_match": true,
+      "dimensions": [
+        96,
+        64
+      ],
+      "rgba_colors": 32,
+      "alpha_zero": 2096,
+      "alpha_semi": 0,
+      "alpha_opaque": 4048,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        5,
+        6,
+        92,
+        58
+      ],
+      "pivot": {
+        "x": 48,
+        "y": 58
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        4048
+      ],
+      "frame_alpha_bounds": [
+        [
+          5,
+          6,
+          92,
+          58
+        ]
+      ],
+      "adjacent_delta_rgba": []
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_03_architecture_details/arch_ancient_timber_bronze_door_64x80.png",
+      "sha256": "248b9323d718692120629a9634e2d569b8eec571123abda6234f1756963f92c2",
+      "expected_sha256": "248b9323d718692120629a9634e2d569b8eec571123abda6234f1756963f92c2",
+      "sha_matches": true,
+      "bytes": 1615,
+      "bytes_match": true,
+      "dimensions": [
+        64,
+        80
+      ],
+      "rgba_colors": 27,
+      "alpha_zero": 2343,
+      "alpha_semi": 0,
+      "alpha_opaque": 2777,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        10,
+        9,
+        54,
+        76
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 75
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        2777
+      ],
+      "frame_alpha_bounds": [
+        [
+          10,
+          9,
+          54,
+          76
+        ]
+      ],
+      "adjacent_delta_rgba": []
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_03_architecture_details/arch_summoning_hall_pedestal_trim_96x48.png",
+      "sha256": "c9d181d78428e44b31ec1d5be67d80e17444e2a6e71fa53dd506cc9bf1f00398",
+      "expected_sha256": "c9d181d78428e44b31ec1d5be67d80e17444e2a6e71fa53dd506cc9bf1f00398",
+      "sha_matches": true,
+      "bytes": 372,
+      "bytes_match": true,
+      "dimensions": [
+        96,
+        48
+      ],
+      "rgba_colors": 12,
+      "alpha_zero": 1608,
+      "alpha_semi": 0,
+      "alpha_opaque": 3000,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        2,
+        8,
+        94,
+        42
+      ],
+      "pivot": {
+        "x": 48,
+        "y": 41
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        3000
+      ],
+      "frame_alpha_bounds": [
+        [
+          2,
+          8,
+          94,
+          42
+        ]
+      ],
+      "adjacent_delta_rgba": []
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_03_architecture_details/arch_warm_stained_window_frame_48x64.png",
+      "sha256": "ce8bc68f3fa128ae532a70d2797ecf2fc6ec4d3b305a21d9b39fef450466601f",
+      "expected_sha256": "ce8bc68f3fa128ae532a70d2797ecf2fc6ec4d3b305a21d9b39fef450466601f",
+      "sha_matches": true,
+      "bytes": 500,
+      "bytes_match": true,
+      "dimensions": [
+        48,
+        64
+      ],
+      "rgba_colors": 10,
+      "alpha_zero": 1632,
+      "alpha_semi": 0,
+      "alpha_opaque": 1440,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        8,
+        8,
+        40,
+        56
+      ],
+      "pivot": {
+        "x": 24,
+        "y": 52
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        1440
+      ],
+      "frame_alpha_bounds": [
+        [
+          8,
+          8,
+          40,
+          56
+        ]
+      ],
+      "adjacent_delta_rgba": []
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_03_architecture_details/arch_tower_gate_buttress_pillar_64x128.png",
+      "sha256": "d4d828ef3f5229634e4c40d58b36f6488141e0943a8688b4b6e39b4882ac5451",
+      "expected_sha256": "d4d828ef3f5229634e4c40d58b36f6488141e0943a8688b4b6e39b4882ac5451",
+      "sha_matches": true,
+      "bytes": 3132,
+      "bytes_match": true,
+      "dimensions": [
+        64,
+        128
+      ],
+      "rgba_colors": 28,
+      "alpha_zero": 3710,
+      "alpha_semi": 0,
+      "alpha_opaque": 4482,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        10,
+        8,
+        55,
+        122
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 121
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        4482
+      ],
+      "frame_alpha_bounds": [
+        [
+          10,
+          8,
+          55,
+          122
+        ]
+      ],
+      "adjacent_delta_rgba": []
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_03_architecture_details/arch_dorm_carved_timber_frieze_96x32.png",
+      "sha256": "d97926caa4831b1c261fe512be7da809a0addc2790f34b28c12cff2956231bac",
+      "expected_sha256": "d97926caa4831b1c261fe512be7da809a0addc2790f34b28c12cff2956231bac",
+      "sha_matches": true,
+      "bytes": 1033,
+      "bytes_match": true,
+      "dimensions": [
+        96,
+        32
+      ],
+      "rgba_colors": 19,
+      "alpha_zero": 1570,
+      "alpha_semi": 0,
+      "alpha_opaque": 1502,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        4,
+        4,
+        92,
+        28
+      ],
+      "pivot": {
+        "x": 48,
+        "y": 27
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 1,
+      "fps": 0,
+      "loop_mode": null,
+      "unique_frames": 1,
+      "frame_active_pixels": [
+        1502
+      ],
+      "frame_alpha_bounds": [
+        [
+          4,
+          4,
+          92,
+          28
+        ]
+      ],
+      "adjacent_delta_rgba": []
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_04_animated_vfx/vfx_tower_gate_portal_swirl_8f.png",
+      "sha256": "9901049c8a136e7155eba12ea8086838441544c289326d31fb11a4bd737901e5",
+      "expected_sha256": "9901049c8a136e7155eba12ea8086838441544c289326d31fb11a4bd737901e5",
+      "sha_matches": true,
+      "bytes": 8641,
+      "bytes_match": true,
+      "dimensions": [
+        512,
+        64
+      ],
+      "rgba_colors": 177,
+      "alpha_zero": 15198,
+      "alpha_semi": 15940,
+      "alpha_opaque": 1630,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        8,
+        0,
+        508,
+        64
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 32
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 8,
+      "fps": 8,
+      "loop_mode": "LOOP_CONTINUOUS",
+      "unique_frames": 8,
+      "frame_active_pixels": [
+        2191,
+        2192,
+        2194,
+        2198,
+        2196,
+        2199,
+        2201,
+        2199
+      ],
+      "frame_alpha_bounds": [
+        [
+          8,
+          2,
+          60,
+          64
+        ],
+        [
+          6,
+          6,
+          60,
+          64
+        ],
+        [
+          5,
+          3,
+          58,
+          64
+        ],
+        [
+          5,
+          1,
+          55,
+          64
+        ],
+        [
+          5,
+          0,
+          57,
+          63
+        ],
+        [
+          5,
+          0,
+          59,
+          59
+        ],
+        [
+          7,
+          0,
+          60,
+          62
+        ],
+        [
+          10,
+          0,
+          60,
+          64
+        ]
+      ],
+      "adjacent_delta_rgba": [
+        22.028,
+        20.955,
+        20.586,
+        22.377,
+        22.764,
+        21.555,
+        21.566,
+        22.798
+      ]
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_04_animated_vfx/vfx_summoning_hall_mana_motes_8f.png",
+      "sha256": "fb0b7986a4176b676f87d5670b82ff63ac9b39102c706e4f49d8f4e42d9be243",
+      "expected_sha256": "fb0b7986a4176b676f87d5670b82ff63ac9b39102c706e4f49d8f4e42d9be243",
+      "sha_matches": true,
+      "bytes": 908,
+      "bytes_match": true,
+      "dimensions": [
+        384,
+        48
+      ],
+      "rgba_colors": 93,
+      "alpha_zero": 18028,
+      "alpha_semi": 403,
+      "alpha_opaque": 1,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        12,
+        2,
+        374,
+        43
+      ],
+      "pivot": {
+        "x": 24,
+        "y": 42
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 8,
+      "fps": 6,
+      "loop_mode": "LOOP_CONTINUOUS",
+      "unique_frames": 8,
+      "frame_active_pixels": [
+        48,
+        48,
+        54,
+        53,
+        47,
+        52,
+        48,
+        54
+      ],
+      "frame_alpha_bounds": [
+        [
+          12,
+          3,
+          36,
+          43
+        ],
+        [
+          12,
+          5,
+          36,
+          43
+        ],
+        [
+          12,
+          2,
+          36,
+          43
+        ],
+        [
+          12,
+          12,
+          36,
+          43
+        ],
+        [
+          12,
+          16,
+          36,
+          43
+        ],
+        [
+          11,
+          12,
+          38,
+          43
+        ],
+        [
+          9,
+          9,
+          39,
+          43
+        ],
+        [
+          11,
+          6,
+          38,
+          43
+        ]
+      ],
+      "adjacent_delta_rgba": [
+        3.048,
+        3.418,
+        3.696,
+        3.167,
+        3.009,
+        3.127,
+        3.47,
+        3.523
+      ]
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_04_animated_vfx/vfx_wind_petals_leaves_6f.png",
+      "sha256": "868712048522d40cfe70aa28331d959f8314e17acbe5654f840893b79f918a2e",
+      "expected_sha256": "868712048522d40cfe70aa28331d959f8314e17acbe5654f840893b79f918a2e",
+      "sha_matches": true,
+      "bytes": 304,
+      "bytes_match": true,
+      "dimensions": [
+        288,
+        48
+      ],
+      "rgba_colors": 5,
+      "alpha_zero": 13740,
+      "alpha_semi": 84,
+      "alpha_opaque": 0,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        11,
+        13,
+        277,
+        46
+      ],
+      "pivot": {
+        "x": 24,
+        "y": 44
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 6,
+      "fps": 6,
+      "loop_mode": "LOOP_CONTINUOUS",
+      "unique_frames": 6,
+      "frame_active_pixels": [
+        14,
+        14,
+        14,
+        14,
+        14,
+        14
+      ],
+      "frame_alpha_bounds": [
+        [
+          11,
+          13,
+          38,
+          38
+        ],
+        [
+          16,
+          19,
+          42,
+          41
+        ],
+        [
+          20,
+          23,
+          44,
+          46
+        ],
+        [
+          14,
+          16,
+          42,
+          33
+        ],
+        [
+          19,
+          22,
+          45,
+          40
+        ],
+        [
+          24,
+          17,
+          37,
+          37
+        ]
+      ],
+      "adjacent_delta_rgba": [
+        1.777,
+        1.777,
+        1.777,
+        1.777,
+        1.777,
+        1.777
+      ]
+    },
+    {
+      "path": "docs/art/argon_production_v2/batch_04_animated_vfx/vfx_rain_droplets_splash_6f.png",
+      "sha256": "57a088a144298aa10bf9557ef4bfdd08400e6ae7ec0b7654c87e8bcd6f7d4077",
+      "expected_sha256": "57a088a144298aa10bf9557ef4bfdd08400e6ae7ec0b7654c87e8bcd6f7d4077",
+      "sha_matches": true,
+      "bytes": 429,
+      "bytes_match": true,
+      "dimensions": [
+        288,
+        48
+      ],
+      "rgba_colors": 11,
+      "alpha_zero": 13314,
+      "alpha_semi": 508,
+      "alpha_opaque": 2,
+      "alpha_stats_match": true,
+      "png_ihdr_matches": true,
+      "bbox": [
+        15,
+        0,
+        279,
+        46
+      ],
+      "pivot": {
+        "x": 24,
+        "y": 42
+      },
+      "pivot_in_or_on_cell": true,
+      "frames": 6,
+      "fps": 8,
+      "loop_mode": "LOOP_CONTINUOUS",
+      "unique_frames": 6,
+      "frame_active_pixels": [
+        26,
+        77,
+        139,
+        25,
+        77,
+        166
+      ],
+      "frame_alpha_bounds": [
+        [
+          15,
+          0,
+          44,
+          41
+        ],
+        [
+          16,
+          8,
+          48,
+          43
+        ],
+        [
+          18,
+          18,
+          48,
+          46
+        ],
+        [
+          19,
+          0,
+          35,
+          41
+        ],
+        [
+          15,
+          6,
+          37,
+          43
+        ],
+        [
+          11,
+          16,
+          39,
+          46
+        ]
+      ],
+      "adjacent_delta_rgba": [
+        7.994,
+        14.141,
+        12.288,
+        7.917,
+        16.096,
+        14.319
+      ]
+    }
+  ]
+}
