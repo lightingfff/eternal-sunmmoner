@@ -76,7 +76,9 @@ jobs:
                       if result.tag.rsplit("}", 1)[-1] not in {"failure", "error"}:
                           continue
                       detail = result.attrib.get("message", "") or (result.text or "")
-                      detail = " ".join(detail.split())[:2000]
+                      detail = " ".join(detail.split())
+                      if len(detail) > 8000:
+                          detail = "...[leading test output truncated]... " + detail[-8000:]
                       label = f"{case.attrib.get('classname', result_file.stem)}#{case.attrib.get('name', 'unknown')}"
                       message = f"{label}: {detail or 'test failed without a message'}"
                       message = message.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
