@@ -1,0 +1,1113 @@
+{
+  "schema": "eternal-summoner.argon-v2-production.v1",
+  "task_id": "ARGON-WORK-002",
+  "role": "GEMINI 4 ARGON HIGH \u2014 Creative & Production Co-Lead",
+  "base_main_sha": "bdff6f9976dc4927e1e095a503bc339509c7a9aa",
+  "camera_contract": {
+    "projection": "ObliqueCamera 2.5D",
+    "ground_y_scale": 0.72,
+    "ground_ellipse_ratio": 0.66,
+    "sanctuary_light_azimuth_deg": 142.0,
+    "sanctuary_light_elevation_deg": 48.0,
+    "sampling": "FilterQuality.None (Nearest-Neighbor)"
+  },
+  "total_original_assets": 24,
+  "batches": {
+    "batch_01_terrain": [
+      {
+        "width": 64,
+        "height": 64,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 8331,
+        "sha256": "7061c0a1f3e497536ef9a23d4f0bfd14e04d94e87def6453bcf55145dc8dd335",
+        "ihdr_crc32": "0xaa6971de",
+        "idat_crc32": "0xfca67b9c",
+        "crc_valid": true,
+        "bbox": [
+          0,
+          0,
+          63,
+          63
+        ],
+        "mean_luma": 43.19,
+        "alpha_stats": {
+          "opaque_255": 4096,
+          "semi_1_254": 0,
+          "transparent_0": 0,
+          "total": 4096
+        },
+        "id": "terrain_forest_grass_v1_64",
+        "path": "docs/art/argon_production_v2/batch_01_terrain/terrain_forest_grass_v1_64.png",
+        "description": "Dark Mystic Forest Turf v1 (Broad Blade & Moss)",
+        "pivot": {
+          "x": 32,
+          "y": 64
+        },
+        "frames": 1,
+        "fps": 0,
+        "seamless_4x4_metrics": {
+          "periodic_mod64": true,
+          "mean_lr_boundary_delta_rgb": 1.51,
+          "mean_tb_boundary_delta_rgb": 2.01,
+          "seamless_verdict": "PASS"
+        },
+        "provenance": "Original Argon v2 procedural pixel synthesis (modulo-64 periodic oblique generator)"
+      },
+      {
+        "width": 64,
+        "height": 64,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 8049,
+        "sha256": "fac3d8e0949fa54feecd35d13b517ec32bf50e42949b3aaa8f5e7c1e865ead61",
+        "ihdr_crc32": "0xaa6971de",
+        "idat_crc32": "0xf048b71a",
+        "crc_valid": true,
+        "bbox": [
+          0,
+          0,
+          63,
+          63
+        ],
+        "mean_luma": 43.26,
+        "alpha_stats": {
+          "opaque_255": 4096,
+          "semi_1_254": 0,
+          "transparent_0": 0,
+          "total": 4096
+        },
+        "id": "terrain_forest_grass_v2_64",
+        "path": "docs/art/argon_production_v2/batch_01_terrain/terrain_forest_grass_v2_64.png",
+        "description": "Dark Mystic Forest Turf v2 (Clover & Slate Pebble)",
+        "pivot": {
+          "x": 32,
+          "y": 64
+        },
+        "frames": 1,
+        "fps": 0,
+        "seamless_4x4_metrics": {
+          "periodic_mod64": true,
+          "mean_lr_boundary_delta_rgb": 0.97,
+          "mean_tb_boundary_delta_rgb": 1.34,
+          "seamless_verdict": "PASS"
+        },
+        "provenance": "Original Argon v2 procedural pixel synthesis (modulo-64 periodic oblique generator)"
+      },
+      {
+        "width": 64,
+        "height": 64,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 7755,
+        "sha256": "d05d485850453f96bc1c9dcc6c9b49a86ab6b992ff9f684a535c2e613fe3e368",
+        "ihdr_crc32": "0xaa6971de",
+        "idat_crc32": "0x1a9dda62",
+        "crc_valid": true,
+        "bbox": [
+          0,
+          0,
+          63,
+          63
+        ],
+        "mean_luma": 43.14,
+        "alpha_stats": {
+          "opaque_255": 4096,
+          "semi_1_254": 0,
+          "transparent_0": 0,
+          "total": 4096
+        },
+        "id": "terrain_forest_grass_v3_64",
+        "path": "docs/art/argon_production_v2/batch_01_terrain/terrain_forest_grass_v3_64.png",
+        "description": "Dark Mystic Forest Turf v3 (Humus Pocket & Pine Needle)",
+        "pivot": {
+          "x": 32,
+          "y": 64
+        },
+        "frames": 1,
+        "fps": 0,
+        "seamless_4x4_metrics": {
+          "periodic_mod64": true,
+          "mean_lr_boundary_delta_rgb": 0.97,
+          "mean_tb_boundary_delta_rgb": 0.97,
+          "seamless_verdict": "PASS"
+        },
+        "provenance": "Original Argon v2 procedural pixel synthesis (modulo-64 periodic oblique generator)"
+      },
+      {
+        "width": 64,
+        "height": 64,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 4358,
+        "sha256": "cc203cb74a572722496d9e3db28020765cb81534c1b104a29ee7112998ebdadd",
+        "ihdr_crc32": "0xaa6971de",
+        "idat_crc32": "0x7e193dca",
+        "crc_valid": true,
+        "bbox": [
+          0,
+          0,
+          63,
+          63
+        ],
+        "mean_luma": 60.2,
+        "alpha_stats": {
+          "opaque_255": 4096,
+          "semi_1_254": 0,
+          "transparent_0": 0,
+          "total": 4096
+        },
+        "id": "terrain_mossy_flagstone_v1_64",
+        "path": "docs/art/argon_production_v2/batch_01_terrain/terrain_mossy_flagstone_v1_64.png",
+        "description": "Mossy Imperial Flagstone Road v1 (Ashlar Courses)",
+        "pivot": {
+          "x": 32,
+          "y": 64
+        },
+        "frames": 1,
+        "fps": 0,
+        "seamless_4x4_metrics": {
+          "periodic_mod64": true,
+          "mean_lr_boundary_delta_rgb": 7.61,
+          "mean_tb_boundary_delta_rgb": 13.9,
+          "seamless_verdict": "PASS"
+        },
+        "provenance": "Original Argon v2 procedural pixel synthesis (modulo-64 periodic oblique generator)"
+      },
+      {
+        "width": 64,
+        "height": 64,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 4424,
+        "sha256": "fde1d867834c7e29e200105990b583aeaccfe1b6d895b9dcd88eb0bd24d7612e",
+        "ihdr_crc32": "0xaa6971de",
+        "idat_crc32": "0xf580d754",
+        "crc_valid": true,
+        "bbox": [
+          0,
+          0,
+          63,
+          63
+        ],
+        "mean_luma": 59.13,
+        "alpha_stats": {
+          "opaque_255": 4096,
+          "semi_1_254": 0,
+          "transparent_0": 0,
+          "total": 4096
+        },
+        "id": "terrain_mossy_flagstone_v2_64",
+        "path": "docs/art/argon_production_v2/batch_01_terrain/terrain_mossy_flagstone_v2_64.png",
+        "description": "Mossy Fractured Flagstone Road v2 (Cracked Slabs)",
+        "pivot": {
+          "x": 32,
+          "y": 64
+        },
+        "frames": 1,
+        "fps": 0,
+        "seamless_4x4_metrics": {
+          "periodic_mod64": true,
+          "mean_lr_boundary_delta_rgb": 8.44,
+          "mean_tb_boundary_delta_rgb": 12.82,
+          "seamless_verdict": "PASS"
+        },
+        "provenance": "Original Argon v2 procedural pixel synthesis (modulo-64 periodic oblique generator)"
+      },
+      {
+        "width": 64,
+        "height": 64,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 7963,
+        "sha256": "eaf7b8104ce2773402031428bc993ba05641c16c33f33689d819e6c591f9948d",
+        "ihdr_crc32": "0xaa6971de",
+        "idat_crc32": "0xeab1792b",
+        "crc_valid": true,
+        "bbox": [
+          0,
+          0,
+          63,
+          63
+        ],
+        "mean_luma": 44.8,
+        "alpha_stats": {
+          "opaque_255": 4096,
+          "semi_1_254": 0,
+          "transparent_0": 0,
+          "total": 4096
+        },
+        "id": "terrain_compacted_earth_64",
+        "path": "docs/art/argon_production_v2/batch_01_terrain/terrain_compacted_earth_64.png",
+        "description": "Ancient Compacted Courtyard Earth & Grit 64x64",
+        "pivot": {
+          "x": 32,
+          "y": 64
+        },
+        "frames": 1,
+        "fps": 0,
+        "seamless_4x4_metrics": {
+          "periodic_mod64": true,
+          "mean_lr_boundary_delta_rgb": 1.4,
+          "mean_tb_boundary_delta_rgb": 1.24,
+          "seamless_verdict": "PASS"
+        },
+        "provenance": "Original Argon v2 procedural pixel synthesis (modulo-64 periodic oblique generator)"
+      },
+      {
+        "width": 64,
+        "height": 64,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 8574,
+        "sha256": "9019f323e0d0175e090b16357602f9dc03aaf521ce9193a5ff9e86ac56dcaf62",
+        "ihdr_crc32": "0xaa6971de",
+        "idat_crc32": "0x1c95e518",
+        "crc_valid": true,
+        "bbox": [
+          0,
+          0,
+          63,
+          63
+        ],
+        "mean_luma": 44.22,
+        "alpha_stats": {
+          "opaque_255": 4096,
+          "semi_1_254": 0,
+          "transparent_0": 0,
+          "total": 4096
+        },
+        "id": "terrain_tower_gate_runic_stone_64",
+        "path": "docs/art/argon_production_v2/batch_01_terrain/terrain_tower_gate_runic_stone_64.png",
+        "description": "Tower Gate Approach Obsidian Runic Paving 64x64",
+        "pivot": {
+          "x": 32,
+          "y": 64
+        },
+        "frames": 1,
+        "fps": 0,
+        "seamless_4x4_metrics": {
+          "periodic_mod64": true,
+          "mean_lr_boundary_delta_rgb": 0.81,
+          "mean_tb_boundary_delta_rgb": 1.62,
+          "seamless_verdict": "PASS"
+        },
+        "provenance": "Original Argon v2 procedural pixel synthesis (modulo-64 periodic oblique generator)"
+      },
+      {
+        "width": 64,
+        "height": 64,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 7979,
+        "sha256": "bf9d0c0c52385a6145439d6d3cca9cbbf799f56a05bf0fe50d807fc55405561c",
+        "ihdr_crc32": "0xaa6971de",
+        "idat_crc32": "0xfb0d8515",
+        "crc_valid": true,
+        "bbox": [
+          0,
+          0,
+          63,
+          63
+        ],
+        "mean_luma": 48.94,
+        "alpha_stats": {
+          "opaque_255": 4096,
+          "semi_1_254": 0,
+          "transparent_0": 0,
+          "total": 4096
+        },
+        "id": "terrain_grass_stone_transition_64",
+        "path": "docs/art/argon_production_v2/batch_01_terrain/terrain_grass_stone_transition_64.png",
+        "description": "Seamless Stone Curb to Dark Forest Turf Transition 64x64",
+        "pivot": {
+          "x": 32,
+          "y": 64
+        },
+        "frames": 1,
+        "fps": 0,
+        "seamless_4x4_metrics": {
+          "periodic_mod64": true,
+          "mean_lr_boundary_delta_rgb": 1.51,
+          "mean_tb_boundary_delta_rgb": 2.01,
+          "seamless_verdict": "PASS"
+        },
+        "provenance": "Original Argon v2 procedural pixel synthesis (modulo-64 periodic oblique generator)",
+        "adjacency_interface": {
+          "type": "9_SLICE_DIRECTIONAL_CURB_AND_CORNER_KIT",
+          "slices": {
+            "NW_corner": [
+              0,
+              0,
+              19,
+              19
+            ],
+            "N_curb": [
+              20,
+              0,
+              43,
+              19
+            ],
+            "NE_corner": [
+              44,
+              0,
+              63,
+              19
+            ],
+            "W_curb": [
+              0,
+              20,
+              19,
+              43
+            ],
+            "center_flagstone_core": [
+              20,
+              20,
+              43,
+              43
+            ],
+            "E_curb": [
+              44,
+              20,
+              63,
+              43
+            ],
+            "SW_corner": [
+              0,
+              44,
+              19,
+              63
+            ],
+            "S_curb": [
+              20,
+              44,
+              43,
+              63
+            ],
+            "SE_corner": [
+              44,
+              44,
+              63,
+              63
+            ]
+          },
+          "outer_perimeter_matches": "terrain_forest_grass_v1_64 (0.0 RGB delta)",
+          "inner_core_matches": "terrain_mossy_flagstone_v1_64 (0.0 RGB delta)"
+        }
+      }
+    ],
+    "batch_02_foliage_props": [
+      {
+        "width": 96,
+        "height": 128,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 1695,
+        "sha256": "9d218b0b9f2e0be12384165656f5cd8d88480cc8f5ef59165dd6176faa389986",
+        "ihdr_crc32": "0xf4dc6cba",
+        "idat_crc32": "0xf9d5e4d0",
+        "crc_valid": true,
+        "bbox": [
+          12,
+          8,
+          84,
+          125
+        ],
+        "mean_luma": 57.59,
+        "alpha_stats": {
+          "opaque_255": 4420,
+          "semi_1_254": 0,
+          "transparent_0": 7868,
+          "total": 12288
+        },
+        "id": "foliage_ancient_pine_96x128",
+        "path": "docs/art/argon_production_v2/batch_02_foliage_props/foliage_ancient_pine_96x128.png",
+        "description": "Ancient Spirit Conifer Pine (5-tier canopy, gnarled bole)",
+        "pivot": {
+          "x": 48,
+          "y": 122
+        },
+        "layer_role": "BACK_CANOPY_OCCLUDER",
+        "frames": 1,
+        "fps": 0,
+        "provenance": "Original Argon v2 2.5D upright sprite synthesis (SanctuaryLight AZ 142 deg)"
+      },
+      {
+        "width": 64,
+        "height": 64,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 646,
+        "sha256": "6f933d571f6bb30da45a472c07d237fe627ea677413d6488dda455e410321bfe",
+        "ihdr_crc32": "0xaa6971de",
+        "idat_crc32": "0x40996a0f",
+        "crc_valid": true,
+        "bbox": [
+          6,
+          23,
+          58,
+          56
+        ],
+        "mean_luma": 55.0,
+        "alpha_stats": {
+          "opaque_255": 1261,
+          "semi_1_254": 0,
+          "transparent_0": 2835,
+          "total": 4096
+        },
+        "id": "foliage_moss_flower_bush_64x64",
+        "path": "docs/art/argon_production_v2/batch_02_foliage_props/foliage_moss_flower_bush_64x64.png",
+        "description": "Low Mossy Woodland Shrub with Warm Amber Buds",
+        "pivot": {
+          "x": 32,
+          "y": 56
+        },
+        "layer_role": "MID_GROUND_SHRUB",
+        "frames": 1,
+        "fps": 0,
+        "provenance": "Original Argon v2 2.5D upright sprite synthesis (SanctuaryLight AZ 142 deg)"
+      },
+      {
+        "width": 64,
+        "height": 64,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 638,
+        "sha256": "da7da58a047c5b40766c559229d51c866cf92c3733d4cda8c9b4d84d456ce84c",
+        "ihdr_crc32": "0xaa6971de",
+        "idat_crc32": "0x6367c80c",
+        "crc_valid": true,
+        "bbox": [
+          6,
+          23,
+          58,
+          56
+        ],
+        "mean_luma": 52.25,
+        "alpha_stats": {
+          "opaque_255": 1214,
+          "semi_1_254": 0,
+          "transparent_0": 2882,
+          "total": 4096
+        },
+        "id": "foliage_ashen_violet_shrub_64x64",
+        "path": "docs/art/argon_production_v2/batch_02_foliage_props/foliage_ashen_violet_shrub_64x64.png",
+        "description": "Corrupted Ashen-Slate & Astral Violet Briar Shrub",
+        "pivot": {
+          "x": 32,
+          "y": 56
+        },
+        "layer_role": "MID_GROUND_SHRUB",
+        "frames": 1,
+        "fps": 0,
+        "provenance": "Original Argon v2 2.5D upright sprite synthesis (SanctuaryLight AZ 142 deg)"
+      },
+      {
+        "width": 64,
+        "height": 48,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 530,
+        "sha256": "9ad3c38322f753db0d964ab07fc2da253eb136c2cebb7a2e351a0d4873f5a393",
+        "ihdr_crc32": "0xa14b7c1f",
+        "idat_crc32": "0x303442fd",
+        "crc_valid": true,
+        "bbox": [
+          11,
+          16,
+          53,
+          42
+        ],
+        "mean_luma": 64.08,
+        "alpha_stats": {
+          "opaque_255": 912,
+          "semi_1_254": 0,
+          "transparent_0": 2160,
+          "total": 3072
+        },
+        "id": "foliage_dorm_blossom_clump_64x48",
+        "path": "docs/art/argon_production_v2/batch_02_foliage_props/foliage_dorm_blossom_clump_64x48.png",
+        "description": "Dorms & Training Courtyard Stone-Curbed Blossom Clump",
+        "pivot": {
+          "x": 32,
+          "y": 42
+        },
+        "layer_role": "FORE_COURTYARD_ACCENT",
+        "frames": 1,
+        "fps": 0,
+        "provenance": "Original Argon v2 2.5D upright sprite synthesis (SanctuaryLight AZ 142 deg)"
+      },
+      {
+        "width": 64,
+        "height": 96,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 1211,
+        "sha256": "1c6e9d94dd8650f96303d668a3522f27016926226625300c1729ad9fc7f97615",
+        "ihdr_crc32": "0xadc574e8",
+        "idat_crc32": "0x92c7355c",
+        "crc_valid": true,
+        "bbox": [
+          9,
+          4,
+          55,
+          87
+        ],
+        "mean_luma": 51.93,
+        "alpha_stats": {
+          "opaque_255": 2602,
+          "semi_1_254": 0,
+          "transparent_0": 3542,
+          "total": 6144
+        },
+        "id": "prop_wall_ivy_drape_64x96",
+        "path": "docs/art/argon_production_v2/batch_02_foliage_props/prop_wall_ivy_drape_64x96.png",
+        "description": "Creeping Fortress Wall Ivy & Hanging Root Tapestry",
+        "pivot": {
+          "x": 32,
+          "y": 88
+        },
+        "layer_role": "FACADE_OVERLAY",
+        "frames": 1,
+        "fps": 0,
+        "provenance": "Original Argon v2 2.5D upright sprite synthesis (SanctuaryLight AZ 142 deg)"
+      },
+      {
+        "width": 64,
+        "height": 96,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 471,
+        "sha256": "22d71139e34b09464821613625641dc2e61383ce741caba2645a15a988000f9d",
+        "ihdr_crc32": "0xadc574e8",
+        "idat_crc32": "0x90917fc4",
+        "crc_valid": true,
+        "bbox": [
+          14,
+          9,
+          58,
+          90
+        ],
+        "mean_luma": 62.27,
+        "alpha_stats": {
+          "opaque_255": 1163,
+          "semi_1_254": 0,
+          "transparent_0": 4981,
+          "total": 6144
+        },
+        "id": "prop_wooden_bronze_wayfinder_64x96",
+        "path": "docs/art/argon_production_v2/batch_02_foliage_props/prop_wooden_bronze_wayfinder_64x96.png",
+        "description": "Weathered Oak & Tarnished Bronze Wayfinder Signpost with Lantern",
+        "pivot": {
+          "x": 32,
+          "y": 90
+        },
+        "layer_role": "STREET_PROP",
+        "frames": 1,
+        "fps": 0,
+        "provenance": "Original Argon v2 2.5D upright sprite synthesis (SanctuaryLight AZ 142 deg)"
+      }
+    ],
+    "batch_03_architecture_details": [
+      {
+        "width": 96,
+        "height": 64,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 2437,
+        "sha256": "70256eeca024cf9c9166a79f658f33f352f8234a3cc23022bae5c82cc98d4d39",
+        "ihdr_crc32": "0xe534720e",
+        "idat_crc32": "0xcc9e2e63",
+        "crc_valid": true,
+        "bbox": [
+          5,
+          6,
+          91,
+          57
+        ],
+        "mean_luma": 45.46,
+        "alpha_stats": {
+          "opaque_255": 4048,
+          "semi_1_254": 0,
+          "transparent_0": 2096,
+          "total": 6144
+        },
+        "id": "arch_black_slate_roof_moss_96x64",
+        "path": "docs/art/argon_production_v2/batch_03_architecture_details/arch_black_slate_roof_moss_96x64.png",
+        "description": "Weathered Black-Slate Scalloped Roof Module with Creeping Moss",
+        "pivot": {
+          "x": 48,
+          "y": 58
+        },
+        "target_facility_anchor": "building_hero_quarters / townhouse roof pitch",
+        "frames": 1,
+        "fps": 0,
+        "provenance": "Original Argon v2 2.5D architectural detail synthesis (front + side plane depth)"
+      },
+      {
+        "width": 64,
+        "height": 80,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 1615,
+        "sha256": "248b9323d718692120629a9634e2d569b8eec571123abda6234f1756963f92c2",
+        "ihdr_crc32": "0xa9bf7345",
+        "idat_crc32": "0xa7711dfd",
+        "crc_valid": true,
+        "bbox": [
+          10,
+          9,
+          53,
+          75
+        ],
+        "mean_luma": 49.78,
+        "alpha_stats": {
+          "opaque_255": 2777,
+          "semi_1_254": 0,
+          "transparent_0": 2343,
+          "total": 5120
+        },
+        "id": "arch_ancient_timber_bronze_door_64x80",
+        "path": "docs/art/argon_production_v2/batch_03_architecture_details/arch_ancient_timber_bronze_door_64x80.png",
+        "description": "Heavy Oak & Riveted Bronze Arched Facility Entrance with 2.5D Stone Jamb",
+        "pivot": {
+          "x": 32,
+          "y": 75
+        },
+        "target_facility_anchor": "SanctuaryHouseEntrances south-face doorway (doorWidth 36)",
+        "frames": 1,
+        "fps": 0,
+        "provenance": "Original Argon v2 2.5D architectural detail synthesis (front + side plane depth)"
+      },
+      {
+        "width": 96,
+        "height": 48,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 372,
+        "sha256": "c9d181d78428e44b31ec1d5be67d80e17444e2a6e71fa53dd506cc9bf1f00398",
+        "ihdr_crc32": "0xee167fcf",
+        "idat_crc32": "0xb2ba636a",
+        "crc_valid": true,
+        "bbox": [
+          2,
+          8,
+          93,
+          41
+        ],
+        "mean_luma": 73.36,
+        "alpha_stats": {
+          "opaque_255": 3000,
+          "semi_1_254": 0,
+          "transparent_0": 1608,
+          "total": 4608
+        },
+        "id": "arch_summoning_hall_pedestal_trim_96x48",
+        "path": "docs/art/argon_production_v2/batch_03_architecture_details/arch_summoning_hall_pedestal_trim_96x48.png",
+        "description": "Carved Stone Plinth & Astral Glyph Frieze Trim for Summoning Hall",
+        "pivot": {
+          "x": 48,
+          "y": 41
+        },
+        "target_facility_anchor": "building_summoning_hall (2380, 1930) south foundation apron",
+        "frames": 1,
+        "fps": 0,
+        "provenance": "Original Argon v2 2.5D architectural detail synthesis (front + side plane depth)"
+      },
+      {
+        "width": 48,
+        "height": 64,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 500,
+        "sha256": "ce8bc68f3fa128ae532a70d2797ecf2fc6ec4d3b305a21d9b39fef450466601f",
+        "ihdr_crc32": "0x5c20f446",
+        "idat_crc32": "0x6cde3902",
+        "crc_valid": true,
+        "bbox": [
+          8,
+          8,
+          39,
+          55
+        ],
+        "mean_luma": 97.19,
+        "alpha_stats": {
+          "opaque_255": 1440,
+          "semi_1_254": 0,
+          "transparent_0": 1632,
+          "total": 3072
+        },
+        "id": "arch_warm_stained_window_frame_48x64",
+        "path": "docs/art/argon_production_v2/batch_03_architecture_details/arch_warm_stained_window_frame_48x64.png",
+        "description": "Gothic Mullion Window Frame with Warm Hearth-Lit Diamond Glass",
+        "pivot": {
+          "x": 24,
+          "y": 52
+        },
+        "target_facility_anchor": "facility_restaurant / facility_hero_quarters upper facade",
+        "frames": 1,
+        "fps": 0,
+        "provenance": "Original Argon v2 2.5D architectural detail synthesis (front + side plane depth)"
+      },
+      {
+        "width": 64,
+        "height": 128,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 3132,
+        "sha256": "d4d828ef3f5229634e4c40d58b36f6488141e0943a8688b4b6e39b4882ac5451",
+        "ihdr_crc32": "0xbb816f6a",
+        "idat_crc32": "0x744b943e",
+        "crc_valid": true,
+        "bbox": [
+          10,
+          8,
+          54,
+          121
+        ],
+        "mean_luma": 57.42,
+        "alpha_stats": {
+          "opaque_255": 4482,
+          "semi_1_254": 0,
+          "transparent_0": 3710,
+          "total": 8192
+        },
+        "id": "arch_tower_gate_buttress_pillar_64x128",
+        "path": "docs/art/argon_production_v2/batch_03_architecture_details/arch_tower_gate_buttress_pillar_64x128.png",
+        "description": "Three-Quarter 2.5D Obsidian Buttress Column with Front/Side Planes & Rune",
+        "pivot": {
+          "x": 32,
+          "y": 121
+        },
+        "target_facility_anchor": "building_tower_gate (1960, 635) flanking portal pylons",
+        "frames": 1,
+        "fps": 0,
+        "provenance": "Original Argon v2 2.5D architectural detail synthesis (front + side plane depth)"
+      },
+      {
+        "width": 96,
+        "height": 32,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 1033,
+        "sha256": "d97926caa4831b1c261fe512be7da809a0addc2790f34b28c12cff2956231bac",
+        "ihdr_crc32": "0xedc07d54",
+        "idat_crc32": "0xaaf759e2",
+        "crc_valid": true,
+        "bbox": [
+          4,
+          4,
+          91,
+          27
+        ],
+        "mean_luma": 48.77,
+        "alpha_stats": {
+          "opaque_255": 1502,
+          "semi_1_254": 0,
+          "transparent_0": 1570,
+          "total": 3072
+        },
+        "id": "arch_dorm_carved_timber_frieze_96x32",
+        "path": "docs/art/argon_production_v2/batch_03_architecture_details/arch_dorm_carved_timber_frieze_96x32.png",
+        "description": "Carved Dark-Oak Corbel & Nordic Relief Frieze Beam for Dormitory Eaves",
+        "pivot": {
+          "x": 48,
+          "y": 27
+        },
+        "target_facility_anchor": "building_hero_quarters (823, 790) mid-story timber belt",
+        "frames": 1,
+        "fps": 0,
+        "provenance": "Original Argon v2 2.5D architectural detail synthesis (front + side plane depth)"
+      }
+    ],
+    "batch_04_animated_vfx": [
+      {
+        "width": 512,
+        "height": 64,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 2987,
+        "sha256": "ba159b3b35e1d21f24a2c675b880a0672f2f9bcd52dcccf868aca41bd994e660",
+        "ihdr_crc32": "0x6cbfcfbf",
+        "idat_crc32": "0x25176c15",
+        "crc_valid": true,
+        "bbox": [
+          12,
+          14,
+          499,
+          50
+        ],
+        "mean_luma": 136.03,
+        "alpha_stats": {
+          "opaque_255": 1328,
+          "semi_1_254": 4070,
+          "transparent_0": 27370,
+          "total": 32768
+        },
+        "id": "vfx_tower_gate_portal_swirl_8f",
+        "path": "docs/art/argon_production_v2/batch_04_animated_vfx/vfx_tower_gate_portal_swirl_8f.png",
+        "description": "Tower Gate Astral Portal Vortex 8-Frame Sheet (64x64 per frame)",
+        "frame_width": 64,
+        "frame_height": 64,
+        "frames": 8,
+        "fps": 8,
+        "loop_mode": "LOOP_CONTINUOUS",
+        "pivot": {
+          "x": 32,
+          "y": 32
+        },
+        "frame_verification": {
+          "active_pixels_per_frame": [
+            664,
+            674,
+            670,
+            689,
+            677,
+            678,
+            673,
+            673
+          ],
+          "unique_frame_hashes_16": [
+            "88d6a36bfea65ac4",
+            "8e93f9617627761a",
+            "0e88e18d3e9b7e27",
+            "86298bf77e20e04b",
+            "b4ba070379fad1c5",
+            "df03f23fc7e5490c",
+            "1fa49756022afaad",
+            "016bb7525efd61dc"
+          ],
+          "frame_alpha_bounds_inclusive": [
+            [
+              12,
+              15,
+              50,
+              46
+            ],
+            [
+              14,
+              14,
+              51,
+              48
+            ],
+            [
+              14,
+              16,
+              50,
+              50
+            ],
+            [
+              13,
+              16,
+              48,
+              50
+            ],
+            [
+              12,
+              15,
+              50,
+              48
+            ],
+            [
+              15,
+              15,
+              52,
+              47
+            ],
+            [
+              14,
+              18,
+              52,
+              48
+            ],
+            [
+              12,
+              16,
+              51,
+              48
+            ]
+          ],
+          "unique_frames_verified": true
+        },
+        "provenance": "Original Argon v2 multi-frame VFX sprite sheet synthesis"
+      },
+      {
+        "width": 384,
+        "height": 48,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 908,
+        "sha256": "fb0b7986a4176b676f87d5670b82ff63ac9b39102c706e4f49d8f4e42d9be243",
+        "ihdr_crc32": "0x187aad7e",
+        "idat_crc32": "0xa347120e",
+        "crc_valid": true,
+        "bbox": [
+          12,
+          2,
+          373,
+          42
+        ],
+        "mean_luma": 137.39,
+        "alpha_stats": {
+          "opaque_255": 1,
+          "semi_1_254": 403,
+          "transparent_0": 18028,
+          "total": 18432
+        },
+        "id": "vfx_summoning_hall_mana_motes_8f",
+        "path": "docs/art/argon_production_v2/batch_04_animated_vfx/vfx_summoning_hall_mana_motes_8f.png",
+        "description": "Summoning Hall Ascending Gold/Violet Mana Motes 8-Frame Sheet (48x48 per frame)",
+        "frame_width": 48,
+        "frame_height": 48,
+        "frames": 8,
+        "fps": 6,
+        "loop_mode": "LOOP_CONTINUOUS",
+        "pivot": {
+          "x": 24,
+          "y": 42
+        },
+        "frame_verification": {
+          "active_pixels_per_frame": [
+            48,
+            48,
+            54,
+            53,
+            47,
+            52,
+            48,
+            54
+          ],
+          "unique_frame_hashes_16": [
+            "e79f901bc8d6b893",
+            "b80cf940a5afd3c1",
+            "f16fae98fde1a634",
+            "1391700b97ee71fb",
+            "43f7de13c4aa1c8b",
+            "499122c3f9d090e2",
+            "c07d99b656b09f67",
+            "2386ba4b994abcae"
+          ],
+          "unique_frames_verified": true
+        },
+        "provenance": "Original Argon v2 multi-frame VFX sprite sheet synthesis"
+      },
+      {
+        "width": 288,
+        "height": 48,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 304,
+        "sha256": "868712048522d40cfe70aa28331d959f8314e17acbe5654f840893b79f918a2e",
+        "ihdr_crc32": "0xb122a7af",
+        "idat_crc32": "0xfed756f9",
+        "crc_valid": true,
+        "bbox": [
+          11,
+          13,
+          276,
+          45
+        ],
+        "mean_luma": 115.78,
+        "alpha_stats": {
+          "opaque_255": 0,
+          "semi_1_254": 84,
+          "transparent_0": 13740,
+          "total": 13824
+        },
+        "id": "vfx_wind_petals_leaves_6f",
+        "path": "docs/art/argon_production_v2/batch_04_animated_vfx/vfx_wind_petals_leaves_6f.png",
+        "description": "Sanctuary Wind-Swept Leaves & Twilight Petals 6-Frame Sheet (48x48 per frame)",
+        "frame_width": 48,
+        "frame_height": 48,
+        "frames": 6,
+        "fps": 6,
+        "loop_mode": "LOOP_CONTINUOUS",
+        "pivot": {
+          "x": 24,
+          "y": 44
+        },
+        "frame_verification": {
+          "active_pixels_per_frame": [
+            14,
+            14,
+            14,
+            14,
+            14,
+            14
+          ],
+          "unique_frame_hashes_16": [
+            "4781c9eb1c341ed1",
+            "e115f7fa420a11e2",
+            "10a4c7bfc330c649",
+            "3aff8dc40970a672",
+            "532b432c8611d8db",
+            "5a38bcc9a91a1df4"
+          ],
+          "unique_frames_verified": true
+        },
+        "provenance": "Original Argon v2 multi-frame VFX sprite sheet synthesis"
+      },
+      {
+        "width": 288,
+        "height": 48,
+        "bit_depth": 8,
+        "color_type": 6,
+        "size_bytes": 429,
+        "sha256": "57a088a144298aa10bf9557ef4bfdd08400e6ae7ec0b7654c87e8bcd6f7d4077",
+        "ihdr_crc32": "0xb122a7af",
+        "idat_crc32": "0x0d83d1ac",
+        "crc_valid": true,
+        "bbox": [
+          15,
+          0,
+          278,
+          45
+        ],
+        "mean_luma": 191.51,
+        "alpha_stats": {
+          "opaque_255": 2,
+          "semi_1_254": 508,
+          "transparent_0": 13314,
+          "total": 13824
+        },
+        "id": "vfx_rain_droplets_splash_6f",
+        "path": "docs/art/argon_production_v2/batch_04_animated_vfx/vfx_rain_droplets_splash_6f.png",
+        "description": "Sanctuary Storm Rain Streaks & Foreshortened Elliptical Ripples 6-Frame Sheet (48x48 per frame)",
+        "frame_width": 48,
+        "frame_height": 48,
+        "frames": 6,
+        "fps": 8,
+        "loop_mode": "LOOP_CONTINUOUS",
+        "pivot": {
+          "x": 24,
+          "y": 42
+        },
+        "frame_verification": {
+          "active_pixels_per_frame": [
+            26,
+            77,
+            139,
+            25,
+            77,
+            166
+          ],
+          "unique_frame_hashes_16": [
+            "8e4ea492280bcf7a",
+            "d1c641f6b7c4b75a",
+            "b9867ff59f8b5ffd",
+            "25701bd9da5c1ff3",
+            "d5264e016c374d2e",
+            "450377b6b3a70d57"
+          ],
+          "unique_frames_verified": true
+        },
+        "provenance": "Original Argon v2 multi-frame VFX sprite sheet synthesis"
+      }
+    ]
+  },
+  "qa_contact_sheets_excluded_from_asset_count": [
+    "docs/art/argon_production_v2/batch_01_terrain_4x4_qa_sheet.png",
+    "docs/art/argon_production_v2/batch_02_03_props_arch_qa_sheet.png",
+    "docs/art/argon_production_v2/batch_04_vfx_qa_sheet.png"
+  ]
+}

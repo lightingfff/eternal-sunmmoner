@@ -1,0 +1,82 @@
+i  emulators: Starting emulators: firestore
+i  emulators: Detected demo project ID "demo-eternal-lobby", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail.
+i  firestore: Firestore Emulator logging to firestore-debug.log
+✔  firestore: Firestore Emulator UI websocket is running on 9150.
+i  Running script: node tools/lobby-hero-rules/test.cjs
+PASS legacy own hero and constrained roster query readable
+PASS full legacy trait migration and new lobby fields update
+PASS same transaction replaces party member and updates profile revision
+PASS house rest fields allowed
+PASS new personality at owned hero creation allowed
+[2026-11-10T19:08:51.284Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dca8 error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'update' @ L219, false for 'update' @ L7, false for 'update' @ L219
+PASS negative HP rejected
+[2026-11-10T19:08:51.305Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dcad error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'update' @ L219, false for 'update' @ L7, false for 'update' @ L219
+PASS HP beyond max rejected
+[2026-11-10T19:08:51.332Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dcae error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'update' @ L219, false for 'update' @ L7, false for 'update' @ L219
+PASS invalid sanity rejected
+[2026-11-10T19:08:51.354Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dcaf error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'update' @ L219, false for 'update' @ L7, false for 'update' @ L219
+PASS BeingPickedUp cannot become persisted assignment
+[2026-11-10T19:08:51.374Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dcb0 error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'update' @ L219, false for 'update' @ L7, false for 'update' @ L219
+PASS invalid trait condition rejected
+[2026-11-10T19:08:51.399Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dcb1 error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'update' @ L219, false for 'update' @ L7, false for 'update' @ L219
+PASS partial hidden trait map rejected
+[2026-11-10T19:08:51.418Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dcb2 error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, evaluation error at L185:24 for 'update' @ L185, false for 'update' @ L7, false for 'update' @ L185
+PASS invalid revision rejected
+[2026-11-10T19:08:51.454Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dcb3 error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, false for 'update' @ L219
+PASS cross-account write denied
+PASS anonymous read denied
+PASS dedicated survival and social metadata accepted
+[2026-11-10T19:08:51.525Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dcb5 error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'update' @ L219, false for 'update' @ L7, false for 'update' @ L219
+PASS negative survival count rejected
+[2026-11-10T19:08:51.544Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dcb6 error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'update' @ L219, false for 'update' @ L7, false for 'update' @ L219
+PASS fractional survival count rejected
+[2026-11-10T19:08:51.570Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dcb7 error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'update' @ L219, false for 'update' @ L7, false for 'update' @ L219
+PASS nonboolean critical return rejected
+[2026-11-10T19:08:51.588Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dcb8 error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'update' @ L219, false for 'update' @ L7, false for 'update' @ L219
+PASS unbounded social dedupe history rejected
+[2026-11-10T19:08:51.609Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dcb9 error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'update' @ L219, false for 'update' @ L7, Unsupported operation error. Received: string(map). Expected: string(int), string(float), string(null), string(string), string(bool), string(path). for 'update' @ L219
+PASS malformed social history tail rejected
+[2026-11-10T19:08:51.628Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dcba error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'update' @ L219, false for 'update' @ L7, false for 'update' @ L219
+PASS numeric social history tail rejected
+[2026-11-10T19:08:51.642Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dcbb error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'update' @ L219, false for 'update' @ L7, false for 'update' @ L219
+PASS empty social history tail rejected
+[2026-11-10T19:08:51.657Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dcbc error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'update' @ L219, false for 'update' @ L7, false for 'update' @ L219
+PASS oversized social history tail rejected
+PASS nested social array rejected by Firestore SDK
+[2026-11-10T19:08:51.676Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dcbd error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'update' @ L219, false for 'update' @ L7, false for 'update' @ L219
+PASS boolean social history tail rejected
+[2026-11-10T19:08:51.691Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dcbe error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'update' @ L219, false for 'update' @ L7, false for 'update' @ L219
+PASS non UUID event ID rejected
+[2026-11-10T19:08:51.708Z]  @firebase/firestore: Firestore (12.5.0): GrpcConnection RPC 'Write' stream 0x7b10dcbf error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'update' @ L7, Unable to evaluate the expression as the maximum of 1000 expressions to evaluate has been reached. for 'update' @ L219, false for 'update' @ L7, false for 'update' @ L219
+PASS multiple UUIDs hidden in one array element rejected
+PASS complete 32 entry social history accepted
+PASS cloud treatment payload serializes Gold and current HP
+PASS synthesis transaction deletes material unbinds gear and cannot consume twice
+PASS equipment membership revision rejects stale fusion query before any deletion
+PASS cross-owner material removal rejects whole transaction
+PASS durable social event payload applies once after retry
+{"tests":33,"result":"PASS","project":"demo-eternal-lobby","emulator":true}
+✔  Script exited successfully (code 0)
+i  emulators: Shutting down emulators.
+i  firestore: Stopping Firestore Emulator
+i  hub: Stopping emulator hub
+i  logging: Stopping Logging Emulator

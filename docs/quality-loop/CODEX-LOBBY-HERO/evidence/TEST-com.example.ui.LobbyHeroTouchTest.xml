@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.ui.LobbyHeroTouchTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-10T05:22:26.990Z" hostname="b316c1c49299" time="1.396">
+  <properties/>
+  <testcase name="secondFingerCancelsHeldHeroWithoutAssignment" classname="com.example.ui.LobbyHeroTouchTest" time="0.124"/>
+  <testcase name="longPressPhysicalDragToHouseDispatchesRestingAssignment" classname="com.example.ui.LobbyHeroTouchTest" time="0.112"/>
+  <testcase name="failedPersistenceRollsBackSoOriginalHeroCanBePickedAgain" classname="com.example.ui.LobbyHeroTouchTest" time="0.112"/>
+  <testcase name="longPressPhysicalDragToGateDispatchesSinglePartyAssignment" classname="com.example.ui.LobbyHeroTouchTest" time="0.896"/>
+  <testcase name="fastDragIsCameraPanAndInvalidDropAndCancelNeverAssign" classname="com.example.ui.LobbyHeroTouchTest" time="0.145"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

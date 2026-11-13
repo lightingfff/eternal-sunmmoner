@@ -1,0 +1,140 @@
+name: Floor 1 playable loop tests
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/src/**'
+      - 'firestore.rules'
+      - 'tools/lobby-hero-rules/**'
+      - 'firebase.*-test.json'
+      - '.github/workflows/floor1-loop-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: floor1-tests-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  gameplay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.3.1'
+      - name: Android SDK
+        run: |
+          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager | head -n 1)
+          "$SDKMANAGER" --install 'platforms;android-36.1' 'build-tools;36.0.0'
+      - name: Temporary Google Sign-In resource
+        run: |
+          mkdir -p app/src/debug/res/values
+          cat > app/src/debug/res/values/google_services_placeholder.xml <<'XML'
+          <resources><string name="default_web_client_id" translatable="false">debug-placeholder.apps.googleusercontent.com</string></resources>
+          XML
+      - name: Actual routes, incident choices and local save
+        run: >-
+          gradle :app:testDebugUnitTest
+          --tests com.example.RescueJourneyStarterPartyTest
+          --tests com.example.RescueJourneyFieldworkTest
+          --tests com.example.CourierSupplyDiversionTest
+          --tests com.example.Floor1RuntimeBudgetTest
+          --tests com.example.data.ExpeditionSettlementLedgerTest
+          --tests com.example.data.ExpeditionLaunchVmTest
+          --console=plain
+      - name: Retain legacy route test results
+        if: always()
+        run: |
+          mkdir -p app/build/floor1-test-results/routes
+          cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/routes/
+      - name: Living expedition mechanics and actual alternate routes
+        run: >-
+          gradle :app:testDebugUnitTest
+          --tests com.example.LivingExpeditionPlaythroughTest
+          --tests com.example.LivingExpeditionMechanicsTest
+          --tests com.example.LivingExpeditionControlTest
+          --tests com.example.LivingNpcCombatTest
+          --tests com.example.ExpeditionFieldRewardsTest
+          --tests com.example.ExpeditionFieldRewardsIntegrationTest
+          --console=plain
+      - name: Retain living expedition results
+        if: always()
+        run: |
+          mkdir -p app/build/floor1-test-results/living
+          cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/living/
+      - name: Tower reforge controls, actual execution and native art
+        run: >-
+          gradle :app:testDebugUnitTest
+          --tests com.example.TowerEncounterFramingTest
+          --tests com.example.TowerTrustAndFeedbackTest
+          --tests com.example.TowerCombatArtEvidenceTest
+          --console=plain
+      - name: Retain Tower reforge results
+        if: always()
+        run: |
+          mkdir -p app/build/floor1-test-results/reforge
+          cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/reforge/
+      - name: Physical UI input and retry regressions
+        run: >-
+          gradle :app:testDebugUnitTest
+          --tests com.example.ui.LivingExpeditionUiTest
+          --tests com.example.ui.ExpeditionFieldRewardUiTest
+          --tests com.example.ui.ExpeditionRewardIconFailureTest
+          --tests com.example.ui.Floor1InputOwnershipTest
+          --tests com.example.ui.Floor1SettlementRecoveryUiTest
+          --tests com.example.RescueTacticalCommandsTest
+          --tests com.example.RescueEnemyTargetingTest
+          --tests com.example.HeroAgencyTest
+          --tests com.example.ui.HeroAgencyAlertUiTest
+          --tests com.example.ui.RescueRetryFlowTest
+          --console=plain
+      - name: Retain UI test results
+        if: always()
+        run: |
+          mkdir -p app/build/floor1-test-results/ui
+          cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/ui/
+      - name: Original escort world and narrow-screen compatibility
+        run: >-
+          gradle :app:testDebugUnitTest
+          --tests com.example.LostCourierVisualTest
+          --tests 'com.example.ui.LayoutResponsivenessRobolectricTest.*tower battle HUD*'
+          --console=plain
+      - name: Retain world compatibility results
+        if: always()
+        run: |
+          mkdir -p app/build/floor1-test-results/world
+          cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/world/
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install rules test tools
+        run: npm install --prefix tools/lobby-hero-rules --ignore-scripts --no-audit --no-fund
+      - name: Receipt and House security rules
+        run: npm test --prefix tools/lobby-hero-rules
+      - name: Cloud settlement race and restart against enforced rules
+        env:
+          JAVA_TOOL_OPTIONS: '-Deternal.test.firestore.database=(default)'
+        run: >-
+          tools/lobby-hero-rules/node_modules/.bin/firebase emulators:exec
+          --project demo-no-project --config firebase.house-test.json --only firestore,auth
+          'gradle :app:testDebugUnitTest --tests com.example.data.firebase.ExpeditionCloudSettlementTest --console=plain'
+      - name: Upload playthrough and UI evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: floor1-playthrough-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            app/build/visual_screenshots/floor1*
+            app/build/visual_screenshots/living-expedition/
+            app/build/visual_screenshots/tower-reforge/
+            app/build/visual_screenshots/p05/
+            app/build/test-results/testDebugUnitTest/
+            app/build/floor1-test-results/
+          if-no-files-found: warn

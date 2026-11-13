@@ -1,0 +1,119 @@
+{
+  "task": "ARGON-WORK-001",
+  "issue": "https://github.com/lightingfff/eternal-sunmmoner/issues/66",
+  "base_main_sha": "bdff6f9976dc4927e1e095a503bc339509c7a9aa",
+  "generator_provenance": "Pure Python deterministic pixel-art procedural synthesis (zlib/struct RGBA PNG encoder, verified CRC32)",
+  "camera_contract": {
+    "projection": "ObliqueCamera 2.5D",
+    "ground_y_scale": 0.72,
+    "light_azimuth_deg": 142,
+    "light_elevation_deg": 48,
+    "filtering": "Nearest-Neighbor"
+  },
+  "assets": {
+    "mossy_cobble_dark_64.png": {
+      "path": "docs/art/argon_pilot/mossy_cobble_dark_64.png",
+      "width": 64,
+      "height": 64,
+      "bit_depth": 8,
+      "color_type": 6,
+      "chunks": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ],
+      "crc_valid": true,
+      "size_bytes": 4762,
+      "sha256": "98de6bec85f6b0af1b23db31b8eb5b7269db53a5d7a98e4d257bd45d742217c6",
+      "alpha_mode": "opaque_rgba",
+      "all_pixels_alpha_255": true,
+      "mean_day_luma": 57.57,
+      "recommended_night_luma": 22.45,
+      "recommended_night_tint": "#10141C",
+      "pivot": {
+        "x": 32,
+        "y": 64
+      },
+      "seamless_verification": {
+        "periodic_modulo_64_construction": true,
+        "mean_left_right_edge_delta_rgb": 9.43,
+        "mean_top_bottom_edge_delta_rgb": 12.77,
+        "verdict": "PASS"
+      }
+    },
+    "amber_lantern_flame_8f.png": {
+      "path": "docs/art/argon_pilot/amber_lantern_flame_8f.png",
+      "width": 192,
+      "height": 32,
+      "frame_width": 24,
+      "frame_height": 32,
+      "frame_count": 8,
+      "grid_layout": "8x1 horizontal strip",
+      "fps": 6,
+      "loop_mode": "LOOP_CONTINUOUS",
+      "pivot_per_frame": {
+        "x": 12,
+        "y": 28
+      },
+      "bit_depth": 8,
+      "color_type": 6,
+      "chunks": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ],
+      "crc_valid": true,
+      "size_bytes": 535,
+      "sha256": "fdba5d9778d9eea9b7787d15458cfa3f901eb8b50513d15ab3b9edf3c557c46c",
+      "alpha_mode": "transparent_rgba",
+      "pixel_alpha_breakdown": {
+        "fully_transparent_alpha_0": 5284,
+        "semi_transparent_halo_1_254": 374,
+        "fully_opaque_core_255": 486,
+        "total_pixels": 6144
+      },
+      "frame_verification": {
+        "active_pixels_per_frame": [
+          103,
+          113,
+          119,
+          107,
+          100,
+          100,
+          113,
+          105
+        ],
+        "unique_frame_hashes_16": [
+          "91a38010a47bf536",
+          "409987b54b2d25a5",
+          "f4ea477956179c54",
+          "88bef11adfe4a704",
+          "39d850ec2b7fda88",
+          "fe843d171371642b",
+          "2f3280b6ecc61279",
+          "7782cf161eed52fb"
+        ],
+        "unique_frames_count": 8,
+        "verdict": "PASS"
+      },
+      "lighting_metadata": {
+        "day_active": false,
+        "night_active": true,
+        "emissive_color": "#F59E0B",
+        "core_color": "#FFF7D6",
+        "emissive_radius_px": 56
+      }
+    },
+    "argon_pilot_contact_sheet.png": {
+      "path": "docs/art/argon_pilot/argon_pilot_contact_sheet.png",
+      "width": 512,
+      "height": 256,
+      "bit_depth": 8,
+      "color_type": 6,
+      "crc_valid": true,
+      "size_bytes": 22048,
+      "sha256": "b0c709237a4d981125b7214a1412cadfa2073bf42335b93de757f46b0916bafa",
+      "note": "Standalone offline QA contact sheet (1x, 2x2 seamless repeat, and 2x nearest-neighbor zoom with pivot markers); NOT a runtime Android screenshot."
+    }
+  }
+}

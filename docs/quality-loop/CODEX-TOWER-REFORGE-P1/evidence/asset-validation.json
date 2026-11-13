@@ -1,0 +1,35 @@
+{
+  "source_sha256": "44c9b3cc13e0a5759376fca987b0f5c71ee7321295c5f62c3e28455b2cc6352d",
+  "actors": [
+    {
+      "actor": "raider",
+      "unique_poses": 12,
+      "rgba_bytes_both_facings": 1769472,
+      "has_real_transparency": true,
+      "sha256": "e999af8ce7de6dc1b391c96c190f3e5292b20016975d63117ef1224807ec85fe"
+    },
+    {
+      "actor": "archer",
+      "unique_poses": 12,
+      "rgba_bytes_both_facings": 1769472,
+      "has_real_transparency": true,
+      "sha256": "e21ba61f0417d51310811540f299fd9cd4c01627959b08b9efed9662d0ea88ef"
+    },
+    {
+      "actor": "wolf",
+      "unique_poses": 12,
+      "rgba_bytes_both_facings": 1769472,
+      "has_real_transparency": true,
+      "sha256": "3b108a6f51b32e51683d9be0f4d1674e14ffc33a8eaa9b46770ddf3bf0282e58"
+    },
+    {
+      "actor": "kraag",
+      "unique_poses": 12,
+      "rgba_bytes_both_facings": 1769472,
+      "has_real_transparency": true,
+      "sha256": "34f03079d0782160442194927a4351e569bbc28847790d11d6833f297c619a2d"
+    }
+  ],
+  "retained_rgba_bytes_both_facings": 7077888,
+  "notes": "Calculated CPU bitmap pixels only, excludes GPU/shadow paths. No physical memory/FPS measurement."
+}

@@ -136,7 +136,9 @@ class SummonerRepositoryRuleTest : FirestoreEmulatorTestBase() {
 
     try {
       withTimeout(FLOW_TIMEOUT_MS) {
-        repo.observeHeroes("unauth_target_uid").first()
+        // An empty cache snapshot may precede the server's authorization result.
+        // Unauthorized data must never arrive; keep collecting until data or the denial.
+        repo.observeHeroes("unauth_target_uid").first { it.isNotEmpty() }
       }
       fail("Expected exception wrapping PERMISSION_DENIED")
     } catch (e: Exception) {

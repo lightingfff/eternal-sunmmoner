@@ -44,8 +44,9 @@ service cloud.firestore {
                'gold', 'manaCrystals', 'soulShards', 'rations',
                'ironOre', 'arcaneEssence', 'highestClearedFloor',
                'totalExpeditions', 'unlockedFacilities', 'storyFlags',
-               'createdAt', 'updatedAt'
+               'createdAt', 'updatedAt', 'lobbyRosterRevision'
              ]) &&
+             (!('lobbyRosterRevision' in data) || (data.lobbyRosterRevision is int && data.lobbyRosterRevision >= 0 && data.lobbyRosterRevision <= 1000000000000)) &&
              data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
              data.userId == request.auth.uid &&
              data.masterName is string && data.masterName.size() >= 1 && data.masterName.size() <= 40 &&
@@ -67,6 +68,33 @@ service cloud.firestore {
              data.updatedAt is timestamp && data.updatedAt <= request.time;
     }
 
+    function validRecentDisdainEventIds(ids) {
+      // UUID-only producer contract keeps complete validation within the rules expression budget.
+      let n = ids.size();
+      let serialized = ids.join('|');
+      return ids is list && n <= 32 &&
+             (n == 0 || (serialized.size() == n * 37 - 1 && serialized.matches('^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(\\|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}){0,31}$')));
+    }
+
+    function validLobbyHeroFields(data) {
+      return (!('currentHp' in data) || (data.currentHp is int && data.currentHp >= -1 && data.currentHp <= data.maxHp)) &&
+             (!('sanityState' in data) || data.sanityState in ['NORMAL', 'ANXIOUS', 'PANICKED', 'SELF_AWARE']) &&
+             (!('currentAssignment' in data) || data.currentAssignment in ['', 'UNASSIGNED', 'IN_PARTY', 'RESTING', 'SACRIFICED']) &&
+             (!('partyJoinedOrder' in data) || (data.partyJoinedOrder is int && data.partyJoinedOrder >= 0)) &&
+             (!('restStartedAtEpochSec' in data) || (data.restStartedAtEpochSec is int && data.restStartedAtEpochSec >= 0 && data.restStartedAtEpochSec <= 4102444800)) &&
+             (!('survivedExpeditions' in data) || (data.survivedExpeditions is int && data.survivedExpeditions >= 0 && data.survivedExpeditions <= 1000000)) &&
+             (!('returnedUnder15PctHp' in data) || data.returnedUnder15PctHp is bool) &&
+             (!('recentDisdainEventIds' in data) || validRecentDisdainEventIds(data.recentDisdainEventIds)) &&
+             (!('hiddenTrait' in data) || (data.hiddenTrait is map &&
+               data.hiddenTrait.keys().hasAll(['id', 'name', 'minimumLevel', 'minimumMorale', 'requiresSelfAwareness', 'unlocked']) &&
+               data.hiddenTrait.keys().hasOnly(['id', 'name', 'minimumLevel', 'minimumMorale', 'requiresSelfAwareness', 'unlocked']) &&
+               data.hiddenTrait.id is string && data.hiddenTrait.id.size() >= 1 && data.hiddenTrait.id.size() <= 80 &&
+               data.hiddenTrait.name is string && data.hiddenTrait.name.size() >= 1 && data.hiddenTrait.name.size() <= 100 &&
+               data.hiddenTrait.minimumLevel is int && data.hiddenTrait.minimumLevel >= 1 && data.hiddenTrait.minimumLevel <= 100 &&
+               data.hiddenTrait.minimumMorale is int && data.hiddenTrait.minimumMorale >= 0 && data.hiddenTrait.minimumMorale <= 100 &&
+               data.hiddenTrait.requiresSelfAwareness is bool && data.hiddenTrait.unlocked is bool));
+    }
+
     function isValidHeroRecord(data) {
       return isSignedIn() &&
              data.keys().hasAll([
@@ -83,8 +111,10 @@ service cloud.firestore {
                'skillLevel', 'personality', 'status',
                'injuryRecoveryUntilEpochSec', 'morale',
                'equippedWeaponId', 'equippedArmorId', 'inActiveSquad',
-               'bondSummary', 'createdAt', 'updatedAt'
+               'bondSummary', 'createdAt', 'updatedAt',
+               'currentHp', 'sanityState', 'currentAssignment', 'partyJoinedOrder', 'restStartedAtEpochSec', 'hiddenTrait', 'survivedExpeditions', 'returnedUnder15PctHp', 'recentDisdainEventIds'
              ]) &&
+             validLobbyHeroFields(data) &&
              data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
              data.userId == request.auth.uid &&
              data.name is string && data.name.size() >= 1 && data.name.size() <= 50 &&
@@ -100,7 +130,7 @@ service cloud.firestore {
              data.speed is int && data.speed >= 20 && data.speed <= 500 &&
              data.skillLevel is int && data.skillLevel >= 1 && data.skillLevel <= 20 &&
              data.personality is string && data.personality.size() <= 20 &&
-             data.personality in ['STOIC', 'RECKLESS', 'CALCULATING', 'DEVOTED', 'CYNICAL', 'LOYAL'] &&
+             data.personality in ['STOIC', 'RECKLESS', 'CALCULATING', 'DEVOTED', 'CYNICAL', 'LOYAL', 'COWARD', 'ARROGANT', 'LONER', 'REBEL'] &&
              data.status is string && data.status.size() <= 20 &&
              data.status in ['READY', 'INJURED', 'RESTING', 'TRAINING'] &&
              data.injuryRecoveryUntilEpochSec is int &&
@@ -163,11 +193,27 @@ service cloud.firestore {
                            'gold', 'manaCrystals', 'soulShards', 'rations',
                            'ironOre', 'arcaneEssence', 'highestClearedFloor',
                            'totalExpeditions', 'unlockedFacilities', 'storyFlags',
-                           'updatedAt'
+                           'updatedAt', 'lobbyRosterRevision'
                          ])
                        );
 
       allow delete: if false;
+
+      match /expeditionSettlements/{attemptId} {
+        // A missing receipt must be readable before an idempotent transaction creates it.
+        allow get: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+        allow list: if false;
+        allow create: if isSignedIn() && request.auth.uid == userId &&
+          isValidId(userId) &&
+          attemptId.matches('^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$') &&
+          incoming().keys().hasAll(['userId', 'attemptId', 'createdAt', 'resultJSON']) &&
+          incoming().keys().hasOnly(['userId', 'attemptId', 'createdAt', 'resultJSON']) &&
+          incoming().userId == userId && incoming().attemptId == attemptId &&
+          incoming().createdAt == request.time &&
+          incoming().resultJSON is string && incoming().resultJSON.size() > 0 &&
+          incoming().resultJSON.size() <= 8192;
+        allow update, delete: if false;
+      }
 
       match /heroes/{heroId} {
         allow get: if isSignedIn() &&
@@ -201,13 +247,15 @@ service cloud.firestore {
                            incoming().diff(existing()).affectedKeys().hasOnly([
                              'level', 'exp', 'maxHp', 'attack', 'defense',
                              'speed', 'skillLevel', 'morale', 'bondSummary',
-                             'updatedAt'
+                             'updatedAt', 'currentHp', 'sanityState', 'currentAssignment',
+                             'partyJoinedOrder', 'restStartedAtEpochSec', 'hiddenTrait', 'survivedExpeditions', 'returnedUnder15PctHp', 'recentDisdainEventIds'
                            ]) ||
                            // Action 2: Squad, Equipment, & Sanctuary Status
                            incoming().diff(existing()).affectedKeys().hasOnly([
                              'status', 'injuryRecoveryUntilEpochSec', 'morale',
                              'inActiveSquad', 'equippedWeaponId', 'equippedArmorId',
-                             'updatedAt'
+                             'updatedAt', 'currentHp', 'sanityState', 'currentAssignment',
+                             'partyJoinedOrder', 'restStartedAtEpochSec', 'hiddenTrait', 'survivedExpeditions', 'returnedUnder15PctHp', 'recentDisdainEventIds'
                            ]) ||
                            // Action 3: Post-Expedition Combined Settlement
                            incoming().diff(existing()).affectedKeys().hasOnly([
@@ -215,7 +263,8 @@ service cloud.firestore {
                              'speed', 'skillLevel', 'status',
                              'injuryRecoveryUntilEpochSec', 'morale',
                              'equippedWeaponId', 'equippedArmorId',
-                             'inActiveSquad', 'bondSummary', 'updatedAt'
+                             'inActiveSquad', 'bondSummary', 'updatedAt',
+                             'currentHp', 'sanityState', 'currentAssignment', 'partyJoinedOrder', 'restStartedAtEpochSec', 'hiddenTrait', 'survivedExpeditions', 'returnedUnder15PctHp', 'recentDisdainEventIds'
                            ])
                          );
 

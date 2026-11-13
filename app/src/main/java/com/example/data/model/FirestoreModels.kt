@@ -2,6 +2,7 @@ package com.example.data.model
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
 import com.google.firebase.firestore.ServerTimestamp
 
@@ -396,6 +397,15 @@ data class HeroRecord(
   val equippedArmorId: String = "",
   val inActiveSquad: Boolean = false,
   val bondSummary: String = "",
+  val currentHp: Long = -1L,
+  val sanityState: String = HeroSanityState.NORMAL.name,
+  val currentAssignment: String = "",
+  val partyJoinedOrder: Long = 0L,
+  val restStartedAtEpochSec: Long = 0L,
+  val hiddenTrait: HeroHiddenTrait = HeroHiddenTrait(),
+  val survivedExpeditions: Int = 0,
+  val returnedUnder15PctHp: Boolean = false,
+  val recentDisdainEventIds: List<String> = emptyList(),
   @ServerTimestamp val createdAt: Timestamp? = null,
   @ServerTimestamp val updatedAt: Timestamp? = null,
 ) {
@@ -407,6 +417,23 @@ data class HeroRecord(
 
   val statusType: HeroStatusType
     get() = HeroStatusType.fromRaw(status)
+
+  fun hasActiveHiddenTrait(id: String): Boolean = hiddenTrait.unlocked && hiddenTrait.id == id
+
+  @get:Exclude
+  val criticalHitChance: Float
+    get() = if (hasActiveHiddenTrait("assassin_instinct")) 0.30f else 0f
+
+  @get:Exclude
+  val isPanicImmune: Boolean
+    get() = hasActiveHiddenTrait("indomitable_will")
+
+  fun effectiveSanityState(): HeroSanityState = when {
+    sanityState == HeroSanityState.SELF_AWARE.name ||
+      name.contains("Han Ysl", ignoreCase = true) || bondSummary.contains("SELF_AWARE") -> HeroSanityState.SELF_AWARE
+    isPanicImmune && sanityState == HeroSanityState.PANICKED.name -> HeroSanityState.NORMAL
+    else -> HeroSanityState.fromRaw(sanityState)
+  }
 
   fun isCurrentlyInjured(nowEpochSec: Long = System.currentTimeMillis() / 1000L): Boolean {
     return status == HeroStatusType.INJURED.name && injuryRecoveryUntilEpochSec > nowEpochSec
@@ -422,7 +449,7 @@ data class HeroRecord(
       status == HeroStatusType.INJURED.name -> "Vừa bình phục • Chờ nhận lệnh tại Khu Nghỉ Ngơi"
       status == HeroStatusType.TRAINING.name -> "Đang rèn luyện tại Sân Tập"
       status == HeroStatusType.RESTING.name -> "Đang nghỉ ngơi hồi phục tại Khu Nghỉ Ngơi"
-      inActiveSquad -> "Trực chiến Đội Viễn Chinh • Tuần tra Thánh Địa"
+      inActiveSquad -> "Trực chiến Đội Viễn Chinh • Tập hợp chờ tại Cổng Tháp"
       else -> "Sinh hoạt tự do tại Thánh Địa"
     }
   }
@@ -445,19 +472,22 @@ data class HeroRecord(
     val bonus = equipment.filter { it.id == equippedWeaponId || it.id == equippedArmorId }
       .sumOf { it.bonusAttack }
     val moraleMultiplier = 0.85f + (morale.coerceIn(0L, 100L) / 100f) * 0.25f
-    return ((attack + bonus) * moraleMultiplier).toInt().coerceAtLeast(5)
+    val traitMultiplier = if (hasActiveHiddenTrait("mortal_sword_saint")) 1.25f else 1f
+    return ((attack + bonus) * moraleMultiplier * traitMultiplier).toInt().coerceAtLeast(5)
   }
 
   fun totalDefense(equipment: List<EquipmentRecord>): Int {
     val bonus = equipment.filter { it.id == equippedWeaponId || it.id == equippedArmorId }
       .sumOf { it.bonusDefense }
-    return (defense + bonus).toInt()
+    val traitMultiplier = if (hasActiveHiddenTrait("bloodline_bastion")) 1.25f else 1f
+    return ((defense + bonus) * traitMultiplier).toInt().coerceAtLeast(0)
   }
 
   fun totalSpeed(equipment: List<EquipmentRecord>): Int {
     val bonus = equipment.filter { it.id == equippedWeaponId || it.id == equippedArmorId }
       .sumOf { it.bonusSpeed }
-    return (speed + bonus).toInt()
+    val traitMultiplier = if (hasActiveHiddenTrait("astral_eye")) 1.20f else 1f
+    return ((speed + bonus) * traitMultiplier).toInt().coerceAtLeast(1)
   }
 }
 

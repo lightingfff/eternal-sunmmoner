@@ -18,6 +18,9 @@ class CourierCombatUnit {
   var isMoving = false
   var facingRight = true
   var hurtFlash = 0f
+  /** One field medicine application; absorbs actual incoming damage, even if HP was full. */
+  var medicineWardHp = 0
+    internal set
 }
 
 data class CourierTelegraph(
@@ -32,8 +35,45 @@ data class CourierTelegraph(
 class LostCourierEncounter internal constructor(
   private val engine: TowerCombatEngine,
   records: List<HeroRecord>,
+  enableRescueJourney: Boolean = false,
+  enableLivingExploration: Boolean = false,
 ) {
   val courier = CourierCombatUnit()
+  val journey: RescueJourney? = if (enableRescueJourney && !enableLivingExploration) RescueJourney(engine, courier) else null
+  val livingExpedition: LivingExpedition? = if (enableLivingExploration) LivingExpedition(engine, courier) else null
+  private var livingCrossingSpawned = false
+  private val livingCrossingIds = linkedSetOf<String>()
+  private val livingCrossingBlocked: Boolean get() = livingCrossingIds.any { id -> engine.enemies.any { it.id == id && !it.dead } }
+  var choice: CourierChoice? = null
+    private set
+  // Existing southern trail, outside escort formation and the straight extraction road.
+  val supplyX = 1660f
+  val supplyY = 1565f
+  var suppliesRecovered = false
+    private set
+  val choiceAvailable: Boolean get() = outcome == null && choice == null && journey?.active != true && livingExpedition?.active != true && courier.x >= 1100f
+
+  fun chooseChoice(selected: CourierChoice): Boolean {
+    if (!choiceAvailable || engine.stage != MissionStage.IN_PROGRESS) return false
+    choice = selected
+    if (selected == CourierChoice.SUPPORT_COURIER) {
+      courier.hp = (courier.hp + 60).coerceAtMost(courier.maxHp)
+      statusVi = "Ưu tiên cứu người: băng bó +60 HP. Hộ tống tới cổng để lưu kết quả hỗ trợ."
+    } else {
+      statusVi = "Tiếp vận ở đài Nam, ngoài đường hộ tống. Theo lối rẽ (1180,1125) → (1480,1520), xác nhận lấy túi rồi quay về bọc lót người đưa thư."
+    }
+    engine.postFeedback(statusVi)
+    return true
+  }
+
+  fun interactSupplies(): Boolean {
+    if (engine.stage != MissionStage.IN_PROGRESS || outcome != null || choice != CourierChoice.RECOVER_SUPPLIES || suppliesRecovered) return false
+    if (engine.heroes.none { !it.knockedOut && hypot(it.x - supplyX, it.y - supplyY) <= RescueFieldAction.INTERACTION_RADIUS }) return false
+    suppliesRecovered = true
+    statusVi = "Đã thu hồi tiếp vận. Đưa người đưa thư sống sót tới cổng để hoàn thành cả hai mục tiêu."
+    engine.postFeedback(statusVi)
+    return true
+  }
   val waypoints = listOf(680f to 1040f, 1220f to 1130f, 1780f to 990f, 2360f to 1080f, 2860f to 1066f)
   var phase = CourierPhase.CLEAR_PATH
     private set
@@ -42,7 +82,7 @@ class LostCourierEncounter internal constructor(
   var statusVi = "Dọn hai lính gác phía trước để người đưa thư lên đường."
     private set
   val objectiveVi: String
-    get() = when (phase) {
+    get() = if (journey?.active == true || journey?.crossingBlocksEscort == true) journey.objectiveVi else when (phase) {
       CourierPhase.CLEAR_PATH -> "Mở đường cho người đưa thư bị thương"
       CourierPhase.RESCUED -> "Đã hộ tống người đưa thư tới cổng an toàn"
       CourierPhase.FAILED -> "Hộ tống thất bại • Có thể thử lại"
@@ -73,6 +113,7 @@ class LostCourierEncounter internal constructor(
   private var scoutResolved = false
 
   internal fun initialize() {
+    if (livingExpedition != null) { phase = CourierPhase.ESCORT; return }
     spawn("courier_path_guard_1", EnemyArchetype.FIELD_GOBLIN_RAIDER, 880f, 1000f)
     spawn("courier_path_guard_2", EnemyArchetype.FIELD_GOBLIN_RAIDER, 940f, 1140f)
   }
@@ -131,7 +172,30 @@ class LostCourierEncounter internal constructor(
       engine.postFeedback(statusVi)
     }
     courier.isMoving = false
-    if (phase != CourierPhase.CLEAR_PATH && waypointIndex < waypoints.size &&
+    livingExpedition?.step(dt)
+    if (livingExpedition?.active == true) return
+    if (livingExpedition != null && !livingCrossingSpawned && courier.x >= 1900f) {
+      livingCrossingSpawned = true
+      if (!livingExpedition.alarmSilenced) {
+        val id = "expedition_crossing_archer"
+        spawn(id, EnemyArchetype.FIELD_GOBLIN_ARCHER, 2220f, 1240f)
+        livingCrossingIds += id
+      }
+      if (!livingExpedition.gateSecured) {
+        val id = "expedition_crossing_wolf"
+        spawn(id, EnemyArchetype.DIRE_WOLF, 2160f, 890f)
+        livingCrossingIds += id
+      }
+      engine.postFeedback(if (livingExpedition.witness?.rescued == true)
+        "Người gác trạm đã chỉ chỗ phục kích. Giữ tuyến sau, dọn đường trước khi người đưa tin tiến qua!"
+        else "Có chuyển động ở hai bên đường! Đội hộ tống phải mở lối qua điểm giao.")
+    }
+    if (phase != CourierPhase.CLEAR_PATH && journey?.active == true) {
+      journey.step(dt)
+      return
+    }
+    journey?.observeEscortState()
+    if (phase != CourierPhase.CLEAR_PATH && journey?.crossingBlocksEscort != true && !livingCrossingBlocked && waypointIndex < waypoints.size &&
       engine.heroes.any { !it.knockedOut && hypot(it.x - courier.x, it.y - courier.y) <= 300f }) {
       val (tx, ty) = waypoints[waypointIndex]
       val distance = hypot(tx - courier.x, ty - courier.y)
@@ -161,12 +225,15 @@ class LostCourierEncounter internal constructor(
       statusVi = "Trinh sát chạy gọi viện! Chặn nó, hoặc Bảo vệ để giữ an toàn người đưa thư. Sợ: -20% sát thương, -15% tốc độ, tối đa 10s."
       engine.postFeedback(statusVi)
     }
-    if (eliteEnemyId == null && courier.x >= 2220f) {
+    if (eliteEnemyId == null && courier.x >= 2220f && journey?.crossingBlocksEscort != true && !livingCrossingBlocked) {
       eliteEnemyId = "courier_gate_captain"
       spawn("courier_gate_captain", EnemyArchetype.GOBLIN_WAR_CAPTAIN, 2540f, 1050f)
+      if (livingExpedition?.gateForced == true) {
+        spawn("expedition_gate_alert_guard", EnemyArchetype.FIELD_GOBLIN_RAIDER, 2460f, 1160f)
+      }
       phase = CourierPhase.GATE_GUARD
       engine.eventWaveTriggeredForCourier()
-      statusVi = "Kraag chắn cổng! ĐIỂM ĐẾN để né vòng đỏ (1,5s), rồi DỒN HỎA LỰC khi hắn hồi sức: +35% sát thương."
+      statusVi = "Kraag chắn cổng! DI CHUYỂN rồi chạm ngoài vòng đỏ (1,5s); DỒN HỎA LỰC khi hắn hồi sức: +35% sát thương."
       engine.postFeedback(statusVi)
     }
   }
@@ -240,7 +307,8 @@ class LostCourierEncounter internal constructor(
         }
         if (hypot(courier.x - warning.x, courier.y - warning.y) <= warning.radius) damageCourier(48)
         engine.aoeEffects += CombatAoEEffect(warning.x, warning.y, warning.radius,
-          androidx.compose.ui.graphics.Color(0xFFEF4444), duration = 0.35f)
+          androidx.compose.ui.graphics.Color(0xFFEF4444), duration = 0.35f,
+          style = CombatFxStyle.SLAM, sourceId = enemy.id)
         eliteTelegraph = null
         eliteRecoveryRemaining = 1.8f
         enemy.attackCooldown = 4.5f
@@ -258,7 +326,7 @@ class LostCourierEncounter internal constructor(
       enemy.aggroed = true
       if (enemy.attackCooldown <= 0f) {
         eliteTelegraph = CourierTelegraph(tx, ty)
-        engine.postFeedback("VÒNG ĐỎ: 1,5s! Dùng ĐIỂM ĐẾN né, rồi DỒN HỎA LỰC phản công.")
+        engine.postFeedback("VÒNG ĐỎ: DI CHUYỂN → chạm ngoài vòng! DỒN HỎA LỰC lúc Kraag hồi sức.")
       }
     }
   }
@@ -273,11 +341,15 @@ class LostCourierEncounter internal constructor(
     enemy.x = pos.first; enemy.y = pos.second; enemy.isMoving = true
   }
 
-  private fun damageCourier(raw: Int) {
+  internal fun damageCourier(raw: Int) {
+    if (livingExpedition?.active == true) return
     val protected = engine.activeOrder == TacticalOrder.PROTECT_ALLY && engine.heroes.any {
       !it.knockedOut && hypot(it.x - courier.x, it.y - courier.y) <= 165f
     }
-    val damage = (raw * if (protected) 0.6f else 1f).toInt().coerceAtLeast(1)
+    val incoming = (raw * if (protected) 0.6f else 1f).toInt().coerceAtLeast(1)
+    val absorbed = minOf(courier.medicineWardHp, incoming)
+    courier.medicineWardHp -= absorbed
+    val damage = incoming - absorbed
     courier.hp = (courier.hp - damage).coerceAtLeast(0)
     courier.hurtFlash = 1f
     engine.floatingTexts += FloatingCombatText(courier.x, courier.y - 36f, "-$damage",
@@ -286,6 +358,7 @@ class LostCourierEncounter internal constructor(
 
   internal fun afterStep() {
     if (outcome != null) return
+    livingExpedition?.afterStep()
     if (eliteEnemyId != null && engine.enemies.any { it.id == eliteEnemyId && it.dead }) {
       eliteTelegraph = null
       eliteRecoveryRemaining = 0f
@@ -303,7 +376,12 @@ class LostCourierEncounter internal constructor(
     if (courier.hp <= 0 || engine.heroes.none { !it.knockedOut }) {
       fail(if (courier.hp <= 0) "Người đưa thư đã gục ngã. Thử lại và giữ đội hình bảo vệ." else "Đội hình đã gục ngã. Có thể chuẩn bị rồi thử lại.")
     } else if (waypointIndex >= waypoints.size && eliteEnemyId != null && engine.enemies.any { it.id == eliteEnemyId && it.dead }) {
-      outcome = CourierOutcome.RESCUED
+      outcome = when {
+        choice == CourierChoice.RECOVER_SUPPLIES && suppliesRecovered -> CourierOutcome.SUPPLIES_RECOVERED
+        choice == CourierChoice.RECOVER_SUPPLIES -> CourierOutcome.RESCUED_WITHOUT_SUPPLIES
+        else -> CourierOutcome.RESCUED
+      }
+      journey?.rescued()
       phase = CourierPhase.RESCUED
       courier.isMoving = false
       statusVi = "Đã cứu người đưa thư! Mở dịch vụ rèn tiếp vận và lưu ký ức đồng đội."

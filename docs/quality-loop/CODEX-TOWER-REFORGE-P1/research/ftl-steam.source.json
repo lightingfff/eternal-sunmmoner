@@ -1,0 +1,26 @@
+{
+  "requested_url": "https://store.steampowered.com/app/212680/FTL_Faster_Than_Light/",
+  "retrieved_utc": "2026-11-12T13:55:14.962045+00:00",
+  "source_type": "developer/publisher Steam description",
+  "status": 200,
+  "final_url": "https://store.steampowered.com/app/212680/FTL_Faster_Than_Light/",
+  "bytes": 141179,
+  "content_type": "text/html; charset=UTF-8",
+  "extract_file": "ftl-steam.txt",
+  "verified_facts": [
+    "Developer/publisher listing identifies Subset Games.",
+    "About This Game describes giving crew orders, managing ship power and choosing weapon targets.",
+    "Combat can be paused to evaluate strategy and issue orders.",
+    "The description presents several responses to shield failure: escape, weapons, or boarding.",
+    "Random encounters/results and permadeath are advertised features."
+  ],
+  "relevant_extract_lines": [
+    267,
+    269,
+    270,
+    272,
+    273,
+    274
+  ],
+  "interpretation_limit": "Descriptive source facts, not measured player enjoyment or retention. No user or critic review quoted as evidence."
+}

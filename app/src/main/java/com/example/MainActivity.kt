@@ -292,8 +292,13 @@ fun EternalSummonerRootApp() {
           onTrainHeroWithFocus = vm::trainHeroWithFocus,
           onUnequipItem = vm::unequipItem,
           onAssignHeroActivity = vm::assignHeroActivity,
+          onDropHero = vm::assignLobbyHero,
           onHostMealWithRecipe = vm::hostRestaurantMealWithRecipe,
           onUnlockExpansion = vm::unlockIslandExpansion,
+          onHealHeroInfirmary = vm::healHeroAtInfirmary,
+          onServeHeartyMeal = vm::serveHeartyMealToHero,
+          onCruelSynthesis = vm::performCruelHeroSynthesis,
+          onSocialDisdainPenalty = { heroId -> vm.applySocialDisdainPenalty(heroId, 2) },
         )
       }
 
@@ -302,6 +307,7 @@ fun EternalSummonerRootApp() {
           state = uiState,
           onSelectFloor = vm::selectFloorForPrep,
           onBackToLobby = vm::returnToSanctuaryLobby,
+          playEntryCutscene = true,
         )
       }
 
@@ -324,6 +330,9 @@ fun EternalSummonerRootApp() {
           onUnequipItem = vm::unequipItem,
           onAssignHeroActivity = vm::assignHeroActivity,
           onHostMealWithRecipe = vm::hostRestaurantMealWithRecipe,
+          onHealHeroInfirmary = vm::healHeroAtInfirmary,
+          onServeHeartyMeal = vm::serveHeartyMealToHero,
+          onCruelSynthesis = vm::performCruelHeroSynthesis,
         )
       }
 
@@ -334,6 +343,7 @@ fun EternalSummonerRootApp() {
           settings = gameSettings,
           onFinishExpedition = { victory, fallen -> vm.finishTowerExpedition(victory, fallen) },
           onReturnToSanctuary = vm::returnToSanctuaryLobby,
+          onPrepareRetry = vm::retryTowerExpedition,
           onFinishExpeditionDetailed = vm::finishTowerExpedition,
           onEquipItem = vm::equipItem,
         )

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.LobbyHeroSystemsTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-10T05:22:12.131Z" hostname="b316c1c49299" time="0.159">
+  <properties/>
+  <testcase name="heldHeroFollowsViewportEdgeScrollWithoutAssigningOrMovingOnItsOwn" classname="com.example.LobbyHeroSystemsTest" time="0.054"/>
+  <testcase name="lowHpHalvesActualMovementAndPickupSuspendsAiThenCancelRestoresPosition" classname="com.example.LobbyHeroSystemsTest" time="0.016"/>
+  <testcase name="nearbyUnassignedHeroesStopAndFaceEachOtherForConversation" classname="com.example.LobbyHeroSystemsTest" time="0.014"/>
+  <testcase name="acceptedDropDiscardsOldWanderRouteAndPickupHitTestingUsesProjectedSpriteAtAllZooms" classname="com.example.LobbyHeroSystemsTest" time="0.002"/>
+  <testcase name="afraidHeroActuallyReachesSafetyWhileFourPartyMembersFormBeforeGate" classname="com.example.LobbyHeroSystemsTest" time="0.062"/>
+  <testcase name="modelValidatesBoundsAndLocksThenRevealsTheActualHiddenTrait" classname="com.example.LobbyHeroSystemsTest" time="0.001"/>
+  <testcase name="deadAndInjuredHeroesCannotBeSentIntoPartyAndHouseDropNeverSacrifices" classname="com.example.LobbyHeroSystemsTest" time="0.001"/>
+  <testcase name="fifthDropEvictsOldestAndRepeatDropDoesNotEvictAnotherMember" classname="com.example.LobbyHeroSystemsTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

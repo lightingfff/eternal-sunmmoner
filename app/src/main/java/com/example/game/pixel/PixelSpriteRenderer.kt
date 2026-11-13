@@ -282,33 +282,33 @@ object PixelSpriteRenderer {
     val startTy = ((minWorldY / worldTileSize).toInt() - 1).coerceAtLeast(minTyBound)
     val endTy = ((maxWorldY / worldTileSize).toInt() + 1).coerceAtMost(maxTyBound)
 
-    val baseTiles = if (biome == BiomeTheme.SANCTUARY_ASTRAL && SanctuaryAssetManager.tileAssets.isNotEmpty()) {
-      SanctuaryAssetManager.tileAssets
-    } else {
-      when (biome) {
-        BiomeTheme.SANCTUARY_ASTRAL, BiomeTheme.TRAINING_HALL_INTERIOR -> PixelTileAtlas.sanctuaryStoneTiles
-        BiomeTheme.RESTAURANT_INTERIOR, BiomeTheme.DORMITORY_INTERIOR -> PixelTileAtlas.tavernWoodPlankTiles
-        BiomeTheme.ARMORY_INTERIOR -> PixelTileAtlas.ruinCitadelFloorTiles
-        BiomeTheme.FIRST_FIELD_MEADOW -> PixelTileAtlas.meadowGrassTiles
-        BiomeTheme.ELDERWOOD_FOREST -> PixelTileAtlas.elderwoodFloorTiles
-        else -> PixelTileAtlas.ruinCitadelFloorTiles
-      }
+    val baseTiles = when (biome) {
+      BiomeTheme.SANCTUARY_ASTRAL -> FantasyHd128Atlas.hdSanctuaryGrassTiles
+      BiomeTheme.TRAINING_HALL_INTERIOR -> FantasyHd128Atlas.hdInteriorMarbleFlagstoneTiles
+      BiomeTheme.RESTAURANT_INTERIOR, BiomeTheme.DORMITORY_INTERIOR -> FantasyHd128Atlas.hdTavernOakPlankTiles
+      BiomeTheme.ARMORY_INTERIOR -> FantasyHd128Atlas.hdArmoryForgeBasaltTiles
+      BiomeTheme.FIRST_FIELD_MEADOW -> FantasyHd128Atlas.hdMeadowGrassTiles
+      BiomeTheme.ELDERWOOD_FOREST -> FantasyHd128Atlas.hdElderwoodFloorTiles
+      BiomeTheme.SUNKEN_RUINS -> FantasyHd128Atlas.hdSunkenRuinsFloorTiles
+      BiomeTheme.CRIMSON_CAVERN -> FantasyHd128Atlas.hdCrimsonCavernFloorTiles
+      BiomeTheme.FALLEN_STAR_TEMPLE -> FantasyHd128Atlas.hdFallenStarFloorTiles
     }
 
-    val roadTiles = if (biome == BiomeTheme.SANCTUARY_ASTRAL && SanctuaryAssetManager.roadAssets.isNotEmpty()) {
-      SanctuaryAssetManager.roadAssets
-    } else {
-      when (biome) {
-        BiomeTheme.SANCTUARY_ASTRAL, BiomeTheme.TRAINING_HALL_INTERIOR -> PixelTileAtlas.sanctuaryCausewayTiles
-        BiomeTheme.RESTAURANT_INTERIOR, BiomeTheme.DORMITORY_INTERIOR, BiomeTheme.ARMORY_INTERIOR -> PixelTileAtlas.tavernFlagstoneAisleTiles
-        BiomeTheme.FIRST_FIELD_MEADOW -> PixelTileAtlas.meadowDirtRoadTiles
-        else -> null
-      }
+    val roadTiles = when (biome) {
+      BiomeTheme.SANCTUARY_ASTRAL -> FantasyHd128Atlas.hdSanctuaryCausewayTiles
+      BiomeTheme.TRAINING_HALL_INTERIOR -> FantasyHd128Atlas.hdSanctuaryStoneTiles
+      BiomeTheme.RESTAURANT_INTERIOR, BiomeTheme.ARMORY_INTERIOR -> FantasyHd128Atlas.hdInteriorMarbleFlagstoneTiles
+      BiomeTheme.DORMITORY_INTERIOR -> FantasyHd128Atlas.hdDormitoryTapestryTiles
+      BiomeTheme.FIRST_FIELD_MEADOW -> FantasyHd128Atlas.hdMeadowPathTiles
+      BiomeTheme.ELDERWOOD_FOREST -> FantasyHd128Atlas.hdElderwoodPathTiles
+      BiomeTheme.SUNKEN_RUINS -> FantasyHd128Atlas.hdSunkenRuinsPathTiles
+      BiomeTheme.CRIMSON_CAVERN -> FantasyHd128Atlas.hdCrimsonCavernPathTiles
+      BiomeTheme.FALLEN_STAR_TEMPLE -> FantasyHd128Atlas.hdFallenStarPathTiles
     }
 
     val roadEdgeTiles = when (biome) {
-      BiomeTheme.SANCTUARY_ASTRAL -> PixelTileAtlas.sanctuaryRoadCurbTiles
-      BiomeTheme.FIRST_FIELD_MEADOW -> PixelTileAtlas.meadowRoadBorderTiles
+      BiomeTheme.SANCTUARY_ASTRAL -> FantasyHd128Atlas.hdSanctuaryCurbTiles
+      BiomeTheme.FIRST_FIELD_MEADOW -> FantasyHd128Atlas.hdMeadowBorderTiles
       else -> null
     }
 
@@ -337,27 +337,35 @@ object PixelSpriteRenderer {
           }
         }
 
-        // P27B ground is a mosaic indexed by WORLD coordinates, so the same material
-        // grammar holds here as in the island renderer. The 8x8 sheet (period 512 px)
-        // is preferred; curbs and legacy families keep their hash choice.
-        when {
-          onRoadCore && roadTiles != null -> drawGroundTile(
-            PixelTileAtlas.sanctuaryCobbleSheet, roadTiles, tx, ty, hash,
-            dstX, dstY, tileScreenW + 1, tileScreenH + 1,
-            rotated = PixelTileAtlas.sanctuaryCobbleSheetRotated,
-          )
-          onRoadEdge && roadEdgeTiles != null -> drawImage(
-            image = roadEdgeTiles[hash % roadEdgeTiles.size],
-            dstOffset = IntOffset(dstX, dstY),
-            dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
-            filterQuality = FilterQuality.None,
-          )
-          else -> drawGroundTile(
-            PixelTileAtlas.sanctuaryGrassSheet, baseTiles, tx, ty, hash,
-            dstX, dstY, tileScreenW + 1, tileScreenH + 1,
-            rotated = PixelTileAtlas.sanctuaryGrassSheetRotated,
-          )
+        val tileToDraw = when {
+          onRoadCore && roadTiles != null -> roadTiles[hash % roadTiles.size]
+          onRoadEdge && roadEdgeTiles != null -> roadEdgeTiles[hash % roadEdgeTiles.size]
+          else -> baseTiles[hash % baseTiles.size]
         }
+        drawImage(
+          image = tileToDraw,
+          dstOffset = IntOffset(dstX, dstY),
+          dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
+          filterQuality = FilterQuality.None,
+        )
+      }
+    }
+
+    // HD-2D Shader Lighting on Floor: Interior Window Sunbeams OR Tower Biome Volumetric Shafts & Caustics
+    if (biome.isInteriorBiome) {
+      val accent = when (biome) {
+        BiomeTheme.RESTAURANT_INTERIOR -> Color(0xFFFBBF24)
+        BiomeTheme.DORMITORY_INTERIOR -> Color(0xFFFDE68A)
+        BiomeTheme.TRAINING_HALL_INTERIOR -> Color(0xFF38BDF8)
+        BiomeTheme.ARMORY_INTERIOR -> Color(0xFFFB923C)
+        else -> Color(0xFFFDE68A)
+      }
+      with(SanctuarySunlightSystem) {
+        drawInteriorHd2dWindowBeamsAndReflections(worldWidth, worldHeight, camX, camY, zoom, timeSec, accent)
+      }
+    } else if (biome != BiomeTheme.SANCTUARY_ASTRAL) {
+      with(SanctuarySunlightSystem) {
+        drawTowerBiomeHd2dLighting(biome, worldWidth, worldHeight, camX, camY, zoom, timeSec)
       }
     }
 
@@ -494,11 +502,13 @@ object PixelSpriteRenderer {
     footY: Float,
     pixelScale: Float,
     alpha: Float = 1f,
+    hdProfile: FantasyHd128Structures.MaterialProfile = FantasyHd128Structures.MaterialProfile.ARCHITECTURE,
   ) {
     val dstW = (bmp.width * pixelScale).roundToInt().coerceAtLeast(2)
     val dstH = (bmp.height * pixelScale).roundToInt().coerceAtLeast(2)
+    val hdBmp = FantasyHd128Structures.hdFor(bmp, hdProfile)
     drawImage(
-      image = bmp,
+      image = hdBmp,
       dstOffset = IntOffset((cx - dstW / 2f).roundToInt(), (footY - dstH).roundToInt()),
       dstSize = IntSize(dstW, dstH),
       alpha = alpha.coerceIn(0f, 1f),
@@ -541,14 +551,21 @@ object PixelSpriteRenderer {
     // P29: align the plinth front edge with the sprite's REAL visible foot (bottom
     // padding aware) instead of a magic 6px, so facade and foundation share one seam.
     val fy = cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, bitmap) * s
-    val shadowA = (0.55f * com.example.game.world.WorldEnvironment.lighting.shadowStrength).coerceIn(0f, 0.55f)
+    val shadowA = (0.72f * com.example.game.world.WorldEnvironment.lighting.shadowStrength).coerceIn(0f, 0.72f)
     // Grounding contact: footprint-shaped parallelogram slightly larger than the plinth.
+    drawPath(
+      Path().apply {
+        moveTo(cx - hw * 1.14f, fy + 5.0f * s); lineTo(cx + hw * 1.14f, fy + 5.0f * s)
+        lineTo(cx + hw * 1.04f, fy - hd * 1.05f); lineTo(cx - hw * 1.04f, fy - hd * 1.05f); close()
+      },
+      Color(0xFF040812).copy(alpha = shadowA * 0.65f),
+    )
     drawPath(
       Path().apply {
         moveTo(cx - hw * 1.08f, fy + 3.5f * s); lineTo(cx + hw * 1.08f, fy + 3.5f * s)
         lineTo(cx + hw, fy - hd); lineTo(cx - hw, fy - hd); close()
       },
-      Color(0xFF060A12).copy(alpha = shadowA),
+      Color(0xFF03060E).copy(alpha = shadowA),
     )
     // Plinth top face (foreshortened stone slab).
     drawPath(
@@ -565,9 +582,9 @@ object PixelSpriteRenderer {
         moveTo(cx - hw, fy); lineTo(cx + hw, fy)
         lineTo(cx + hw, fy + faceH); lineTo(cx - hw, fy + faceH); close()
       },
-      Color(0xFF262C38),
+      Color(0xFF222836),
     )
-    drawLine(Color(0xFF5A6474), Offset(cx - hw, fy), Offset(cx + hw, fy), 1.6f * s)
+    drawLine(Color(0xFF687488), Offset(cx - hw, fy), Offset(cx + hw, fy), 1.8f * s)
     // Entrance steps descending toward the viewer, centered on the front edge.
     val stepW = hw * 0.36f
     for (k in 0 until 3) {
@@ -591,14 +608,15 @@ object PixelSpriteRenderer {
     topFraction: Float = 0.58f,
     alpha: Float = 0.94f,
   ) {
-    val srcH = (bmp.height * topFraction).roundToInt().coerceIn(2, bmp.height)
+    val hdBmp = FantasyHd128Structures.hdFor(bmp, FantasyHd128Structures.MaterialProfile.FOLIAGE)
+    val srcH = (hdBmp.height * topFraction).roundToInt().coerceIn(2, hdBmp.height)
     val fullDstW = (bmp.width * pixelScale).roundToInt().coerceAtLeast(2)
     val fullDstH = (bmp.height * pixelScale).roundToInt().coerceAtLeast(2)
     val topDstH = (fullDstH * topFraction).roundToInt().coerceAtLeast(2)
     drawImage(
-      image = bmp,
+      image = hdBmp,
       srcOffset = IntOffset(0, 0),
-      srcSize = IntSize(bmp.width, srcH),
+      srcSize = IntSize(hdBmp.width, srcH),
       dstOffset = IntOffset((cx - fullDstW / 2f).roundToInt(), (footY - fullDstH).roundToInt()),
       dstSize = IntSize(fullDstW, topDstH),
       alpha = alpha,
@@ -624,12 +642,12 @@ object PixelSpriteRenderer {
     val offX = offWx * zoom
     val offY = offWy * zoom * ObliqueCamera.OBLIQUE_Y_SCALE
     // Contact AO — always pinned at foot, footprint-matched, never offset
-    val contactRX = caster.footprintRX * zoom * 0.92f
-    val contactRY = caster.footprintRY * zoom * 0.62f
+    val contactRX = caster.footprintRX * zoom * 0.96f
+    val contactRY = caster.footprintRY * zoom * 0.66f
     drawOval(
-      color = Color.Black.copy(alpha = (baseAlpha * 1.10f).coerceIn(0f, 0.55f)),
-      topLeft = Offset(cx - contactRX * 0.90f, footY - contactRY * 0.78f),
-      size = Size(contactRX * 1.80f, contactRY * 1.38f),
+      color = Color(0xFF030710).copy(alpha = (baseAlpha * 1.35f).coerceIn(0f, 0.72f)),
+      topLeft = Offset(cx - contactRX * 0.94f, footY - contactRY * 0.80f),
+      size = Size(contactRX * 1.88f, contactRY * 1.44f),
     )
     // Cast silhouette — directional, material-specific, softness-driven
     when (caster.silhouette) {
@@ -640,24 +658,19 @@ object PixelSpriteRenderer {
     }
   }
   private fun DrawScope.drawRectCastShadow(cx: Float, footY: Float, caster: ShadowCaster, zoom: Float, offX: Float, offY: Float, baseAlpha: Float) {
-    // Footprint rectangle with softness chamfer — represents roof/wall mass
     val hw = caster.footprintRX * zoom
     val hd = caster.footprintRY * zoom / ObliqueCamera.GROUND_ELLIPSE_RATIO * ObliqueCamera.OBLIQUE_Y_SCALE
-    // Soft expand: larger softness → more penumbra spread
-    val expand = caster.softnessPx * zoom * 0.32f
+    val expand = caster.softnessPx * zoom * 0.34f
     val left = cx - hw - expand; val right = cx + hw + expand
     val top = footY - hd * 2f - expand; val bottom = footY + expand * 0.45f
-    // Outer penumbra (2x blur, lighter)
     val outer = Path().apply { moveTo(left + offX - 2f*zoom, top + offY); lineTo(right + offX + 2f*zoom, top + offY); lineTo(right + offX + 2f*zoom, bottom + offY); lineTo(left + offX - 2f*zoom, bottom + offY); close() }
-    drawPath(outer, Color(0xFF0A0C14).copy(alpha = (baseAlpha * 0.22f).coerceIn(0f, 0.22f)))
-    // Core (tighter, denser)
-    val inner = Path().apply { moveTo(cx - hw*0.88f + offX, footY - hd*1.55f + offY); lineTo(cx + hw*0.88f + offX, footY - hd*1.55f + offY); lineTo(cx + hw*0.88f + offX, footY - hd*0.15f + offY); lineTo(cx - hw*0.88f + offX, footY - hd*0.15f + offY); close() }
-    drawPath(inner, Color(0xFF0A0C14).copy(alpha = (baseAlpha * 0.48f).coerceIn(0f, 0.38f)))
+    drawPath(outer, Color(0xFF060B16).copy(alpha = (baseAlpha * 0.34f).coerceIn(0f, 0.34f)))
+    val inner = Path().apply { moveTo(cx - hw*0.90f + offX, footY - hd*1.60f + offY); lineTo(cx + hw*0.90f + offX, footY - hd*1.60f + offY); lineTo(cx + hw*0.90f + offX, footY - hd*0.12f + offY); lineTo(cx - hw*0.90f + offX, footY - hd*0.12f + offY); close() }
+    drawPath(inner, Color(0xFF040812).copy(alpha = (baseAlpha * 0.66f).coerceIn(0f, 0.56f)))
   }
   private fun DrawScope.drawCanopyCastShadow(cx: Float, footY: Float, caster: ShadowCaster, zoom: Float, offX: Float, offY: Float, baseAlpha: Float) {
-    // Irregular canopy — 12-point radial wobble seeded by id hash, mimics alpha-masked foliage
-    val rx = (caster.footprintRX * 0.95f + caster.softnessPx * 0.28f) * zoom
-    val ry = (caster.heightPx * 0.10f + caster.footprintRY * 0.55f) * zoom
+    val rx = (caster.footprintRX * 0.96f + caster.softnessPx * 0.28f) * zoom
+    val ry = (caster.heightPx * 0.11f + caster.footprintRY * 0.58f) * zoom
     val seed = caster.id.hashCode()
     fun wobblePath(expandK: Float): Path {
       val p = Path()
@@ -672,24 +685,22 @@ object PixelSpriteRenderer {
       }
       p.close(); return p
     }
-    drawPath(wobblePath(1.12f), Color(0xFF0A0C14).copy(alpha = (baseAlpha * 0.30f).coerceIn(0f, 0.25f)))
-    drawPath(wobblePath(0.88f), Color(0xFF0A0C14).copy(alpha = (baseAlpha * 0.42f).coerceIn(0f, 0.30f)))
+    drawPath(wobblePath(1.14f), Color(0xFF060B16).copy(alpha = (baseAlpha * 0.42f).coerceIn(0f, 0.36f)))
+    drawPath(wobblePath(0.90f), Color(0xFF040812).copy(alpha = (baseAlpha * 0.62f).coerceIn(0f, 0.48f)))
   }
   private fun DrawScope.drawGateCastShadow(cx: Float, footY: Float, caster: ShadowCaster, zoom: Float, offX: Float, offY: Float, baseAlpha: Float) {
     val hw = caster.footprintRX * zoom * 0.92f
     val hd = caster.footprintRY * zoom / ObliqueCamera.GROUND_ELLIPSE_RATIO * ObliqueCamera.OBLIQUE_Y_SCALE
-    // Twin pillars with gap (portal void keeps light)
     val gap = hw * 0.42f
     val pillarW = hw * 0.38f
     fun pillarPath(centerOffset: Float): Path {
       val pcx = cx + centerOffset
       return Path().apply { moveTo(pcx - pillarW + offX, footY - hd*2.2f + offY); lineTo(pcx + pillarW + offX, footY - hd*2.2f + offY); lineTo(pcx + pillarW + offX, footY + offY); lineTo(pcx - pillarW + offX, footY + offY); close() }
     }
-    drawPath(pillarPath(-gap), Color(0xFF0A0C14).copy(alpha = (baseAlpha * 0.42f).coerceIn(0f, 0.33f)))
-    drawPath(pillarPath(gap), Color(0xFF0A0C14).copy(alpha = (baseAlpha * 0.42f).coerceIn(0f, 0.33f)))
-    // Faint connector under arch
+    drawPath(pillarPath(-gap), Color(0xFF040812).copy(alpha = (baseAlpha * 0.58f).coerceIn(0f, 0.48f)))
+    drawPath(pillarPath(gap), Color(0xFF040812).copy(alpha = (baseAlpha * 0.58f).coerceIn(0f, 0.48f)))
     val arch = Path().apply { moveTo(cx - hw*0.62f + offX, footY - hd*0.55f + offY); lineTo(cx + hw*0.62f + offX, footY - hd*0.55f + offY); lineTo(cx + hw*0.62f + offX, footY - hd*0.15f + offY); lineTo(cx - hw*0.62f + offX, footY - hd*0.15f + offY); close() }
-    drawPath(arch, Color(0xFF0A0C14).copy(alpha = (baseAlpha * 0.16f).coerceIn(0f, 0.14f)))
+    drawPath(arch, Color(0xFF040812).copy(alpha = (baseAlpha * 0.28f).coerceIn(0f, 0.24f)))
   }
 
   @Deprecated("Use drawCastersShadow(obs→caster) for silhouette-faithful shadows; kept for compat.")
@@ -698,13 +709,12 @@ object PixelSpriteRenderer {
     footY: Float,
     halfW: Float,
     halfH: Float,
-    alpha: Float = 0.52f,
+    alpha: Float = 0.64f,
   ) {
     val heightProxy = (halfW * 0.95f + halfH * 1.35f).coerceAtLeast(12f)
     val rx = halfW * 0.92f; val ry = halfH * 0.92f
-    // Build lightweight caster to reuse silhouette path
     val tmp = ShadowCaster(id = "legacy_${cx.toInt()}_${footY.toInt()}", heightPx = heightProxy, footprintRX = rx, footprintRY = ry, silhouette = com.example.game.map.ShadowSilhouette.RECT, opacity = alpha, softnessPx = 5f)
-    drawCastersShadow(cx, footY, tmp, zoom = 1f, alphaOverride = alpha * 0.92f)
+    drawCastersShadow(cx, footY, tmp, zoom = 1f, alphaOverride = alpha * 1.12f)
   }
 
   fun DrawScope.drawProp(
@@ -1310,16 +1320,11 @@ object PixelSpriteRenderer {
     }
   }
 
-  /** Authored premium sheet id for a hero, or null when the procedural sheet still applies. */
-  private fun premiumActorId(heroName: String?, heroClass: HeroClassType): String? = when {
-    heroName == "Kaelen" && heroClass == HeroClassType.KNIGHT -> "kaelen"
-    heroName == "Lyra" && heroClass == HeroClassType.ARCHER -> "lyra"
-    else -> null
-  }
-
   /**
    * Renders Master Summoner, Autonomous Heroes, or Sanctuary Keepers in True 3/4 Perspective
-   * (38x50 native pixel art at crisp nearest-neighbor scale + foreshortened elliptical ground shadow).
+   * using sculpted High-Definition 76x100 dark-fantasy pixel art (FantasyHd128CharacterAtlas)
+   * with 6-frame breathing/wind-rippled idle cycles, 8-frame articulated stride cycles,
+   * and 4-frame weapon-arc attack animations.
    */
   fun DrawScope.drawCharacterSprite(
     worldX: Float,
@@ -1346,86 +1351,94 @@ object PixelSpriteRenderer {
     val cy = ObliqueCamera.worldToScreenY(worldY, camY, zoom, size.height / 2f)
     if (cx < -120f || cx > size.width + 120f || cy < -150f || cy > size.height + 120f) return
 
-    // Authored premium sheets win when they exist; every path below still works when the
-    // sheet is absent or invalid, so a missing asset can never strand a hero without art.
-    val premiumId = if (isMaster) null else premiumActorId(heroName, heroClass)
-    val premium = premiumId?.let { PremiumActorAtlas.get(it) }
-    val pixelScale = (premium?.worldPixelScale ?: 1.85f) * zoom
+    val pixelScale = 0.96f * zoom
 
     // Foreshortened 3/4 Sovereign Sigil / Shield Barrier Ellipse on Ground
     if (shieldOrAuraColor != null) {
       drawOval(
-        color = shieldOrAuraColor.copy(alpha = 0.52f),
+        color = shieldOrAuraColor.copy(alpha = 0.56f),
         topLeft = Offset(cx - 28f * zoom, cy - 12f * zoom),
         size = Size(56f * zoom, 24f * zoom),
-        style = Stroke(width = 2.0f * zoom),
+        style = Stroke(width = 2.2f * zoom),
       )
     }
 
-    // The shield-shockwave ground ring belongs to Kaelen's knight skill, not to an archer.
-    if (premium != null && premiumId == "kaelen") with(PremiumSliceRenderer) {
-      drawSkillGround(cx,cy,zoom,attackAnimProgress,skillAnimation)
-    }
-    val frameBmp = premium?.frame(facingRight,facingNorth,isMoving,attackAnimProgress,
-      skillAnimation,hurtFlash,isInjuredResting,timeSec,emotion=emotion) ?: run {
-    val sheet = if (isMaster) {
-      PixelCharacterAtlas.masterSprites
-    } else {
-      PixelCharacterAtlas.heroSheet(heroClass)
+    // Foreshortened 2.5D HD-2D Ground Sigil & Expanding Skill Shockwave
+    with(FantasyHd2dSkillVfx) {
+      drawHeroGroundSigilAndShockwave(
+        cx = cx,
+        cy = cy,
+        zoom = zoom,
+        heroClass = heroClass,
+        isMaster = isMaster,
+        attackAnimProgress = attackAnimProgress,
+        skillAnimation = skillAnimation,
+        timeSec = timeSec,
+      )
     }
 
-    sheet.selectFrame(
+    if (!isMaster && heroName == "Kaelen" && heroClass == HeroClassType.KNIGHT) {
+      with(PremiumSliceRenderer) {
+        drawSkillGround(cx, cy, zoom, attackAnimProgress, skillAnimation)
+      }
+    }
+
+    val sheet = if (isMaster) {
+      FantasyHd128CharacterAtlas.masterSheet
+    } else {
+      FantasyHd128CharacterAtlas.heroSheet(heroClass)
+    }
+
+    val effectiveAttackProgress = if (skillAnimation && attackAnimProgress <= 0.01f) {
+      ((timeSec * 3.5f) % 1f).coerceIn(0.05f, 0.95f)
+    } else {
+      attackAnimProgress
+    }
+
+    val frameBmp = sheet.selectFrame(
       facingRight = facingRight,
       isMoving = isMoving,
-      attackProgress = attackAnimProgress,
+      attackProgress = effectiveAttackProgress,
       hurtFlash = hurtFlash,
       isResting = isInjuredResting,
       timeSec = timeSec,
       seed = (worldX * 0.01f + worldY * 0.01f),
       facingNorth = facingNorth,
     )
-    }
 
     with(SanctuaryEnvironmentShadows) {
-      drawCharacterShadow(frameBmp, cx, cy, zoom, pixelScale, premium?.pivotY)
+      drawCharacterShadow(frameBmp, cx, cy, zoom, pixelScale, null)
     }
 
     drawCrispSprite(
       bmp = frameBmp,
       cx = cx,
-      footY = if (premium == null) cy + 6f * zoom else cy + (frameBmp.height-premium.pivotY)*pixelScale,
+      footY = cy + 6f * zoom,
       pixelScale = pixelScale,
+      hdProfile = FantasyHd128Structures.MaterialProfile.CHARACTER,
     )
 
-    if (premium != null) with(PremiumSliceRenderer) {
-      drawContactTrail(cx,cy,zoom,facingRight,attackAnimProgress,skillAnimation)
-    }
-    if (premium == null && attackAnimProgress > 0.08f && !isMaster) {
-      val slashColor = when (heroClass) {
-        HeroClassType.KNIGHT -> Color(0xFF38BDF8)
-        HeroClassType.ARCHER -> Color(0xFFFDE047)
-        HeroClassType.MAGE -> Color(0xFFE879F9)
-        HeroClassType.ASSASSIN -> Color(0xFFF43F5E)
-        HeroClassType.PRIEST -> Color(0xFF34D399)
-        HeroClassType.BERSERKER -> Color(0xFFFB923C)
-      }
-      drawArc(
-        color = slashColor.copy(alpha = (1f - attackAnimProgress).coerceIn(0.28f, 0.95f)),
-        startAngle = if (facingRight) -65f else 115f,
-        sweepAngle = 130f,
-        useCenter = false,
-        topLeft = Offset(cx - 32f * zoom, cy - 58f * zoom),
-        size = Size(64f * zoom, 48f * zoom),
-        style = Stroke(width = 3.2f * zoom),
+    // Cinematic HD-2D Multi-Layered Class Skill & Attack VFX
+    with(FantasyHd2dSkillVfx) {
+      drawHeroSkillAndAttackOverlay(
+        cx = cx,
+        cy = cy,
+        zoom = zoom,
+        heroClass = heroClass,
+        isMaster = isMaster,
+        facingRight = facingRight,
+        attackAnimProgress = attackAnimProgress,
+        skillAnimation = skillAnimation,
+        timeSec = timeSec,
       )
     }
 
     if (!isMaster && (hpFraction < 0.999f || isInjuredResting)) {
-      val barW = 40f * zoom
-      val barH = 5.2f * zoom
+      val barW = 42f * zoom
+      val barH = 5.4f * zoom
       val bx = cx - barW / 2f
-      val by = cy - 86f * zoom
-      drawRect(Color(0xDD090710), Offset(bx - 1.2f, by - 1.2f), Size(barW + 2.4f, barH + 2.4f))
+      val by = cy - 90f * zoom
+      drawRect(Color(0xE0080C18), Offset(bx - 1.4f, by - 1.4f), Size(barW + 2.8f, barH + 2.8f))
       val hpCol = when {
         isInjuredResting -> Color(0xFFF59E0B)
         hpFraction > 0.55f -> Color(0xFF10B981)
@@ -1456,45 +1469,42 @@ object PixelSpriteRenderer {
     val cy = ObliqueCamera.worldToScreenY(worldY, camY, zoom, size.height / 2f)
     if (cx < -150f || cx > size.width + 150f || cy < -180f || cy > size.height + 150f) return
 
-    val scaleMult = if (archetype.isBoss) 2.0f else 1.85f
-    val premium = if (archetype == EnemyArchetype.FIELD_GOBLIN_RAIDER) PremiumActorAtlas.get("goblin_raider") else null
-    val p = (premium?.worldPixelScale ?: scaleMult) * zoom
+    val p = (if (archetype.isBoss) 1.04f else 0.95f) * zoom
 
     if (deathAnimProgress > 0f) {
       val fade = (1f - deathAnimProgress).coerceIn(0f, 1f)
-      if (premium != null) {
-        val bmp = premium.frame(facingRight,false,false,0f,false,0f,false,timeSec,deathAnimProgress)
-        drawCrispSprite(bmp,cx,cy+(bmp.height-premium.pivotY)*p,p,fade)
-        return
-      }
       val dropY = deathAnimProgress * 14f * zoom
-      val sheet = PixelCharacterAtlas.enemySheet(archetype)
+      val sheet = FantasyHd128CharacterAtlas.enemySheet(archetype)
       val bmp = if (facingRight) sheet.hurtRight else sheet.hurtLeft
-      drawCrispSprite(bmp, cx, cy + 6f * zoom + dropY, p * (1f - deathAnimProgress * 0.25f), alpha = fade)
-      for (e in 0..4) {
-        val ex = cx + (e - 2) * 9f * zoom * (0.4f + deathAnimProgress)
+      drawCrispSprite(
+        bmp = bmp,
+        cx = cx,
+        footY = cy + 6f * zoom + dropY,
+        pixelScale = p * (1f - deathAnimProgress * 0.25f),
+        alpha = fade,
+        hdProfile = FantasyHd128Structures.MaterialProfile.CHARACTER,
+      )
+      for (e in 0..5) {
+        val ex = cx + (e - 2.5f) * 9f * zoom * (0.4f + deathAnimProgress)
         val ey = cy - 18f * zoom - deathAnimProgress * (24f + e * 6f) * zoom
-        drawCircle(Color(0xFFFB7185).copy(alpha = fade), radius = 3.0f * zoom, center = Offset(ex, ey))
+        drawCircle(Color(0xFFFB7185).copy(alpha = fade), radius = 3.2f * zoom, center = Offset(ex, ey))
       }
       return
     }
 
-
-
     if (isTargetMarked) {
       val pulse = 0.85f + 0.15f * sin(timeSec * 8f)
-      val rx = (if (archetype.isBoss) 40f else 28f) * zoom * pulse
+      val rx = (if (archetype.isBoss) 42f else 30f) * zoom * pulse
       val ry = rx * ObliqueCamera.GROUND_ELLIPSE_RATIO
       drawOval(
         color = Color(0xFFEF4444),
         topLeft = Offset(cx - rx, cy - ry),
         size = Size(rx * 2f, ry * 2f),
-        style = Stroke(width = 2.4f * zoom),
+        style = Stroke(width = 2.6f * zoom),
       )
     }
 
-    val frameBmp = premium?.frame(facingRight,false,isMoving,attackAnimProgress,
-      false,hurtFlash,false,timeSec) ?: PixelCharacterAtlas.enemySheet(archetype).selectFrame(
+    val frameBmp = FantasyHd128CharacterAtlas.enemySheet(archetype).selectFrame(
       facingRight = facingRight,
       isMoving = isMoving,
       attackProgress = attackAnimProgress,
@@ -1504,21 +1514,34 @@ object PixelSpriteRenderer {
       seed = worldX * 0.02f,
     )
     with(SanctuaryEnvironmentShadows) {
-      drawCharacterShadow(frameBmp, cx, cy, zoom, p, premium?.pivotY)
+      drawCharacterShadow(frameBmp, cx, cy, zoom, p, null)
     }
 
     drawCrispSprite(
       bmp = frameBmp,
       cx = cx,
-      footY = if (premium == null) cy + 6f * zoom else cy + (frameBmp.height-premium.pivotY)*p,
+      footY = cy + 6f * zoom,
       pixelScale = p,
+      hdProfile = FantasyHd128Structures.MaterialProfile.CHARACTER,
     )
 
-    val barW = (if (archetype.isBoss) 68f else 40f) * zoom
-    val barH = (if (archetype.isBoss) 6.8f else 5.0f) * zoom
+    with(FantasyHd2dSkillVfx) {
+      drawEnemyCombatAuraAndSlash(
+        cx = cx,
+        cy = cy,
+        zoom = zoom,
+        archetype = archetype,
+        facingRight = facingRight,
+        attackAnimProgress = attackAnimProgress,
+        timeSec = timeSec,
+      )
+    }
+
+    val barW = (if (archetype.isBoss) 70f else 42f) * zoom
+    val barH = (if (archetype.isBoss) 7.0f else 5.2f) * zoom
     val bx = cx - barW / 2f
-    val by = cy - (if (archetype.isBoss) 124f else 82f) * zoom
-    drawRect(Color(0xDD090710), Offset(bx - 1.2f, by - 1.2f), Size(barW + 2.4f, barH + 2.4f))
+    val by = cy - (if (archetype.isBoss) 128f else 86f) * zoom
+    drawRect(Color(0xE0080C18), Offset(bx - 1.4f, by - 1.4f), Size(barW + 2.8f, barH + 2.8f))
     drawRect(
       color = if (archetype.isBoss) Color(0xFFE11D48) else Color(0xFFEF4444),
       topLeft = Offset(bx, by),
@@ -1532,18 +1555,21 @@ object PixelSpriteRenderer {
     particlesEnabled: Boolean = true,
   ) {
     if (biome == BiomeTheme.SANCTUARY_ASTRAL) {
+      with(SanctuarySunlightSystem) {
+        drawHd2dAtmosphericDepthGrade(timeSec)
+      }
       if (!particlesEnabled) return
-      // Dark Fantasy: faint embers, cold mist motes & rare falling ash - sparse, desaturated
-      val petalCount = 14
+      // Dark Fantasy HD-2D: golden sunlit dust motes, sakura petals & astral spores
+      val petalCount = 18
       for (i in 0 until petalCount) {
         val seed = i * 43.3f
         val px = ((seed * 31.7f + timeSec * (14f + (i % 3) * 4f)) % size.width.coerceAtLeast(1f))
         val py = ((seed * 19.3f + timeSec * (9f + (i % 3) * 3f) + sin(timeSec * 1.2f + i) * 10f) % size.height.coerceAtLeast(1f))
-        val alpha = (0.18f + 0.16f * abs(sin(timeSec * 1.4f + i))).coerceIn(0.08f, 0.35f)
+        val alpha = (0.24f + 0.22f * abs(sin(timeSec * 1.4f + i))).coerceIn(0.10f, 0.48f)
         val col = when (i % 3) {
-          0 -> Color(0xFF8A7A97) // dusky ash-lavender
-          1 -> Color(0xFF6B7A8A) // cold mist blue-grey
-          else -> Color(0xFF9A6B3A) // faint ember amber very muted
+          0 -> Color(0xFFFBCFE8) // sakura rose petal
+          1 -> Color(0xFFBAE6FD) // astral sky mote
+          else -> Color(0xFFFDE68A) // golden sun mote
         }
         drawOval(
           color = col.copy(alpha = alpha),

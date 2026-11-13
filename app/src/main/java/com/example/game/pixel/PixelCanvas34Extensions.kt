@@ -53,25 +53,32 @@ fun PixelCanvas.drawPitchedRoof34(
     val x0 = leftX + inset
     val x1 = leftX + frontWidth - inset
     val isCourseLip = (ry % 4 == 3)
+    val isCourseTop = (ry % 4 == 0)
     val courseIdx = ry / 4
     for (px in x0..x1) {
       val rel = (px - x0).toFloat() / (x1 - x0).coerceAtLeast(1)
-      val tileSeam = ((px + (courseIdx % 2) * 3) % 5 == 0)
+      val tileOffset = px + (courseIdx % 2) * 3
+      val tileSeam = (tileOffset % 6 == 0)
+      val tileCenter = (tileOffset % 6 == 3)
       val col = when {
         ry == 0 -> ridgeCap
-        ry == 1 -> shingleHi
-        isCourseLip -> shingleDark
+        ry == 1 -> 0xFFFBE28A.toInt()
+        ry == 2 -> shingleHi
+        isCourseLip -> if (tileCenter) shingleMid else shingleDark
         tileSeam -> shingleDark
-        rel < 0.34f -> shingleHi
-        rel < 0.72f -> shingleWarm
+        isCourseTop && rel < 0.55f -> shingleHi
+        rel < 0.28f -> shingleHi
+        rel < 0.68f -> shingleWarm
         else -> shingleMid
       }
       set(px, y, col)
     }
-    // Crisp dark-oak gable bargeboards on left & right edges
+    // Crisp dark-oak gable bargeboards + gilded NW sun-edge chamfer on left & right edges
     set(x0, y, timberTrim)
-    set(x0 + 1, y, shingleHi)
+    set(x0 + 1, y, ridgeCap)
+    set(x0 + 2, y, shingleHi)
     set(x1, y, timberTrim)
+    if (x1 - 1 > x0 + 2) set(x1 - 1, y, shingleDark)
   }
 
   // 2. 2.5D Oblique Right-Side Angled Roof / Gable Return Plane for unmistakable 3D volume
@@ -89,9 +96,12 @@ fun PixelCanvas.drawPitchedRoof34(
     }
   }
 
-  // 3. Heavy Overhanging Eave Beam & Cast Shadow Lip at Bottom of Roof
+  // 3. Heavy Overhanging Eave Beam, Carved Corbel Dentils & Cast Shadow Lip at Bottom of Roof
   val eaveY = topY + roofHeight
   hLine(leftX - 2, eaveY, frontWidth + 4, timberTrim)
+  for (cx in (leftX + 2) until (leftX + frontWidth - 2) step 6) {
+    set(cx, eaveY, ridgeCap)
+  }
   hLine(leftX - 1, eaveY + 1, frontWidth + 2, 0xFF1E1016.toInt())
 }
 
@@ -106,12 +116,14 @@ fun PixelCanvas.drawRoofDormer34(
   roofWarm: Int = 0xFF9C3740.toInt(),
   roofHi: Int = 0xFFC24D50.toInt(),
 ) {
-  // Peaked mini-gable roof
+  // Peaked mini-gable roof with golden finial tip
+  set(centerX, (topY - 1).coerceAtLeast(0), 0xFFF7D57E.toInt())
   for (ry in 0..7) {
     val span = 1 + (halfSpan - 1) * ry / 7
     for (dx in -span..span) {
       val col = when {
         abs(dx) == span -> 0xFF361E16.toInt()
+        abs(dx) == span - 1 && dx < 0 -> 0xFFF7D57E.toInt()
         dx < 0 -> roofHi
         else -> roofWarm
       }
@@ -119,7 +131,7 @@ fun PixelCanvas.drawRoofDormer34(
     }
   }
   // Dormer cheek wall & warm glowing attic window
-  fillRect(centerX - halfSpan + 2, topY + 8, (halfSpan - 2) * 2 + 1, 9, 0xFFB8997A.toInt())
+  fillRect(centerX - halfSpan + 2, topY + 8, (halfSpan - 2) * 2 + 1, 9, 0xFFD9C3A8.toInt())
   fillRect(centerX - halfSpan + 2, topY + 8, 2, 9, 0xFF3B231A.toInt())
   fillRect(centerX + halfSpan - 3, topY + 8, 2, 9, 0xFF3B231A.toInt())
   drawGlowingWindow(centerX - 3, topY + 9, 7, 7)

@@ -1,0 +1,11 @@
+{
+  "command": "gradle :app:testDebugUnitTest --tests com.example.ExpeditionFieldRewardsIntegrationTest --console=plain",
+  "tests": 4,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "unique_local_tests_including_broad_run": 59,
+  "new_unique_tests": 21,
+  "production_code_unchanged_since_broad_run": true,
+  "actual_simulation_stdout": "FIELD_REWARD_ACTUAL_SIMULATION route=north_east seconds=89.938065 walking=79.56918 combat=12.899975 outcome=RESCUED claimed=[north, east]\nFIELD_REWARD_THREE_SITE_ACTUAL_SIMULATION seconds=106.30823 resolved=[north, south, east] claims={north=READINESS, south=WARD, east=HEALING} outcome=RESCUED courierHp=270 heroHp=[(hero_starter_kaelen, 515), (hero_starter_lyra, 330), (hero_starter_vesper, 310)]\n"
+}

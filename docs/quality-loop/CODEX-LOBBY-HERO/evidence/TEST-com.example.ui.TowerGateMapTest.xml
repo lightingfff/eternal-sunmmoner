@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.ui.TowerGateMapTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-10T05:22:29.521Z" hostname="b316c1c49299" time="28.193">
+  <properties/>
+  <testcase name="naturalSixSecondCutsceneReachesUnobstructedThreeGates" classname="com.example.ui.TowerGateMapTest" time="0.128"/>
+  <testcase name="portraitGateTargetsAreSeparatedAndFloorOneRemainsReachable" classname="com.example.ui.TowerGateMapTest" time="0.168"/>
+  <testcase name="skipPhysicalPortalTouchesLockedFloorAndBackPreserveNavigation" classname="com.example.ui.TowerGateMapTest" time="26.3"/>
+  <testcase name="carpetTracksTheActualSlopingRoadInsteadOfAnIndependentVerticalAxis" classname="com.example.ui.TowerGateMapTest" time="0.058"/>
+  <testcase name="productionRendererCapturesArchitectureAnimationAndSanctuaryApproach" classname="com.example.ui.TowerGateMapTest" time="1.535"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

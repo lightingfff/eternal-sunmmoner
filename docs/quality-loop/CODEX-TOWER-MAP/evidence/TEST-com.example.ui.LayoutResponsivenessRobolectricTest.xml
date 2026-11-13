@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.ui.LayoutResponsivenessRobolectricTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-09T14:30:28.807Z" hostname="b316c1c49299" time="5.265">
+  <properties/>
+  <testcase name="narrow portrait 360x640 floor selection squad prep and facility modals fit cleanly" classname="com.example.ui.LayoutResponsivenessRobolectricTest" time="2.383"/>
+  <testcase name="management navigation opens roster team summon and hero details" classname="com.example.ui.LayoutResponsivenessRobolectricTest" time="2.872"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

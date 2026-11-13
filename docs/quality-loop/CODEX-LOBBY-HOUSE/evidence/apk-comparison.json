@@ -1,0 +1,50 @@
+{
+  "local_pr87": {
+    "path": "/workspace/lobby-hero-system/app/build/outputs/apk/debug/app-debug.apk",
+    "size": 40055110,
+    "sha256": "afa39fe7be570e397382a4c267a1525070fc51af0a96c5b91f8f300a64b772a0",
+    "apk_signature_verifies": true,
+    "certificate_sha256": "5d6c1e109e50cf7ae057ea4728602447fe50e68b43385c50cb04aa743d9193f8",
+    "package": "com.aistudio.eternalsummoner.kvrpzm",
+    "version_code": "1",
+    "version_name": "1.0",
+    "launchable_activity": "com.example.MainActivity",
+    "zip_crc_ok": true
+  },
+  "ci_pr87": {
+    "path": "/workspace/house-fix-evidence/android-audit/pr87-ci/Eternal-Summoner-debug.apk",
+    "size": 39488076,
+    "sha256": "98c97f83ce0c916808a54d0fbc0a2ea240053406d3be25a4e861638d2a5f048c",
+    "apk_signature_verifies": true,
+    "certificate_sha256": "9d179477ce35520d6af58f29864c94d60ae4c8ca283e84541cd08192534a8b2b",
+    "package": "com.aistudio.eternalsummoner.kvrpzm",
+    "version_code": "1",
+    "version_name": "1.0",
+    "launchable_activity": "com.example.MainActivity",
+    "zip_crc_ok": true
+  },
+  "main_before_pr87": {
+    "path": "/workspace/house-fix-evidence/android-audit/before-pr87/Eternal-Summoner-debug.apk",
+    "size": 39438924,
+    "sha256": "1dd1dc3663f22ce68119ed5df67272de3a1e1e0e9345cced7ab4c92acf465edc",
+    "apk_signature_verifies": true,
+    "certificate_sha256": "9d179477ce35520d6af58f29864c94d60ae4c8ca283e84541cd08192534a8b2b",
+    "package": "com.aistudio.eternalsummoner.kvrpzm",
+    "version_code": "1",
+    "version_name": "1.0",
+    "launchable_activity": "com.example.MainActivity",
+    "zip_crc_ok": true
+  },
+  "main_latest": {
+    "path": "/workspace/house-fix-evidence/android-audit/main-latest/Eternal-Summoner-debug.apk",
+    "size": 39569996,
+    "sha256": "b14908c031e711284ef4e14745826d85912392522c4f5afdfa35e1600b22b206",
+    "apk_signature_verifies": true,
+    "certificate_sha256": "9d179477ce35520d6af58f29864c94d60ae4c8ca283e84541cd08192534a8b2b",
+    "package": "com.aistudio.eternalsummoner.kvrpzm",
+    "version_code": "1",
+    "version_name": "1.0",
+    "launchable_activity": "com.example.MainActivity",
+    "zip_crc_ok": true
+  }
+}

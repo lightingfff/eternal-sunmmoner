@@ -1,0 +1,70 @@
+{
+  "status": "PASS",
+  "scope": "ETERNAL SUMMONER debug APK reference compatibility; no device installation is attempted",
+  "device_install_verified": false,
+  "baseline": {
+    "path": "/workspace/house-fix-evidence/android-audit/before-pr87/Eternal-Summoner-debug.apk",
+    "bytes": 39438924,
+    "sha256": "1dd1dc3663f22ce68119ed5df67272de3a1e1e0e9345cced7ab4c92acf465edc",
+    "application_id": "com.aistudio.eternalsummoner.kvrpzm",
+    "version_code": 1,
+    "version_name": "1.0",
+    "launchable_activity": "com.example.MainActivity",
+    "debuggable": true,
+    "certificate_sha256": [
+      "9d179477ce35520d6af58f29864c94d60ae4c8ca283e84541cd08192534a8b2b"
+    ],
+    "signature_schemes": {
+      "v1": false,
+      "v2": true,
+      "v3": false,
+      "v3.1": false,
+      "v4": false
+    },
+    "native_abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "signature_verified": true,
+    "zip_crc_verified": true
+  },
+  "candidate": {
+    "path": "/workspace/house-fix-evidence/android-audit/pr87-ci/Eternal-Summoner-debug.apk",
+    "bytes": 39488076,
+    "sha256": "98c97f83ce0c916808a54d0fbc0a2ea240053406d3be25a4e861638d2a5f048c",
+    "application_id": "com.aistudio.eternalsummoner.kvrpzm",
+    "version_code": 1,
+    "version_name": "1.0",
+    "launchable_activity": "com.example.MainActivity",
+    "debuggable": true,
+    "certificate_sha256": [
+      "9d179477ce35520d6af58f29864c94d60ae4c8ca283e84541cd08192534a8b2b"
+    ],
+    "signature_schemes": {
+      "v1": false,
+      "v2": true,
+      "v3": false,
+      "v3.1": false,
+      "v4": false
+    },
+    "native_abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "signature_verified": true,
+    "zip_crc_verified": true
+  },
+  "checks": {
+    "project_application_id_preserved": true,
+    "launcher_preserved": true,
+    "version_not_downgraded": true,
+    "strict_v2_debug_profile": true,
+    "signing_certificate_preserved": true,
+    "baseline_native_abis_retained": true
+  },
+  "failures": []
+}

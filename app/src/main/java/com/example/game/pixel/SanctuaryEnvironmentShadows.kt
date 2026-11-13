@@ -79,6 +79,7 @@ object SanctuaryEnvironmentShadows {
   fun DrawScope.drawCharacterShadow(bitmap: ImageBitmap, cx: Float, cy: Float, zoom: Float, pixelScale: Float, groundPivotY: Int? = null) {
     val bounds = ObliqueSpriteGeometry.bounds(bitmap)
     val path = silhouette(bitmap)
+    val shadowStrength = com.example.game.world.WorldEnvironment.lighting.shadowStrength
     projection.reset()
     projection.values[0] = pixelScale
     projection.values[1] = 0f
@@ -88,10 +89,26 @@ object SanctuaryEnvironmentShadows {
     projection.values[12] = cx + projection.values[4]*pivotDelta
     projection.values[13] = if (groundPivotY == null) cy + 6f*zoom - bounds.bottomPadding*pixelScale
       else cy + projection.values[5]*pivotDelta
-    withTransform({ transform(projection) }) { drawPath(path,Color(0xff111b26).copy(alpha=.27f*com.example.game.world.WorldEnvironment.lighting.shadowStrength)) }
-    val contactRadius=(bitmap.width*pixelScale*.18f).coerceIn(7f*zoom,24f*zoom)
-    drawLine(Color(0x250C1720), androidx.compose.ui.geometry.Offset(cx-contactRadius,cy),androidx.compose.ui.geometry.Offset(cx+contactRadius,cy),4f*zoom)
-    drawLine(Color(0x450C1720), androidx.compose.ui.geometry.Offset(cx-contactRadius*.7f,cy),androidx.compose.ui.geometry.Offset(cx+contactRadius*.7f,cy),2f*zoom)
+    withTransform({ transform(projection) }) {
+      withTransform({ scale(1.06f, 1.04f, Offset.Zero) }) {
+        drawPath(path, Color(0xFF080E1C).copy(alpha = (0.24f * shadowStrength).coerceIn(0f, 0.34f)))
+      }
+      drawPath(path, Color(0xFF050A14).copy(alpha = (0.56f * shadowStrength).coerceIn(0f, 0.72f)))
+    }
+    val contactRadius = (bitmap.width * pixelScale * 0.22f).coerceIn(10f * zoom, 28f * zoom)
+    val contactRy = contactRadius * ObliqueCamera.GROUND_ELLIPSE_RATIO * 0.72f
+    drawOval(
+      color = Color(0x68060B16),
+      topLeft = Offset(cx - contactRadius * 1.15f, cy - contactRy * 0.65f),
+      size = Size(contactRadius * 2.30f, contactRy * 1.65f),
+    )
+    drawOval(
+      color = Color(0xA8040811),
+      topLeft = Offset(cx - contactRadius * 0.82f, cy - contactRy * 0.42f),
+      size = Size(contactRadius * 1.64f, contactRy * 1.18f),
+    )
+    drawLine(Color(0x66050912), Offset(cx - contactRadius, cy + 1f * zoom), Offset(cx + contactRadius, cy + 1f * zoom), 4.5f * zoom)
+    drawLine(Color(0x9903060D), Offset(cx - contactRadius * 0.72f, cy + 1f * zoom), Offset(cx + contactRadius * 0.72f, cy + 1f * zoom), 2.4f * zoom)
   }
   private class CasterGeometry(
     val silhouette: Path, val contact: Path, val spriteScale: Float,
@@ -110,11 +127,11 @@ object SanctuaryEnvironmentShadows {
     val depth = if(obs.footprintDepthNorth>0f) obs.footprintDepthNorth else bitmap.width*scale*(if(tree) .5f else .35f)
     val height = (bounds.visibleHeight*scale-depth*ObliqueCamera.OBLIQUE_Y_SCALE).coerceAtLeast(8f)*obs.scale
     val foot = (ObliqueSpriteGeometry.drawFootOffset(obs.propKind,bitmap)-bounds.bottomPadding*scale)*obs.scale
-    val hw = (if(tree) bitmap.width*scale*.11f else if(obs.footprintHalfW>0f) obs.footprintHalfW else bitmap.width*scale*.32f)*obs.scale
-    val hd = (if(tree) hw*.38f else if(obs.footprintDepthNorth>0f) obs.footprintDepthNorth*.18f*obs.scale else hw*.18f).coerceAtLeast(2f)
+    val hw = (if(tree) bitmap.width*scale*.13f else if(obs.footprintHalfW>0f) obs.footprintHalfW else bitmap.width*scale*.34f)*obs.scale
+    val hd = (if(tree) hw*.42f else if(obs.footprintDepthNorth>0f) obs.footprintDepthNorth*.22f*obs.scale else hw*.22f).coerceAtLeast(2.5f)
     val contact = Path().apply {
-      moveTo(-hw*.92f,-hd*.5f);lineTo(-hw*.6f,-hd);lineTo(hw*.72f,-hd)
-      lineTo(hw,0f);lineTo(hw*.7f,hd*.5f);lineTo(-hw*.8f,hd*.5f);close()
+      moveTo(-hw*.95f,-hd*.55f);lineTo(-hw*.62f,-hd);lineTo(hw*.75f,-hd)
+      lineTo(hw,0f);lineTo(hw*.74f,hd*.58f);lineTo(-hw*.84f,hd*.58f);close()
     }
     return CasterGeometry(silhouette(bitmap),contact,scale*obs.scale,bounds.visibleHeight.toFloat(),height,
       (foot-obs.elevationZ)/ObliqueCamera.OBLIQUE_Y_SCALE,tree).also { casters[obs]=it;casterGeometryBuildCount++ }
@@ -145,16 +162,22 @@ object SanctuaryEnvironmentShadows {
       projection.values[5]=SanctuaryLight.SHADOW_DIR_Y*g.height/(g.visibleHeight*SanctuaryLight.TAN_ELEV)
       projection.values[12]=obs.x
       projection.values[13]=obs.y+g.footOffset
-      val opacity=SanctuaryShadowRegistry.opacityFor(obs.propKind)*light.shadowStrength
+      val rawOpacity=SanctuaryShadowRegistry.opacityFor(obs.propKind)*light.shadowStrength
+      val deepOpacity=(rawOpacity * 1.68f).coerceAtMost(0.76f)
       withTransform({ transform(projection) }) {
-        // The softer crown and crisp root contact share one cached silhouette, no blur pass.
-        if(g.tree && DepthPresentation.quality==DepthPresentation.Quality.BALANCED) {
-          withTransform({ scale(1.025f,1.015f,Offset.Zero) }) { drawPath(g.silhouette,Color(0xff111b26).copy(alpha=opacity*.18f)) }
+        // Soft outer penumbra + deep obsidian-indigo cast shadow core
+        if(DepthPresentation.quality==DepthPresentation.Quality.BALANCED) {
+          withTransform({ scale(1.032f,1.022f,Offset.Zero) }) {
+            drawPath(g.silhouette,Color(0xFF08101E).copy(alpha=(rawOpacity * 0.46f).coerceAtMost(0.32f)))
+          }
         }
-        drawPath(g.silhouette,Color(0xff111b26).copy(alpha=opacity*(if(g.tree) .82f else 1f)))
+        drawPath(g.silhouette,Color(0xFF060C18).copy(alpha=deepOpacity*(if(g.tree) .90f else 1f)))
       }
       withTransform({ translate(obs.x,obs.y+g.footOffset) }) {
-        drawPath(g.contact,Color(0xff0d1720).copy(alpha=(if(g.tree) .32f else .22f)*light.shadowStrength))
+        withTransform({ scale(1.22f, 1.22f, Offset.Zero) }) {
+          drawPath(g.contact,Color(0xFF070D19).copy(alpha=(if(g.tree) .34f else .28f)*light.shadowStrength))
+        }
+        drawPath(g.contact,Color(0xFF040811).copy(alpha=(if(g.tree) .58f else .48f)*light.shadowStrength))
       }
     }
   }

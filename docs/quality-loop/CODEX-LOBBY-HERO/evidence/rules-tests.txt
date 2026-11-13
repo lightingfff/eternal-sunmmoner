@@ -1,0 +1,15 @@
+PASS legacy own hero and constrained roster query readable
+PASS full legacy trait migration and new lobby fields update
+PASS same transaction replaces party member and updates profile revision
+PASS house rest fields allowed
+PASS new personality at owned hero creation allowed
+PASS negative HP rejected
+PASS HP beyond max rejected
+PASS invalid sanity rejected
+PASS BeingPickedUp cannot become persisted assignment
+PASS invalid trait condition rejected
+PASS partial hidden trait map rejected
+PASS invalid revision rejected
+PASS cross-account write denied
+PASS anonymous read denied
+14/14 PASS; demo-eternal-lobby emulator only.

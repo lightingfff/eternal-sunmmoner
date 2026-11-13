@@ -39,6 +39,8 @@ data class GuestSaveSnapshot(
   val equipment: List<EquipmentRecord>,
   val settings: GameSettings = GameSettings(),
   val lastSavedEpochSec: Long = System.currentTimeMillis() / 1000L,
+  // Replay protection is bounded to the last 32 receipts; evicted attempt IDs are no longer deduplicated.
+  val settledExpeditions: Map<String, ExpeditionSettlementResult> = emptyMap(),
 ) {
   companion object {
     const val CURRENT_SAVE_SCHEMA_VERSION = 3
@@ -124,6 +126,27 @@ interface SummonerDataSource {
     milestone: IslandExpansionMilestone,
   )
 
+  suspend fun assignLobbyHero(heroId: String, assignment: com.example.data.model.HeroAssignment)
+
+  suspend fun healHeroAtInfirmary(
+    profile: MasterProfile,
+    hero: HeroRecord,
+    goldCost: Long = LobbyHeroAssignments.INFIRMARY_HEAL_GOLD_COST,
+  )
+
+  suspend fun serveHeartyMealToHero(
+    profile: MasterProfile,
+    hero: HeroRecord,
+    goldCost: Long = LobbyHeroAssignments.HEARTY_MEAL_GOLD_COST,
+  )
+
+  suspend fun performCruelHeroSynthesis(
+    targetHeroId: String,
+    sacrificedHeroIds: List<String>,
+  ): CruelSynthesisOutcome
+
+  suspend fun applySocialDisdainPenalty(lowStarHeroId: String, penalty: Int = 2, eventId: String = "")
+
   suspend fun toggleHeroInSquad(hero: HeroRecord, currentSquadSize: Int)
 
   suspend fun markStoryFlag(profile: MasterProfile, flag: String)
@@ -140,6 +163,8 @@ interface SummonerDataSource {
     discoveredNodeIds: Set<String> = emptySet(),
     courierOutcome: CourierOutcome? = null,
     courierMemoryHeroId: String? = null,
+    remainingHeroHpRatios: Map<String, Float> = emptyMap(),
+    attemptId: String? = null,
   ): ExpeditionSettlementResult
 }
 
@@ -229,12 +254,14 @@ object SanctuaryProgressionHelper {
     val distinct = rawFlags.map { it.take(50) }.filter { it.isNotBlank() }.distinct()
     if (distinct.size <= 20) return distinct
     val permanent = distinct.filter {
-      it == "PROLOGUE_SEEN" || it.startsWith("EXP_") || LostCourierProgression.isPermanentFlag(it)
+      it == com.example.game.story.ManhwaStoryData.FLAG_PROLOGUE_SEEN || it == "PROLOGUE_SEEN" ||
+        it.startsWith("EXP_") || LostCourierProgression.isPermanentFlag(it)
     }
-    val transient = distinct.filterNot {
-      it == "PROLOGUE_SEEN" || it.startsWith("EXP_") || LostCourierProgression.isPermanentFlag(it)
-    }
-    val remainingSlots = (20 - permanent.size).coerceAtLeast(0)
-    return (permanent.take(20) + transient.takeLast(remainingSlots))
+    // Keep the latest meal token through a long journey; older meal tokens remain disposable.
+    val latestFeast = distinct.lastOrNull { it.startsWith("MEAL_") || it.startsWith("FEAST_UNTIL_") }
+    val prioritized = (permanent + listOfNotNull(latestFeast)).take(20)
+    val transient = distinct.filterNot { it in prioritized }
+    val remainingSlots = (20 - prioritized.size).coerceAtLeast(0)
+    return prioritized + transient.takeLast(remainingSlots)
   }
 }

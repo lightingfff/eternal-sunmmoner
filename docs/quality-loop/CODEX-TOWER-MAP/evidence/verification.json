@@ -1,0 +1,48 @@
+{
+  "base_sha": "9d9f5b6c8f11ffa84e3c15c50e0fc866e991091e",
+  "android_assemble_debug": "PASS",
+  "tests": [
+    {
+      "name": "com.example.SanctuaryEnvironmentArtTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "7.902"
+    },
+    {
+      "name": "com.example.performance.SceneFrameLoopLifecycleRobolectricTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "4.472"
+    },
+    {
+      "name": "com.example.ui.LayoutResponsivenessRobolectricTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "5.265"
+    },
+    {
+      "name": "com.example.ui.TowerGateMapTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "22.613"
+    }
+  ],
+  "total_tests": 12,
+  "baseline_captures": {
+    "tests": 2,
+    "result": "PASS",
+    "source": "unmodified base SHA, detached worktree"
+  },
+  "apk_sha256": "d2b123adda4e8ff26a4df1accb44d907a4f5da9e567c357103fa9c1968a7aae7",
+  "apk_bytes": 39991946,
+  "apk_zip_crc_and_asset_match": "PASS",
+  "device": "NOT TESTED: adb devices -l empty"
+}

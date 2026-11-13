@@ -2,6 +2,7 @@ package com.example.data.firebase
 
 import android.content.Context
 import com.example.R
+import com.example.data.ExpeditionSettlementCodec
 import com.example.data.FeastBuffHelper
 import com.example.data.GuestSaveSnapshot
 import com.example.data.LostCourierProgression
@@ -114,6 +115,7 @@ class SummonerRepository(
       .snapshots()
       .map { snap ->
         snap.toObjects(HeroRecord::class.java, DocumentSnapshot.ServerTimestampBehavior.ESTIMATE)
+          .map { com.example.data.LobbyHeroAssignments.checkAndUnlockHiddenTrait(it) }
       }
       .catch { error ->
         if (error is Exception) handleFirestoreError(error, OperationType.LIST, path)
@@ -347,40 +349,46 @@ class SummonerRepository(
       }
 
     val heroId = "hero_${UUID.randomUUID().toString().replace("-", "").take(16)}"
-    val squadAutoJoin = existingHeroes.count { it.inActiveSquad && !it.isCurrentlyInjured() } < 4
+    var squadAutoJoin = false
+    var partyJoinOrder = 0L
 
     val userRef = db.collection("users").document(uid)
     val heroRef = userRef.collection("heroes").document(heroId)
 
     try {
-      val batch = db.batch()
-      batch.update(
-        userRef,
-        mapOf(
-          "soulShards" to (profile.soulShards - shardCost).coerceAtLeast(0L),
-          "manaCrystals" to (profile.manaCrystals - manaCost).coerceAtLeast(0L),
-          "updatedAt" to FieldValue.serverTimestamp(),
-        ),
-      )
-      batch.set(
-        heroRef,
-        heroMap(
-          uid = uid,
-          name = candidate.name,
-          title = candidate.title,
-          heroClass = candidate.heroClass.name,
-          rarity = candidate.rarity,
-          maxHp = candidate.hp,
-          attack = candidate.atk,
-          defense = candidate.def,
-          speed = candidate.spd,
-          personality = candidate.personality.name,
-          weaponId = "",
-          inSquad = squadAutoJoin,
-          bond = candidate.bond,
-        ),
-      )
-      batch.commit().await()
+      var committed = false
+      for (attempt in 0 until 4) {
+        val before = userRef.get(com.google.firebase.firestore.Source.SERVER).await()
+        val docs = userRef.collection("heroes").whereEqualTo("userId", uid)
+          .get(com.google.firebase.firestore.Source.SERVER).await().documents
+        require(docs.size < 400) { "Danh sách Anh hùng đã đạt giới hạn." }
+        try {
+          squadAutoJoin = db.runTransaction { tx ->
+            val current = tx.get(userRef)
+            if (current.get("updatedAt") != before.get("updatedAt") || current.getLong("lobbyRosterRevision") != before.getLong("lobbyRosterRevision")) throw LobbyRosterChanged()
+            val roster = docs.mapNotNull { tx.get(it.reference).toObject(HeroRecord::class.java) }
+            val shards = current.getLong("soulShards") ?: 0L
+            val mana = current.getLong("manaCrystals") ?: 0L
+            require(shards >= shardCost && mana >= manaCost) { "Không đủ tài nguyên triệu hồi." }
+            val join = roster.count { it.inActiveSquad } < 4
+            partyJoinOrder = if (join) ((roster.maxOfOrNull { it.partyJoinedOrder } ?: 0L).coerceAtMost(Long.MAX_VALUE-1) + 1L) else 0L
+            tx.update(userRef, mapOf("soulShards" to shards - shardCost, "manaCrystals" to mana - manaCost,
+              "lobbyRosterRevision" to ((current.getLong("lobbyRosterRevision") ?: 0L) + 1L), "updatedAt" to FieldValue.serverTimestamp()))
+            tx.set(heroRef, heroMap(uid = uid, name = candidate.name, title = candidate.title,
+              heroClass = candidate.heroClass.name, rarity = candidate.rarity, maxHp = candidate.hp,
+              attack = candidate.atk, defense = candidate.def, speed = candidate.spd,
+              personality = candidate.personality.name, weaponId = "", inSquad = join, bond = candidate.bond) + mapOf("partyJoinedOrder" to partyJoinOrder))
+            join
+          }.await()
+          committed = true
+          break
+        } catch (e: Exception) {
+          var cause: Throwable? = e
+          while (cause != null && cause !is LobbyRosterChanged) cause = cause.cause
+          if (cause == null) throw e
+        }
+      }
+      check(committed) { "Danh sách Anh hùng đang thay đổi, hãy triệu hồi lại." }
 
       return HeroRecord(
         id = heroId,
@@ -401,6 +409,7 @@ class SummonerRepository(
         injuryRecoveryUntilEpochSec = 0L,
         morale = 100L,
         inActiveSquad = squadAutoJoin,
+        partyJoinedOrder = partyJoinOrder,
         bondSummary = candidate.bond,
       )
     } catch (e: CancellationException) {
@@ -475,6 +484,8 @@ class SummonerRepository(
           mapOf(
             "level" to (hero.level + 1L).coerceAtMost(100L),
             "maxHp" to (hero.maxHp + hpGain).coerceAtMost(100000L),
+            "currentHp" to if (hero.currentHp < 0L) -1L else (hero.currentHp + hpGain).coerceAtMost(100000L),
+            "hiddenTrait" to com.example.data.LobbyHeroPersistenceFields.traitFields(hero.hiddenTrait.copy(unlocked = hero.hiddenTrait.unlocked || hero.hiddenTrait.canUnlock((hero.level + 1L).toInt(), hero.morale.toInt(), com.example.data.model.HeroSanityState.fromRaw(hero.sanityState)))),
             "attack" to (hero.attack + atkGain).coerceAtMost(50000L),
             "defense" to (hero.defense + defGain).coerceAtMost(50000L),
             "speed" to (hero.speed + spdGain).coerceAtMost(500L),
@@ -550,6 +561,8 @@ class SummonerRepository(
           "updatedAt" to FieldValue.serverTimestamp(),
         ),
       )
+      batch.update(userRef, mapOf("lobbyRosterRevision" to FieldValue.increment(1L),
+        "updatedAt" to FieldValue.serverTimestamp()))
       batch.commit().await()
     } catch (e: CancellationException) {
       throw e
@@ -592,6 +605,8 @@ class SummonerRepository(
           ),
         )
       }
+      batch.update(userRef, mapOf("lobbyRosterRevision" to FieldValue.increment(1L),
+        "updatedAt" to FieldValue.serverTimestamp()))
       batch.commit().await()
     } catch (e: CancellationException) {
       throw e
@@ -619,7 +634,12 @@ class SummonerRepository(
       heroRef.update(
         mapOf(
           "status" to targetStatus.name,
+          "currentAssignment" to if (targetStatus == HeroStatusType.RESTING) "RESTING" else if (hero.inActiveSquad) "IN_PARTY" else "UNASSIGNED",
+          "inActiveSquad" to (hero.inActiveSquad && targetStatus != HeroStatusType.RESTING),
+          "restStartedAtEpochSec" to if (targetStatus == HeroStatusType.RESTING) nowSec else 0L,
+          "currentHp" to com.example.data.model.HeroData.fromRecord(hero, nowSec).currentHP.toLong(),
           "morale" to (hero.morale + moraleBoost).coerceIn(0L, 100L),
+          "hiddenTrait" to com.example.data.LobbyHeroPersistenceFields.traitFields(hero.hiddenTrait.copy(unlocked = hero.hiddenTrait.unlocked || hero.hiddenTrait.canUnlock(hero.level.toInt(), (hero.morale + moraleBoost).coerceIn(0L,100L).toInt(), com.example.data.model.HeroSanityState.fromRaw(hero.sanityState)))),
           "updatedAt" to FieldValue.serverTimestamp(),
         ),
       ).await()
@@ -785,8 +805,12 @@ class SummonerRepository(
         heroRef,
         mapOf(
           "status" to HeroStatusType.READY.name,
+          "currentHp" to hero.maxHp,
+          "currentAssignment" to if (hero.inActiveSquad) "IN_PARTY" else "UNASSIGNED",
+          "restStartedAtEpochSec" to 0L,
           "injuryRecoveryUntilEpochSec" to 0L,
           "morale" to (hero.morale + 15L).coerceAtMost(100L),
+          "hiddenTrait" to com.example.data.LobbyHeroPersistenceFields.traitFields(hero.hiddenTrait.copy(unlocked = hero.hiddenTrait.unlocked || hero.hiddenTrait.canUnlock(hero.level.toInt(), (hero.morale + 15L).coerceAtMost(100L).toInt(), com.example.data.model.HeroSanityState.fromRaw(hero.sanityState)))),
           "updatedAt" to FieldValue.serverTimestamp(),
         ),
       )
@@ -843,6 +867,7 @@ class SummonerRepository(
           userRef.collection("heroes").document(hero.id),
           mapOf(
             "morale" to (hero.morale + recipe.moraleGain).coerceIn(0L, 100L),
+            "hiddenTrait" to com.example.data.LobbyHeroPersistenceFields.traitFields(hero.hiddenTrait.copy(unlocked = hero.hiddenTrait.unlocked || hero.hiddenTrait.canUnlock(hero.level.toInt(), (hero.morale + recipe.moraleGain).coerceIn(0L,100L).toInt(), com.example.data.model.HeroSanityState.fromRaw(hero.sanityState)))),
             "injuryRecoveryUntilEpochSec" to if (healedStatus == HeroStatusType.READY.name) 0L else trimmedRecovery,
             "status" to healedStatus,
             "updatedAt" to FieldValue.serverTimestamp(),
@@ -892,30 +917,174 @@ class SummonerRepository(
     }
   }
 
-  override suspend fun toggleHeroInSquad(hero: HeroRecord, currentSquadSize: Int) {
+  private class LobbyRosterChanged : RuntimeException()
+
+  private suspend fun mutateLobbyAssignment(heroId: String, requested: com.example.data.model.HeroAssignment?, replace: Boolean) {
     val uid = requireUserId()
-    if (!hero.inActiveSquad) {
-      require(!hero.isCurrentlyInjured()) {
-        "${hero.name} đang bị thương! Hãy đưa về Khu Nghỉ Ngơi hồi phục trước."
-      }
-      require(currentSquadSize < 4) {
-        "Đội hình viễn chinh tối đa 4 Anh hùng."
+    val userRef = db.collection("users").document(uid)
+    // Read the query between two checks of the profile revision/timestamp. All roster writers
+    // touch that profile in the same transaction/batch, so a stale membership list is retried.
+    repeat(4) {
+      val before = userRef.get(com.google.firebase.firestore.Source.SERVER).await()
+      val docs = userRef.collection("heroes").whereEqualTo("userId", uid)
+        .get(com.google.firebase.firestore.Source.SERVER).await().documents
+      require(docs.size <= 400) { "Danh sách Anh hùng vượt giới hạn giao dịch an toàn." }
+      try {
+        db.runTransaction { tx ->
+          val profile = tx.get(userRef)
+          if (profile.get("updatedAt") != before.get("updatedAt") ||
+            profile.getLong("lobbyRosterRevision") != before.getLong("lobbyRosterRevision")) throw LobbyRosterChanged()
+          val current = docs.mapNotNull { doc -> tx.get(doc.reference).toObject(HeroRecord::class.java) }
+          val hero = requireNotNull(current.find { it.id == heroId }) { "Không tìm thấy Anh hùng sở hữu." }
+          val assignment = requested ?: if (hero.inActiveSquad) com.example.data.model.HeroAssignment.UNASSIGNED else com.example.data.model.HeroAssignment.IN_PARTY
+          val next = com.example.data.LobbyHeroAssignments.assign(current, heroId, assignment, System.currentTimeMillis() / 1000L, replace)
+          next.zip(current).filter { (a, b) -> a != b }.forEach { (h, _) ->
+            tx.update(userRef.collection("heroes").document(h.id), mapOf(
+              "inActiveSquad" to h.inActiveSquad, "currentAssignment" to h.currentAssignment,
+              "status" to h.status, "currentHp" to h.currentHp, "partyJoinedOrder" to h.partyJoinedOrder,
+              "restStartedAtEpochSec" to h.restStartedAtEpochSec,
+              "survivedExpeditions" to h.survivedExpeditions, "returnedUnder15PctHp" to h.returnedUnder15PctHp,
+              "hiddenTrait" to mapOf("id" to h.hiddenTrait.id, "name" to h.hiddenTrait.name,
+                "minimumLevel" to h.hiddenTrait.minimumLevel, "minimumMorale" to h.hiddenTrait.minimumMorale,
+                "requiresSelfAwareness" to h.hiddenTrait.requiresSelfAwareness, "unlocked" to h.hiddenTrait.unlocked),
+              "updatedAt" to FieldValue.serverTimestamp()))
+          }
+          tx.update(userRef, mapOf("lobbyRosterRevision" to ((profile.getLong("lobbyRosterRevision") ?: 0L) + 1L),
+            "updatedAt" to FieldValue.serverTimestamp()))
+          true
+        }.await()
+        return
+      } catch (e: Exception) {
+        var cause: Throwable? = e
+        while (cause != null && cause !is LobbyRosterChanged) cause = cause.cause
+        if (cause == null) throw e
       }
     }
-    val heroRef = db.collection("users").document(uid).collection("heroes").document(hero.id)
-    try {
-      heroRef.update(
-        mapOf(
-          "inActiveSquad" to !hero.inActiveSquad,
-          "updatedAt" to FieldValue.serverTimestamp(),
-        ),
-      ).await()
-    } catch (e: CancellationException) {
-      throw e
-    } catch (e: Exception) {
-      handleFirestoreError(e, OperationType.UPDATE, heroRef.path)
-      throw e
+    error("Danh sách Anh hùng đang thay đổi, hãy thử thả lại.")
+  }
+
+  override suspend fun assignLobbyHero(heroId: String, assignment: com.example.data.model.HeroAssignment) {
+    mutateLobbyAssignment(heroId, assignment, true)
+  }
+
+  private data class HouseMutation<T>(
+    val profile: MasterProfile,
+    val heroes: List<HeroRecord>,
+    val equipment: List<EquipmentRecord>,
+    val result: T,
+  )
+
+  private fun houseHeroFields(hero: HeroRecord): Map<String, Any> =
+    com.example.data.LobbyHeroPersistenceFields.fields(hero) + mapOf(
+      "level" to hero.level, "exp" to hero.exp, "maxHp" to hero.maxHp,
+      "attack" to hero.attack, "defense" to hero.defense, "morale" to hero.morale,
+      "inActiveSquad" to hero.inActiveSquad, "status" to hero.status,
+      "injuryRecoveryUntilEpochSec" to hero.injuryRecoveryUntilEpochSec,
+      "bondSummary" to hero.bondSummary, "updatedAt" to FieldValue.serverTimestamp(),
+    )
+
+  /** Query membership is protected by the same profile revision used by Lobby drops. */
+  private suspend fun <T> mutateHouseRoster(
+    materialIds: List<String> = emptyList(),
+    transform: (MasterProfile, List<HeroRecord>, List<EquipmentRecord>) -> HouseMutation<T>,
+  ): T {
+    val uid = requireUserId()
+    val userRef = db.collection("users").document(uid)
+    repeat(4) {
+      val before = userRef.get(com.google.firebase.firestore.Source.SERVER).await()
+      val heroDocs = userRef.collection("heroes").whereEqualTo("userId", uid)
+        .get(com.google.firebase.firestore.Source.SERVER).await().documents
+      val gearDocs = if (materialIds.isEmpty()) emptyList() else userRef.collection("equipment")
+        .whereEqualTo("userId", uid).whereIn("equippedByHeroId", materialIds)
+        .get(com.google.firebase.firestore.Source.SERVER).await().documents
+      require(heroDocs.size + gearDocs.size <= 450) { "Danh sách vượt giới hạn giao dịch an toàn." }
+      try {
+        return db.runTransaction { tx ->
+          val profileDoc = tx.get(userRef)
+          if (profileDoc.get("updatedAt") != before.get("updatedAt") ||
+            profileDoc.getLong("lobbyRosterRevision") != before.getLong("lobbyRosterRevision")) throw LobbyRosterChanged()
+          val currentProfile = requireNotNull(profileDoc.toObject(MasterProfile::class.java)) { "Không tìm thấy Master." }
+          val heroes = heroDocs.mapNotNull { tx.get(it.reference).toObject(HeroRecord::class.java) }
+          val gear = gearDocs.mapNotNull { tx.get(it.reference).toObject(EquipmentRecord::class.java) }
+          require(heroes.all { it.userId == uid } && gear.all { it.userId == uid }) { "Dữ liệu không thuộc Master hiện tại." }
+          val mutation = transform(currentProfile, heroes, gear)
+          val nextById = mutation.heroes.associateBy { it.id }
+          heroes.forEach { old ->
+            val next = nextById[old.id]
+            if (next == null) tx.delete(userRef.collection("heroes").document(old.id))
+            else if (next != old) tx.update(userRef.collection("heroes").document(old.id), houseHeroFields(next))
+          }
+          mutation.equipment.forEach { next ->
+            if (next != gear.find { it.id == next.id }) tx.update(userRef.collection("equipment").document(next.id),
+              mapOf("equippedByHeroId" to next.equippedByHeroId, "updatedAt" to FieldValue.serverTimestamp()))
+          }
+          tx.update(userRef, mapOf("gold" to mutation.profile.gold,
+            "lobbyRosterRevision" to ((profileDoc.getLong("lobbyRosterRevision") ?: 0L) + 1L),
+            "updatedAt" to FieldValue.serverTimestamp()))
+          mutation.result
+        }.await()
+      } catch (e: CancellationException) {
+        throw e
+      } catch (e: Exception) {
+        var cause: Throwable? = e
+        while (cause != null && cause !is LobbyRosterChanged) cause = cause.cause
+        if (cause == null) throw e
+      }
     }
+    error("Danh sách đang thay đổi. Vui lòng thử lại thao tác trong Nhà.")
+  }
+
+  override suspend fun healHeroAtInfirmary(profile: MasterProfile, hero: HeroRecord, goldCost: Long) {
+    val now = System.currentTimeMillis() / 1000L
+    mutateHouseRoster { fresh, roster, gear ->
+      val (nextProfile, nextHeroes) = com.example.data.LobbyHeroAssignments.healHeroAtInfirmary(fresh, roster, hero.id, now, goldCost)
+      HouseMutation(nextProfile, nextHeroes, gear, Unit)
+    }
+  }
+
+  override suspend fun serveHeartyMealToHero(profile: MasterProfile, hero: HeroRecord, goldCost: Long) {
+    val now = System.currentTimeMillis() / 1000L
+    mutateHouseRoster { fresh, roster, gear ->
+      val (nextProfile, nextHeroes) = com.example.data.LobbyHeroAssignments.serveHeartyMealToHero(fresh, roster, hero.id, now, goldCost)
+      HouseMutation(nextProfile, nextHeroes, gear, Unit)
+    }
+  }
+
+  override suspend fun performCruelHeroSynthesis(targetHeroId: String, sacrificedHeroIds: List<String>): com.example.data.CruelSynthesisOutcome {
+    require(sacrificedHeroIds.size in 1..3 && sacrificedHeroIds.distinct().size == sacrificedHeroIds.size && targetHeroId !in sacrificedHeroIds) {
+      "Chọn 1–3 Anh hùng hiến tế khác nhau, không trùng Anh hùng Chính."
+    }
+    val seed = Random.nextInt()
+    val now = System.currentTimeMillis() / 1000L
+    return mutateHouseRoster(sacrificedHeroIds) { fresh, roster, gear ->
+      // Firestore may invoke this lambda again: the same seed preserves the original 20% roll.
+      val outcome = com.example.data.LobbyHeroAssignments.performCruelSynthesis(roster, targetHeroId, sacrificedHeroIds, Random(seed), now)
+      HouseMutation(fresh, outcome.updatedRoster,
+        gear.map { if (it.equippedByHeroId in sacrificedHeroIds) it.copy(equippedByHeroId = "") else it }, outcome)
+    }
+  }
+
+  override suspend fun applySocialDisdainPenalty(lowStarHeroId: String, penalty: Int, eventId: String) {
+    require(penalty == 2)
+    val durableEventId = eventId.ifBlank { UUID.randomUUID().toString() }
+    require(com.example.data.LobbyHeroAssignments.isValidSocialEventId(durableEventId)) { "Mã biến cố tinh thần không hợp lệ." }
+    val userRef = db.collection("users").document(requireUserId())
+    val heroRef = userRef.collection("heroes").document(lowStarHeroId)
+    db.runTransaction { tx ->
+      val profile = tx.get(userRef)
+      val hero = tx.get(heroRef).toObject(HeroRecord::class.java) ?: return@runTransaction
+      if (durableEventId in hero.recentDisdainEventIds) return@runTransaction
+      val next = com.example.data.LobbyHeroAssignments.applyProximityDisdainMoralePenalty(listOf(hero), lowStarHeroId, penalty).single()
+      tx.update(heroRef, mapOf("morale" to next.morale, "sanityState" to next.sanityState,
+        "recentDisdainEventIds" to (hero.recentDisdainEventIds + durableEventId).takeLast(32),
+        "updatedAt" to FieldValue.serverTimestamp()))
+      tx.update(userRef, mapOf("lobbyRosterRevision" to ((profile.getLong("lobbyRosterRevision") ?: 0L) + 1L),
+        "updatedAt" to FieldValue.serverTimestamp()))
+    }.await()
+  }
+
+  override suspend fun toggleHeroInSquad(hero: HeroRecord, currentSquadSize: Int) {
+    mutateLobbyAssignment(hero.id, null, false)
   }
 
   override suspend fun markStoryFlag(profile: MasterProfile, flag: String) {
@@ -950,38 +1119,45 @@ class SummonerRepository(
     discoveredNodeIds: Set<String>,
     courierOutcome: CourierOutcome?,
     courierMemoryHeroId: String?,
+    remainingHeroHpRatios: Map<String, Float>,
+    attemptId: String?,
   ): ExpeditionSettlementResult {
+    attemptId?.let(ExpeditionSettlementCodec::validateAttemptId)
     val uid = requireUserId()
     val userRef = db.collection("users").document(uid)
     val escortOutcome = courierOutcome?.let {
-      if (floorNumber == 1 && victory && it == CourierOutcome.RESCUED) CourierOutcome.RESCUED else CourierOutcome.FAILED
+      if (floorNumber == 1 && victory && LostCourierProgression.isRescue(it)) it else CourierOutcome.FAILED
     }
     try {
-      // Read before writing: a retry or a stale UI profile cannot grant the service/memory twice.
-      if (escortOutcome != null) {
-        return db.runTransaction { transaction ->
-          val currentProfile = transaction.get(userRef).toObject(MasterProfile::class.java)
-            ?: error("Không tìm thấy tiến trình Master để lưu nhiệm vụ.")
-          val currentHeroes = squadHeroes.mapNotNull { hero ->
-            transaction.get(userRef.collection("heroes").document(hero.id)).toObject(HeroRecord::class.java)
+      val receiptRef = attemptId?.let { userRef.collection("expeditionSettlements").document(it) }
+      return db.runTransaction { transaction ->
+        // All reads precede writes. A retried transaction or save request reuses this receipt.
+        if (receiptRef != null) {
+          val receipt = transaction.get(receiptRef)
+          if (receipt.exists()) {
+            require(receipt.getString("userId") == uid && receipt.getString("attemptId") == attemptId)
+            return@runTransaction ExpeditionSettlementCodec.decode(requireNotNull(receipt.getString("resultJSON")))
           }
-          buildExpeditionSettlement(
-            uid, currentProfile, currentHeroes, fallenHeroIds, floorNumber, victory, retreatUsed,
-            bonusGold, bonusMana, discoveredNodeIds, escortOutcome, courierMemoryHeroId,
-            updateDocument = { ref, fields -> transaction.update(ref, fields); Unit },
-            setDocument = { ref, fields -> transaction.set(ref, fields); Unit },
-          )
-        }.await()
-      }
-      val batch = db.batch()
-      val result = buildExpeditionSettlement(
-        uid, profile, squadHeroes, fallenHeroIds, floorNumber, victory, retreatUsed,
-        bonusGold, bonusMana, discoveredNodeIds, null, null,
-        updateDocument = { ref, fields -> batch.update(ref, fields); Unit },
-        setDocument = { ref, fields -> batch.set(ref, fields); Unit },
-      )
-      batch.commit().await()
-      return result
+        }
+        val currentProfile = transaction.get(userRef).toObject(MasterProfile::class.java)
+          ?: error("Không tìm thấy tiến trình Master để lưu nhiệm vụ.")
+        val currentHeroes = squadHeroes.mapNotNull { hero ->
+          transaction.get(userRef.collection("heroes").document(hero.id)).toObject(HeroRecord::class.java)
+        }
+        val result = buildExpeditionSettlement(
+          uid, currentProfile, currentHeroes, fallenHeroIds, floorNumber, victory, retreatUsed,
+          bonusGold, bonusMana, discoveredNodeIds, escortOutcome, courierMemoryHeroId, remainingHeroHpRatios,
+          updateDocument = { ref, fields -> transaction.update(ref, fields); Unit },
+          setDocument = { ref, fields -> transaction.set(ref, fields); Unit },
+        )
+        if (receiptRef != null) transaction.set(receiptRef, mapOf(
+          "userId" to uid,
+          "attemptId" to checkNotNull(attemptId),
+          "createdAt" to FieldValue.serverTimestamp(),
+          "resultJSON" to ExpeditionSettlementCodec.encode(result),
+        ))
+        result
+      }.await()
     } catch (e: CancellationException) {
       throw e
     } catch (e: Exception) {
@@ -1003,6 +1179,7 @@ class SummonerRepository(
     discoveredNodeIds: Set<String>,
     courierOutcome: CourierOutcome?,
     courierMemoryHeroId: String?,
+    remainingHeroHpRatios: Map<String, Float>,
     updateDocument: (com.google.firebase.firestore.DocumentReference, Map<String, Any>) -> Unit,
     setDocument: (com.google.firebase.firestore.DocumentReference, Map<String, Any>) -> Unit,
   ): ExpeditionSettlementResult {
@@ -1029,8 +1206,8 @@ class SummonerRepository(
       retreatUsed -> 18L + floorNumber * 5L
       else -> 10L
     }
-    val goldEarned = ((baseGold + bonusGold) * dockMult).toLong()
-    val manaEarned = ((baseMana + bonusMana) * dockMult).toLong()
+    val goldEarned = ((baseGold + bonusGold) * dockMult).toLong() + LostCourierProgression.bonusGold(profile.storyFlags, courierOutcome)
+    val manaEarned = ((baseMana + bonusMana) * dockMult).toLong() + LostCourierProgression.bonusMana(profile.storyFlags, courierOutcome)
     val shardsEarned = when {
       victory -> 15L + floorNumber * 8L
       retreatUsed -> 5L + floorNumber * 2L
@@ -1116,26 +1293,47 @@ class SummonerRepository(
         else -> (hero.morale - 22L).coerceIn(moraleFloor, 100L)
       }
 
+      val nextMaxHp = (hero.maxHp + if (didLevelUp) 32L else 0L).coerceAtMost(100000L)
+      val health = com.example.data.ExpeditionHeroHealth.returnFromBattle(
+        hero, nextMaxHp, wasKnockedOut, remainingHeroHpRatios[hero.id],
+      )
+      val baseBond = if (courierForgeUnlocked && hero.id == memoryHeroId) {
+        courierMemoryHeroName = hero.name
+        LostCourierProgression.rememberRescue(hero.bondSummary)
+      } else hero.bondSummary
+      val appraisedHero = com.example.data.LobbyHeroAssignments.checkAndUnlockHiddenTrait(
+        health.copy(
+          level = nextLevel,
+          morale = nextMorale,
+          maxHp = nextMaxHp,
+          bondSummary = baseBond,
+        ),
+        nowSec,
+      )
+
       updateDocument(
         heroRef,
         mapOf(
           "level" to nextLevel,
           "exp" to remExp.coerceAtMost(10000000L),
-          "maxHp" to (hero.maxHp + if (didLevelUp) 32L else 0L).coerceAtMost(100000L),
+          "maxHp" to nextMaxHp,
           "attack" to (hero.attack + if (didLevelUp) 7L else 0L).coerceAtMost(50000L),
           "defense" to (hero.defense + if (didLevelUp) 4L else 0L).coerceAtMost(50000L),
           "speed" to (hero.speed + if (didLevelUp) 2L else 0L).coerceAtMost(500L),
           "status" to nextStatus,
           "injuryRecoveryUntilEpochSec" to recoveryUntil,
           "morale" to nextMorale,
+          "hiddenTrait" to com.example.data.LobbyHeroPersistenceFields.traitFields(appraisedHero.hiddenTrait),
+          "sanityState" to appraisedHero.sanityState,
           "inActiveSquad" to if (wasKnockedOut) false else hero.inActiveSquad,
+          "currentHp" to appraisedHero.currentHp,
+          "survivedExpeditions" to appraisedHero.survivedExpeditions,
+          "returnedUnder15PctHp" to appraisedHero.returnedUnder15PctHp,
+          "currentAssignment" to if (wasKnockedOut) "RESTING" else if (hero.inActiveSquad) "IN_PARTY" else "UNASSIGNED",
+          "restStartedAtEpochSec" to if (wasKnockedOut) nowSec else 0L,
+          "bondSummary" to baseBond,
           "updatedAt" to FieldValue.serverTimestamp(),
-        ).let { fields ->
-          if (courierForgeUnlocked && hero.id == memoryHeroId) {
-            courierMemoryHeroName = hero.name
-            fields + ("bondSummary" to LostCourierProgression.rememberRescue(hero.bondSummary))
-          } else fields
-        },
+        ),
       )
     }
 
@@ -1319,7 +1517,7 @@ class SummonerRepository(
               "bondSummary" to h.bondSummary.take(200),
               "createdAt" to FieldValue.serverTimestamp(),
               "updatedAt" to FieldValue.serverTimestamp(),
-            ),
+            ) + com.example.data.LobbyHeroPersistenceFields.fields(h),
           )
         }
         snapshot.equipment.forEach { eq ->
@@ -1400,7 +1598,7 @@ class SummonerRepository(
                 "bondSummary" to h.bondSummary.take(200),
                 "createdAt" to FieldValue.serverTimestamp(),
                 "updatedAt" to FieldValue.serverTimestamp(),
-              ),
+              ) + com.example.data.LobbyHeroPersistenceFields.fields(h.copy(inActiveSquad = false)),
             )
           } else if (LostCourierProgression.hasRescueMemory(h.bondSummary)) {
             val cloudHero = existingHeroesSnap.documents.firstOrNull { it.id == h.id }

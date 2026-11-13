@@ -1,0 +1,45 @@
+ETERNAL SUMMONER — GEMINI 4 ARGON HIGH
+NHIỆM VỤ SẢN XUẤT ĐỒ HỌA SANCTUARY V2 (24+ ASSET GỐC, NHIỀU BATCH)
+
+Bạn là Creative & Production Co-Lead làm việc song song với Arena A01. Đây là giai đoạn SẢN XUẤT THẬT, không phải một bài thử nghiệm 2 file PNG. Mục tiêu là nâng cảm giác cao cấp dark-fantasy pixel 2.5D của Sanctuary mà không thay đổi bản đồ, hình dạng đảo, các công trình, tọa độ, tương tác, camera hay gameplay đang hoạt động.
+
+Repository: https://github.com/lightingfff/eternal-sunmmoner
+Đọc AGENTS.md, docs/agents/DUAL_LEAD_WORKFLOW.md, docs/agents/ROLE_MATRIX.md, docs/agents/REVIEW_GATES.md, .agents/skills/eternal-argon-creative-technical-lead/SKILL.md, các skill art/spritesheet liên quan, dữ liệu assets và manifest hiện tại. Kiểm tra HEAD hiện tại: các file đã push trong docs/art/argon_pilot/ đã có, không tạo lại trùng lặp. Đọc đúng renderer/atlas, ObliqueCamera Y=0.72, SanctuaryLight, pivots/footprint, nearest-neighbor, depth sorting, roof/canopy occlusion, shadow direction và culling/performance.
+
+TRƯỚC KHI TẠO: lập bảng kiểm kê asset hiện có trên main và asset còn thiếu; có đường dẫn thật, dimensions, usage và ảnh render game khi sẵn có. Không chép artwork hoặc bố cục chính xác từ manhwa. Art phải nguyên bản, pixel density nhất quán, vật liệu giàu chi tiết, ánh sáng có thể dùng trong game Android thật. Không tự tô toàn bộ Sanctuary thành một ảnh nền.
+
+ĐỢT 1 — TERRAIN / MATERIALS (Ít nhất 8 PNG riêng)
+Tạo 3 biến thể nền cỏ rừng ma thuật tối, 2 biến thể đường lát đá có rêu, 1 nền đất nén cũ, 1 nền đá gần cổng tháp, 1 tile chuyển tiếp cỏ–đá. Tile nền 64×64 RGBA; bảo đảm cạnh lặp tự nhiên, không lộ lưới khi rải 4×4, và có điểm nhìn phù hợp phép chiếu oblique. Nhiều biến thể phải thực sự khác nhau về cụm pixel và vật liệu, không chỉ đổi màu.
+
+ĐỢT 2 — FOLIAGE & PROPS (Ít nhất 6 PNG gốc)
+Tạo cây thông cổ có silhouette đẹp, bụi rêu/hoa thấp, cây bụi tím xám, khóm hoa nhỏ theo khu Dorms/Training, thảm dây leo leo tường, đèn/biển chỉ đường bằng gỗ–đồng cũ. Kích thước có thể là 64×64, 64×96, 96×128... theo đối tượng; KHÔNG ép vật thể cao thành vuông 64×64 gây mất tỉ lệ. Dùng pivot chân rõ ràng, alpha thực, tiền/cảnh hậu và ánh sáng tương ứng SanctuaryLight; không đổi footprint xây dựng.
+
+ĐỢT 3 — ARCHITECTURAL MATERIAL DETAILS (Ít nhất 6 PNG gốc)
+Không tạo nhà mới hoặc di chuyển công trình. Tạo 6 chi tiết có thể gắn với công trình CŨ: mái ngói đen cũ có rêu, cửa gỗ đồng cổ, viền nền đá của Summoning Hall, khung cửa sổ ấm, trụ/tường cổng Tower Gate, dải gỗ trang trí khu Dorms. Cung cấp bản spec gắn asset bằng anchors nhưng CHƯA chỉnh renderer hoặc runtime. Cần tránh làm các bức tường nhìn phẳng, bảo đảm mặt trước/mặt bên/mái có chiều sâu 2.5D.
+
+ĐỢT 4 — ANIMATED VFX (Ít nhất 4 spritesheet THỰC)
+Tạo: (a) portal glow xoáy cho Tower Gate, tối thiểu 8 frame; (b) đốm sáng ma thuật quanh Summoning Hall, tối thiểu 8 frame; (c) hiệu ứng lá/hoa lay động, tối thiểu 6 frame; (d) mưa giọt/hạt nước phản sáng, tối thiểu 6 frame. Kiểm tra từng frame có khác biệt có chủ đích, animation loop hợp lý, alpha thật và pivot rõ ràng. Giữ lantern 8-frame từ đợt pilot như asset tham khảo, không lặp lại coi là asset mới. VFX phải tiết chế, không lạm dụng fullscreen shader hoặc làm điện thoại nóng thêm.
+
+ĐẢM BẢO TỔNG: >=24 asset gốc mới (8+6+6+4) và mỗi spritesheet có đúng số frame. Không đếm contact sheets, JSON, markdown, ảnh mockup hoặc đổi tên file trùng thành asset mới. Nếu có thể và chất lượng không giảm, tạo thêm biến thể; không chạy theo số lượng mà bỏ qua chiều sâu art.
+
+CHẤT LƯỢNG VÀ BẰNG CHỨNG:
+- Xuất từng PNG thật, không chỉ hiển thị ảnh trong chat; ghi size, SHA256, CRC32 chunk, decode, RGBA/alpha, dimensions, số frame, fps, pivot, bbox và provenance vào manifest.
+- Kiểm tra các mẫu terrain lặp dạng 4×4 với cả đường biên; phân biệt seam pass về số đo với đánh giá trực quan (không tự đánh dấu đẹp chỉ vì CRC PASS).
+- Kiểm tra VFX frame hash/độ khác biệt và ảnh minh họa các frame. Contact sheet là bằng chứng riêng, KHÔNG phải bằng chứng game runtime.
+- Tạo bản so sánh với asset đang có bằng tông màu, saturation, mật độ chi tiết, ánh sáng và độ đọc gameplay. Nếu có khả năng chạy project thật, chụp screenshot in-engine; nếu không thì ghi NOT TESTED, không bịa FPS/nhiệt độ.
+- Ưu tiên phong cách pixel dark fantasy cao cấp, hình khối/material lighting sắc, dịu mà rõ: xanh rêu thẫm, đá xám lạnh, nâu gỗ cũ, đồng hun, tím khói; điểm nhấn hổ phách. Không nhòe pixel, không art vector đơn giản giả pixel, không texture phẳng chỉ noise màu.
+
+QUY TRÌNH PHÂN CÔNG / GIT:
+- Giai đoạn mới phải có Issue ARGON-WORK-002 riêng và được Game Director/A01 xác nhận READY, mô tả chính xác file được viết. Không sửa lại Issue #66 đã push pilot.
+- Làm 4 batch tách thư mục, ví dụ docs/art/argon_production_v2/batch_01...batch_04; có danh sách từng file và manifest, bản preview; A08 có thể QA sau mỗi batch, A03 đánh giá render fit, A10 đánh giá risk, A09 kiểm tra độc lập, Codex review code/metadata nếu cần.
+- Không ghi vào app/src/main/assets, Kotlin, Gradle, metadata.json, settings.gradle.kts, camera/map/save, file P31 hiện có. Không đẩy trực tiếp lên main. Sử dụng nhánh feature riêng và PR khi môi trường cho phép; nếu nền tảng buộc push main, DỪNG và báo cách bàn giao ZIP/branch thay thế để bảo vệ các agent khác.
+- Bàn giao 4 batch trong một PR art-only đủ lớn để không mất nhiều lần merge; không tự merge. Chỉ chuyển sang tích hợp vào engine trong task khác, sau khi A08/A03/A01 chốt hợp đồng và user duyệt.
+- Phân biệt rõ thành công xuất file / kiểm tra kỹ thuật / kiểm tra thẩm mỹ / kiểm tra in-engine. Nếu không đủ công cụ tạo asset chất lượng, báo đúng blocker thay vì tạo placeholder rồi nói premium.
+
+THỨ TỰ THỰC HIỆN NGAY:
+1) Kiểm kê asset có sẵn và nêu các gap có bằng chứng (ngắn gọn).
+2) Đề xuất Issue ARGON-WORK-002 và khóa đúng đường dẫn để owner duyệt. Nếu đã được owner cho phép nhiệm vụ này qua prompt và quyền repo hiện tại cho phép mở issue thì tạo issue; nếu không thì soạn nội dung issue để chủ dự án tạo, không giả trạng thái READY.
+3) Sau khi issue READY, thực hiện Batch 1 thật, kiểm định và gửi báo cáo các file đã tạo; tiếp tục Batch 2–4 bằng cùng quy trình. Không dừng ở kế hoạch, không chỉ tạo 2 asset thử nghiệm.
+4) Bàn giao bộ 24+ file PNG, manifest và bằng chứng chất lượng theo từng batch, đường dẫn branch/PR hoặc ZIP thật nếu GitHub bị chặn.
+
+KẾT QUẢ MONG ĐỢI: Gói art gốc thực sự có khả năng tích hợp vào các layer 2.5D Sanctuary hiện hữu, không phải một bản thiết kế mới, ảnh concept rời rạc, hay một scene mô phỏng toàn bản đồ.

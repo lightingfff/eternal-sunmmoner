@@ -2,6 +2,7 @@ package com.example.data.local
 
 import android.content.Context
 import android.util.Log
+import com.example.data.ExpeditionSettlementCodec
 import com.example.data.FeastBuffHelper
 import com.example.data.GameSettings
 import com.example.data.GuestSaveSnapshot
@@ -24,6 +25,7 @@ import com.example.data.model.PersonalityType
 import com.example.data.model.SanctuaryMealRecipe
 import com.example.data.model.TrainingFocus
 import java.io.File
+import java.io.FileOutputStream
 import java.util.UUID
 import kotlin.random.Random
 import kotlinx.coroutines.flow.Flow
@@ -54,6 +56,7 @@ class LocalGuestSaveManager(context: Context) {
   private val sessionFile = File(storageDir, "session_state.json")
 
   private val ioMutex = Mutex()
+  private val snapshotGuard = Any()
 
   private val _sessionMode = MutableStateFlow(readInitialSessionMode())
   val sessionMode: StateFlow<SessionAccountMode> = _sessionMode.asStateFlow()
@@ -73,17 +76,19 @@ class LocalGuestSaveManager(context: Context) {
    */
   suspend fun startOrResumeGuestSession(preferredMasterName: String = "Master"): GuestSaveSnapshot =
     ioMutex.withLock {
-      val existing = _guestSnapshot.value ?: loadValidSnapshotFromDisk()
-      val activeSnapshot = if (existing != null) {
-        existing.copy(lastSavedEpochSec = System.currentTimeMillis() / 1000L)
-      } else {
-        createStarterGuestSnapshot(preferredMasterName)
+      synchronized(snapshotGuard) {
+        val existing = _guestSnapshot.value ?: loadValidSnapshotFromDisk()
+        val activeSnapshot = if (existing != null) {
+          existing.copy(lastSavedEpochSec = System.currentTimeMillis() / 1000L)
+        } else {
+          createStarterGuestSnapshot(preferredMasterName)
+        }
+        writeSnapshotAtomically(activeSnapshot)
+        _guestSnapshot.value = activeSnapshot
+        _sessionMode.value = SessionAccountMode.GUEST_LOCAL
+        persistSessionState(SessionAccountMode.GUEST_LOCAL, _settings.value)
+        activeSnapshot
       }
-      writeSnapshotAtomically(activeSnapshot)
-      _guestSnapshot.value = activeSnapshot
-      _sessionMode.value = SessionAccountMode.GUEST_LOCAL
-      persistSessionState(SessionAccountMode.GUEST_LOCAL, _settings.value)
-      activeSnapshot
     }
 
   fun markGoogleCloudSessionActive() {
@@ -98,32 +103,42 @@ class LocalGuestSaveManager(context: Context) {
   }
 
   fun updateSettings(newSettings: GameSettings) {
-    val snap = _guestSnapshot.value
-    if (snap != null) {
-      val updated = snap.copy(
-        settings = newSettings,
-        lastSavedEpochSec = System.currentTimeMillis() / 1000L,
-      )
-      writeSnapshotAtomically(updated)
-      _guestSnapshot.value = updated
+    synchronized(snapshotGuard) {
+      val snap = _guestSnapshot.value
+      if (snap != null) {
+        val updated = snap.copy(
+          settings = newSettings,
+          lastSavedEpochSec = System.currentTimeMillis() / 1000L,
+        )
+        writeSnapshotAtomically(updated)
+        _guestSnapshot.value = updated
+      }
+      _settings.value = newSettings
+      persistSessionState(_sessionMode.value, newSettings)
     }
-    _settings.value = newSettings
-    persistSessionState(_sessionMode.value, newSettings)
   }
 
   suspend fun mutateSnapshot(
     transform: (GuestSaveSnapshot) -> GuestSaveSnapshot,
   ): GuestSaveSnapshot = ioMutex.withLock {
-    val current = _guestSnapshot.value
-      ?: loadValidSnapshotFromDisk()
-      ?: createStarterGuestSnapshot("Master")
-    val next = transform(current).copy(
-      schemaVersion = GuestSaveSnapshot.CURRENT_SAVE_SCHEMA_VERSION,
-      lastSavedEpochSec = System.currentTimeMillis() / 1000L,
-    )
-    writeSnapshotAtomically(next)
-    _guestSnapshot.value = next
-    next
+    synchronized(snapshotGuard) {
+      val current = _guestSnapshot.value
+        ?: loadValidSnapshotFromDisk()
+        ?: createStarterGuestSnapshot("Master")
+      val transformed = transform(current)
+      if (transformed === current) return@synchronized current
+      val nowSec = System.currentTimeMillis() / 1000L
+      val next = transformed.copy(
+        heroes = transformed.heroes.map { hero ->
+          com.example.data.LobbyHeroAssignments.checkAndUnlockHiddenTrait(hero, nowSec)
+        },
+        schemaVersion = GuestSaveSnapshot.CURRENT_SAVE_SCHEMA_VERSION,
+        lastSavedEpochSec = nowSec,
+      )
+      writeSnapshotAtomically(next)
+      _guestSnapshot.value = next
+      next
+    }
   }
 
   private fun readInitialSessionMode(): SessionAccountMode {
@@ -205,20 +220,30 @@ class LocalGuestSaveManager(context: Context) {
   private fun writeSnapshotAtomically(snapshot: GuestSaveSnapshot) {
     try {
       val json = serializeSnapshot(snapshot).toString()
-      tempSaveFile.writeText(json, Charsets.UTF_8)
+      FileOutputStream(tempSaveFile).use { stream ->
+        stream.write(json.toByteArray(Charsets.UTF_8))
+        stream.fd.sync()
+      }
       if (primarySaveFile.exists() && primarySaveFile.length() > 0L) {
         // Keep last known good primary as backup before replacing
         if (parseFileSafely(primarySaveFile) != null) {
-          primarySaveFile.copyTo(backupSaveFile, overwrite = true)
+          val backupTemp = File(storageDir, "guest_save_v2.bak.tmp")
+          FileOutputStream(backupTemp).use { stream ->
+            stream.write(primarySaveFile.readBytes())
+            stream.fd.sync()
+          }
+          check(backupTemp.renameTo(backupSaveFile)) { "Không thể lưu bản dự phòng an toàn." }
         }
       }
-      if (!tempSaveFile.renameTo(primarySaveFile)) {
-        tempSaveFile.copyTo(primarySaveFile, overwrite = true)
-        tempSaveFile.delete()
-      }
-      if (!backupSaveFile.exists()) {
-        primarySaveFile.copyTo(backupSaveFile, overwrite = true)
-      }
+      check(tempSaveFile.renameTo(primarySaveFile)) { "Không thể thay thế bản lưu nguyên tử." }
+      // The committed primary is authoritative. A backup repair must never turn a successful
+      // commit into a reported failure (which could repeat a paid action on retry).
+      if (!backupSaveFile.exists()) runCatching {
+        FileOutputStream(backupSaveFile).use { stream ->
+          stream.write(json.toByteArray(Charsets.UTF_8))
+          stream.fd.sync()
+        }
+      }.onFailure { Log.w(TAG, "Backup creation deferred; primary committed", it) }
     } catch (e: Exception) {
       Log.e(TAG, "Atomic guest save failed", e)
       throw e
@@ -388,7 +413,7 @@ class LocalGuestSaveManager(context: Context) {
       schemaVersion = GuestSaveSnapshot.CURRENT_SAVE_SCHEMA_VERSION,
       guestPlayerId = guestUid,
       profile = profile,
-      heroes = heroes,
+      heroes = heroes.map { com.example.data.LobbyHeroAssignments.checkAndUnlockHiddenTrait(it) },
       equipment = equipment,
       settings = _settings.value,
       lastSavedEpochSec = System.currentTimeMillis() / 1000L,
@@ -420,6 +445,9 @@ class LocalGuestSaveManager(context: Context) {
     put("guestPlayerId", s.guestPlayerId)
     put("lastSavedEpochSec", s.lastSavedEpochSec)
     put("settings", serializeSettings(s.settings))
+    put("settledExpeditions", JSONObject().apply {
+      s.settledExpeditions.forEach { (id, result) -> put(id, ExpeditionSettlementCodec.encode(result)) }
+    })
 
     val p = s.profile
     put(
@@ -468,6 +496,19 @@ class LocalGuestSaveManager(context: Context) {
           put("equippedArmorId", h.equippedArmorId)
           put("inActiveSquad", h.inActiveSquad)
           put("bondSummary", h.bondSummary)
+          put("currentHp", h.currentHp)
+          put("survivedExpeditions", h.survivedExpeditions)
+          put("returnedUnder15PctHp", h.returnedUnder15PctHp)
+          put("recentDisdainEventIds", JSONArray(h.recentDisdainEventIds.takeLast(32)))
+          put("sanityState", h.sanityState)
+          put("currentAssignment", h.currentAssignment)
+          put("partyJoinedOrder", h.partyJoinedOrder)
+          put("restStartedAtEpochSec", h.restStartedAtEpochSec)
+          put("hiddenTrait", JSONObject().apply {
+            put("id", h.hiddenTrait.id); put("name", h.hiddenTrait.name)
+            put("minimumLevel", h.hiddenTrait.minimumLevel); put("minimumMorale", h.hiddenTrait.minimumMorale)
+            put("requiresSelfAwareness", h.hiddenTrait.requiresSelfAwareness); put("unlocked", h.hiddenTrait.unlocked)
+          })
         },
       )
     }
@@ -561,7 +602,9 @@ class LocalGuestSaveManager(context: Context) {
           defense = h.optLong("defense", 20L).coerceIn(0L, 50000L),
           speed = h.optLong("speed", 100L).coerceIn(20L, 500L),
           skillLevel = h.optLong("skillLevel", 1L).coerceIn(1L, 20L),
-          personality = PersonalityType.fromRaw(h.optString("personality", "STOIC")).name,
+          personality = h.optString("personality", "STOIC").let { raw ->
+            if (com.example.data.model.LobbyPersonality.entries.any { it.name == raw }) raw else PersonalityType.fromRaw(raw).name
+          },
           status = HeroStatusType.fromRaw(h.optString("status", "READY")).name,
           injuryRecoveryUntilEpochSec = h.optLong("injuryRecoveryUntilEpochSec", 0L).coerceAtLeast(0L),
           morale = h.optLong("morale", 100L).coerceIn(0L, 100L),
@@ -569,6 +612,20 @@ class LocalGuestSaveManager(context: Context) {
           equippedArmorId = h.optString("equippedArmorId", ""),
           inActiveSquad = h.optBoolean("inActiveSquad", false),
           bondSummary = h.optString("bondSummary", "Chiến đấu vì Thánh Địa.").take(200),
+          currentHp = h.optLong("currentHp", -1L).coerceIn(-1L, h.optLong("maxHp", 350L).coerceIn(50L, 100000L)),
+          survivedExpeditions = h.optInt("survivedExpeditions", 0).coerceIn(0, 1_000_000),
+          returnedUnder15PctHp = h.optBoolean("returnedUnder15PctHp", false),
+          recentDisdainEventIds = h.optJSONArray("recentDisdainEventIds")?.let { ids ->
+            (0 until ids.length()).mapNotNull { i -> ids.optString(i).takeIf { it.length in 1..80 } }.distinct().takeLast(32)
+          }.orEmpty(),
+          sanityState = com.example.data.model.HeroSanityState.fromRaw(h.optString("sanityState")).name,
+          currentAssignment = h.optString("currentAssignment").takeIf { raw -> com.example.data.model.HeroAssignment.entries.any { it.name == raw } }.orEmpty(),
+          partyJoinedOrder = h.optLong("partyJoinedOrder", 0L).coerceAtLeast(0L),
+          restStartedAtEpochSec = h.optLong("restStartedAtEpochSec", 0L).coerceAtLeast(0L),
+          hiddenTrait = h.optJSONObject("hiddenTrait")?.let { t -> com.example.data.model.HeroHiddenTrait(
+            id = t.optString("id", "unyielding_soul").take(80), name = t.optString("name", "Linh hồn bất khuất").take(100),
+            minimumLevel = t.optInt("minimumLevel", 10).coerceIn(1, 100), minimumMorale = t.optInt("minimumMorale", 60).coerceIn(0, 100),
+            requiresSelfAwareness = t.optBoolean("requiresSelfAwareness"), unlocked = t.optBoolean("unlocked")) } ?: com.example.data.model.HeroHiddenTrait(),
         )
       }
     }
@@ -602,9 +659,15 @@ class LocalGuestSaveManager(context: Context) {
       schemaVersion = GuestSaveSnapshot.CURRENT_SAVE_SCHEMA_VERSION,
       guestPlayerId = guestId,
       profile = profile,
-      heroes = heroes,
+      heroes = heroes.map { com.example.data.LobbyHeroAssignments.checkAndUnlockHiddenTrait(it) },
       equipment = equipment,
       settings = settings,
+      settledExpeditions = root.optJSONObject("settledExpeditions")?.let { ledger ->
+        require(ledger.length() <= ExpeditionSettlementCodec.MAX_RECORDS)
+        ledger.keys().asSequence().associate { id ->
+          ExpeditionSettlementCodec.validateAttemptId(id) to ExpeditionSettlementCodec.decode(ledger.getString(id))
+        }
+      }.orEmpty(),
       lastSavedEpochSec = root.optLong("lastSavedEpochSec", System.currentTimeMillis() / 1000L),
     )
   }
@@ -665,10 +728,11 @@ class LocalGuestDataSource(
       }
 
     val heroId = "hero_${UUID.randomUUID().toString().replace("-", "").take(16)}"
-    val squadAutoJoin = existingHeroes.count { it.inActiveSquad && !it.isCurrentlyInjured() } < 4
 
     lateinit var createdHero: HeroRecord
     saveManager.mutateSnapshot { snap ->
+      require(snap.profile.soulShards >= shardCost && snap.profile.manaCrystals >= manaCost) { "Không đủ tài nguyên triệu hồi." }
+      val squadAutoJoin = snap.heroes.count { it.inActiveSquad } < 4
       createdHero = HeroRecord(
         id = heroId,
         userId = snap.guestPlayerId,
@@ -688,6 +752,7 @@ class LocalGuestDataSource(
         injuryRecoveryUntilEpochSec = 0L,
         morale = 100L,
         inActiveSquad = squadAutoJoin,
+        partyJoinedOrder = if (squadAutoJoin) ((snap.heroes.maxOfOrNull { it.partyJoinedOrder } ?: 0L).coerceAtMost(Long.MAX_VALUE-1) + 1L) else 0L,
         bondSummary = candidate.bond,
       )
       snap.copy(
@@ -756,6 +821,7 @@ class LocalGuestDataSource(
               it.copy(
                 level = (it.level + 1L).coerceAtMost(100L),
                 maxHp = (it.maxHp + hpGain).coerceAtMost(100000L),
+                currentHp = if (it.currentHp < 0L) -1L else (it.currentHp + hpGain).coerceAtMost(100000L),
                 attack = (it.attack + atkGain).coerceAtMost(50000L),
                 defense = (it.defense + defGain).coerceAtMost(50000L),
                 speed = (it.speed + spdGain).coerceAtMost(500L),
@@ -843,6 +909,10 @@ class LocalGuestDataSource(
             val moraleBoost = if (targetStatus == HeroStatusType.RESTING) 8L else 0L
             h.copy(
               status = targetStatus.name,
+              currentAssignment = if (targetStatus == HeroStatusType.RESTING) "RESTING" else if (h.inActiveSquad) "IN_PARTY" else "UNASSIGNED",
+              inActiveSquad = h.inActiveSquad && targetStatus != HeroStatusType.RESTING,
+              restStartedAtEpochSec = if (targetStatus == HeroStatusType.RESTING) nowSec else 0L,
+              currentHp = com.example.data.model.HeroData.fromRecord(h, nowSec).currentHP.toLong(),
               morale = (h.morale + moraleBoost).coerceIn(0L, 100L),
             )
           } else {
@@ -961,6 +1031,9 @@ class LocalGuestDataSource(
           if (h.id == hero.id) {
             h.copy(
               status = HeroStatusType.READY.name,
+              currentHp = h.maxHp,
+              currentAssignment = if (h.inActiveSquad) "IN_PARTY" else "UNASSIGNED",
+              restStartedAtEpochSec = 0L,
               injuryRecoveryUntilEpochSec = 0L,
               morale = (h.morale + 15L).coerceAtMost(100L),
             )
@@ -1041,21 +1114,90 @@ class LocalGuestDataSource(
     }
   }
 
-  override suspend fun toggleHeroInSquad(hero: HeroRecord, currentSquadSize: Int) {
-    if (!hero.inActiveSquad) {
-      require(!hero.isCurrentlyInjured()) {
-        "${hero.name} đang bị thương! Hãy đưa về Khu Nghỉ Ngơi hồi phục trước."
-      }
-      require(currentSquadSize < 4) {
-        "Đội hình viễn chinh tối đa 4 Anh hùng."
-      }
-    }
+  override suspend fun assignLobbyHero(heroId: String, assignment: com.example.data.model.HeroAssignment) {
     saveManager.mutateSnapshot { snap ->
-      snap.copy(
-        heroes = snap.heroes.map { h ->
-          if (h.id == hero.id) h.copy(inActiveSquad = !h.inActiveSquad) else h
-        },
+      snap.copy(heroes = com.example.data.LobbyHeroAssignments.assign(snap.heroes, heroId, assignment, System.currentTimeMillis() / 1000L))
+    }
+  }
+
+  override suspend fun healHeroAtInfirmary(
+    profile: MasterProfile,
+    hero: HeroRecord,
+    goldCost: Long,
+  ) {
+    val nowSec = System.currentTimeMillis() / 1000L
+    saveManager.mutateSnapshot { snap ->
+      val (nextProfile, nextHeroes) = com.example.data.LobbyHeroAssignments.healHeroAtInfirmary(
+        profile = snap.profile,
+        roster = snap.heroes,
+        heroId = hero.id,
+        now = nowSec,
+        goldCost = goldCost,
       )
+      snap.copy(profile = nextProfile, heroes = nextHeroes)
+    }
+  }
+
+  override suspend fun serveHeartyMealToHero(
+    profile: MasterProfile,
+    hero: HeroRecord,
+    goldCost: Long,
+  ) {
+    val nowSec = System.currentTimeMillis() / 1000L
+    saveManager.mutateSnapshot { snap ->
+      val (nextProfile, nextHeroes) = com.example.data.LobbyHeroAssignments.serveHeartyMealToHero(
+        profile = snap.profile,
+        roster = snap.heroes,
+        heroId = hero.id,
+        now = nowSec,
+        goldCost = goldCost,
+      )
+      snap.copy(profile = nextProfile, heroes = nextHeroes)
+    }
+  }
+
+  override suspend fun performCruelHeroSynthesis(
+    targetHeroId: String,
+    sacrificedHeroIds: List<String>,
+  ): com.example.data.CruelSynthesisOutcome {
+    val nowSec = System.currentTimeMillis() / 1000L
+    var outcome: com.example.data.CruelSynthesisOutcome? = null
+    saveManager.mutateSnapshot { snap ->
+      val res = com.example.data.LobbyHeroAssignments.performCruelSynthesis(
+        roster = snap.heroes,
+        targetHeroId = targetHeroId,
+        sacrificedHeroIds = sacrificedHeroIds,
+        now = nowSec,
+      )
+      outcome = res
+      val sacrificedSet = sacrificedHeroIds.toSet()
+      val nextEquipment = snap.equipment.map { eq ->
+        if (eq.equippedByHeroId in sacrificedSet) eq.copy(equippedByHeroId = "") else eq
+      }
+      snap.copy(heroes = res.updatedRoster, equipment = nextEquipment)
+    }
+    return requireNotNull(outcome)
+  }
+
+  override suspend fun applySocialDisdainPenalty(lowStarHeroId: String, penalty: Int, eventId: String) {
+    val durableEventId = eventId.ifBlank { UUID.randomUUID().toString() }
+    require(com.example.data.LobbyHeroAssignments.isValidSocialEventId(durableEventId)) { "Mã biến cố tinh thần không hợp lệ." }
+    saveManager.mutateSnapshot { snap ->
+      val hero = snap.heroes.find { it.id == lowStarHeroId } ?: return@mutateSnapshot snap
+      if (durableEventId in hero.recentDisdainEventIds) return@mutateSnapshot snap
+      val changed = com.example.data.LobbyHeroAssignments.applyProximityDisdainMoralePenalty(snap.heroes, lowStarHeroId, penalty)
+      snap.copy(heroes = changed.map { h ->
+        if (h.id == lowStarHeroId) h.copy(recentDisdainEventIds = (h.recentDisdainEventIds + durableEventId).takeLast(32)) else h
+      })
+    }
+  }
+
+  override suspend fun toggleHeroInSquad(hero: HeroRecord, currentSquadSize: Int) {
+    saveManager.mutateSnapshot { snap ->
+      val current = requireNotNull(snap.heroes.find { it.id == hero.id })
+      val assignment = if (current.inActiveSquad) com.example.data.model.HeroAssignment.UNASSIGNED else com.example.data.model.HeroAssignment.IN_PARTY
+      snap.copy(heroes = com.example.data.LobbyHeroAssignments.assign(snap.heroes, hero.id, assignment,
+        System.currentTimeMillis() / 1000L, replaceWhenFull = false))
     }
   }
 
@@ -1079,7 +1221,11 @@ class LocalGuestDataSource(
     discoveredNodeIds: Set<String>,
     courierOutcome: CourierOutcome?,
     courierMemoryHeroId: String?,
+    remainingHeroHpRatios: Map<String, Float>,
+    attemptId: String?,
   ): ExpeditionSettlementResult {
+    attemptId?.let(ExpeditionSettlementCodec::validateAttemptId)
+    var settlement: ExpeditionSettlementResult? = null
     val nowSec = System.currentTimeMillis() / 1000L
     val hasAstralDock = SanctuaryProgressionHelper.isExpansionUnlocked(
       profile.storyFlags,
@@ -1101,8 +1247,8 @@ class LocalGuestDataSource(
       retreatUsed -> 18L + floorNumber * 5L
       else -> 10L
     }
-    val goldEarned = ((baseGold + bonusGold) * dockMult).toLong()
-    val manaEarned = ((baseMana + bonusMana) * dockMult).toLong()
+    var goldEarned = ((baseGold + bonusGold) * dockMult).toLong()
+    var manaEarned = ((baseMana + bonusMana) * dockMult).toLong()
     val shardsEarned = when {
       victory -> 15L + floorNumber * 8L
       retreatUsed -> 5L + floorNumber * 2L
@@ -1122,7 +1268,7 @@ class LocalGuestDataSource(
     val leveledNames = mutableListOf<String>()
     var lootedName: String? = null
     val escortOutcome = courierOutcome?.let {
-      if (floorNumber == 1 && victory && it == CourierOutcome.RESCUED) CourierOutcome.RESCUED else CourierOutcome.FAILED
+      if (floorNumber == 1 && victory && LostCourierProgression.isRescue(it)) it else CourierOutcome.FAILED
     }
     var courierForgeUnlocked = false
     var courierMemoryHeroName: String? = null
@@ -1134,7 +1280,14 @@ class LocalGuestDataSource(
     }
 
     saveManager.mutateSnapshot { snap ->
+      val existing = attemptId?.let { snap.settledExpeditions[it] }
+      if (existing != null) {
+        settlement = existing
+        return@mutateSnapshot snap
+      }
       val cur = snap.profile
+      goldEarned += LostCourierProgression.bonusGold(cur.storyFlags, escortOutcome)
+      manaEarned += LostCourierProgression.bonusMana(cur.storyFlags, escortOutcome)
       val totalMasterExp = cur.masterExp + masterExpGain
       val newMasterLevel = (1L + totalMasterExp / 250L).coerceAtMost(100L)
       val newHighestFloor = if (victory) maxOf(cur.highestClearedFloor, floorNumber.toLong()) else cur.highestClearedFloor
@@ -1172,21 +1325,31 @@ class LocalGuestDataSource(
             else -> (hero.morale - 22L).coerceIn(moraleFloor, 100L)
           }
 
-          hero.copy(
-            level = nextLevel,
-            exp = remExp.coerceAtMost(10000000L),
-            maxHp = (hero.maxHp + if (didLevelUp) 32L else 0L).coerceAtMost(100000L),
-            attack = (hero.attack + if (didLevelUp) 7L else 0L).coerceAtMost(50000L),
-            defense = (hero.defense + if (didLevelUp) 4L else 0L).coerceAtMost(50000L),
-            speed = (hero.speed + if (didLevelUp) 2L else 0L).coerceAtMost(500L),
-            status = nextStatus,
-            injuryRecoveryUntilEpochSec = recoveryUntil,
-            morale = nextMorale,
-            inActiveSquad = if (wasKnockedOut) false else hero.inActiveSquad,
-            bondSummary = if (courierForgeUnlocked && hero.id == memoryHeroId) {
-              courierMemoryHeroName = hero.name
-              LostCourierProgression.rememberRescue(hero.bondSummary)
-            } else hero.bondSummary,
+          val nextMaxHp = (hero.maxHp + if (didLevelUp) 32L else 0L).coerceAtMost(100000L)
+          val health = com.example.data.ExpeditionHeroHealth.returnFromBattle(
+            hero, nextMaxHp, wasKnockedOut, remainingHeroHpRatios[hero.id],
+          )
+          val baseBond = if (courierForgeUnlocked && hero.id == memoryHeroId) {
+            courierMemoryHeroName = hero.name
+            LostCourierProgression.rememberRescue(hero.bondSummary)
+          } else hero.bondSummary
+          com.example.data.LobbyHeroAssignments.checkAndUnlockHiddenTrait(
+            health.copy(
+              level = nextLevel,
+              exp = remExp.coerceAtMost(10000000L),
+              maxHp = nextMaxHp,
+              attack = (hero.attack + if (didLevelUp) 7L else 0L).coerceAtMost(50000L),
+              defense = (hero.defense + if (didLevelUp) 4L else 0L).coerceAtMost(50000L),
+              speed = (hero.speed + if (didLevelUp) 2L else 0L).coerceAtMost(500L),
+              status = nextStatus,
+              injuryRecoveryUntilEpochSec = recoveryUntil,
+              morale = nextMorale,
+              inActiveSquad = if (wasKnockedOut) false else hero.inActiveSquad,
+              currentAssignment = if (wasKnockedOut) "RESTING" else if (hero.inActiveSquad) "IN_PARTY" else "UNASSIGNED",
+              restStartedAtEpochSec = if (wasKnockedOut) nowSec else 0L,
+              bondSummary = baseBond,
+            ),
+            nowSec,
           )
         }
       }
@@ -1218,7 +1381,28 @@ class LocalGuestDataSource(
         LostCourierProgression.outcomeFlags(cur.storyFlags, escortOutcome) + nodeFlags,
       )
 
+      settlement = ExpeditionSettlementResult(
+        victory = victory,
+        floorNumber = floorNumber,
+        goldEarned = goldEarned,
+        manaEarned = manaEarned,
+        shardsEarned = shardsEarned,
+        oreEarned = oreEarned,
+        essenceEarned = essenceEarned,
+        injuredHeroNames = injuredNames,
+        leveledUpHeroNames = leveledNames,
+        lootedItemName = lootedName,
+        outcomeType = outcomeType,
+        bonusDiscoveryGold = bonusGold,
+        bonusDiscoveryMana = bonusMana,
+        discoveredNodesCount = discoveredNodeIds.size,
+        courierOutcome = escortOutcome,
+        courierForgeUnlocked = courierForgeUnlocked,
+        courierMemoryHeroName = courierMemoryHeroName,
+      )
+
       snap.copy(
+        settledExpeditions = if (attemptId != null) ExpeditionSettlementCodec.append(snap.settledExpeditions, attemptId, checkNotNull(settlement)) else snap.settledExpeditions,
         profile = cur.copy(
           masterLevel = newMasterLevel,
           masterExp = totalMasterExp.coerceAtMost(10000000L),
@@ -1237,24 +1421,6 @@ class LocalGuestDataSource(
       )
     }
 
-    return ExpeditionSettlementResult(
-      victory = victory,
-      floorNumber = floorNumber,
-      goldEarned = goldEarned,
-      manaEarned = manaEarned,
-      shardsEarned = shardsEarned,
-      oreEarned = oreEarned,
-      essenceEarned = essenceEarned,
-      injuredHeroNames = injuredNames,
-      leveledUpHeroNames = leveledNames,
-      lootedItemName = lootedName,
-      outcomeType = outcomeType,
-      bonusDiscoveryGold = bonusGold,
-      bonusDiscoveryMana = bonusMana,
-      discoveredNodesCount = discoveredNodeIds.size,
-      courierOutcome = escortOutcome,
-      courierForgeUnlocked = courierForgeUnlocked,
-      courierMemoryHeroName = courierMemoryHeroName,
-    )
+    return checkNotNull(settlement)
   }
 }

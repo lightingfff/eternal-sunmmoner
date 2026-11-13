@@ -1,0 +1,17 @@
+{
+  "requested_url": "https://tapas.io/series/pick-me-up/info",
+  "retrieved_utc": "2026-11-12T13:54:36.638832+00:00",
+  "source_type": "official publisher",
+  "default_sandbox_attempt": "not attempted",
+  "status": 200,
+  "final_url": "https://tapas.io/series/pick-me-up/info",
+  "bytes": 181054,
+  "content_type": "text/html;charset=UTF-8",
+  "extract_file": "pick-me-up-tapas.txt",
+  "verified_facts": [
+    "Publisher description presents a player transported into a one-star hero previously treated as expendable boss-pattern fodder.",
+    "Publisher credits WASAK BASAK, nicesun and Hermod, with A.TEMPO MEDIA copyright."
+  ],
+  "scope_limit": "Publisher premise only. Detailed systems, party size and tower mission rules are not established by this page.",
+  "interpretation_limit": "Descriptive source facts, not measured player enjoyment or retention. No user or critic review quoted as evidence."
+}

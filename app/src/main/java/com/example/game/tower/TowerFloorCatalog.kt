@@ -507,6 +507,69 @@ object TowerFloorCatalog {
       )
     }
 
+    // 9. Royal Guardian Statues, Blazing Arcane Braziers & Astral Obelisks framing the Grand Plaza,
+    // Northern Tower Gate Forecourt, Eastern Sakura Pavilion & Southern Ceremonial Avenue
+    listOf(
+      1740f to 695f,
+      2180f to 695f,
+      1545f to 1125f,
+      1545f to 1355f,
+      1940f to 825f,
+      1940f to 1645f,
+      1475f to 1980f,
+      1745f to 1980f,
+    ).forEachIndexed { idx, (sx, sy) ->
+      obstacles += WorldObstacle(
+        id = "sanctuary_royal_statue_$idx",
+        x = sx,
+        y = sy,
+        radius = 18f,
+        blocksMovement = true,
+        propKind = PropKind.ROYAL_STATUE,
+        scale = 0.98f,
+      )
+    }
+
+    listOf(
+      1830f to 665f,
+      2090f to 665f,
+      1805f to 1110f,
+      2075f to 1110f,
+      1805f to 1370f,
+      2075f to 1370f,
+      2510f to 1160f,
+      2510f to 1330f,
+      2250f to 1885f,
+      2610f to 1885f,
+    ).forEachIndexed { idx, (bx, by) ->
+      obstacles += WorldObstacle(
+        id = "sanctuary_arcane_brazier_$idx",
+        x = bx,
+        y = by,
+        radius = 14f,
+        blocksMovement = true,
+        propKind = PropKind.ARCANE_BRAZIER,
+        scale = 0.95f,
+      )
+    }
+
+    listOf(
+      1665f to 755f,
+      2255f to 755f,
+      2355f to 1015f,
+      2355f to 1465f,
+    ).forEachIndexed { idx, (ox, oy) ->
+      obstacles += WorldObstacle(
+        id = "sanctuary_astral_obelisk_$idx",
+        x = ox,
+        y = oy,
+        radius = 18f,
+        blocksMovement = true,
+        propKind = PropKind.SUMMON_OBELISK,
+        scale = 0.94f,
+      )
+    }
+
     return GeneratedMapLayout(
       width = SANCTUARY_WIDTH,
       height = SANCTUARY_HEIGHT,

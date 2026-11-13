@@ -66,6 +66,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import kotlinx.coroutines.launch
+import com.example.data.model.HeroAssignment
+import com.example.ui.components.lobbyHeroGestures
+import com.example.ui.components.pickupHeroAtScreen
+import com.example.ui.components.drawLobbyHero
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -91,6 +102,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -229,12 +241,33 @@ fun SanctuaryLobbyScreen(
   onHostMealWithRecipe: (SanctuaryMealRecipe) -> Unit = { _ -> onHostMeal() },
   onUnlockExpansion: (IslandExpansionMilestone) -> Unit = {},
   sceneActive: Boolean = true,
+  onDropHero: suspend (String, HeroAssignment) -> Boolean = { _, _ -> false },
+  onHealHeroInfirmary: (HeroRecord) -> Unit = { h -> onRecoverHero(h, false) },
+  onServeHeartyMeal: (HeroRecord) -> Unit = { h -> onRecoverHero(h, true) },
+  onCruelSynthesis: (String, List<String>) -> Unit = { _, _ -> },
+  onSocialDisdainPenalty: (String) -> Unit = {},
 ) {
   val artContext = androidx.compose.ui.platform.LocalContext.current
   remember(artContext) { com.example.game.pixel.SanctuaryArtAssets.init(artContext) }
   remember(artContext) { com.example.game.world.WorldEnvironment.init(artContext) }
   val lobbyEngine = remember { SanctuaryLobbyEngine() }
   val depthQueue = remember { LobbyDrawQueue() }
+  val dropScope = rememberCoroutineScope()
+  val persistDrop by rememberUpdatedState(onDropHero)
+  val latestDisdainCallback by rememberUpdatedState(onSocialDisdainPenalty)
+  var pickupOffset by remember { mutableStateOf(Offset.Zero) }
+  var pendingDrop by remember { mutableStateOf(false) }
+  val dragInvalidation = remember { mutableIntStateOf(0) }
+  val heldPointer = remember { mutableStateOf<Offset?>(null) }
+  var canvasPixels by remember { mutableStateOf(Size.Zero) }
+  val lifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(lifecycleOwner, lobbyEngine) {
+    val observer = LifecycleEventObserver { _, event ->
+      if (event == Lifecycle.Event.ON_STOP) lobbyEngine.finishHeroPickUp(false)
+    }
+    lifecycleOwner.lifecycle.addObserver(observer)
+    onDispose { lifecycleOwner.lifecycle.removeObserver(observer); lobbyEngine.finishHeroPickUp(false) }
+  }
   val textMeasurer = rememberTextMeasurer()
   val focusRequester = remember { FocusRequester() }
 
@@ -282,8 +315,9 @@ fun SanctuaryLobbyScreen(
     zoom = lobbyEngine.zoom
   }
 
-  LaunchedEffect(state.heroes) {
+  LaunchedEffect(state.heroes, state.lobbySyncRevision) {
     lobbyEngine.syncHeroes(state.heroes, System.currentTimeMillis() / 1000L)
+    dragInvalidation.intValue++
   }
 
   BackHandler(
@@ -324,11 +358,18 @@ fun SanctuaryLobbyScreen(
     // frames retain the same fixed 60 Hz simulation; background time is excluded by SceneFrameLoop.
     val dt = elapsed.coerceAtMost(0.25f)
     animTimeSec += dt
+    heldPointer.value?.takeIf { lobbyEngine.pickedHeroId != null && !pendingDrop }?.let { p ->
+      lobbyEngine.dragAtViewportEdge(p.x, p.y, canvasPixels.width, canvasPixels.height, pickupOffset.x, pickupOffset.y, dt)
+    }
     val kDx = (if (keyRight) 1f else 0f) - (if (keyLeft) 1f else 0f)
     val kDy = (if (keyDown) 1f else 0f) - (if (keyUp) 1f else 0f)
     val dx = if (kotlin.math.abs(joyDx) > 0.05f) joyDx else kDx
     val dy = if (kotlin.math.abs(joyDy) > 0.05f) joyDy else kDy
     fixedSimulation.advance(dt) { step -> lobbyEngine.step(step, dx, dy) }
+    val disdainTargets = lobbyEngine.consumePendingDisdainPenaltyHeroIds()
+    if (disdainTargets.isNotEmpty()) {
+      disdainTargets.forEach { targetId -> latestDisdainCallback(targetId) }
+    }
     activeInteriorState = lobbyEngine.activeInterior
     hudClock[0] += dt
     if (hudClock[0] >= 0.25f) {
@@ -371,8 +412,11 @@ fun SanctuaryLobbyScreen(
                 zoom = lobbyEngine.zoom
               } else {
                 lobbyEngine.nearbyFacility?.let { fac ->
-                  if (lobbyEngine.isInsideInterior) onOpenFacility(fac)
-                  else promptedFacility = fac
+                  if (lobbyEngine.isInsideInterior || fac == FacilityType.TOWER_GATE || fac == FacilityType.HERO_QUARTERS) {
+                    onOpenFacility(fac)
+                  } else {
+                    promptedFacility = fac
+                  }
                 }
               }
             }
@@ -390,40 +434,21 @@ fun SanctuaryLobbyScreen(
       (constraints.maxHeight.toFloat() - 150f).coerceAtLeast(240f) / 2120f,
     ).coerceIn(0.27f, 0.54f)
 
-    fun computeLobbyCam(viewportHalfW: Float, viewportHalfH: Float): Pair<Float, Float> {
-      val layout = lobbyEngine.mapLayout
-      val effectiveWorldW = if (!lobbyEngine.isInsideInterior && IslandExpansionMilestone.EAST_CELESTIAL_GARDEN in unlockedExpansions) {
-        SanctuaryIslandGeometry.EXPANDED_WORLD_WIDTH
-      } else {
-        layout.width
-      }
-      val cx = ObliqueCamera.clampCamX(
-        desiredCamX = lobbyEngine.camX,
-        worldWidth = effectiveWorldW,
-        wallMargin = layout.wallMargin,
-        zoom = zoom,
-        viewportHalfW = viewportHalfW,
-      )
-      val cy = ObliqueCamera.clampCamY(
-        desiredCamY = lobbyEngine.camY,
-        worldHeight = layout.height,
-        wallMargin = layout.wallMargin,
-        zoom = zoom,
-        viewportHalfH = viewportHalfH,
-        northHeadroomWorld = 220f,
-      )
-      return cx to cy
-    }
+    fun computeLobbyCam(viewportHalfW: Float, viewportHalfH: Float): Pair<Float, Float> =
+      lobbyEngine.renderedCamera(viewportHalfW * 2f, viewportHalfH * 2f, zoom)
 
     // 1. Interactive True Oblique 3/4 Pixel-Art Sanctuary & 4 Enterable 2.5D Facility Interiors Canvas
     Canvas(
       modifier = Modifier
         .fillMaxSize()
         .testTag("sanctuary_canvas")
-        .pointerInput(Unit) {
-          detectTransformGestures { centroid, pan, zoomChange, _ ->
-            val halfW = size.width / 2f
-            val halfH = size.height / 2f
+        .onSizeChanged { canvasPixels = Size(it.width.toFloat(), it.height.toFloat()) }
+        .lobbyHeroGestures(
+          enabled = !pendingDrop && state.activeFacilityModal == null && managementMode == null &&
+            !showMasterHub && !showPauseMapModal && !showChronicleModal && !showExpansionModal && inspectingHeroId == null && !showPrologue,
+          onTransform = { centroid, pan, zoomChange ->
+            val halfW = constraints.maxWidth / 2f
+            val halfH = constraints.maxHeight / 2f
             if (abs(zoomChange - 1f) > 0.003f) {
               val oldZoom = lobbyEngine.zoom
               val newZoom = (oldZoom * zoomChange).coerceIn(0.36f, 1.48f)
@@ -443,66 +468,87 @@ fun SanctuaryLobbyScreen(
                 worldDy = -pan.y / (zoom * ObliqueCamera.OBLIQUE_Y_SCALE),
               )
             }
-          }
-        }
-        .pointerInput(zoom) {
-          detectTapGestures { tapOffset ->
-            val halfW = size.width / 2f
-            val halfH = size.height / 2f
+          },
+          onTap = tap@ { tapOffset ->
+            val halfW = constraints.maxWidth / 2f
+            val halfH = constraints.maxHeight / 2f
             val (camX, camY) = computeLobbyCam(halfW, halfH)
             val worldX = ObliqueCamera.screenToWorldX(tapOffset.x, camX, zoom, halfW)
             val worldY = ObliqueCamera.screenToWorldY(tapOffset.y, camY, zoom, halfH)
 
             if (lobbyEngine.isInsideInterior) {
-              val activeInt = lobbyEngine.activeInterior ?: return@detectTapGestures
+              val activeInt = lobbyEngine.activeInterior ?: return@tap
               val (exitX, exitY) = TowerFloorCatalog.interiorExitPoint(activeInt)
               if (hypot(worldX - exitX, worldY - exitY) <= 88f) {
                 lobbyEngine.exitFacilityInterior()
                 activeInteriorState = lobbyEngine.activeInterior
                 zoom = lobbyEngine.zoom
-                return@detectTapGestures
+                return@tap
               }
               val tappedHero = lobbyEngine.selectHeroAt(worldX, worldY)
               if (tappedHero != null) {
                 if (!tappedHero.isSanctuaryKeeperNpc) {
                   lobbyEngine.selectedHeroId = tappedHero.heroId
                   hudSelectedHeroId = tappedHero.heroId
+                  dragInvalidation.intValue++
                 } else {
                   onOpenFacility(activeInt)
                 }
-                return@detectTapGestures
+                return@tap
               }
               if (lobbyEngine.selectFacilityAt(worldX, worldY) != null) {
                 onOpenFacility(activeInt)
-                return@detectTapGestures
+                return@tap
               }
               lobbyEngine.setTapDestination(worldX, worldY)
             } else {
-              // 1. Contextual Facility Tap Priority (External Master Commander — no walking required!)
               val tappedFacility = lobbyEngine.selectFacilityAt(worldX, worldY)
-              if (tappedFacility != null) {
-                promptedFacility = tappedFacility
-                return@detectTapGestures
+              val screenHitHero = pickupHeroAtScreen(
+                lobbyEngine.heroActors,
+                tapOffset,
+                camX,
+                camY,
+                zoom,
+                Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat()),
+                minimumTargetPx = if (tappedFacility == null) 44f * artContext.resources.displayMetrics.density else 0f,
+              )
+
+              if (screenHitHero != null && !screenHitHero.isSanctuaryKeeperNpc) {
+                lobbyEngine.selectedHeroId = screenHitHero.heroId
+                hudSelectedHeroId = screenHitHero.heroId
+                lobbyEngine.triggerHeroTapSpeech(screenHitHero.heroId)
+                promptedFacility = null
+                dragInvalidation.intValue++
+                return@tap
               }
 
-              // 2. Physical Island Expansion Beacon / Terrace Tap
+              // 2. Facility Tap: Tapping "Ngôi Nhà" (HERO_QUARTERS) or "Cổng Tháp" (TOWER_GATE) opens its UI directly without blocking!
+              if (tappedFacility != null) {
+                if (tappedFacility == FacilityType.TOWER_GATE || tappedFacility == FacilityType.HERO_QUARTERS) {
+                  promptedFacility = null
+                  onOpenFacility(tappedFacility)
+                } else {
+                  promptedFacility = tappedFacility
+                }
+                return@tap
+              }
+
+              // 3. Physical Island Expansion Beacon / Terrace Tap
               val tappedExpansion = lobbyEngine.selectExpansionAt(worldX, worldY)
               if (tappedExpansion != null) {
                 promptedFacility = null
                 showExpansionModal = true
-                return@detectTapGestures
+                return@tap
               }
 
-              // 3. Hero or Keeper NPC Selection
-              val tappedHero = lobbyEngine.selectHeroAt(worldX, worldY)
-              if (tappedHero != null) {
-                if (!tappedHero.isSanctuaryKeeperNpc) {
-                  lobbyEngine.selectedHeroId = tappedHero.heroId
-                  hudSelectedHeroId = tappedHero.heroId
+              // 4. Keeper NPC Selection
+              val tappedNpc = lobbyEngine.selectHeroAt(worldX, worldY)
+              if (tappedNpc != null && tappedNpc.isSanctuaryKeeperNpc) {
+                if (tappedNpc.heroId == "npc_gatekeeper") {
                   promptedFacility = null
+                  onOpenFacility(FacilityType.TOWER_GATE)
                 } else {
-                  promptedFacility = when (tappedHero.heroId) {
-                    "npc_gatekeeper" -> FacilityType.TOWER_GATE
+                  promptedFacility = when (tappedNpc.heroId) {
                     "npc_alchemist" -> FacilityType.SYNTHESIS_LAB
                     "npc_registry_officer" -> FacilityType.SUMMONING_HALL
                     "npc_trainer" -> FacilityType.TRAINING_GROUND
@@ -511,16 +557,62 @@ fun SanctuaryLobbyScreen(
                     else -> FacilityType.TOWER_GATE
                   }
                 }
-                return@detectTapGestures
+                return@tap
               }
 
-              // 4. Empty Terrain Tap: Command selected hero or pan camera
+              // 5. Empty Terrain Tap: Command selected hero or pan camera
               promptedFacility = null
               lobbyEngine.setTapDestination(worldX, worldY)
             }
-          }
-        },
+          },
+          onPickUp = { point ->
+            val (cx, cy) = computeLobbyCam(constraints.maxWidth / 2f, constraints.maxHeight / 2f)
+            val wx = ObliqueCamera.screenToWorldX(point.x, cx, zoom, constraints.maxWidth / 2f)
+            val wy = ObliqueCamera.screenToWorldY(point.y, cy, zoom, constraints.maxHeight / 2f)
+            val facilityBehind = lobbyEngine.selectFacilityAt(wx, wy)
+            val actor = if (!lobbyEngine.isInsideInterior) pickupHeroAtScreen(lobbyEngine.heroActors, point, cx, cy, zoom,
+              Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat()),
+              minimumTargetPx = if (facilityBehind == null) 48f * artContext.resources.displayMetrics.density else 0f) else null
+            if (actor == null || !lobbyEngine.beginHeroPickUp(actor.heroId)) false else {
+              pickupOffset = Offset(actor.x - wx, actor.y - wy)
+              heldPointer.value = point
+              dragInvalidation.intValue++
+              promptedFacility = null
+              true
+            }
+          },
+          onDrag = { point ->
+            heldPointer.value = point
+            val (cx, cy) = computeLobbyCam(constraints.maxWidth / 2f, constraints.maxHeight / 2f)
+            dragInvalidation.intValue++
+            lobbyEngine.dragPickedHeroTo(
+              ObliqueCamera.screenToWorldX(point.x, cx, zoom, constraints.maxWidth / 2f) + pickupOffset.x,
+              ObliqueCamera.screenToWorldY(point.y, cy, zoom, constraints.maxHeight / 2f) + pickupOffset.y)
+          },
+          onDrop = { point ->
+            heldPointer.value = null
+            val (cx, cy) = computeLobbyCam(constraints.maxWidth / 2f, constraints.maxHeight / 2f)
+            val request = lobbyEngine.dropRequestAt(
+              ObliqueCamera.screenToWorldX(point.x, cx, zoom, constraints.maxWidth / 2f),
+              ObliqueCamera.screenToWorldY(point.y, cy, zoom, constraints.maxHeight / 2f))
+            if (request == null) lobbyEngine.finishHeroPickUp(false) else {
+              pendingDrop = true
+              dropScope.launch {
+                var accepted = false
+                try {
+                  accepted = persistDrop(request.heroId, request.assignment)
+                  if (accepted && request.assignment == HeroAssignment.RESTING) {
+                    onOpenFacility(FacilityType.HERO_QUARTERS)
+                  }
+                }
+                finally { lobbyEngine.finishHeroPickUp(accepted); pendingDrop = false; dragInvalidation.intValue++ }
+              }
+            }
+          },
+          onCancel = { heldPointer.value = null; lobbyEngine.finishHeroPickUp(false); dragInvalidation.intValue++ },
+        ),
     ) {
+      dragInvalidation.intValue
       // Animation state is read in draw only, so a world tick does not recompose the HUD.
       val drawStarted = if (settings.performanceOverlay) System.nanoTime() else 0L
 
@@ -610,34 +702,8 @@ fun SanctuaryLobbyScreen(
           is LobbyDrawableItem.HeroNpc -> {
             val a = item.actor
             val isSelected = lobbyEngine.selectedHeroId == a.heroId
-            drawCharacterSprite(
-              worldX = a.x,
-              worldY = a.y,
-              camX = camX,
-              camY = camY,
-              zoom = zoom,
-              isMaster = false,
-              heroClass = a.heroClass,
-              facingRight = a.facingRight,
-              isMoving = a.isMoving,
-              attackAnimProgress = a.attackPracticeAnim,
-              hurtFlash = 0f,
-              hpFraction = if (a.isInjured) 0.35f else 1f,
-              shieldOrAuraColor = when {
-                isSelected -> SummonerGold.copy(alpha = 0.90f)
-                a.isSanctuaryKeeperNpc -> PortalCyan.copy(alpha = 0.45f)
-                else -> null
-              },
-              isInjuredResting = a.isInjured || a.isSeatedDining,
-              timeSec = animTimeSec,
-              facingNorth = a.facingNorth,
-              heroName = a.name,
-              emotion = when {
-                a.isInjured -> "fear"
-                a.attackPracticeAnim > 0f || isSelected -> "alert"
-                else -> "calm"
-              },
-            )
+            if (a.heroId == lobbyEngine.pickedHeroId) return@forEach
+            drawLobbyHero(a, camX, camY, zoom, animTimeSec, isSelected)
             drawActorCanopyOcclusion(layout.obstacles,a.x,a.y,camX,camY,zoom,animTimeSec)
           }
         }
@@ -657,6 +723,19 @@ fun SanctuaryLobbyScreen(
         drawWorldGrade()
         drawLocalLights(layout.obstacles,camX,camY,zoom)
         drawWeather(camX,camY,zoom,true)
+      }
+      lobbyEngine.pickedHeroId?.let { id ->
+        lobbyEngine.heroActors.firstOrNull { it.heroId == id }?.let { actor ->
+          drawLobbyHero(actor, camX, camY, zoom, animTimeSec, selected = true, held = true)
+        }
+        lobbyEngine.dropZones.forEach { zone ->
+          val r = zone.bounds
+          val left = ObliqueCamera.worldToScreenX(r.left, camX, zoom, halfW)
+          val top = ObliqueCamera.worldToScreenY(r.top, camY, zoom, halfH)
+          val right = ObliqueCamera.worldToScreenX(r.right, camX, zoom, halfW)
+          val bottom = ObliqueCamera.worldToScreenY(r.bottom, camY, zoom, halfH)
+          drawRect(PortalCyan.copy(alpha = .55f), Offset(left, top), Size(right - left, bottom - top), style = Stroke(2f))
+        }
       }
       val topHudSafePx = (if (isWideScreen) 64.dp else 112.dp).toPx()
 
@@ -686,17 +765,23 @@ fun SanctuaryLobbyScreen(
         placedTagRects += rect
 
         drawRoundRect(
-          color = Color(0xDF172033),
+          color = Color(0x9E12223A),
           topLeft = topLeft,
           size = Size(boxW, boxH),
-          cornerRadius = CornerRadius(8f, 8f),
+          cornerRadius = CornerRadius(9f, 9f),
         )
         drawRoundRect(
-          color = borderCol.copy(alpha = 0.88f),
+          color = Color(0x387DD3FC),
+          topLeft = Offset(topLeft.x + 1.5f, topLeft.y + 1.5f),
+          size = Size((boxW - 3f).coerceAtLeast(2f), (boxH * 0.45f).coerceAtLeast(2f)),
+          cornerRadius = CornerRadius(7f, 7f),
+        )
+        drawRoundRect(
+          color = borderCol.copy(alpha = 0.92f),
           topLeft = topLeft,
           size = Size(boxW, boxH),
-          cornerRadius = CornerRadius(8f, 8f),
-          style = Stroke(width = 1.4f),
+          cornerRadius = CornerRadius(9f, 9f),
+          style = Stroke(width = 1.5f),
         )
         drawText(measured, topLeft = Offset(zx - measured.size.width / 2f, zy - measured.size.height / 2f))
       }
@@ -763,17 +848,7 @@ fun SanctuaryLobbyScreen(
         )
       }
 
-      // Crisp Under-Foot RPG Name Pills + Single Closest Speech Bubble (only at gameplay zoom >= 0.64f)
-      val activeSpeakerId = if (zoom >= 0.64f) {
-        lobbyEngine.heroActors
-          .filter { it.speechBubble != null }
-          .minByOrNull { hypot(it.x - lobbyEngine.masterX, it.y - lobbyEngine.masterY) }
-          ?.takeIf { hypot(it.x - lobbyEngine.masterX, it.y - lobbyEngine.masterY) <= 420f }
-          ?.heroId
-      } else {
-        null
-      }
-
+      // Crisp Under-Foot RPG Name Pills + Dynamic Floating Speech Bubbles above Heroes (3.5s fade-out)
       lobbyEngine.heroActors.forEach { actor ->
         if (zoom < 0.62f && actor.isSanctuaryKeeperNpc) return@forEach
         val hx = ObliqueCamera.worldToScreenX(actor.x, camX, zoom, halfW)
@@ -799,49 +874,71 @@ fun SanctuaryLobbyScreen(
           if (placedTagRects.none { it.overlaps(candidateRect) }) {
             placedTagRects += candidateRect
             drawRoundRect(
-              color = Color(0xCC0D0A1A),
+              color = Color(0x94102038),
               topLeft = pillTopLeft,
               size = Size(pillW, pillH),
-              cornerRadius = CornerRadius(6f, 6f),
+              cornerRadius = CornerRadius(7f, 7f),
             )
             drawRoundRect(
-              color = (if (actor.isSanctuaryKeeperNpc) PortalCyan else SummonerGold).copy(alpha = 0.55f),
+              color = (if (actor.isSanctuaryKeeperNpc) PortalCyan else SummonerGold).copy(alpha = 0.72f),
               topLeft = pillTopLeft,
               size = Size(pillW, pillH),
-              cornerRadius = CornerRadius(6f, 6f),
-              style = Stroke(width = 1f),
+              cornerRadius = CornerRadius(7f, 7f),
+              style = Stroke(width = 1.1f),
             )
             drawText(nameLayout, topLeft = Offset(hx - nameLayout.size.width / 2f, footTagY + 1.5f))
           }
         }
       }
 
-      lobbyEngine.heroActors.firstOrNull { it.heroId == activeSpeakerId && it.speechBubble != null }?.let { actor ->
-        val bubble = actor.speechBubble ?: return@let
+      // Render Floating Speech Bubbles above all active speaking Heroes (prioritizing picked/selected Hero first)
+      val speakingActors = lobbyEngine.heroActors
+        .filter { !it.speechBubble.isNullOrBlank() && it.speechTimer > 0f }
+        .sortedByDescending {
+          when {
+            it.heroId == lobbyEngine.pickedHeroId -> 3
+            it.heroId == lobbyEngine.selectedHeroId -> 2
+            !it.isSanctuaryKeeperNpc -> 1
+            else -> 0
+          }
+        }
+
+      speakingActors.forEach { actor ->
+        val bubble = actor.speechBubble ?: return@forEach
+        val isHeld = actor.heroId == lobbyEngine.pickedHeroId
+        val fadeAlpha = (actor.speechTimer / 0.85f).coerceIn(0f, 1f)
         val hx = ObliqueCamera.worldToScreenX(actor.x, camX, zoom, halfW)
-        val headY = ObliqueCamera.worldToScreenY(actor.y, camY, zoom, halfH, elevationZ = 84f)
-        if (hx in 24f..(size.width - 24f) && headY in (topHudSafePx + 24f)..(size.height - 32f)) {
+        val headElevation = if (isHeld) 108f else 86f
+        val headY = ObliqueCamera.worldToScreenY(actor.y, camY, zoom, halfH, elevationZ = headElevation)
+        if (hx in 16f..(size.width - 16f) && headY in (topHudSafePx + 18f)..(size.height - 24f)) {
           val bLayout = textMeasurer.measure(
-            text = bubble.take(42) + if (bubble.length > 42) "…" else "",
-            style = TextStyle(color = SummonerGold, fontSize = 10.sp, fontWeight = FontWeight.Medium),
+            text = bubble,
+            style = TextStyle(
+              color = SummonerGold.copy(alpha = fadeAlpha),
+              fontSize = if (zoom < 0.56f) 9.sp else 10.sp,
+              fontWeight = FontWeight.Medium,
+            ),
+            constraints = androidx.compose.ui.unit.Constraints(
+              maxWidth = minOf(260.dp.toPx().toInt(), (size.width - 56f).toInt()).coerceAtLeast(1),
+            ),
           )
           val bx = (hx - bLayout.size.width / 2f).coerceIn(12f, (size.width - bLayout.size.width - 18f).coerceAtLeast(12f))
-          val by = (headY - bLayout.size.height - 6f).coerceAtLeast(topHudSafePx + 8f)
-          val bubbleRect = androidx.compose.ui.geometry.Rect(Offset(bx - 7f, by - 4f), Size(bLayout.size.width + 14f, bLayout.size.height + 8f))
-          if (placedTagRects.none { it.overlaps(bubbleRect) }) {
+          val by = (headY - bLayout.size.height - 8f).coerceAtLeast(topHudSafePx + 8f)
+          val bubbleRect = androidx.compose.ui.geometry.Rect(Offset(bx - 8f, by - 5f), Size(bLayout.size.width + 16f, bLayout.size.height + 10f))
+          if (isHeld || placedTagRects.none { it.overlaps(bubbleRect) }) {
             placedTagRects += bubbleRect
             drawRoundRect(
-              color = Color(0xEE141122),
-              topLeft = Offset(bx - 7f, by - 4f),
-              size = Size(bLayout.size.width + 14f, bLayout.size.height + 8f),
-              cornerRadius = CornerRadius(8f, 8f),
+              color = Color(0xD8102038).copy(alpha = 0.88f * fadeAlpha),
+              topLeft = Offset(bx - 8f, by - 5f),
+              size = Size(bLayout.size.width + 16f, bLayout.size.height + 10f),
+              cornerRadius = CornerRadius(9f, 9f),
             )
             drawRoundRect(
-              color = SummonerGold.copy(alpha = 0.55f),
-              topLeft = Offset(bx - 7f, by - 4f),
-              size = Size(bLayout.size.width + 14f, bLayout.size.height + 8f),
-              cornerRadius = CornerRadius(8f, 8f),
-              style = Stroke(width = 1f),
+              color = (if (isHeld) PortalCyan else SummonerGold).copy(alpha = 0.85f * fadeAlpha),
+              topLeft = Offset(bx - 8f, by - 5f),
+              size = Size(bLayout.size.width + 16f, bLayout.size.height + 10f),
+              cornerRadius = CornerRadius(9f, 9f),
+              style = Stroke(width = if (isHeld) 1.6f else 1.2f),
             )
             drawText(bLayout, topLeft = Offset(bx, by))
           }
@@ -1295,7 +1392,14 @@ fun SanctuaryLobbyScreen(
       SanctuaryFacilityModalOverlay(
         facility = openFacility,
         state = state,
-        onClose = onCloseFacility,
+        onClose = {
+          if (openFacility == FacilityType.HERO_QUARTERS && lobbyEngine.activeInterior == FacilityType.HERO_QUARTERS) {
+            lobbyEngine.exitFacilityInterior()
+            activeInteriorState = lobbyEngine.activeInterior
+            zoom = lobbyEngine.zoom
+          }
+          onCloseFacility()
+        },
         onSummonHero = onSummonHero,
         onTrainHero = onTrainHero,
         onEquipItem = onEquipItem,
@@ -1331,6 +1435,9 @@ fun SanctuaryLobbyScreen(
           inspectingHeroId = hero.id
         },
         initialSelectedHeroId = lobbyEngine.selectedHeroId,
+        onHealHeroInfirmary = onHealHeroInfirmary,
+        onServeHeartyMeal = onServeHeartyMeal,
+        onCruelSynthesis = onCruelSynthesis,
       )
     }
 
@@ -1413,16 +1520,16 @@ fun SanctuaryLobbyScreen(
       )
     }
 
-    // 7. Opening Manhwa Awakening Cutscene
+    // 7. Opening Manhwa Awakening Cutscene (Crystal Glass Overlay — keeps Sanctuary world visible!)
     if (showPrologue && openFacility == null && !showPauseMapModal && !showExpansionModal && inspectingHero == null) {
       val beat = ManhwaStoryData.PROLOGUE_BEATS[prologueIndex.coerceIn(0, ManhwaStoryData.PROLOGUE_BEATS.lastIndex)]
       Box(
         modifier = Modifier
           .fillMaxSize()
-          .background(ObsidianVoid.copy(alpha = 0.88f))
+          .background(Color(0x280A1628))
           .windowInsetsPadding(WindowInsets.safeDrawing)
           .padding(14.dp),
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.BottomCenter,
       ) {
         if (isWideScreen && isShortHeight) {
           Row(
@@ -1506,19 +1613,19 @@ private fun SanctuaryOverviewMapOverlay(
   Box(
     modifier = Modifier
       .fillMaxSize()
-      .background(ObsidianVoid.copy(alpha = 0.88f))
+      .background(Color(0x2E0A1628))
       .windowInsetsPadding(WindowInsets.safeDrawing)
-      .padding(12.dp),
+      .padding(16.dp),
     contentAlignment = Alignment.Center,
   ) {
     Surface(
-      shape = RoundedCornerShape(18.dp),
-      color = FantasySkin.Panel,
+      shape = RoundedCornerShape(20.dp),
+      color = Color(0xD6132238),
       modifier = Modifier
-        .fillMaxSize()
-        .widthIn(max = 760.dp)
-        .heightIn(max = 580.dp)
-        .border(1.5.dp, SummonerGold, RoundedCornerShape(18.dp)),
+        .fillMaxWidth(0.94f)
+        .widthIn(max = 720.dp)
+        .heightIn(max = 520.dp)
+        .border(1.5.dp, SummonerGold.copy(alpha = 0.85f), RoundedCornerShape(20.dp)),
     ) {
       Column(
         modifier = Modifier.padding(16.dp),
@@ -1715,19 +1822,19 @@ private fun SanctuaryChronicleOverlay(
   Box(
     modifier = Modifier
       .fillMaxSize()
-      .background(ObsidianVoid.copy(alpha = 0.88f))
+      .background(Color(0x280A1628))
       .windowInsetsPadding(WindowInsets.safeDrawing)
-      .padding(14.dp),
+      .padding(16.dp),
     contentAlignment = Alignment.Center,
   ) {
     Surface(
-      shape = RoundedCornerShape(18.dp),
-      color = FantasySkin.Panel,
+      shape = RoundedCornerShape(20.dp),
+      color = Color(0xD4132238),
       modifier = Modifier
-        .fillMaxWidth()
-        .widthIn(max = 680.dp)
-        .heightIn(max = 520.dp)
-        .border(1.5.dp, PortalCyan, RoundedCornerShape(18.dp)),
+        .fillMaxWidth(0.92f)
+        .widthIn(max = 640.dp)
+        .heightIn(max = 480.dp)
+        .border(1.5.dp, PortalCyan.copy(alpha = 0.88f), RoundedCornerShape(20.dp)),
     ) {
       Column(
         modifier = Modifier.padding(18.dp),
@@ -1775,9 +1882,9 @@ private fun SanctuaryChronicleOverlay(
 @Composable
 private fun ChronicleTile(title: String, desc: String, accentCol: Color) {
   Surface(
-    shape = RoundedCornerShape(10.dp),
-    color = Color(0xFF1B1632),
-    modifier = Modifier.fillMaxWidth().border(1.dp, accentCol.copy(alpha = 0.45f), RoundedCornerShape(10.dp)),
+    shape = RoundedCornerShape(12.dp),
+    color = Color(0x9E192B46),
+    modifier = Modifier.fillMaxWidth().border(1.dp, accentCol.copy(alpha = 0.58f), RoundedCornerShape(12.dp)),
   ) {
     Column(modifier = Modifier.padding(12.dp)) {
       Text(title, style = MaterialTheme.typography.labelLarge, color = accentCol)
@@ -1797,11 +1904,25 @@ private fun PrologueDialogueCard(
   modifier: Modifier = Modifier,
 ) {
   Surface(
-    shape = RoundedCornerShape(16.dp),
-    color = FantasySkin.Panel,
-    modifier = modifier.border(1.5.dp, ArcaneViolet, RoundedCornerShape(16.dp)),
+    shape = RoundedCornerShape(18.dp),
+    color = Color(0xDC08172E),
+    modifier = modifier.border(1.5.dp, PortalCyan.copy(alpha = 0.85f), RoundedCornerShape(18.dp)),
   ) {
     Column(modifier = Modifier.padding(16.dp)) {
+      Surface(
+        shape = RoundedCornerShape(6.dp),
+        color = Color(0xA4102646),
+        modifier = Modifier.border(1.dp, SummonerGold.copy(alpha = 0.65f), RoundedCornerShape(6.dp)),
+      ) {
+        Text(
+          text = "[ SYSTEM AWAKENING • KHỞI ĐẦU KHẾ ƯỚC VĨNH HẰNG ]",
+          style = MaterialTheme.typography.labelSmall,
+          color = PortalCyan,
+          fontWeight = FontWeight.Bold,
+          modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+        )
+      }
+      Spacer(modifier = Modifier.height(8.dp))
       Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         PixelHeroPortraitAvatar(heroClass = beat.heroClassForPortrait, sizeDp = 48.dp)
         Column(modifier = Modifier.weight(1f)) {
