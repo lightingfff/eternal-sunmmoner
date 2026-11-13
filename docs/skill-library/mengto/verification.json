@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "source_commit": "07274a3b3dba5f6a311186ddaf65765d94f78cec",
+  "source_files": 236,
+  "skill_entrypoints": 183,
+  "selected_skill_support_files": 61,
+  "python_syntax": 9,
+  "json_syntax": 0,
+  "selected_entrypoint_local_links": 3,
+  "project_links": 213
+}

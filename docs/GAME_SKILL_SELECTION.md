@@ -21,6 +21,29 @@ dụng; thao tác MCP chưa dùng được vì phiên rà soát không có conne
 | Duyệt chất lượng | [scenario-quality-gate](skill-library/scenario/upstream/skills/scenario-quality-gate/SKILL.md) | Dùng rubric local khi thiếu dịch vụ; kiểm tra anatomy, vũ khí, phối cảnh và identity, không chỉ điểm số. |
 | Sửa lỗi hình ảnh có giới hạn | [scenario-refine-loop](skill-library/scenario/upstream/skills/scenario-refine-loop/SKILL.md) | Chẩn đoán lỗi cụ thể, sửa phần lỗi, mỗi vòng một biến; không regenerate cả bộ khi chỉ một frame sai. |
 
+## MengTo: gameplay, combat và review hình ảnh
+
+[Project adapter](../.agents/skills/mengto-game-design/SKILL.md) chọn phương pháp từ
+[183skill được lập danh mục](skill-library/mengto/CATALOG.md), MIT ©2026MengTo, commit
+`07274a3b3dba5f6a311186ddaf65765d94f78cec`. Đã đọc10entrypoint phù hợp, lưu đầy đủ
+supporting files của10thư mục đó; các mục còn lại chỉ giữ văn bản chính để đọc theo việc.
+
+| Công việc | Skill phù hợp |
+|---|---|
+| Map thiếu định hướng/lựa chọn rõ | `author-game-levels`: không gian có mục đích, tách cảnh/collision/nav/encounter, kiểm tra route và gate |
+| Đòn đánh thiếu logic hoặc phản hồi | `design-action-combat`: startup/contact/recovery, contact một lần, điều kiện hướng/khoảng cách/interrupt |
+| Quái thiếu nhất quán hoặc AI khó đọc | `build-game-monster-system` + `tune-enemy-ai`: definition/runtime/view tách biệt, collider/pivot ổn định, intent và phản ứng công bằng |
+| Animation cứng, chân/vũ khí lệch | `game-dev-combat-animation`: baseline, phase thật, contact strip, xem toàn frame ở góc camera gameplay |
+| Skill chỉ là vòng tròn/flash chung chung | `game-dev-combat-skill-polish`: động tác người dùng, effect và phản ứng mục tiêu cùng một nhịp; chấm art riêng readability |
+| HUD chiếm màn hình, quá nhiều nhãn/khung | `no-ai-design-slop`; chỉ review dùng `audit-ai-design-slop`: tìm tác hại cụ thể và sửa nhỏ theo hệ thống đã có |
+| Cần mục tiêu chất lượng có bằng chứng | `workflow-score-to-target`: rubric cố định, baseline, reviewer thật, không tự làm tròn điểm để đạt |
+| Kiểm chứng hành trình người chơi | `test-playable-web-games`: mượn test matrix, thực hiện bằng Android simulation/UI/build và runtime thật |
+
+Không áp các số rig/triangle/Retina, nguồn model, tài khoản hay điểm số dự án mẫu thành
+yêu cầu/kết quả của ETERNAL SUMMONER. Giữ Kotlin/Compose và pixel art .72; không xóa cầu
+thang/cổng/cutscene chỉ vì template flat-world nói vậy. Đọc skill không tự sửa game,
+cài provider, huấn luyện model hay chứng minh animation/gameplay đã đạt chất lượng.
+
 ## Chỉ mượn nguyên tắc, không chạy code engine khác
 
 Nguồn nằm trong `skill-library/scenario/upstream/skills/game-engines/unity/`:
