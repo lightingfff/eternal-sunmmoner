@@ -81,8 +81,11 @@ jobs:
                           detail = "...[leading test output truncated]... " + detail[-8000:]
                       label = f"{case.attrib.get('classname', result_file.stem)}#{case.attrib.get('name', 'unknown')}"
                       message = f"{label}: {detail or 'test failed without a message'}"
-                      message = message.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
-                      print(f"::error title=Floor 1 route test failure::{message}")
+                      chunks = [message[offset:offset + 1200] for offset in range(0, len(message), 1200)]
+                      for index, chunk in enumerate(chunks, start=1):
+                          chunk = chunk.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+                          title = f"Floor 1 route test failure [{index}/{len(chunks)}]"
+                          print(f"::error title={title}::{chunk}")
           PY
       - name: Living expedition mechanics and actual alternate routes
         run: >-
