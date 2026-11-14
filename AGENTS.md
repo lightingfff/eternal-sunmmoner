@@ -22,6 +22,12 @@ Preserve the 2.5D rules above; upstream top-down examples and suggested frame si
 do not override this game's projection, pivots, gameplay timing or existing systems.
 The local skill is saved project guidance, not a promise of memory in unrelated chats.
 
+## Arena iterative game studio
+When Arena Agent Mode develops or refines ETERNAL SUMMONER, first read `.agents/skills/eternal-arena-quality-loop/SKILL.md` in addition to `eternal-summoner-skill-router`. Treat subroles as logical roles unless verified native subagent tools exist. For meaningful code/art changes run baseline -> implement -> evidence -> critique -> targeted fix -> re-test (max 3 refinement cycles). Preserve all original graphics, gameplay and Android constraints. Never fake CI, true device FPS, image review, provider QA score, or parallel worker execution. Do not merge PRs without owner approval.
+
+## Arena specialist skill orchestration
+When Arena works on ETERNAL SUMMONER, read `.agents/skills/eternal-summoner-skill-router/SKILL.md` and `.agents/skills/eternal-arena-quality-loop/SKILL.md`, then select relevant specialist skills by actual task. Preserve the original AGENTS.md and all project contracts. Use native parallel subagents only if verified available; otherwise execute roles sequentially with file ownership and honest role labels. Require baseline, real tests/render/playthrough evidence, targeted corrections (at most 3 rounds), final QA and PR for owner. Never fake CI or device measurements. Never auto-merge.
+
 ## User's character and asset pipeline preference
 
 For character animation, combat VFX or environment asset preparation, also read
@@ -31,12 +37,6 @@ Kotlin/Compose atlas, pivot and simulation timing contracts. Use the pinned cata
 in `docs/skill-library/character-assets/`; select relevant guidance only. Keep
 provider runners inactive unless a later task authorizes their actual use. Source
 defaults do not override the game's camera, atlas format, memory or hit timing.
-
-## Arena iterative game studio
-When Arena Agent Mode develops or refines ETERNAL SUMMONER, first read `.agents/skills/eternal-arena-quality-loop/SKILL.md` in addition to `eternal-summoner-skill-router`. Treat subroles as logical roles unless verified native subagent tools exist. For meaningful code/art changes run baseline -> implement -> evidence -> critique -> targeted fix -> re-test (max 3 refinement cycles). Preserve all original graphics, gameplay and Android constraints. Never fake CI, true device FPS, image review, provider QA score, or parallel worker execution. Do not merge PRs without owner approval.
-
-## Arena specialist skill orchestration
-When Arena works on ETERNAL SUMMONER, read `.agents/skills/eternal-summoner-skill-router/SKILL.md` and `.agents/skills/eternal-arena-quality-loop/SKILL.md`, then select relevant specialist skills by actual task. Preserve the original AGENTS.md and all project contracts. Use native parallel subagents only if verified available; otherwise execute roles sequentially with file ownership and honest role labels. Require baseline, real tests/render/playthrough evidence, targeted corrections (at most 3 rounds), final QA and PR for owner. Never fake CI or device measurements. Never auto-merge.
 
 ## Twelve real-agent GitHub dispatch (2026-11)
 
