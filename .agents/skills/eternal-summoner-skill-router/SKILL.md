@@ -30,6 +30,17 @@ files; other skills' ancillary scripts/references are not fully vendored.
 - HUD layout/input: transferable principles from `scenario-unity-ui`; retain Compose.
 - Pixel import/atlas checks: transferable principles from `scenario-unity-2d`.
 
+## Character / Meowa / current Scenario overlay
+
+For character animation or environment asset preparation, read
+[character-asset-pipeline](../character-asset-pipeline/SKILL.md). Its
+[current catalog](../../../docs/skill-library/character-assets/CATALOG.md) covers
+all 181 entrypoints in the three user-requested repositories. The original 174-file
+Scenario ZIP catalog above remains a frozen snapshot; the overlay indexes current
+179 Scenario texts, reusing 163 unchanged files and retaining 5 additions plus 11
+updates. Meowa is a complete inactive reference snapshot; Character is original
+project notes and pinned links/hashes. No provider is installed or invoked by this.
+
 ## Project overrides and capability checks
 
 1. User instructions, actual repository code and AGENTS.md govern execution. Uploaded

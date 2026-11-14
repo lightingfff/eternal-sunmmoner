@@ -55,3 +55,18 @@ Xem từng tên và phân loại trong [CATALOG.md](skill-library/scenario/CATAL
 Kotlin/Compose hiện có.” Sprite work kết hợp thêm `ai-game-spritesheets` đã lưu trước đó.
 Chỉ đọc nguồn liên quan. Giữ license và nguồn gốc khi tái sử dụng; không cần dịch vụ trả
 phí để đọc hướng dẫn. Các file này là bộ nhớ trong repository, không phải huấn luyện mô hình.
+
+## Bổ sung Character Animation Creator / Meowa / Scenario hiện tại
+
+Đọc [adapter character-asset-pipeline](../.agents/skills/character-asset-pipeline/SKILL.md)
+và [ghi chú áp dụng](skill-library/character-assets/READING_NOTES.md) khi làm nhân vật,
+animation, VFX hoặc map/texture. [Danh mục mới](skill-library/character-assets/CATALOG.md)
+bao phủ 1 skill Character, 1 skill Meowa nhiều module và 179 skill Scenario hiện tại.
+Bản ZIP 174 file trên vẫn giữ nguyên để đối chiếu; 163 file trùng dùng lại qua hash,
+5 skill mới và 11 file thay đổi được lưu ở overlay, không cài lặp cả thư viện.
+
+Ưu tiên kiểm tra direction, motion thật, loop seam, anchor liên động tác và hit-frame
+đúng simulation. Loader Tower hiện có cell/pivot/timing riêng, không tự đổi sang default
+64px/6-frame của nguồn. Meowa map 2:1/top-down và workbench web không thay camera .72
+hay engine native. Provider chưa được cài/gọi; không tự phát sinh chi phí. Đọc đúng
+phần cần dùng, không nạp/chạy toàn bộ thư viện cho mỗi tác vụ.

@@ -22,6 +22,16 @@ Preserve the 2.5D rules above; upstream top-down examples and suggested frame si
 do not override this game's projection, pivots, gameplay timing or existing systems.
 The local skill is saved project guidance, not a promise of memory in unrelated chats.
 
+## User's character and asset pipeline preference
+
+For character animation, combat VFX or environment asset preparation, also read
+`.agents/skills/character-asset-pipeline/SKILL.md`. It adapts the user-requested
+Character Animation Creator, Meowa and current Scenario libraries to existing
+Kotlin/Compose atlas, pivot and simulation timing contracts. Use the pinned catalog
+in `docs/skill-library/character-assets/`; select relevant guidance only. Keep
+provider runners inactive unless a later task authorizes their actual use. Source
+defaults do not override the game's camera, atlas format, memory or hit timing.
+
 ## Arena iterative game studio
 When Arena Agent Mode develops or refines ETERNAL SUMMONER, first read `.agents/skills/eternal-arena-quality-loop/SKILL.md` in addition to `eternal-summoner-skill-router`. Treat subroles as logical roles unless verified native subagent tools exist. For meaningful code/art changes run baseline -> implement -> evidence -> critique -> targeted fix -> re-test (max 3 refinement cycles). Preserve all original graphics, gameplay and Android constraints. Never fake CI, true device FPS, image review, provider QA score, or parallel worker execution. Do not merge PRs without owner approval.
 
