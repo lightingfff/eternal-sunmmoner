@@ -1,0 +1,571 @@
+{
+  "repository": "https://github.com/obra/superpowers",
+  "commit": "22f0b463e7a5e579904dd6211a520321035526f7",
+  "version": "7.0.2",
+  "license": "MIT",
+  "copyright": "2025 Jesse Vincent",
+  "capturedDate": "2026-11-14",
+  "timezone": "Asia/Saigon",
+  "activation": "INACTIVE_REFERENCE_ONLY",
+  "sourceFiles": [
+    {
+      "path": ".codex-plugin/plugin.json",
+      "bytes": 1730,
+      "sha256": "925b862a7ee38f170f4595a33a1d3c1cecd5e944f271b30d98efa55919febab0"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1070,
+      "sha256": "a37e0e9697144819e1d965176ac4ae5bc3fa02d11e7812036bbcadf6dafe2400"
+    },
+    {
+      "path": "README.md",
+      "bytes": 14847,
+      "sha256": "79f29f50c735862d2e304ea547b4c9aa67d9db6909ff6fb7b5ea922d7bcbc3e7"
+    },
+    {
+      "path": "hooks/hooks-cursor.json",
+      "bytes": 137,
+      "sha256": "53d8ceb3ff5d8bb1c4f283f238cc868b8c1af22e40a3ac30f6d6e4173effefbd"
+    },
+    {
+      "path": "hooks/hooks.json",
+      "bytes": 424,
+      "sha256": "19fa1af26a0ed32bfabee6c4d744e5447ea3bdf769efceba9e268f2d9f6dc263"
+    },
+    {
+      "path": "hooks/run-hook.cmd",
+      "bytes": 3577,
+      "sha256": "324b298bd370d6f3ea71c165e0b732d5678e5cff68d0d7f7e47c13bc2cb2559a"
+    },
+    {
+      "path": "hooks/session-start",
+      "bytes": 4421,
+      "sha256": "38fdeed045b28b62034a809e45602e33358573acbc23c83787d76d449cb89902"
+    },
+    {
+      "path": "package.json",
+      "bytes": 433,
+      "sha256": "49004c08be59f027bf23a500d57ab1ba6a288deb5697d3cbd743432cf4a42059"
+    },
+    {
+      "path": "scripts/package-codex-plugin.sh",
+      "bytes": 10338,
+      "sha256": "297c6f3e7c5ee9fabe2fe39765109a7a5e79e9b19c990775025586c5263121d4"
+    },
+    {
+      "path": "scripts/sync-to-codex-plugin.sh",
+      "bytes": 15097,
+      "sha256": "68faa7e87b9df99ded0b9a1ed2e683c1007c36543593adfdbf55a9d57ab318d5"
+    },
+    {
+      "path": "skills/brainstorming/SKILL.md",
+      "bytes": 15190,
+      "sha256": "2c9ca71f94886f9ca9f4aef055f7cafb3e1a9bdf3aeebf8f4cb547c69405d207"
+    },
+    {
+      "path": "skills/brainstorming/builder-check-prompt.md",
+      "bytes": 881,
+      "sha256": "36d51a4723d6f0a3ce5811a0ea3b3a8424f07533947e1355f5d8cb8cce40c55e"
+    },
+    {
+      "path": "skills/brainstorming/scripts/frame-template.html",
+      "bytes": 8094,
+      "sha256": "6a8a4e58bd6a44b904e2e3c57de774481d909204597e1498de53f1b2fecc4c4e"
+    },
+    {
+      "path": "skills/brainstorming/scripts/helper.js",
+      "bytes": 5615,
+      "sha256": "43c6d69954a46ec34a2a262bcc62a9a7e83e839c739f199cb72646d397c686e3"
+    },
+    {
+      "path": "skills/brainstorming/scripts/server.cjs",
+      "bytes": 25699,
+      "sha256": "763abf96510e0b892a1141397b31aa82ef900cf87ed34dde94bc8782baf4a7ca"
+    },
+    {
+      "path": "skills/brainstorming/scripts/start-server.sh",
+      "bytes": 7315,
+      "sha256": "314dd68dc00e8dd94c7491aca8a5f004c7fddffc161e2b07482f29f48d13659a"
+    },
+    {
+      "path": "skills/brainstorming/scripts/stop-server.sh",
+      "bytes": 3263,
+      "sha256": "0b5ccbbd57f62d3ed88993f7940b5ee0e5c0fc9b21c550c623da4f6292e47daf"
+    },
+    {
+      "path": "skills/brainstorming/visual-companion.md",
+      "bytes": 13413,
+      "sha256": "6ffcb038b53254bd31debaa15e12dcd4ff24bd63d690e0b644ac6396701cf2e2"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/SKILL.md",
+      "bytes": 6941,
+      "sha256": "3143de8695c5a2d63e8b1675f33837578076f464deb127c2ebdd0b46fceef886"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/prompts/analyst-common.md",
+      "bytes": 1582,
+      "sha256": "88801c36070be2a54a8a9a29632b01ab21db053e2e76ee49b5252a9b74ca4090"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/prompts/cost-and-time.md",
+      "bytes": 1640,
+      "sha256": "fe97a66d4db3b436816ef82694bda413b522b3a862dd41978da01e358fffecc4"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/prompts/plan-adherence.md",
+      "bytes": 1637,
+      "sha256": "1dcbab82033598a2e9c9ee42e950d4b1822d2c871c02cef9e102cdd5cbbda113"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/prompts/quality-evidence.md",
+      "bytes": 1476,
+      "sha256": "749d11cf678f379ed77a29274cad456634e0284aa523639a1a214a9f2b986eb1"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/prompts/repeated-work.md",
+      "bytes": 1469,
+      "sha256": "895027f2dfa4b1b8bcdb7ac9aec8d45a80bff212fad6ec6cad5ab38fa68322f5"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/prompts/request-conflicts.md",
+      "bytes": 1011,
+      "sha256": "e800e38d8b7752c212c76c5c3ed75cd78b749684263ea0c313586f26af6f4b5c"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/prompts/scrub-audit.md",
+      "bytes": 1363,
+      "sha256": "5cc48f05a7f81f5f7e05e0c7ceafc0fb8774bcaf75fe88dcb5c7e408026c70ad"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/prompts/scrub.md",
+      "bytes": 1471,
+      "sha256": "854cb3320cc5377b493cea2f72519d67983464882db68a0f408a7d0a0f040b8c"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/prompts/similar-session.md",
+      "bytes": 1711,
+      "sha256": "b190f713b463df2bb5ec3914647e204074d1bd50643a53159db6d13cace916c1"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/prompts/skill-timeline.md",
+      "bytes": 1646,
+      "sha256": "45d604d583b57a77b9033eced8eb875ef342af70fcd66cf7d15c6dc89964890f"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/prompts/stumbles.md",
+      "bytes": 1330,
+      "sha256": "1f2d1f048aff7b8b400006301f1ce8c232ecc7e9d5f705af27a849b2c03ea2e7"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/references/context-safety.md",
+      "bytes": 990,
+      "sha256": "e6be2bd3495f454d4bedee9484d728d245d1fa656e11fc4ceec5693c16e4730a"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/references/github-issues.md",
+      "bytes": 1636,
+      "sha256": "d26ef9197b4a6ae5159ae6d11abd162bcc624d95fc7ccf508e07b68f916a1b19"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/references/redaction-policy.md",
+      "bytes": 2243,
+      "sha256": "96b16f47074838fe2d7e609577d6f8b0ad460f8378b281a3f96ee23cb5a08bde"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/references/session-discovery.md",
+      "bytes": 1859,
+      "sha256": "6d1dced083e5d978448a78df298cf515531b0eb39b2854a4a2afbffeb69a7435"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/templates/bundle-README.md",
+      "bytes": 3672,
+      "sha256": "2e6ddc6b106028d5ebd00a50ad93a77111d675c219ee1273cd0857869e8d51ec"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/templates/case.md",
+      "bytes": 2983,
+      "sha256": "597892462be83bc478536ec91f7c285f6dd25d119c560734a3a180fe8471301d"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/templates/issue.md",
+      "bytes": 2680,
+      "sha256": "afd21779e5de5bc5adfe2f5a50a04e44ab8d50d9ad0f829243de248d6f023eed"
+    },
+    {
+      "path": "skills/diagnosing-superpowers/templates/report.md",
+      "bytes": 2359,
+      "sha256": "38295d0fd785e8608f330815c59ebd7047942002ec7085aecbed54681f56b0c1"
+    },
+    {
+      "path": "skills/dispatching-parallel-agents/SKILL.md",
+      "bytes": 6078,
+      "sha256": "1968923066f3b707eb01d1992cdf4c42284c3855f70253b9cd5000ff45fca13c"
+    },
+    {
+      "path": "skills/executing-plans/SKILL.md",
+      "bytes": 18364,
+      "sha256": "deaf176fa179827e80f2ea3101db3ea90fdf562ebef340eba761e4687940f5f5"
+    },
+    {
+      "path": "skills/executing-plans/scripts/task-done",
+      "bytes": 1900,
+      "sha256": "ac0b5ebafc7d471507b7e94d88da77a11f187ba277c8d48fefaf8ff3e4fee50e"
+    },
+    {
+      "path": "skills/executing-plans/scripts/task-start",
+      "bytes": 1185,
+      "sha256": "4ae7ce3b6777c3240af786197836a6b4bbf3b0ee831c25f147c149ea8db54a21"
+    },
+    {
+      "path": "skills/finishing-a-development-branch/SKILL.md",
+      "bytes": 7781,
+      "sha256": "8db5a922b242dd4e1bf824cb91c13b3e8d8e8a86d6ceaf7f0774eb9cce909d65"
+    },
+    {
+      "path": "skills/receiving-code-review/SKILL.md",
+      "bytes": 6203,
+      "sha256": "091df1629510af1b92fc4abd6f96732ebedb4cb2c0f3457e8f2740b0504a2438"
+    },
+    {
+      "path": "skills/requesting-code-review/SKILL.md",
+      "bytes": 2974,
+      "sha256": "2180e14a448e9410bec88e6646a2d1f0ce7fdd58de27388c1e052e929679d2bc"
+    },
+    {
+      "path": "skills/requesting-code-review/code-reviewer.md",
+      "bytes": 6449,
+      "sha256": "82e370be6b3447523816286195571e4216ba56ba1ad6ad0e87862294c4c78dcb"
+    },
+    {
+      "path": "skills/subagent-driven-development/SKILL.md",
+      "bytes": 19740,
+      "sha256": "1baf70e307bde682c462513c86116333f1f066168c6710f45145bf5f0b00828d"
+    },
+    {
+      "path": "skills/subagent-driven-development/implementer-prompt.md",
+      "bytes": 6335,
+      "sha256": "81dd9d5a3fb0b09b96b5829f03b9796842f3199ef7591d1ba1c2db2a515f64d0"
+    },
+    {
+      "path": "skills/subagent-driven-development/re-review-prompt.md",
+      "bytes": 4833,
+      "sha256": "ad54d0a10f1c2c8e656456e0a46e654af5dfe5ee6bcef63428cfd69b8dcd9311"
+    },
+    {
+      "path": "skills/subagent-driven-development/references/batching.md",
+      "bytes": 583,
+      "sha256": "b54dc7e23dbfb90db89bcb2fb3af591aabf6a271a165fbc0da4c6f9439980eac"
+    },
+    {
+      "path": "skills/subagent-driven-development/references/cannot-verify.md",
+      "bytes": 513,
+      "sha256": "e698713a15e0eabf1a2ab26ffe1bb04bf70c9d6d2e2060d44a0f9a1bdd4408bf"
+    },
+    {
+      "path": "skills/subagent-driven-development/references/final-review.md",
+      "bytes": 2576,
+      "sha256": "6c9e12093e46c4ad0a203bc07709c17e3470f855f1b78e55c5e7b722a012a32c"
+    },
+    {
+      "path": "skills/subagent-driven-development/references/fix-loop.md",
+      "bytes": 4314,
+      "sha256": "1938ce707915efc44021e563ebc29666329e20ad861b6c50b89f305b8f4e8d8b"
+    },
+    {
+      "path": "skills/subagent-driven-development/references/handling-reports.md",
+      "bytes": 1062,
+      "sha256": "8f759cdd4936220c38aab05b6d6c48c6df8ac8f146b0f37a6d2facbf87133c67"
+    },
+    {
+      "path": "skills/subagent-driven-development/references/preflight.md",
+      "bytes": 1353,
+      "sha256": "3ea21c5fc1af1a190ac8a9d19ceb0849b47bf2ffe27b87dffcc21b6a0539776c"
+    },
+    {
+      "path": "skills/subagent-driven-development/references/resuming.md",
+      "bytes": 614,
+      "sha256": "ff6e38bde2276faa2a7e93513086caded0ea10edbf2ec7f349a7e3b0d7c668c4"
+    },
+    {
+      "path": "skills/subagent-driven-development/scripts/review-package",
+      "bytes": 2444,
+      "sha256": "aed7c6e09fc660417d28898ed975e84651cb9f18f4675141cd475edfb7037f3d"
+    },
+    {
+      "path": "skills/subagent-driven-development/scripts/sdd-repo",
+      "bytes": 2356,
+      "sha256": "6f8256a776968d394bae679572e41ce572fd45c72074b98f9a8eb8b4f160e06f"
+    },
+    {
+      "path": "skills/subagent-driven-development/scripts/sdd-workspace",
+      "bytes": 4823,
+      "sha256": "de3af5252fa595fc2000ba05cf69e06187d5c8aae9d283cced4c167ad1813061"
+    },
+    {
+      "path": "skills/subagent-driven-development/scripts/task-brief",
+      "bytes": 4769,
+      "sha256": "0f244a12e146393c552ba62069d3eedcc85cb3f76de67b01f4e11219e5ebbcd8"
+    },
+    {
+      "path": "skills/subagent-driven-development/task-reviewer-prompt.md",
+      "bytes": 9175,
+      "sha256": "61a04c2fb29907887d8babee1594f5e35ae26d461e7e584f5b7c283215165e08"
+    },
+    {
+      "path": "skills/systematic-debugging/SKILL.md",
+      "bytes": 9530,
+      "sha256": "51c6435d98c83c42c96ba7c35725a0b2c376cd487fb1a4e6bd0ddbe7e33ef202"
+    },
+    {
+      "path": "skills/systematic-debugging/condition-based-waiting-example.ts",
+      "bytes": 5054,
+      "sha256": "40ae5ebe497fdf310200e43fe986552546d0a22837c0d39e855db1cfd33eb88e"
+    },
+    {
+      "path": "skills/systematic-debugging/condition-based-waiting.md",
+      "bytes": 3516,
+      "sha256": "e89fec8400d6cd50f43407cec9fab50976ba4d55d0ec2eb51c0bd68036b54c26"
+    },
+    {
+      "path": "skills/systematic-debugging/defense-in-depth.md",
+      "bytes": 3650,
+      "sha256": "1e175fb86fc357e58c6aebf5441e481e1b7868b4380c0456b63a17eefbd18ba7"
+    },
+    {
+      "path": "skills/systematic-debugging/find-polluter.sh",
+      "bytes": 1986,
+      "sha256": "dd7b8f13c4cc2a24b33ff87b18da9248f3e1c80a085c3316224f69ff0fa5c43c"
+    },
+    {
+      "path": "skills/systematic-debugging/root-cause-tracing.md",
+      "bytes": 5321,
+      "sha256": "75b933b6a8c40bdb2031b10f21654395b56ec6ab6bc7b018c18d3fe57aeb7fb8"
+    },
+    {
+      "path": "skills/test-driven-development/SKILL.md",
+      "bytes": 9578,
+      "sha256": "64b03fce4aee5a97a93160cea8111f3ba13a17b7c001db4bd5836d67fd10705d"
+    },
+    {
+      "path": "skills/test-driven-development/writing-good-tests.md",
+      "bytes": 8268,
+      "sha256": "51471c853306ff92ca8bb41dcaea05f31c0e46b03651f8f3c99754b7172f4ae1"
+    },
+    {
+      "path": "skills/using-git-worktrees/SKILL.md",
+      "bytes": 6813,
+      "sha256": "8cfb86f121269e8f7f12361e6795c4f6738828340e28964c9229d365666c9edd"
+    },
+    {
+      "path": "skills/using-superpowers/SKILL.md",
+      "bytes": 3192,
+      "sha256": "82c5c8866ad7f5dd4440ce66bd7806ba48a2f13771beae5cf112e53f08fe36ba"
+    },
+    {
+      "path": "skills/using-superpowers/references/antigravity-tools.md",
+      "bytes": 1495,
+      "sha256": "4880f6de3da4e32f9659ebe7a72b9e0ebfff04e028c2ed96173f86d0387a04c0"
+    },
+    {
+      "path": "skills/using-superpowers/references/claude-code-tools.md",
+      "bytes": 1469,
+      "sha256": "21479a3fee27448cab8748a3b5687e53bb257883bda9c070426f9a1ab5cebf1b"
+    },
+    {
+      "path": "skills/using-superpowers/references/codex-tools.md",
+      "bytes": 4762,
+      "sha256": "1a38ad9b188c393052f58d95657a1c35ea6aafc8b5a27f198f3922912f70bbe7"
+    },
+    {
+      "path": "skills/using-superpowers/references/gemini-tools.md",
+      "bytes": 4598,
+      "sha256": "62b9157bcb0ee3c6784e3d0da0798ddfa5872f9e0c34bea48f3079dabea71965"
+    },
+    {
+      "path": "skills/using-superpowers/references/hermes-tools.md",
+      "bytes": 1964,
+      "sha256": "e2185c976a3c87503910e05e2aea58cc89bc8e569bb624b93df9958ac47a9190"
+    },
+    {
+      "path": "skills/using-superpowers/references/muse-tools.md",
+      "bytes": 1908,
+      "sha256": "5a1da5c575fe18456ca71cd47ebfd8a38c745f8d82a67fe64d5b83080000eeb3"
+    },
+    {
+      "path": "skills/using-superpowers/references/pi-tools.md",
+      "bytes": 1242,
+      "sha256": "703dbc83d23ecab9c6f388460c38abc482e9dee2fe6772a8c7a255152ad3a4d5"
+    },
+    {
+      "path": "skills/verification-before-completion/SKILL.md",
+      "bytes": 3646,
+      "sha256": "2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3"
+    },
+    {
+      "path": "skills/writing-plans/SKILL.md",
+      "bytes": 10335,
+      "sha256": "a6c67c1900064347c2a329990dd3c555657c51c3ec53b259a08aa01a2c26139a"
+    },
+    {
+      "path": "skills/writing-skills/SKILL.md",
+      "bytes": 16738,
+      "sha256": "8cb3ac68c6d8c4bb46886b998b09af7989643cab8bd0e46ee86dd62e64546bbe"
+    },
+    {
+      "path": "skills/writing-skills/references/CLAUDE_MD_TESTING.md",
+      "bytes": 5423,
+      "sha256": "0b379a3415e185d3c434b3ad283d8aa132f3022c2a4f210f168865b5986bcef0"
+    },
+    {
+      "path": "skills/writing-skills/references/anthropic-best-practices.md",
+      "bytes": 46197,
+      "sha256": "217629b356c09c9bd11017c9788e8fc654ca1b32c92d4a51cd490e16dd65e59a"
+    },
+    {
+      "path": "skills/writing-skills/references/bulletproofing.md",
+      "bytes": 2577,
+      "sha256": "9397023e6bc85b556a57f3097371363bf03e28e755c57f403f470bcda90e0a23"
+    },
+    {
+      "path": "skills/writing-skills/references/discovery.md",
+      "bytes": 7616,
+      "sha256": "c6bbc74af3be90f693f7cbc986af6fa94e8df75f65109b52e96032587f5b92af"
+    },
+    {
+      "path": "skills/writing-skills/references/flowcharts.md",
+      "bytes": 1262,
+      "sha256": "8b1f542391f274f0d33f3457ac099a3d317d6877eaa3b8d3b1ebef151b55fda7"
+    },
+    {
+      "path": "skills/writing-skills/references/graphviz-conventions.dot",
+      "bytes": 5970,
+      "sha256": "e2890a593c91370e384b42f2f67b1a6232c9e69dddea7891a0c1c46d7b20b694"
+    },
+    {
+      "path": "skills/writing-skills/references/persuasion-principles.md",
+      "bytes": 5901,
+      "sha256": "a51bc9bf75189ea73a27b3fb504a2fdfdb966fb1f7f1cdf03203230a216ccc03"
+    },
+    {
+      "path": "skills/writing-skills/references/testing-skills-with-subagents.md",
+      "bytes": 12557,
+      "sha256": "ed8a6862c085900135962390530d9dc7637ad6d650b4324ce3b051287a5c3f22"
+    },
+    {
+      "path": "skills/writing-skills/render-graphs.js",
+      "bytes": 4968,
+      "sha256": "c7f412cc629461c4d10287e668731874c0497707023e3e3f74a5355eb2cee196"
+    }
+  ],
+  "skills": [
+    {
+      "name": "brainstorming",
+      "path": "skills/brainstorming/SKILL.md",
+      "description": "You MUST use this before any creative work - creating features, building components, adding functionality, modifying behavior, or planning anything new, in software or out of it (a talk, a business, a renovation).",
+      "mainTextRead": true,
+      "supportStatus": "All tracked files under this skill directory are retained; not all support files have been individually reviewed or executed."
+    },
+    {
+      "name": "diagnosing-superpowers",
+      "path": "skills/diagnosing-superpowers/SKILL.md",
+      "description": "Use when a superpowers session went wrong and your human partner wants to know why — repeated work, ignored plans, stumbles, poor results, a skill that didn't fire, \"it took too long\", \"why is it so expensive\", \"what is it doing\" — or wants to build a bug report for the superpowers maintainers, for the current session or a past one identified by id or path, on any harness.",
+      "mainTextRead": true,
+      "supportStatus": "All tracked files under this skill directory are retained; not all support files have been individually reviewed or executed."
+    },
+    {
+      "name": "dispatching-parallel-agents",
+      "path": "skills/dispatching-parallel-agents/SKILL.md",
+      "description": "Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies",
+      "mainTextRead": true,
+      "supportStatus": "All tracked files under this skill directory are retained; not all support files have been individually reviewed or executed."
+    },
+    {
+      "name": "executing-plans",
+      "path": "skills/executing-plans/SKILL.md",
+      "description": "Use when executing an implementation plan in the current session as the implementer yourself — your human partner chose inline execution, or no subagent tool is available",
+      "mainTextRead": true,
+      "supportStatus": "All tracked files under this skill directory are retained; not all support files have been individually reviewed or executed."
+    },
+    {
+      "name": "finishing-a-development-branch",
+      "path": "skills/finishing-a-development-branch/SKILL.md",
+      "description": "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work",
+      "mainTextRead": true,
+      "supportStatus": "All tracked files under this skill directory are retained; not all support files have been individually reviewed or executed."
+    },
+    {
+      "name": "receiving-code-review",
+      "path": "skills/receiving-code-review/SKILL.md",
+      "description": "Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation",
+      "mainTextRead": true,
+      "supportStatus": "All tracked files under this skill directory are retained; not all support files have been individually reviewed or executed."
+    },
+    {
+      "name": "requesting-code-review",
+      "path": "skills/requesting-code-review/SKILL.md",
+      "description": "Use when completing tasks, implementing major features, or before merging to verify work meets requirements",
+      "mainTextRead": true,
+      "supportStatus": "All tracked files under this skill directory are retained; not all support files have been individually reviewed or executed."
+    },
+    {
+      "name": "subagent-driven-development",
+      "path": "skills/subagent-driven-development/SKILL.md",
+      "description": "Use when executing implementation plans with independent tasks in the current session",
+      "mainTextRead": true,
+      "supportStatus": "All tracked files under this skill directory are retained; not all support files have been individually reviewed or executed."
+    },
+    {
+      "name": "systematic-debugging",
+      "path": "skills/systematic-debugging/SKILL.md",
+      "description": "Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes",
+      "mainTextRead": true,
+      "supportStatus": "All tracked files under this skill directory are retained; not all support files have been individually reviewed or executed."
+    },
+    {
+      "name": "test-driven-development",
+      "path": "skills/test-driven-development/SKILL.md",
+      "description": "Use when implementing any feature or bugfix, before writing implementation code",
+      "mainTextRead": true,
+      "supportStatus": "All tracked files under this skill directory are retained; not all support files have been individually reviewed or executed."
+    },
+    {
+      "name": "using-git-worktrees",
+      "path": "skills/using-git-worktrees/SKILL.md",
+      "description": "Use when starting feature work that needs isolation from current workspace or before executing implementation plans - ensures an isolated workspace exists via native tools or git worktree fallback",
+      "mainTextRead": true,
+      "supportStatus": "All tracked files under this skill directory are retained; not all support files have been individually reviewed or executed."
+    },
+    {
+      "name": "using-superpowers",
+      "path": "skills/using-superpowers/SKILL.md",
+      "description": "Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarifying questions",
+      "mainTextRead": true,
+      "supportStatus": "All tracked files under this skill directory are retained; not all support files have been individually reviewed or executed."
+    },
+    {
+      "name": "verification-before-completion",
+      "path": "skills/verification-before-completion/SKILL.md",
+      "description": "Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always",
+      "mainTextRead": true,
+      "supportStatus": "All tracked files under this skill directory are retained; not all support files have been individually reviewed or executed."
+    },
+    {
+      "name": "writing-plans",
+      "path": "skills/writing-plans/SKILL.md",
+      "description": "Use when you have a spec or requirements for a multi-step task, before touching code",
+      "mainTextRead": true,
+      "supportStatus": "All tracked files under this skill directory are retained; not all support files have been individually reviewed or executed."
+    },
+    {
+      "name": "writing-skills",
+      "path": "skills/writing-skills/SKILL.md",
+      "description": "Use when creating new skills, editing existing skills, or verifying skills work before deployment",
+      "mainTextRead": true,
+      "supportStatus": "All tracked files under this skill directory are retained; not all support files have been individually reviewed or executed."
+    }
+  ],
+  "includedSelection": "Every tracked skills/** and hooks/** file, README.md, LICENSE, package.json, .codex-plugin/plugin.json, scripts/package-codex-plugin.sh, scripts/sync-to-codex-plugin.sh",
+  "excluded": "Rest of upstream repository, Git metadata, global installation, active hooks/config, tests/evals/dependencies/assets and other platform plugins; README external links are not a promise those files are vendored."
+}

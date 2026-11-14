@@ -72,3 +72,13 @@ that needs them. Marketing, team administration, monetization, multiplayer and m
 of the upstream skill repository are not default game requirements. Do not preload or
 execute all 174 skills each turn. This saved project guidance does not guarantee memory
 in a different repository or unrelated chat.
+
+## Software workflow references
+
+For debugging, plans, test strategy, peer review and final verification, consult
+[superpowers-eternal](../superpowers-eternal/SKILL.md) and its
+[15-skill catalog](../../../docs/skill-library/superpowers/CATALOG.md).
+Select the relevant source; the archived library is not an activated plugin.
+Existing user authorization, exact-SHA review, file ownership and owner-only merge
+take precedence over upstream approval menus, review shortcuts and installation
+examples. No global config/hooks or diagnostic exports are enabled by reading it.
