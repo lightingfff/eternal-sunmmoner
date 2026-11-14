@@ -14,7 +14,7 @@ import org.json.JSONObject
 
 /** Finite process-lifetime CPU cache. Loading happens before draw, never inside frame selection. */
 internal object TowerMonsterAtlas {
-  data class Frame(val image: ImageBitmap, val pivotX: Int, val pivotY: Int, val worldScale: Float)
+  data class Frame(val image: ImageBitmap, val pivotX: Int, val pivotY: Int, val worldScale: Float, val healthBarHeight: Float = 0f)
   private class Clip(val indices: IntArray, val times: FloatArray, val loop: Boolean) {
     val duration = times.sum()
     fun index(seconds: Float): Int {
@@ -24,7 +24,7 @@ internal object TowerMonsterAtlas {
       return indices[i]
     }
   }
-  private class Sheet(val right: Array<Frame>, val left: Array<Frame>)
+  private class Sheet(val frames: Array<Frame>)
   @Volatile private var sheets: Map<EnemyArchetype, Sheet> = emptyMap()
   private var clips: Map<String, Clip> = emptyMap()
   @Volatile private var attempted = false
@@ -33,6 +33,7 @@ internal object TowerMonsterAtlas {
   internal val loadedCount get() = sheets.size
 
   @Synchronized fun preload(context: Context) {
+    CompletionEnemyAtlas.preload(context)
     if (attempted) return
     val built = linkedMapOf<EnemyArchetype, Sheet>()
     val owned = mutableListOf<Bitmap>()
@@ -82,16 +83,8 @@ internal object TowerMonsterAtlas {
               android.graphics.Rect(0, 0, w, h), paint)
             Frame(bitmap.asImageBitmap(), px, py, scale)
           }
-          val left = Array(12) { column ->
-            val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-            owned += bitmap
-            val canvas = Canvas(bitmap)
-            canvas.translate(w.toFloat(), 0f); canvas.scale(-1f, 1f)
-            canvas.drawBitmap(source, android.graphics.Rect(column*w, 0, (column+1)*w, h),
-              android.graphics.Rect(0, 0, w, h), paint)
-            Frame(bitmap.asImageBitmap(), w-px, py, scale)
-          }
-          built[type] = Sheet(right, left)
+          // Left-facing bodies mirror at draw, preserving the original pivot and world light.
+          built[type] = Sheet(right)
         } finally { source.recycle() }
       }
       val total = owned.sumOf { it.allocationByteCount.toLong() }
@@ -109,8 +102,8 @@ internal object TowerMonsterAtlas {
   }
 
   fun frame(enemy: EnemyCombatUnit, seconds: Float, charging: Boolean, recovering: Boolean): Frame? {
-    val sheet = sheets[enemy.archetype] ?: return null
-    val frames = if (enemy.facingRight) sheet.right else sheet.left
+    val sheet = sheets[enemy.archetype] ?: return CompletionEnemyAtlas.frame(enemy, seconds)
+    val frames = sheet.frames
     val clipName = when {
       enemy.dead -> "defeat"
       charging -> return frames[6]

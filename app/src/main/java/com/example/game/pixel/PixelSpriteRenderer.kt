@@ -324,7 +324,7 @@ object PixelSpriteRenderer {
 
         var onRoadCore = false
         var onRoadEdge = false
-        if (biome != BiomeTheme.FIRST_FIELD_MEADOW && roadTiles != null) {
+        if ((biome.isInteriorBiome || biome == BiomeTheme.SANCTUARY_ASTRAL) && roadTiles != null) {
           for (seg in paths) {
             val d = distanceToSegment(centerWx, centerWy, seg)
             if (d <= seg.width * 0.50f) {
@@ -350,7 +350,7 @@ object PixelSpriteRenderer {
       }
     }
 
-    if (biome == BiomeTheme.FIRST_FIELD_MEADOW) {
+    if (!biome.isInteriorBiome && biome != BiomeTheme.SANCTUARY_ASTRAL) {
       with(MeadowRoadArt) { draw(paths, roadTiles, camX, camY, zoom, startTx..endTx, startTy..endTy) }
     }
 
@@ -509,7 +509,7 @@ object PixelSpriteRenderer {
   ) {
     val dstW = (bmp.width * pixelScale).roundToInt().coerceAtLeast(2)
     val dstH = (bmp.height * pixelScale).roundToInt().coerceAtLeast(2)
-    val hdBmp = FantasyHd128Structures.hdFor(bmp, hdProfile)
+    val hdBmp = if (CompletionPropAtlas.isAuthored(bmp) || CompletionInteriorAtlas.isAuthored(bmp)) bmp else FantasyHd128Structures.hdFor(bmp, hdProfile)
     drawImage(
       image = hdBmp,
       dstOffset = IntOffset((cx - dstW / 2f).roundToInt(), (footY - dstH).roundToInt()),
@@ -704,7 +704,14 @@ object PixelSpriteRenderer {
 
     // null selects the existing projected-shadow pass, after camera culling.
     val legacyShadow = renderShadow ?: (SanctuaryEnvironmentShadows.sprite(obs) == null)
-    when (obs.propKind) {
+    val furnishing = CompletionInteriorAtlas.entry(obs.propKind)
+    if (furnishing != null) {
+      val scale = furnishing.pixelScale * s
+      drawImage(furnishing.image, dstOffset = IntOffset((cx - furnishing.pivotX * scale).roundToInt(),
+        (cy - furnishing.pivotY * scale).roundToInt()),
+        dstSize = IntSize((furnishing.image.width * scale).roundToInt().coerceAtLeast(1),
+          (furnishing.image.height * scale).roundToInt().coerceAtLeast(1)), filterQuality = FilterQuality.None)
+    } else when (obs.propKind) {
       PropKind.FACILITY_TOWER_GATE, PropKind.TOWER_PORTAL_GATE -> {
         val pulse = 0.88f + 0.12f * sin(timeSec * 3.2f)
         // P26: the gate is the luminous heart of the island. Local light intensity
@@ -998,7 +1005,9 @@ object PixelSpriteRenderer {
 
       PropKind.ROYAL_STATUE -> {
         if (legacyShadow) drawDirectionalShadow34(cx, cy, 42f * s, 12f * s, alpha = 0.52f)
-        drawCrispSprite(PixelStructureAtlas.royalStatueSprite, cx, cy + 4f * s, 2.0f * s)
+        val statue = PixelStructureAtlas.royalStatueSprite
+        val foot = if (CompletionPropAtlas.isAuthored(statue)) ObliqueSpriteGeometry.drawFootOffset(obs.propKind, statue) else 4f
+        drawCrispSprite(statue, cx, cy + foot * s, 2.0f * s)
       }
 
       PropKind.OBSIDIAN_COLUMN, PropKind.RUINED_PILLAR -> {
@@ -1089,6 +1098,10 @@ object PixelSpriteRenderer {
       }
 
       PropKind.TATTERED_BANNER -> {
+        val authoredBanner = PixelStructureAtlas.tatteredBannerSprite
+        if (authoredBanner != null) {
+          drawCrispSprite(authoredBanner, cx, cy + 4f * s, s)
+        } else {
         val wave = sin(timeSec * 4.2f + obs.x) * 4.5f * s
         drawLine(Color(0xFF120D1D), Offset(cx, cy + 4f * s), Offset(cx, cy - 64f * s), strokeWidth = 5f * s)
         drawLine(Color(0xFFD99B26), Offset(cx, cy + 4f * s), Offset(cx, cy - 64f * s), strokeWidth = 3f * s)
@@ -1101,6 +1114,7 @@ object PixelSpriteRenderer {
         }
         drawPath(banner, Color(0xFF6B21A8))
         drawRect(Color(0xFFF5B841), Offset(cx - 3f * s, cy - 64f * s), Size(8f * s, 4f * s))
+        }
       }
 
       PropKind.TRAINING_DUMMY -> {
@@ -1169,6 +1183,11 @@ object PixelSpriteRenderer {
       }
 
       PropKind.CRIMSON_CRYSTAL -> {
+        val authoredCrystal = PixelStructureAtlas.crimsonCrystalSprite
+        if (authoredCrystal != null) {
+          drawForeshortenedGlow(cx, cy - 6f * s, 46f * s, Color(0xFFF43F5E).copy(alpha = 0.34f))
+          drawCrispSprite(authoredCrystal, cx, cy + 4f * s, s)
+        } else {
         val p = Path().apply {
           moveTo(cx, cy - 54f * s)
           lineTo(cx + 18f * s, cy - 14f * s)
@@ -1178,6 +1197,7 @@ object PixelSpriteRenderer {
         }
         drawForeshortenedGlow(cx, cy - 6f * s, 46f * s, Color(0xFFF43F5E).copy(alpha = 0.34f))
         drawPath(p, Color(0xFFE11D48))
+        }
       }
 
       else -> {
@@ -1328,7 +1348,7 @@ object PixelSpriteRenderer {
     }
 
     // Foreshortened 2.5D HD-2D Ground Sigil & Expanding Skill Shockwave
-    with(FantasyHd2dSkillVfx) {
+    if (hpFraction > 0f || isMaster) with(FantasyHd2dSkillVfx) {
       drawHeroGroundSigilAndShockwave(
         cx = cx,
         cy = cy,
@@ -1350,7 +1370,8 @@ object PixelSpriteRenderer {
     val authored = if (isMaster) null else AuthoredHeroAtlas.frame(
       heroName, heroClass, isMoving, attackAnimProgress, hurtFlash, isInjuredResting,
       hpFraction, timeSec, facingNorth, skillAnimation,
-    )
+    ) ?: CompletionClassAtlas.frame(heroClass, isMoving, attackAnimProgress, hurtFlash,
+      isInjuredResting, hpFraction, timeSec, facingNorth, skillAnimation)
     if (authored != null) {
       val scale = authored.worldScale * zoom
       with(SanctuaryEnvironmentShadows) {
@@ -1418,7 +1439,7 @@ object PixelSpriteRenderer {
       )
     }
 
-    if (!isMaster && (hpFraction < 0.999f || isInjuredResting)) {
+    if (!isMaster && hpFraction > 0f && (hpFraction < 0.999f || isInjuredResting)) {
       val barW = 42f * zoom
       val barH = 5.4f * zoom
       val bx = cx - barW / 2f

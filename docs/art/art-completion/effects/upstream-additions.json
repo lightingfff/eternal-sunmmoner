@@ -1,0 +1,31 @@
+{
+  "commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+  "license": "MIT; excludes stock actor/gallery/font",
+  "files": [
+    {
+      "path": "tools/art/vendor/pixelfx/src/fx/melee/dagger-flurry.js",
+      "sha256": "d58ec0ed5233072950077fd09a883b4f6df83680fdccf6ccce0bcc225c854190",
+      "bytes": 6353
+    },
+    {
+      "path": "tools/art/vendor/pixelfx/src/fx/melee/spin-slash.js",
+      "sha256": "242a0ef74279a7735339afe0452fe08aa2ac7d8c94c54d0144b94b5bc87c58d6",
+      "bytes": 7863
+    },
+    {
+      "path": "tools/art/vendor/pixelfx/src/fx/impacts/hit-spark.js",
+      "sha256": "b0f2d0e5337ab2fff3a6a8995e6404fed72512bdcd1bc92838a60bf879bc732a",
+      "bytes": 4254
+    },
+    {
+      "path": "tools/art/vendor/pixelfx/src/fx/impacts/ground-slam.js",
+      "sha256": "5e62e89d63ae68929b4e3ba5b1cf9e210866a5e0180107f9bc32b0cd9e344cc3",
+      "bytes": 9506
+    },
+    {
+      "path": "tools/art/vendor/pixelfx/src/fx/holy/sunburst.js",
+      "sha256": "64c28225db3b858adc4cd2691ad659b2d1437e88843e8d4012fea17ff2f90b30",
+      "bytes": 3497
+    }
+  ]
+}

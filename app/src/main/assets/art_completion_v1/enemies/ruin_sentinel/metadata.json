@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "type": "RUIN_SENTINEL",
+  "frame": [
+    128,
+    144
+  ],
+  "pivot": [
+    64,
+    134
+  ],
+  "columns": 12,
+  "rows": 1,
+  "world_scale": 0.82,
+  "atlas_file": "atlas.png",
+  "atlas_sha256": "e573386d520abb581e2fa678e70ebc952c6a963fd6444d4f99a8880c09c373c9",
+  "frame_order": [
+    "idle0",
+    "idle1",
+    "walk0",
+    "walk1",
+    "walk2",
+    "walk3",
+    "anticipation",
+    "contact",
+    "recovery",
+    "hurt",
+    "collapse",
+    "defeat"
+  ],
+  "retained_rgba_bytes": 884736,
+  "native_generated_dimensions_claimed": false,
+  "left_direction": "Mirrored by runtime at draw; no separately authored left claim",
+  "source": {
+    "file": "docs/art/art-completion/enemies/source/ruin_sentinel.png",
+    "sha256": "566818660f4468e86f1e6d449a6445f3956482c78e51bc58e13a41d66f58bce3",
+    "dimensions": [
+      2172,
+      724
+    ],
+    "grid": [
+      6,
+      2
+    ],
+    "alpha_threshold": 96
+  },
+  "normalization": {
+    "fixed_scale": 0.3,
+    "fixed_root_x": 189,
+    "row_baselines": [
+      345,
+      345
+    ],
+    "logical_source_cell": [
+      362,
+      362
+    ],
+    "extraction": "Connected silhouettes plus nearest detached clusters; no weapon crop at nominal cell boundaries",
+    "per_frame_recentering": false,
+    "per_frame_rescaling": false
+  },
+  "unique_pose_hashes": [
+    "18c72dd3c45be13f5502425eb0f8632f3008ccf2eeb891f48f5172ab9f8d69cb",
+    "3e707806066c9007da527a7d4aecd21bcfb4749fadf7aced115159d142fadc2b",
+    "e460b63d3951af34d4b1e7efd4c3a2c70a65d4114466e8eb9ef228f74c40dac1",
+    "fc39b9f6a82993478de704523d3e9838a8866a6088aceff32ed4b0afe1bd04ac",
+    "2f52bae818093e727eb5082df297b90a32e1953f3a3535abcef77c70844f5ea4",
+    "162a8a1cf8f1ecf0746fd515f9622376fd6e9e366d8daf008d97b178925f8005",
+    "6980a86b9919fed4cfeda38bc7630ec4ce85aa926a4619df41e9ee3a87c4dfca",
+    "3355b7f867f7ca46535c4b996aaabb3341664828174c6288534a823ac968bec6",
+    "c6dff1955f39ac50e7d6e09ea92c5b36c16984c549612368323084e2ae12163c",
+    "ace91ba55592f931b1946f98ce8ad6245fb74d6419585c24b4a59d94c22110cf",
+    "a3fe701856fa7467a557380e4b2db6c12eb972e198665f4b0a70ef68574d3505",
+    "425dec14d9186c9837889fea6b138bbbb7de4b59eeac038669dcba6f8eb1765f"
+  ]
+}

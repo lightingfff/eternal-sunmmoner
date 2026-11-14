@@ -1,0 +1,326 @@
+{
+  "version": 1,
+  "pack": "art_completion_v1/interiors",
+  "origin": "Genuine original hosted imagegen furniture; normalized derivatives, not native-size claims",
+  "sources": [
+    {
+      "file": "docs/art/art-completion/interiors/source/eight-furnishings-v1.png",
+      "sha256": "f16973e3f9678782ba00cc9dd25c1bf2b5eaa8eef9dd2adafd19d3d808a07497",
+      "dimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "file": "docs/art/art-completion/interiors/source/eight-furnishings-clean.png",
+      "sha256": "2948638eb279ec18662938f65a27506c295a77bc0d4c9376e8dd588856cce213",
+      "dimensions": [
+        1774,
+        887
+      ]
+    },
+    {
+      "file": "docs/art/art-completion/interiors/source/wide-furnishings.png",
+      "sha256": "b2293f7720ae4b130ca47b69a768b95690d1ee6f48aa727e8032d77501f6fba9",
+      "dimensions": [
+        2172,
+        724
+      ]
+    }
+  ],
+  "source_notes": "Initial source had semitransparent white matte and is never used for runtime. A genuine imagegen background-removal correction produced the transparent source. Three broader furniture designs were then generated to fit old wide canvases without nonuniform distortion.",
+  "projection": "2.5D oblique .72 ground; upright height, NW key/cool right shade",
+  "props": [
+    {
+      "id": "forge_anvil",
+      "file": "forge_anvil.png",
+      "width": 96,
+      "height": 80,
+      "pivot": [
+        48,
+        72
+      ],
+      "alpha_bbox": [
+        11,
+        4,
+        84,
+        72
+      ],
+      "sha256": "189ec9541c884c26bcc359a0f9d876fab290137673e2ed024ba353de50ff51a6",
+      "rgba_bytes": 30720,
+      "source": "docs/art/art-completion/interiors/source/eight-furnishings-clean.png",
+      "source_sha256": "2948638eb279ec18662938f65a27506c295a77bc0d4c9376e8dd588856cce213",
+      "source_alpha_bbox": [
+        44,
+        68,
+        423,
+        421
+      ],
+      "fixed_scale": 0.19263456090651557,
+      "paste": [
+        11,
+        4
+      ],
+      "opaque_pixels": 3382,
+      "alpha_threshold": 96,
+      "unique_rgb_colors": 128,
+      "clipped_opaque_pixels": 0,
+      "normalization": "one uniform scale per static prop; nearest; binary alpha;128-color palette"
+    },
+    {
+      "id": "armor_stand",
+      "file": "armor_stand.png",
+      "width": 64,
+      "height": 96,
+      "pivot": [
+        32,
+        88
+      ],
+      "alpha_bbox": [
+        16,
+        20,
+        48,
+        88
+      ],
+      "sha256": "de365a4e61f161302086b642fcb61b45d9947c41b043a9e10f843bb342c04d2c",
+      "rgba_bytes": 24576,
+      "source": "docs/art/art-completion/interiors/source/eight-furnishings-clean.png",
+      "source_sha256": "2948638eb279ec18662938f65a27506c295a77bc0d4c9376e8dd588856cce213",
+      "source_alpha_bbox": [
+        565,
+        12,
+        760,
+        425
+      ],
+      "fixed_scale": 0.16464891041162227,
+      "paste": [
+        16,
+        20
+      ],
+      "opaque_pixels": 1353,
+      "alpha_threshold": 96,
+      "unique_rgb_colors": 128,
+      "clipped_opaque_pixels": 0,
+      "normalization": "one uniform scale per static prop; nearest; binary alpha;128-color palette"
+    },
+    {
+      "id": "personal_chest",
+      "file": "personal_chest.png",
+      "width": 64,
+      "height": 48,
+      "pivot": [
+        32,
+        40
+      ],
+      "alpha_bbox": [
+        11,
+        6,
+        53,
+        40
+      ],
+      "sha256": "1cf8a1af8a2ba0284fede480a8a7f14a739d82539fd8629991ba93859b28c68d",
+      "rgba_bytes": 12288,
+      "source": "docs/art/art-completion/interiors/source/eight-furnishings-clean.png",
+      "source_sha256": "2948638eb279ec18662938f65a27506c295a77bc0d4c9376e8dd588856cce213",
+      "source_alpha_bbox": [
+        941,
+        114,
+        1255,
+        367
+      ],
+      "fixed_scale": 0.13438735177865613,
+      "paste": [
+        11,
+        6
+      ],
+      "opaque_pixels": 1159,
+      "alpha_threshold": 96,
+      "unique_rgb_colors": 128,
+      "clipped_opaque_pixels": 0,
+      "normalization": "one uniform scale per static prop; nearest; binary alpha;128-color palette"
+    },
+    {
+      "id": "care_table",
+      "file": "care_table.png",
+      "width": 112,
+      "height": 80,
+      "pivot": [
+        56,
+        72
+      ],
+      "alpha_bbox": [
+        9,
+        14,
+        103,
+        72
+      ],
+      "sha256": "53ea27cad487b86c2ea9975a0e562098bb24ce1023047b90cadc70955a7f4296",
+      "rgba_bytes": 35840,
+      "source": "docs/art/art-completion/interiors/source/wide-furnishings.png",
+      "source_sha256": "b2293f7720ae4b130ca47b69a768b95690d1ee6f48aa727e8032d77501f6fba9",
+      "source_alpha_bbox": [
+        21,
+        180,
+        624,
+        554
+      ],
+      "fixed_scale": 0.15508021390374332,
+      "paste": [
+        9,
+        14
+      ],
+      "opaque_pixels": 3605,
+      "alpha_threshold": 96,
+      "unique_rgb_colors": 128,
+      "clipped_opaque_pixels": 0,
+      "normalization": "one uniform scale per static prop; nearest; binary alpha;128-color palette"
+    },
+    {
+      "id": "long_table",
+      "file": "long_table.png",
+      "width": 108,
+      "height": 68,
+      "pivot": [
+        54,
+        62
+      ],
+      "alpha_bbox": [
+        4,
+        14,
+        104,
+        62
+      ],
+      "sha256": "571c1a988d5a7f3a0afddacd44fbf3856a7f9e6ca6995127a1b0d7098e0622ac",
+      "rgba_bytes": 29376,
+      "source": "docs/art/art-completion/interiors/source/wide-furnishings.png",
+      "source_sha256": "b2293f7720ae4b130ca47b69a768b95690d1ee6f48aa727e8032d77501f6fba9",
+      "source_alpha_bbox": [
+        648,
+        212,
+        1383,
+        563
+      ],
+      "fixed_scale": 0.1360544217687075,
+      "paste": [
+        4,
+        14
+      ],
+      "opaque_pixels": 2914,
+      "alpha_threshold": 96,
+      "unique_rgb_colors": 128,
+      "clipped_opaque_pixels": 0,
+      "normalization": "one uniform scale per static prop; nearest; binary alpha;128-color palette"
+    },
+    {
+      "id": "bookshelf",
+      "file": "bookshelf.png",
+      "width": 56,
+      "height": 64,
+      "pivot": [
+        28,
+        58
+      ],
+      "alpha_bbox": [
+        10,
+        4,
+        46,
+        58
+      ],
+      "sha256": "7937599e002bcaeef8023bc8629dcccca2da552ff4f0ff62f1e6e1b8082b49cd",
+      "rgba_bytes": 14336,
+      "source": "docs/art/art-completion/interiors/source/eight-furnishings-clean.png",
+      "source_sha256": "2948638eb279ec18662938f65a27506c295a77bc0d4c9376e8dd588856cce213",
+      "source_alpha_bbox": [
+        520,
+        460,
+        786,
+        859
+      ],
+      "fixed_scale": 0.13533834586466165,
+      "paste": [
+        10,
+        4
+      ],
+      "opaque_pixels": 1645,
+      "alpha_threshold": 96,
+      "unique_rgb_colors": 128,
+      "clipped_opaque_pixels": 0,
+      "normalization": "one uniform scale per static prop; nearest; binary alpha;128-color palette"
+    },
+    {
+      "id": "tavern_counter",
+      "file": "tavern_counter.png",
+      "width": 160,
+      "height": 80,
+      "pivot": [
+        80,
+        74
+      ],
+      "alpha_bbox": [
+        11,
+        4,
+        148,
+        74
+      ],
+      "sha256": "6d4e59d443b903f6ae375b76083d16da770e23b5cfc33028aa92f9e1c8d20535",
+      "rgba_bytes": 51200,
+      "source": "docs/art/art-completion/interiors/source/wide-furnishings.png",
+      "source_sha256": "b2293f7720ae4b130ca47b69a768b95690d1ee6f48aa727e8032d77501f6fba9",
+      "source_alpha_bbox": [
+        1416,
+        179,
+        2145,
+        551
+      ],
+      "fixed_scale": 0.1881720430107527,
+      "paste": [
+        11,
+        4
+      ],
+      "opaque_pixels": 6770,
+      "alpha_threshold": 96,
+      "unique_rgb_colors": 128,
+      "clipped_opaque_pixels": 0,
+      "normalization": "one uniform scale per static prop; nearest; binary alpha;128-color palette"
+    },
+    {
+      "id": "recovery_bed",
+      "file": "recovery_bed.png",
+      "width": 96,
+      "height": 72,
+      "pivot": [
+        48,
+        64
+      ],
+      "alpha_bbox": [
+        14,
+        2,
+        82,
+        64
+      ],
+      "sha256": "df0fcb2a608d7a5fdafd58bf4a3329d88a2cec56ba4116e88b1a6c54494790bb",
+      "rgba_bytes": 27648,
+      "source": "docs/art/art-completion/interiors/source/eight-furnishings-clean.png",
+      "source_sha256": "2948638eb279ec18662938f65a27506c295a77bc0d4c9376e8dd588856cce213",
+      "source_alpha_bbox": [
+        1353,
+        483,
+        1758,
+        853
+      ],
+      "fixed_scale": 0.16756756756756758,
+      "paste": [
+        14,
+        2
+      ],
+      "opaque_pixels": 2464,
+      "alpha_threshold": 96,
+      "unique_rgb_colors": 128,
+      "clipped_opaque_pixels": 0,
+      "normalization": "one uniform scale per static prop; nearest; binary alpha;128-color palette"
+    }
+  ],
+  "retained_rgba_bytes": 225984,
+  "runtime_shadow_baked": false,
+  "native_generated_dimensions_claimed": false
+}

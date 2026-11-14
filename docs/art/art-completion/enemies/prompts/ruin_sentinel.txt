@@ -1,0 +1,19 @@
+Create an ORIGINAL production game spritesheet for ETERNAL SUMMONER. RUIN SENTINEL: an imposing ancient armored stone-and-tarnished-bronze automaton knight. Off-white weathered stone plate with dark slate joint gaps, verdigris bronze edging, deep-red rune eye slit in a closed angular helmet, rectangular embossed bronze shield and SHORT broad bronze spear held diagonally. Full anatomical articulated armored body with waist, knees, elbows and stone fingers; no square placeholder body. Heavy architectural stone texture, scarred chisel work and beveled metallic edges. Detailed sculpted master pixel-art, coherent crisp clusters and controlled palette, upper-left warm pale key light, cool darker right side. Full upright being seen in 3/4 oblique RPG camera about40degrees above ground, faces RIGHT throughout, front and right side visible. No floor, cast shadow, no ground circle, no standaloneVFX/text/UI/grid.
+
+EXACT6columns x2rows equal cells on wide LANDSCAPE transparent PNG,12 complete separated figures. Same anatomical scale, gear, camera and centered logical foot root per cell, ground baseline90%cellheight. Generous margins keep shield, spear, helmet, boots and fully fallen body inside eachcell. Weapon is short enough for a128x144runtimecell. No figure overlaps another. Genuinealpha only.
+
+Frame order left-to-right top row then bottom row:
+1 idle neutral guard stance.
+2 idle breathing weightshift and shieldangle change, boots planted.
+3 walk right with left leg leading, right spear arm swings back.
+4 walk lowcontact with trailing right legpassing, bodyweight lowered.
+5 walk right with right leg leading, left shield armforward.
+6 walk highpassing with left footlifted, shoulders opposed.
+7 melee anticipation: shield braced, spear drawn back near waist, knees bent.
+8 CONTACT: spear thrust fully forward to right at chestheight, forward legbraced, torso stretched; noimpactVFX.
+9 recovery: spear retracts, upperbody leans slightlyforward thenreturns.
+10 hurt: torso knocked back, shield across chest, headrecoils.
+11 collapse: falling onto one knee, shield drops.
+12 defeated: entire sentinel lies on side onground, spear/shield beside it within samecell, much lower than standing; retain same anatomicalscale, never shrinktofit.
+
+Actual distinctlimb poses and realleft/right alternatinggait, not duplicates moved sideways. No perspectivedirectionchange or pose-facingfront. No backgroundcheckerboard. Readable pixelclusters and armored volume after nearest-neighbor normalization to128x144. Originaluncopyrighteddesign.

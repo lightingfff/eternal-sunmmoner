@@ -1,0 +1,41 @@
+{
+  "classes": {
+    "assassin": {
+      "poses": 24,
+      "source_dimensions": [
+        1024,
+        1536
+      ],
+      "scale": 0.34,
+      "retained_rgba_bytes": 1286144,
+      "alpha": "binary",
+      "clipped_pixels": 0,
+      "unique_pose_hashes": 24
+    },
+    "priest": {
+      "poses": 24,
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "scale": 0.36,
+      "retained_rgba_bytes": 1286144,
+      "alpha": "binary",
+      "clipped_pixels": 0,
+      "unique_pose_hashes": 24
+    },
+    "berserker": {
+      "poses": 24,
+      "source_dimensions": [
+        1536,
+        1024
+      ],
+      "scale": 0.38,
+      "retained_rgba_bytes": 1286144,
+      "alpha": "binary",
+      "clipped_pixels": 0,
+      "unique_pose_hashes": 24
+    }
+  },
+  "total_retained_bytes": 3858432
+}

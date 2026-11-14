@@ -29,6 +29,10 @@ object SanctuaryArtAssets {
     ArtDepthAssets.preload(context.applicationContext)
     AuthoredHeroAtlas.preload(context.applicationContext)
     AuthoredStructureAtlas.preload(context.applicationContext)
+    ArchitectureSurfaceArt.preload(context.applicationContext)
+    CompletionClassAtlas.preload(context.applicationContext)
+    CompletionPropAtlas.preload(context.applicationContext)
+    CompletionInteriorAtlas.preload(context.applicationContext)
   }
   fun image(id: String): ImageBitmap? = asset("sanctuary_p03/$id.png")
   internal fun textAsset(path: String): String? = context?.assets?.open(path)?.bufferedReader()?.use { it.readText() }

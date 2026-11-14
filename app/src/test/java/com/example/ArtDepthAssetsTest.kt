@@ -58,9 +58,9 @@ class ArtDepthAssetsTest {
     assertNull(AuthoredStructureAtlas.landmark("summoning_hall", 200, 200))
     TowerMonsterAtlas.preload(RuntimeEnvironment.getApplication())
     TowerCombatFxAtlas.preload(RuntimeEnvironment.getApplication())
-    assertEquals("pixelfx_v1", TowerCombatFxAtlas.sourcePack)
+    assertEquals("art_completion_v1/effects", TowerCombatFxAtlas.sourcePack)
     assertEquals(1, TowerCombatFxAtlas.decodeCount)
-    assertEquals(1_179_648L, TowerCombatFxAtlas.retainedBytes)
+    assertEquals(2_359_296L, TowerCombatFxAtlas.retainedBytes)
     assertTrue(TowerMonsterAtlas.retainedBytes + TowerCombatFxAtlas.retainedBytes <= 8L * 1024 * 1024)
     val initial = requireNotNull(frame())
     repeat(200) {

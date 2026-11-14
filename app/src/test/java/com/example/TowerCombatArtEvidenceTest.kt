@@ -84,7 +84,7 @@ class TowerCombatArtEvidenceTest {
     assertEquals("Each of the four source PNGs decodes once", 4, TowerMonsterAtlas.decodeCount)
     assertTrue(TowerMonsterAtlas.retainedBytes in 1L..8L * 1024 * 1024)
     assertEquals(1,TowerCombatFxAtlas.decodeCount)
-    assertEquals(1179648L,TowerCombatFxAtlas.retainedBytes)
+    assertEquals(2359296L,TowerCombatFxAtlas.retainedBytes)
     assertTrue(TowerMonsterAtlas.retainedBytes+TowerCombatFxAtlas.retainedBytes<=8L*1024*1024)
   }
 
@@ -108,7 +108,7 @@ class TowerCombatArtEvidenceTest {
       val right = allFrames(type, true)
       val left = allFrames(type, false)
       assertEquals(12, right.size)
-      assertEquals(24, (right + left).map { System.identityHashCode(it.image.asAndroidBitmap()) }.distinct().size)
+      assertEquals(12, (right + left).map { System.identityHashCode(it.image.asAndroidBitmap()) }.distinct().size)
       (right + left).forEach { frame ->
         val bitmap = frame.image.asAndroidBitmap()
         assertFalse(bitmap.isRecycled)
@@ -119,11 +119,8 @@ class TowerCombatArtEvidenceTest {
         assertEquals(132, frame.pivotY)
       }
       right.zip(left).forEach { (a, b) ->
-        val r = a.image.asAndroidBitmap(); val l = b.image.asAndroidBitmap()
-        assertEquals(r.width - a.pivotX, b.pivotX)
-        // Exact pixel correspondence also catches accidental filtering during mirror caching.
-        for (y in 0 until r.height) for (x in 0 until r.width)
-          assertEquals(r.getPixel(x, y), l.getPixel(r.width - 1 - x, y))
+        assertSame(a.image, b.image)
+        assertEquals(a.pivotX, b.pivotX)
       }
     }
     repeat(20) {
@@ -135,7 +132,7 @@ class TowerCombatArtEvidenceTest {
     output.mkdirs()
     output.resolve("atlas_native_measurements.txt").writeText(
       "Robolectric SDK36 NATIVE; decoded=${TowerMonsterAtlas.decodeCount}; actors=${TowerMonsterAtlas.loadedCount}; " +
-        "retainedBytes=${TowerMonsterAtlas.retainedBytes}; 96 cached enemy surfaces; " +
+        "retainedBytes=${TowerMonsterAtlas.retainedBytes}; 48 cached enemy surfaces, draw-time mirror; " +
         "vfxDecode=${TowerCombatFxAtlas.decodeCount}; vfxBytes=${TowerCombatFxAtlas.retainedBytes}; " +
         "combinedBytes=${TowerMonsterAtlas.retainedBytes+TowerCombatFxAtlas.retainedBytes}; NOT device memory/FPS\n")
   }
@@ -168,7 +165,7 @@ class TowerCombatArtEvidenceTest {
     bitmaps.forEach { assertFalse(it.isRecycled);assertTrue(it.isPremultiplied);assertTrue(it.hasAlpha()) }
     repeat(100) { index -> styles.forEach { TowerCombatFxAtlas.frame(it,(index%8)/8f) } }
     assertEquals(1,TowerCombatFxAtlas.decodeCount)
-    assertEquals(1179648L,TowerCombatFxAtlas.retainedBytes)
+    assertEquals(2359296L,TowerCombatFxAtlas.retainedBytes)
   }
 
   @Test fun captainSlamShowsContactBeforeSettlingIntoRecovery() {

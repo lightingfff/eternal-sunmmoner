@@ -1,0 +1,124 @@
+{
+  "distinctPassedCases": 84,
+  "runs": [
+    {
+      "log": "art-completion-regression.log",
+      "result": "PASS",
+      "cases": [
+        "Floor1RuntimeBudgetTest.expiredEffectsAreReleasedAndRetryOwnsFreshRuntimeState",
+        "Floor1RuntimeBudgetTest.authoredWavesAreFiniteAndClearedPhasesCannotRespawnThem",
+        "Floor1RuntimeBudgetTest.renderPacingKeepsTheSameFixedSimulationAndEncounterState",
+        "TowerCombatArtEvidenceTest.productionShortLandscapePinnedMoveCommandAndPhysicalGroundTap",
+        "TowerCombatArtEvidenceTest.preloadValidatesEveryPremultipliedFrameBothFacesAndKeepsWarmDecodeCountStable",
+        "TowerCombatArtEvidenceTest.authoredSkillClipsAdvanceThroughDistinctPremultipliedSurfacesWithoutReload",
+        "TowerCombatArtEvidenceTest.captainSlamShowsContactBeforeSettlingIntoRecovery",
+        "TowerCombatArtEvidenceTest.actualGuestNorthernAssaultProducesANativeExecutionSequence",
+        "TowerCombatArtEvidenceTest.productionPortraitPinnedMoveCommandAndPhysicalGroundTap",
+        "TowerCombatArtEvidenceTest.contactPoseChangesAtTheActualPoint22SecondDamageMarker",
+        "TowerCombatArtEvidenceTest.arrangedRealRendererMatrixOnTowerGrassAndEdgeBackgrounds",
+        "GuestSavePersistenceRobolectricTest.corrupted primary save file automatically recovers from backup without losing player progress",
+        "GuestSavePersistenceRobolectricTest.logout to title gate preserves guest save on disk for seamless re-entry",
+        "GuestSavePersistenceRobolectricTest.feast buff boosts squad combat stats and hero AI updates observable intent labels across all 8 orders",
+        "GuestSavePersistenceRobolectricTest.one-tap guest creation initializes starter roster gear and persists GUEST_LOCAL session",
+        "GuestSavePersistenceRobolectricTest.returning guest launch automatically restores saved progress across simulated app restart",
+        "LobbyHeroPersistenceTest.hiddenTraitUnlockIsPermanentAndCloudImportFieldsKeepLobbyState",
+        "LobbyHeroPersistenceTest.assignmentHealthSanityPersonalityAndHiddenTraitSurviveRestart",
+        "LobbyHeroPersistenceTest.autoJoinedSummonGetsNewerOrderThanExistingPartyAndTrainingDoesNotLoseHp",
+        "LobbyHeroPersistenceTest.overlappingDropRequestsNeverPersistAFullPartyPlusOne",
+        "LobbyHeroPersistenceTest.legacySaveWithoutNewFieldsLoadsWithoutResettingProgress",
+        "LobbyHeroPersistenceTest.sanctuaryInfirmaryHealHeartyMealAndCruelSynthesisPersistImmediatelyToLocalJson",
+        "TowerCombatReforgeTest.telegraphHazardEnablesImmediateTouchDodgeWithoutManualOrderSelection",
+        "TowerCombatReforgeTest.courierDoesNotUseBriskProtectedMarchWhenTheMasterDivertsTheParty",
+        "TowerCombatReforgeTest.courierActivelySupportsHeroesDuringKraagGateBattle",
+        "TowerCombatReforgeTest.finalCourierStoneMarksGuardianDeadClearsTargetAndAllowsExtraction",
+        "TowerCombatReforgeTest.scoutInterceptionGrantsOneReadinessShortcutAndPreventsReinforcements",
+        "TowerCombatReforgeTest.kraagBreakWindowIncreasesFocusFireDamageWithVisualFeedback",
+        "TowerCombatReforgeTest.safeMarchEscortSpeedIsBriskWhenRoadIsClear",
+        "LobbyHeroTouchTest.secondFingerCancelsHeldHeroWithoutAssignment",
+        "LobbyHeroTouchTest.longPressPhysicalDragToHouseDispatchesRestingAssignment",
+        "LobbyHeroTouchTest.tappingHouseOrTowerGateWithoutDraggingHeroOpensFacilityUiDirectly",
+        "LobbyHeroTouchTest.failedPersistenceRollsBackSoOriginalHeroCanBePickedAgain",
+        "LobbyHeroTouchTest.heroAccessibilityPaddingCannotStealGateTapOrLongHoldOutsideTheSprite",
+        "LobbyHeroTouchTest.longPressPhysicalDragToGateDispatchesSinglePartyAssignment",
+        "LobbyHeroTouchTest.fastDragIsCameraPanAndInvalidDropAndCancelNeverAssign",
+        "LobbyHeroTouchTest.holdingBuildingWithoutAHeroStillOpensItOnRelease",
+        "RescueRetryFlowTest.retryWaitsForSavedOutcomeAndPreparationPreservesInjuriesAndRewards",
+        "RescueRetryFlowTest.failedSaveCannotPrepareRetryUntilSaveRetrySucceeds"
+      ],
+      "buildSummary": "BUILD SUCCESSFUL in 26s\n31 actionable tasks: 1 executed, 30 up-to-date\nConfiguration cache entry stored."
+    },
+    {
+      "log": "art-completion-world-regression.log",
+      "result": "PASS",
+      "cases": [
+        "ArtDepthRenderContractTest.mirroredCasterKeepsTheSameWorldLightDirection",
+        "ArtDepthRenderContractTest.roundedRoadJunctionsHaveNoWindingHolesAtGameplayZooms",
+        "MapForgeArchitectureRenderTest.captureArchitectureSliceThroughTheRealRenderer",
+        "P28DRenderTest.structureFoundationsMultiZoomDayNight",
+        "P28DRenderTest.indicativeFrameTimeProbe",
+        "LayoutResponsivenessRobolectricTest.narrow portrait 360x640 sanctuary lobby has slim HUD and non-overlapping controls",
+        "LayoutResponsivenessRobolectricTest.narrow portrait 360x640 floor selection squad prep and facility modals fit cleanly",
+        "LayoutResponsivenessRobolectricTest.widescreen landscape 800x360 sanctuary and tower battle HUDs stay compact and collision-free",
+        "LayoutResponsivenessRobolectricTest.summoning requires explicit spend confirmation and supports cancellation",
+        "LayoutResponsivenessRobolectricTest.login gate renders one-tap guest button google sign-in and settings cleanly",
+        "LayoutResponsivenessRobolectricTest.management navigation opens roster team summon and hero details",
+        "LayoutResponsivenessRobolectricTest.render widescreen oblique 3_4 sanctuary restaurant and floor01 screenshots",
+        "LayoutResponsivenessRobolectricTest.render high resolution 4_3 full sanctuary island overview screenshot",
+        "LayoutResponsivenessRobolectricTest.pixel tile and monumental structure atlases generate crisp pixel art sprites",
+        "LayoutResponsivenessRobolectricTest.narrow portrait 360x640 tower battle HUD and 8 tactical orders never overlap joystick",
+        "LayoutResponsivenessRobolectricTest.saved expedition rewards use readable fantasy summary",
+        "LayoutResponsivenessRobolectricTest.playable restaurant interior entry exit and settings account modal render cleanly"
+      ],
+      "buildSummary": "BUILD SUCCESSFUL in 23s\n31 actionable tasks: 1 executed, 30 up-to-date\nConfiguration cache entry stored."
+    },
+    {
+      "log": "art-completion-contracts-r3.log",
+      "result": "PASS",
+      "cases": [
+        "ArtCompletionAssetsTest.actualGenericAttackEventsReleaseImmediatelyWhileKaelenKeepsHisContactMarker",
+        "ArtCompletionAssetsTest.everyExecutionAndProjectileStyleLoadsWithinOriginalCombinedBudgetAndStaysWarm",
+        "ArtCompletionAssetsTest.everyClassAndEnemyHasRealAuthoredArtWithoutDuplicateFacingPixels",
+        "ArtCompletionFallbackTest.partialNewGatePackFallsBackAsAWholeWithoutMixingSceneVersions",
+        "ArtCompletionFallbackTest.missingNamedBankNeverUsesALegacyPortraitForTheWrongClass",
+        "ArtCompletionFallbackTest.partialClassBankPublishesNoActorsOrPortraitsAndDoesNotRetry",
+        "ArtCompletionFallbackTest.partialEnemyBankPublishesNoActorsAndDoesNotRetry",
+        "ArtDepthAssetsTest.allNamedPosesAreDistinctAndRenderedThroughSharedProductionPath",
+        "ArtDepthAssetsTest.materialCellsReassembleContinuouslyIncludingNegativeWorldCoordinates",
+        "ArtDepthAssetsTest.realPacksLoadWithinBudgetsAndStayWarm",
+        "ArtDepthAssetsTest.contactPoseFollowsSimulationAndRangedReleaseIsImmediate",
+        "ArtDepthFallbackTest.missingBothPixelPacksLeavesVectorFallbackAvailableWithoutRetries",
+        "ArtDepthFallbackTest.corruptPixelFxFallsBackToOriginalPngAndDoesNotRetryDuringFrames",
+        "ArtDepthFallbackTest.missingSecondHeroDoesNotPublishPartiallyPreparedFirstHero",
+        "ArtCompletionUiTest.actualHudAvatarsAndCardsKeepClassIdentityAndPhysicalTapOnShortLandscape",
+        "ArtCompletionUiTest.actualHudAvatarsAndCardsKeepClassIdentityAndPhysicalTapOnPortrait"
+      ],
+      "buildSummary": "BUILD SUCCESSFUL in 8s\n31 actionable tasks: 1 executed, 30 up-to-date\nConfiguration cache entry reused."
+    },
+    {
+      "log": "art-completion-apk.log",
+      "result": "PASS",
+      "cases": [
+        "ArtCompletionColdStartTest.recordsStartupTowerAndGateCostsSeparatelyWithCompletePixelBankAccounting"
+      ],
+      "buildSummary": "BUILD SUCCESSFUL in 1m 18s\n47 actionable tasks: 18 executed, 3 from cache, 26 up-to-date\nConfiguration cache entry stored."
+    },
+    {
+      "log": "art-completion-final-render.log",
+      "result": "PASS",
+      "cases": [
+        "ArtCompletionRenderTest.allClassesAndEnemiesRenderAtThreeZoomsIncludingExecutionHurtAndDefeat",
+        "ArtCompletionRenderTest.retainedInteriorArchitectureStillMatchesTheNewMaterialPalette",
+        "ArtCompletionRenderTest.everyOutdoorBiomeUsesTheRealLayoutAndContinuousMaterials",
+        "ArtCompletionRenderTest.everyEffectAndProjectileRunsAtItsExistingSimulationPosition",
+        "ArtCompletionRenderTest.enemyBodiesMirrorExactlyWhileKeepingTheirFootAnchor",
+        "ArtCompletionRenderTest.surfacePhaseTracksPanAndDoesNotPaintOutsideItsMask",
+        "TowerGateMapTest.naturalSixSecondCutsceneReachesUnobstructedThreeGates",
+        "TowerGateMapTest.portraitGateTargetsAreSeparatedAndFloorOneRemainsReachable",
+        "TowerGateMapTest.skipPhysicalPortalTouchesLockedFloorAndBackPreserveNavigation",
+        "TowerGateMapTest.carpetTracksTheActualSlopingRoadInsteadOfAnIndependentVerticalAxis",
+        "TowerGateMapTest.productionRendererCapturesArchitectureAnimationAndSanctuaryApproach"
+      ],
+      "buildSummary": "BUILD SUCCESSFUL in 1m 6s\n47 actionable tasks: 1 executed, 46 up-to-date\nConfiguration cache entry stored."
+    }
+  ]
+}
