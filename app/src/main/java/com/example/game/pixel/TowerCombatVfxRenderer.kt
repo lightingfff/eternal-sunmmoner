@@ -38,7 +38,9 @@ internal object TowerCombatVfxRenderer {
     val white=Color(0xFFFFF4D6).copy(alpha=alpha)
     val spread=fx.maxRadius*(.35f+.65f*p)*zoom
     TowerCombatFxAtlas.frame(fx.style,p)?.let { frame ->
-      val scale=(if(fx.style==CombatFxStyle.GUARD)1.18f else 1.50f)*zoom
+      val scale=(if(fx.style==CombatFxStyle.GUARD) {
+        if (TowerCombatFxAtlas.sourcePack == "pixelfx_v1") 1.70f else 1.18f
+      } else 1.50f)*zoom
       drawImage(frame.image,
         dstOffset=IntOffset((x-frame.pivotX*scale).roundToInt(),(y-frame.pivotY*scale).roundToInt()),
         dstSize=IntSize((frame.image.width*scale).roundToInt().coerceAtLeast(1),

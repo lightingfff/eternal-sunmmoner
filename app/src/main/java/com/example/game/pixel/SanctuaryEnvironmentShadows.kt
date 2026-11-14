@@ -76,12 +76,13 @@ object SanctuaryEnvironmentShadows {
       }
     }
   }
-  fun DrawScope.drawCharacterShadow(bitmap: ImageBitmap, cx: Float, cy: Float, zoom: Float, pixelScale: Float, groundPivotY: Int? = null) {
+  fun DrawScope.drawCharacterShadow(bitmap: ImageBitmap, cx: Float, cy: Float, zoom: Float, pixelScale: Float, groundPivotY: Int? = null, mirrored: Boolean = false) {
     val bounds = ObliqueSpriteGeometry.bounds(bitmap)
     val path = silhouette(bitmap)
     val shadowStrength = com.example.game.world.WorldEnvironment.lighting.shadowStrength
     projection.reset()
-    projection.values[0] = pixelScale
+    // Mirror the caster's local silhouette, never the world-light shear direction.
+    projection.values[0] = if (mirrored) -pixelScale else pixelScale
     projection.values[1] = 0f
     projection.values[4] = SanctuaryLight.SHADOW_DIR_X * pixelScale / SanctuaryLight.TAN_ELEV
     projection.values[5] = SanctuaryLight.SHADOW_DIR_Y * pixelScale * ObliqueCamera.OBLIQUE_Y_SCALE / SanctuaryLight.TAN_ELEV

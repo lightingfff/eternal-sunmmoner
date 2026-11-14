@@ -1,0 +1,8 @@
+{
+  "observedColdLoad": true,
+  "initWallMs": 394.121577,
+  "averageWarmInitWallMs": 0.00193407,
+  "materialsDecoded": 16,
+  "heroAndPortraitsDecoded": 6,
+  "note": "Synchronous asset preparation on native Robolectric host; not phone cold launch, FPS, GPU or thermal evidence"
+}

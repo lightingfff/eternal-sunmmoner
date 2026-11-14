@@ -1,0 +1,617 @@
+{
+  "hero": "Lyra",
+  "frame": [
+    96,
+    112
+  ],
+  "pivot": [
+    48,
+    104
+  ],
+  "columns": 12,
+  "rows": [
+    "front_right",
+    "back_right"
+  ],
+  "world_scale": 1.08,
+  "frame_order": [
+    "idle0",
+    "idle1",
+    "walk0",
+    "walk1",
+    "walk2",
+    "walk3",
+    "draw",
+    "release",
+    "recover",
+    "hurt",
+    "collapse",
+    "defeat"
+  ],
+  "atlas_file": "lyra.png",
+  "atlas_sha256": "69a4c8bf26c651be8db64bad877a4b0ce727cece09d0656970d5485b9e500353",
+  "portrait_file": "portrait.png",
+  "portrait_sha256": "75eec30e4c1a747a911791832dca1533e45a350f367881a1d64e85ad42461e5c",
+  "retained_rgba_bytes": 1114112,
+  "native_generated_dimensions_claimed": false,
+  "normalization": "Imagegen source normalized to runtime cells; shared scale/root per clip; nearest-only; no drawn/invented frames",
+  "left_direction": "root renderer derives via flip at draw; no separately authored left claim",
+  "unique_pose_hashes": [
+    "bf27328471a2873563915f1f09acb4f46eb25db3a97050282ee52f08db5d77ed",
+    "afcb965742656f9a05989c5a61a39671d4523ac7e8a5fef6ec8b308fbbe33d23",
+    "739cda7e27d97b5d496bbaad352f179b33c718c49631d9b0383c34d06feefaa8",
+    "b8dc878408a9742bda721d80b4f369560f7569e12900f096865f92b29a46d5f6",
+    "99afd8b1699d1fe443cbfa19e915673c0b1d69b96c8398ba3ab53c6b9ab080a4",
+    "1d59e154c73d5d5fc4d740872deb5424eaa91e7ca015710afd59033cd028efb7",
+    "deb439249f39cd15eb98259573b443fee065da5c165ed8c3d86e26bebdfcdba4",
+    "71778f5a4423296ac3da003328740ea908d7e5a18c07c4cddd2dbe604491f2bf",
+    "8f909c071f2354c20d2ae139342781900f3fb7170cb7f9e9b961b44fa7b62aee",
+    "57f42edf91a2aaeeee080d0b8c7199fed3b2b206b14e4b66a8ebca6bf88dc5e6",
+    "8eebe9f90127beb6a63b241c4632fedf848d41fda155d0b831905ed069f40549",
+    "f76f536a470cf256a61fea139fbf71b9c45e058ac09d2ccd5abf8d13427a9619",
+    "f8dcdc0e187e09dcad777acebe9ea06c8e7f43ac7085f06ef1dbf9e27db2d816",
+    "c6e01f70e4c7d64d61d54eede44b057b403b2f68357436bcf6750fb178c5db9d",
+    "e493c0aa6a5104e560b54681f708d47a27b0be5fc4c5d7632f659f1bae817d91",
+    "cdf6bb931e773f2d32aaf11b6ec57858277271f82ef6bc42e58862a4758e9c0d",
+    "583df28407736bc5681210760178ba7db74498f0ab473cabe0416fcda497c5be",
+    "1aa2fcddaf5056f275a84c936a4ed6daa249b13f4046a343aa8ec1490cf21768",
+    "eb7663ff013e5027a376d7b935f808422e18a871c5c7f1ed4d668bd33ae4251e",
+    "227bf41de2f8a82277594728ec842f59ad8d487a46103dfcf294ebaa4878a80b",
+    "e0d8d40012325864ebd26ba31dde2d7a97036e23db73bed8a7ad1f176bf8caf5",
+    "975bc1a700f21c44b47631a7bbc021c31be41c8f03711606a4ce46c6903bf383",
+    "3fecb5d108ceba937fbb870674420d1a728be5d9da528526210ebf990608d023",
+    "2824509f5ccb0aa93f05df3db7bde4bfba3ec46f69e50b2881b6fa3bd859b405"
+  ],
+  "sources": {
+    "walk_front": {
+      "source": "references/walk_front_source.png",
+      "source_sha256": "8d1582f4e2d0dacb6204e5c3aadb944aa14494d635fdcefa91efed6385d37fdd",
+      "source_size": [
+        2172,
+        724
+      ],
+      "method": "hosted_imagegen",
+      "common_scale": 0.11695906432748537,
+      "common_source_root_x": 300,
+      "common_source_baseline": 697,
+      "no_per_frame_fit_or_center": true,
+      "frames": [
+        {
+          "column": 0,
+          "source_occupied_columns": [
+            70,
+            449
+          ],
+          "logical_slot_left": 0.0,
+          "paste": [
+            21,
+            22
+          ],
+          "bbox": [
+            21,
+            24,
+            65,
+            104
+          ],
+          "opaque_pixels": 2074
+        },
+        {
+          "column": 1,
+          "source_occupied_columns": [
+            643,
+            992
+          ],
+          "logical_slot_left": 543.0,
+          "paste": [
+            25,
+            22
+          ],
+          "bbox": [
+            25,
+            24,
+            66,
+            104
+          ],
+          "opaque_pixels": 1973
+        },
+        {
+          "column": 2,
+          "source_occupied_columns": [
+            1158,
+            1535
+          ],
+          "logical_slot_left": 1086.0,
+          "paste": [
+            21,
+            22
+          ],
+          "bbox": [
+            21,
+            24,
+            65,
+            104
+          ],
+          "opaque_pixels": 2057
+        },
+        {
+          "column": 3,
+          "source_occupied_columns": [
+            1732,
+            2078
+          ],
+          "logical_slot_left": 1629.0,
+          "paste": [
+            25,
+            22
+          ],
+          "bbox": [
+            25,
+            24,
+            65,
+            103
+          ],
+          "opaque_pixels": 1943
+        }
+      ]
+    },
+    "walk_back": {
+      "source": "references/walk_back_source.png",
+      "source_sha256": "dcaa58637f12031048a88c3172ea98a0f61bed18aff303a16143af34ea20f35b",
+      "source_size": [
+        2172,
+        724
+      ],
+      "method": "hosted_imagegen",
+      "common_scale": 0.11494252873563218,
+      "common_source_root_x": 280,
+      "common_source_baseline": 710,
+      "no_per_frame_fit_or_center": true,
+      "frames": [
+        {
+          "column": 0,
+          "source_occupied_columns": [
+            78,
+            429
+          ],
+          "logical_slot_left": 0.0,
+          "paste": [
+            25,
+            22
+          ],
+          "bbox": [
+            25,
+            24,
+            65,
+            103
+          ],
+          "opaque_pixels": 1768
+        },
+        {
+          "column": 1,
+          "source_occupied_columns": [
+            660,
+            972
+          ],
+          "logical_slot_left": 543.0,
+          "paste": [
+            29,
+            22
+          ],
+          "bbox": [
+            29,
+            24,
+            65,
+            102
+          ],
+          "opaque_pixels": 1649
+        },
+        {
+          "column": 2,
+          "source_occupied_columns": [
+            1162,
+            1515
+          ],
+          "logical_slot_left": 1086.0,
+          "paste": [
+            25,
+            22
+          ],
+          "bbox": [
+            25,
+            24,
+            66,
+            104
+          ],
+          "opaque_pixels": 1805
+        },
+        {
+          "column": 3,
+          "source_occupied_columns": [
+            1752,
+            2059
+          ],
+          "logical_slot_left": 1629.0,
+          "paste": [
+            30,
+            22
+          ],
+          "bbox": [
+            30,
+            24,
+            65,
+            100
+          ],
+          "opaque_pixels": 1591
+        }
+      ]
+    },
+    "attack_front": {
+      "source": "references/attack_front_source.png",
+      "source_sha256": "7ca5269c14d578427e1ae591a83fe623d2a660a4145b73d254697a269d2b10b5",
+      "source_size": [
+        2172,
+        724
+      ],
+      "method": "hosted_imagegen",
+      "common_scale": 0.1225114854517611,
+      "common_source_root_x": 365,
+      "common_source_baseline": 695,
+      "no_per_frame_fit_or_center": true,
+      "frames": [
+        {
+          "column": 0,
+          "source_occupied_columns": [
+            127,
+            597
+          ],
+          "logical_slot_left": 0.0,
+          "paste": [
+            19,
+            19
+          ],
+          "bbox": [
+            19,
+            21,
+            77,
+            104
+          ],
+          "opaque_pixels": 2497
+        },
+        {
+          "column": 1,
+          "source_occupied_columns": [
+            785,
+            1314
+          ],
+          "logical_slot_left": 724.0,
+          "paste": [
+            11,
+            19
+          ],
+          "bbox": [
+            11,
+            21,
+            76,
+            104
+          ],
+          "opaque_pixels": 2698
+        },
+        {
+          "column": 2,
+          "source_occupied_columns": [
+            1518,
+            1954
+          ],
+          "logical_slot_left": 1448.0,
+          "paste": [
+            12,
+            19
+          ],
+          "bbox": [
+            12,
+            24,
+            65,
+            104
+          ],
+          "opaque_pixels": 2432
+        }
+      ]
+    },
+    "attack_back": {
+      "source": "references/attack_back_source.png",
+      "source_sha256": "55597711fa29a9b3f573f2eb3ae10a2ce5e113674018ef900928cb66affb1dab",
+      "source_size": [
+        2172,
+        724
+      ],
+      "method": "hosted_imagegen",
+      "common_scale": 0.12195121951219512,
+      "common_source_root_x": 350,
+      "common_source_baseline": 719,
+      "no_per_frame_fit_or_center": true,
+      "frames": [
+        {
+          "column": 0,
+          "source_occupied_columns": [
+            151,
+            572
+          ],
+          "logical_slot_left": 0.0,
+          "paste": [
+            24,
+            16
+          ],
+          "bbox": [
+            24,
+            16,
+            75,
+            103
+          ],
+          "opaque_pixels": 1946
+        },
+        {
+          "column": 1,
+          "source_occupied_columns": [
+            805,
+            1306
+          ],
+          "logical_slot_left": 724.0,
+          "paste": [
+            15,
+            16
+          ],
+          "bbox": [
+            15,
+            16,
+            76,
+            103
+          ],
+          "opaque_pixels": 2163
+        },
+        {
+          "column": 2,
+          "source_occupied_columns": [
+            1593,
+            1954
+          ],
+          "logical_slot_left": 1448.0,
+          "paste": [
+            23,
+            16
+          ],
+          "bbox": [
+            23,
+            24,
+            67,
+            103
+          ],
+          "opaque_pixels": 1798
+        }
+      ]
+    },
+    "state_front": {
+      "source": "references/state_front_source.png",
+      "source_sha256": "ff4d3b6bb0ab1622d56ece62810de59324ffedc3eda97101fa8b91795b654e57",
+      "source_size": [
+        2172,
+        724
+      ],
+      "method": "hosted_imagegen",
+      "common_scale": 0.12048192771084337,
+      "common_source_root_x": 265,
+      "common_source_baseline": 690,
+      "no_per_frame_fit_or_center": true,
+      "frames": [
+        {
+          "column": 0,
+          "source_occupied_columns": [
+            70,
+            420
+          ],
+          "logical_slot_left": 0.0,
+          "paste": [
+            25,
+            21
+          ],
+          "bbox": [
+            25,
+            24,
+            67,
+            104
+          ],
+          "opaque_pixels": 2066
+        },
+        {
+          "column": 1,
+          "source_occupied_columns": [
+            491,
+            834
+          ],
+          "logical_slot_left": 434.4,
+          "paste": [
+            23,
+            21
+          ],
+          "bbox": [
+            23,
+            24,
+            64,
+            104
+          ],
+          "opaque_pixels": 2086
+        },
+        {
+          "column": 2,
+          "source_occupied_columns": [
+            887,
+            1239
+          ],
+          "logical_slot_left": 868.8,
+          "paste": [
+            18,
+            21
+          ],
+          "bbox": [
+            18,
+            26,
+            60,
+            104
+          ],
+          "opaque_pixels": 2079
+        },
+        {
+          "column": 3,
+          "source_occupied_columns": [
+            1278,
+            1670
+          ],
+          "logical_slot_left": 1303.2,
+          "paste": [
+            13,
+            21
+          ],
+          "bbox": [
+            13,
+            48,
+            60,
+            103
+          ],
+          "opaque_pixels": 1570
+        },
+        {
+          "column": 4,
+          "source_occupied_columns": [
+            1699,
+            2140
+          ],
+          "logical_slot_left": 1737.6,
+          "paste": [
+            11,
+            21
+          ],
+          "bbox": [
+            11,
+            65,
+            64,
+            103
+          ],
+          "opaque_pixels": 1132
+        }
+      ]
+    },
+    "state_back": {
+      "source": "references/state_back_source.png",
+      "source_sha256": "be596af82052cc590fbf25fb53e8240ad90f0f863aa19a80ad0de607830de4fe",
+      "source_size": [
+        2172,
+        724
+      ],
+      "method": "hosted_imagegen",
+      "common_scale": 0.11816838995568685,
+      "common_source_root_x": 260,
+      "common_source_baseline": 695,
+      "no_per_frame_fit_or_center": true,
+      "frames": [
+        {
+          "column": 0,
+          "source_occupied_columns": [
+            61,
+            385
+          ],
+          "logical_slot_left": 0.0,
+          "paste": [
+            24,
+            22
+          ],
+          "bbox": [
+            24,
+            24,
+            62,
+            105
+          ],
+          "opaque_pixels": 1848
+        },
+        {
+          "column": 1,
+          "source_occupied_columns": [
+            466,
+            803
+          ],
+          "logical_slot_left": 434.4,
+          "paste": [
+            21,
+            22
+          ],
+          "bbox": [
+            21,
+            24,
+            61,
+            105
+          ],
+          "opaque_pixels": 1907
+        },
+        {
+          "column": 2,
+          "source_occupied_columns": [
+            852,
+            1211
+          ],
+          "logical_slot_left": 868.8,
+          "paste": [
+            15,
+            22
+          ],
+          "bbox": [
+            15,
+            27,
+            57,
+            105
+          ],
+          "opaque_pixels": 1932
+        },
+        {
+          "column": 3,
+          "source_occupied_columns": [
+            1271,
+            1664
+          ],
+          "logical_slot_left": 1303.2,
+          "paste": [
+            13,
+            22
+          ],
+          "bbox": [
+            13,
+            45,
+            59,
+            105
+          ],
+          "opaque_pixels": 1599
+        },
+        {
+          "column": 4,
+          "source_occupied_columns": [
+            1711,
+            2135
+          ],
+          "logical_slot_left": 1737.6,
+          "paste": [
+            14,
+            22
+          ],
+          "bbox": [
+            14,
+            66,
+            64,
+            105
+          ],
+          "opaque_pixels": 1117
+        }
+      ]
+    }
+  },
+  "portrait_source": {
+    "path": "references/portrait_source.png",
+    "sha256": "d21a8f8e1c0dae29497ee18f45801599df93e62f487bbd8d77bf089c9467ceb0"
+  }
+}

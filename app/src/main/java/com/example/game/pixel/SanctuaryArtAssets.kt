@@ -24,7 +24,12 @@ object SanctuaryArtAssets {
   internal val cachedImageCount get() = images.size
   /** Decoded PNG cache only; generated actor atlases and GPU copies are not included. Sample at 1 Hz. */
   internal val cachedBitmapBytes: Long get() = images.values.sumOf { it.asAndroidBitmap().allocationByteCount.toLong() }
-  fun init(context: Context) { this.context = context.applicationContext }
+  fun init(context: Context) {
+    this.context = context.applicationContext
+    ArtDepthAssets.preload(context.applicationContext)
+    AuthoredHeroAtlas.preload(context.applicationContext)
+    AuthoredStructureAtlas.preload(context.applicationContext)
+  }
   fun image(id: String): ImageBitmap? = asset("sanctuary_p03/$id.png")
   internal fun textAsset(path: String): String? = context?.assets?.open(path)?.bufferedReader()?.use { it.readText() }
   internal fun asset(path: String): ImageBitmap? {
@@ -132,6 +137,7 @@ object SanctuaryArtAssets {
   }
 
   internal fun preferredLandmark(name: String, width: Int, height: Int): ImageBitmap? {
+    AuthoredStructureAtlas.landmark(name, width, height)?.let { return it }
     if (visualProfile == SanctuaryVisualProfile.P27B) {
       assetSafe("sanctuary_p27b/structures/$name.png")
         ?.takeIf { it.width == width && it.height == height }?.let { return it }
