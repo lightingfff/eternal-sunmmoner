@@ -23,6 +23,9 @@ object FantasyHd128Structures {
   private val hdCache = ConcurrentHashMap<Int, ImageBitmap>()
 
   fun hdFor(source: ImageBitmap, materialProfile: MaterialProfile = MaterialProfile.ARCHITECTURE): ImageBitmap {
+    // Authored facilities already contain painted stone, roof bevels and local shade.
+    // Resynthesizing every pixel invents grain and retains another four times their RAM.
+    if (materialProfile == MaterialProfile.ARCHITECTURE && source.width >= 160) return source
     val key = System.identityHashCode(source) * 31 + materialProfile.ordinal
     return hdCache.getOrPut(key) {
       synthesizeHd128Sprite(source, materialProfile)

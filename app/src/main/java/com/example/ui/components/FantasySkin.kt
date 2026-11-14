@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 
 /** Shared controls across management, inventory, tower preparation and settlement. */
@@ -26,6 +28,20 @@ object FantasySkin {
   // for small idle chips/docks (modals keep the denser Panel). Contrast enforced by tests.
   val HudGlass=Color(0xCC141D2A)
   val Gold=Color(0xffc6b27f)
+  /** A restrained raised-metal edge. Drawn over chrome only; leaves text and world visibility intact. */
+  fun Modifier.materialEdge(): Modifier = drawWithCache {
+    val inset = 3.dp.toPx()
+    val weight = 1.dp.toPx()
+    onDrawWithContent {
+      drawContent()
+      if (size.width > inset * 2 && size.height > inset * 2) {
+        drawLine(Color(0xFFEFDCAB).copy(alpha = .38f),
+          Offset(inset * 2, inset), Offset(size.width - inset * 2, inset), weight)
+        drawLine(Color(0xFF050B14).copy(alpha = .70f),
+          Offset(inset * 2, size.height - inset), Offset(size.width - inset * 2, size.height - inset), weight * 1.5f)
+      }
+    }
+  }
   @Composable fun buttonColors(containerColor: Color=Panel,contentColor: Color=Gold,
     disabledContainerColor: Color=Color(0xff242a30),disabledContentColor: Color=Color(0xff80868d)): ButtonColors {
     return ButtonDefaults.buttonColors(
@@ -39,7 +55,9 @@ object FantasySkin {
   elevation: ButtonElevation?=null,border: BorderStroke?=BorderStroke(1.dp,FantasySkin.Gold.copy(alpha=.5f)),
   contentPadding: PaddingValues=PaddingValues(horizontal=14.dp,vertical=9.dp),
   interactionSource: MutableInteractionSource?=null,content: @Composable RowScope.()->Unit) {
-  Button(onClick,modifier.heightIn(min=48.dp),enabled,shape,colors,elevation,border,contentPadding,interactionSource,content)
+  val raised = elevation ?: ButtonDefaults.buttonElevation(defaultElevation=2.dp,
+    pressedElevation=0.dp,focusedElevation=2.dp,hoveredElevation=3.dp,disabledElevation=0.dp)
+  Button(onClick,with(FantasySkin) { modifier.heightIn(min=48.dp).materialEdge() },enabled,shape,colors,raised,border,contentPadding,interactionSource,content)
 }
 @Composable fun RewardSummary(gold: Long,mana: Long,shards: Long,ore: Long,essence: Long) {
   Column(verticalArrangement=Arrangement.spacedBy(8.dp),modifier=Modifier.fillMaxWidth()) {

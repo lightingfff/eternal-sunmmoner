@@ -1,0 +1,1 @@
+Robolectric SDK36 NATIVE; decoded=4; actors=4; retainedBytes=7077888; 96 cached enemy surfaces; vfxDecode=1; vfxBytes=1179648; combinedBytes=8257536; NOT device memory/FPS

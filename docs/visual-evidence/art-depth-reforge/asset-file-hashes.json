@@ -1,0 +1,164 @@
+{
+  "files": [
+    {
+      "path": "app/src/main/assets/art_depth_v1/materials/carpet.png",
+      "bytes": 153641,
+      "sha256": "dc9ca24a8419f9413f734460b503f6cad901586c9145904009793e4b4c796169"
+    },
+    {
+      "path": "app/src/main/assets/art_depth_v1/materials/cobble.png",
+      "bytes": 135042,
+      "sha256": "f70635d9b365bbbedd6d9549de74622ea65ff985ce2eeb842cf65c8c750421b2"
+    },
+    {
+      "path": "app/src/main/assets/art_depth_v1/materials/forest_moss.png",
+      "bytes": 132980,
+      "sha256": "e5afc0277bf2decc4adbc1296e50c37acb9dbd84c60680f7a66fc906ccdb04ef"
+    },
+    {
+      "path": "app/src/main/assets/art_depth_v1/materials/forge.png",
+      "bytes": 127116,
+      "sha256": "8c73ad39f7154efea84c5e1e35cd0e49589484aae543061350ff9d01ed504608"
+    },
+    {
+      "path": "app/src/main/assets/art_depth_v1/materials/leaf_litter.png",
+      "bytes": 140895,
+      "sha256": "7e400864fbb411653610849d1f41d760fd5de280d5f914095e13154587d1fc02"
+    },
+    {
+      "path": "app/src/main/assets/art_depth_v1/materials/limestone.png",
+      "bytes": 143350,
+      "sha256": "369af3d2f1dac3818298c6aca8b68a842764c6842844574dc29a86d13be43eb7"
+    },
+    {
+      "path": "app/src/main/assets/art_depth_v1/materials/manifest.json",
+      "bytes": 7196,
+      "sha256": "a8e0e7a8c20f2ed22124d0f83e242da824a7f469f0e6b1e92f02d30fdb464ab8"
+    },
+    {
+      "path": "app/src/main/assets/art_depth_v1/materials/marble.png",
+      "bytes": 121563,
+      "sha256": "3eb04aaf208dca0ddb9632fb93aa56d20cf7ce74f33c3e481dbbd7376a1522b5"
+    },
+    {
+      "path": "app/src/main/assets/art_depth_v1/materials/meadow_grass.png",
+      "bytes": 131622,
+      "sha256": "6e5e8e03b177f2b635978d9f17e28d21185e126d06b37db94d4791e051311770"
+    },
+    {
+      "path": "app/src/main/assets/art_depth_v1/materials/oak.png",
+      "bytes": 113942,
+      "sha256": "912abf4990354dde392293626767eaf6b76d13db30a9226e031be426f3c21941"
+    },
+    {
+      "path": "app/src/main/assets/art_depth_v1/materials/rock.png",
+      "bytes": 133809,
+      "sha256": "b8f4ae406d67a4ae832ac3ec22c7d9b182683bf031e929940be7ebbb14aaaed3"
+    },
+    {
+      "path": "app/src/main/assets/art_depth_v1/materials/ruin.png",
+      "bytes": 135702,
+      "sha256": "010c609a073fef882a7b693f4180a2070572e23a06db9deb34d33b723bf4dc33"
+    },
+    {
+      "path": "app/src/main/assets/art_depth_v1/materials/sanctuary_grass.png",
+      "bytes": 129107,
+      "sha256": "467e3c6a56bad05e050b27aa052a4e4b7ad6daf689f199fd8f0cf799547e7a3c"
+    },
+    {
+      "path": "app/src/main/assets/art_depth_v1/materials/sand.png",
+      "bytes": 122923,
+      "sha256": "38d1b1d216ff074a92b94fb5afee36f2d6114403b4267edbf1165db4d741a72d"
+    },
+    {
+      "path": "app/src/main/assets/art_depth_v1/materials/soil.png",
+      "bytes": 125476,
+      "sha256": "3b79bd903df21c2133d9603584b2f8ffe20c7501cb440d90d11d6ae16fa455f9"
+    },
+    {
+      "path": "app/src/main/assets/art_depth_v1/materials/star_stone.png",
+      "bytes": 128528,
+      "sha256": "3caca4f2f2b45eafc454aa7a181e62f9b9398dfadf84ad0ecda23969707a2562"
+    },
+    {
+      "path": "app/src/main/assets/art_depth_v1/materials/volcanic.png",
+      "bytes": 121611,
+      "sha256": "635a075ba565ba5dae986d6c56ede71fef054edeccc574fc64af11a5cf119e7e"
+    },
+    {
+      "path": "app/src/main/assets/art_depth_v1/structures/manifest.json",
+      "bytes": 693,
+      "sha256": "f28ad40959e452e06b6db8444725ece7b877b0f41481af9fe64cdb81ca8e5696"
+    },
+    {
+      "path": "app/src/main/assets/art_depth_v1/structures/summoning_hall.png",
+      "bytes": 67835,
+      "sha256": "cbe76a21714995230c77e821249a083a0a46bad0ba2167a44e25ed612f540ead"
+    },
+    {
+      "path": "app/src/main/assets/character_upgrade_v1/kaelen/kaelen.png",
+      "bytes": 142015,
+      "sha256": "eed46e057625716d1adac906a34d7c96ec6ab39b512ebe22c16b3ecbc8eafbe4"
+    },
+    {
+      "path": "app/src/main/assets/character_upgrade_v1/kaelen/metadata.json",
+      "bytes": 14337,
+      "sha256": "038bacebae3e4e9870a73b72333b10a5b7c8ef1654a2fc419aef77372a247ef8"
+    },
+    {
+      "path": "app/src/main/assets/character_upgrade_v1/kaelen/portrait.png",
+      "bytes": 30847,
+      "sha256": "c0caf02f56e063e065081320e9bb8bc09924f86a5e029ab87cc4919c844f1981"
+    },
+    {
+      "path": "app/src/main/assets/character_upgrade_v1/lyra/lyra.png",
+      "bytes": 130528,
+      "sha256": "69a4c8bf26c651be8db64bad877a4b0ce727cece09d0656970d5485b9e500353"
+    },
+    {
+      "path": "app/src/main/assets/character_upgrade_v1/lyra/metadata.json",
+      "bytes": 14207,
+      "sha256": "f7d8b0f1b8bbb04a78c063788660e0ea599649d80fb3894cd3a4ade69a647db4"
+    },
+    {
+      "path": "app/src/main/assets/character_upgrade_v1/lyra/portrait.png",
+      "bytes": 27037,
+      "sha256": "75eec30e4c1a747a911791832dca1533e45a350f367881a1d64e85ad42461e5c"
+    },
+    {
+      "path": "app/src/main/assets/character_upgrade_v1/vesper/metadata.json",
+      "bytes": 14198,
+      "sha256": "b3479bb83dd4df1130bfb5c81360d6a08aceee52f03c7f0c4a08ad339e3dcee4"
+    },
+    {
+      "path": "app/src/main/assets/character_upgrade_v1/vesper/portrait.png",
+      "bytes": 38968,
+      "sha256": "30bd28c084b60fb1cf52a2dfdb63186d21945641d158197f63d074da11546e4a"
+    },
+    {
+      "path": "app/src/main/assets/character_upgrade_v1/vesper/vesper.png",
+      "bytes": 166881,
+      "sha256": "03befc3acf35ca078ad37f0f2adfff18bc17ab599a2f938d1796e46852a531c3"
+    },
+    {
+      "path": "app/src/main/assets/pixelfx_v1/LICENSE",
+      "bytes": 1093,
+      "sha256": "0a77565a50c3462831244452f129c38d2adc4fd07897cbeba8adc943f958604e"
+    },
+    {
+      "path": "app/src/main/assets/pixelfx_v1/NOTICE.md",
+      "bytes": 620,
+      "sha256": "d12932473f98b1a3f0b5820ae23d568b52e39294ba7c2d60c0649a93a808af3b"
+    },
+    {
+      "path": "app/src/main/assets/pixelfx_v1/vfx.png",
+      "bytes": 73176,
+      "sha256": "6078700376e1ead6bac7e9643c660b35239e23bfa1c6c44d16d1bc21b36e5490"
+    },
+    {
+      "path": "app/src/main/assets/pixelfx_v1/vfx_manifest.json",
+      "bytes": 5286,
+      "sha256": "ef6de0f053229398dec709d4b78555bb0115f22158f0636abf8843672fb4ff3c"
+    }
+  ]
+}

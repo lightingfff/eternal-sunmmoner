@@ -149,21 +149,25 @@ object SanctuaryWorldRenderer {
       val startTy = ((minWy / worldTileSize).toInt() - 1).coerceAtLeast(4)
       val endTy = ((maxWy / worldTileSize).toInt() + 1).coerceAtMost(38)
 
-      // 3A. 128x128 Ultra-Detailed HD-2D Fantasy Sunlit Emerald-Moss Grass Lawn Across Entire Island
+      // Continuous authored grass macros; procedural tile fallback retains the existing ground grid.
       val hdGrassTiles = FantasyHd128Atlas.hdSanctuaryGrassTiles
-      for (ty in startTy..endTy) {
-        val wy = ty * worldTileSize
-        val dstY = sy(wy).roundToInt()
-        for (tx in startTx..endTx) {
-          val wx = tx * worldTileSize
-          val dstX = sx(wx).roundToInt()
-          val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
-          drawImage(
-            image = hdGrassTiles[hash % hdGrassTiles.size],
-            dstOffset = IntOffset(dstX, dstY),
-            dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
-            filterQuality = FilterQuality.None,
-          )
+      val macroDrawn = with(ArtDepthAssets) {
+        drawGrassMacros(startTx, endTx, startTy, endTy, ::sx, { sy(it) }, zoom)
+      }
+      if (!macroDrawn) {
+        for (ty in startTy..endTy) {
+          val wy = ty * worldTileSize
+          val dstY = sy(wy).roundToInt()
+          for (tx in startTx..endTx) {
+            val wx = tx * worldTileSize
+            val dstX = sx(wx).roundToInt()
+            drawImage(
+              image = ArtDepthAssets.tile(hdGrassTiles, tx, ty),
+              dstOffset = IntOffset(dstX, dstY),
+              dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
+              filterQuality = FilterQuality.None,
+            )
+          }
         }
       }
 
@@ -317,9 +321,8 @@ object SanctuaryWorldRenderer {
         for (tx in 6..21) {
           val wx = tx * worldTileSize
           val dstX = sx(wx).roundToInt()
-          val hash = ((tx * 49297) xor (ty * 91813)) and 0x7FFFFFFF
           drawImage(
-            image = sandTiles[hash % sandTiles.size],
+            image = ArtDepthAssets.tile(sandTiles, tx, ty),
             dstOffset = IntOffset(dstX, dstY),
             dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
             filterQuality = FilterQuality.None,
@@ -352,8 +355,7 @@ object SanctuaryWorldRenderer {
     for (ty in rows) for (tx in columns) {
       // The road verge ring is a clip ring: tiles fully outside the road cannot contribute.
       if (roadPaths != null && !SanctuaryRoadCoverage.mayContainRoad(roadPaths, tx, ty, roadExtraWorld)) continue
-      val index = ((tx * 73856093 xor ty * 19349663) and 0x7fffffff) % tiles.size
-      drawImage(tiles[index], dstOffset=IntOffset(sx(tx*64f).roundToInt(),sy(ty*64f,0f).roundToInt()),
+      drawImage(ArtDepthAssets.tile(tiles, tx, ty), dstOffset=IntOffset(sx(tx*64f).roundToInt(),sy(ty*64f,0f).roundToInt()),
         dstSize=IntSize((64*zoom).roundToInt().coerceAtLeast(1)+1,(64*zoom*ObliqueCamera.OBLIQUE_Y_SCALE).roundToInt().coerceAtLeast(1)+1),filterQuality=FilterQuality.None)
     }
   }
@@ -427,9 +429,8 @@ object SanctuaryWorldRenderer {
           if (wx > 2460f) continue
           if (!SanctuaryRoadCoverage.mayContainRoad(paths, tx, ty)) continue
           val dstX = sx(wx).roundToInt()
-          val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
           drawImage(
-            image = cobbleTiles[hash % cobbleTiles.size],
+            image = ArtDepthAssets.tile(cobbleTiles, tx, ty),
             dstOffset = IntOffset(dstX, dstY),
             dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
             filterQuality = FilterQuality.None,
@@ -1135,7 +1136,7 @@ object SanctuaryWorldRenderer {
       for (ty in 10..28) for (tx in 21..39) {
         val hash = ((tx * 73856093 xor ty * 19349663) and 0x7fffffff)
         drawImage(
-          image = tiles[hash % tiles.size],
+          image = ArtDepthAssets.tile(tiles, tx, ty),
           dstOffset = IntOffset(sx(tx * 64f).roundToInt(), sy(ty * 64f, 0f).roundToInt()),
           dstSize = IntSize(tw, th),
           filterQuality = FilterQuality.None,
@@ -1758,12 +1759,8 @@ object SanctuaryWorldRenderer {
       // AO under southern gate platform
       val gL = sx(1380f); val gR = sx(1840f); val gB = sy(2390f, 0f)
       drawOval(Color(0xFF060A14).copy(alpha = 0.36f), Offset(gL - 12f*zoom, gB - 6f*zoom), Size((gR-gL)+24f*zoom, 26f*zoom))
-      // Building foot AO — Tower Gate, Summoning Hall, Dorms, Armory, Synthesis, Restaurant
-      drawBuildingAO(sx(1960f)-50f*zoom, sy(635f,0f)-6f*zoom, 100f*zoom, 18f*zoom, alpha=0.32f)
-      drawBuildingAO(sx(2380f)-60f*zoom, sy(1930f,0f)-6f*zoom, 120f*zoom, 16f*zoom, alpha=0.30f)
-      drawBuildingAO(sx(1105f)-42f*zoom, sy(955f,0f)-5f*zoom, 84f*zoom, 14f*zoom, alpha=0.28f)
-      drawBuildingAO(sx(995f)-42f*zoom, sy(685f,0f)-5f*zoom, 84f*zoom, 14f*zoom, alpha=0.28f)
-      drawBuildingAO(sx(825f)-42f*zoom, sy(820f,0f)-5f*zoom, 84f*zoom, 14f*zoom, alpha=0.28f)
+      // Building contact belongs to drawProp at each live obstacle anchor.
+      // A second hardcoded AO list drifted away from moved doors/facades.
       // Tree canopy AO — oak/pine/sakura clusters produce rich darkening under foliage mass
       drawTreeCanopyAO(sx(750f), sy(920f,0f), 34f*zoom, 12f*zoom, alpha=0.28f)
       drawTreeCanopyAO(sx(1280f), sy(640f,0f), 28f*zoom, 10f*zoom, alpha=0.26f)

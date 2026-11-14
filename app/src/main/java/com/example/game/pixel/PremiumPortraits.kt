@@ -21,6 +21,10 @@ internal object PremiumPortraits {
     // frame the HUD avatar is drawn.
     val key = heroName ?: return null
     if (key.isEmpty()) return null
+    AuthoredHeroAtlas.portrait(key)?.let { image ->
+      if (cache[key] !== image) cache[key] = image
+      return image
+    }
     if (cache.containsKey(key)) return cache[key]
     val image = runCatching {
       val text = SanctuaryArtAssets.textAsset("premium_slice/manifest.json") ?: return@runCatching null

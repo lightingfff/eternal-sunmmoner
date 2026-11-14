@@ -1,0 +1,154 @@
+{
+  "repository": "https://github.com/patch-gg/pixelfx",
+  "commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+  "license": "MIT; gallery PatchPixel font excluded",
+  "catalog_effect_count": 244,
+  "selected_effects": [
+    "impacts/shield-block",
+    "arcane/mana-burst",
+    "melee/sword-slash",
+    "holy/heal-aoe"
+  ],
+  "vendor_files": [
+    {
+      "path": "LICENSE",
+      "sha256": "0a77565a50c3462831244452f129c38d2adc4fd07897cbeba8adc943f958604e",
+      "bytes": 1093
+    },
+    {
+      "path": "NOTICE.md",
+      "sha256": "d12932473f98b1a3f0b5820ae23d568b52e39294ba7c2d60c0649a93a808af3b",
+      "bytes": 620
+    },
+    {
+      "path": "package.json",
+      "sha256": "a0663052563c9e8cf1c5aceee3f57efd9d3031fd6ea51db4d4816705c1f00264",
+      "bytes": 538
+    },
+    {
+      "path": "src/core/act.js",
+      "sha256": "b4fdeaf8af30c709748bb221c3b3854cc0438f2ce6c6d99f0324e3b3701b9f71",
+      "bytes": 24016
+    },
+    {
+      "path": "src/core/actor.js",
+      "sha256": "5c867a24a88e93520d020b77190f12db265eb8fc357136ce3d92de05e19e63c2",
+      "bytes": 4375
+    },
+    {
+      "path": "src/core/chain.js",
+      "sha256": "5014a0eae326f1855f5e320308ad370dbc342d2f1051df3665866401956bfef9",
+      "bytes": 2137
+    },
+    {
+      "path": "src/core/color.js",
+      "sha256": "4e63f3074df7c1e138f721959858d12e4f6ccc2bf4f8e98c576efbae51241e54",
+      "bytes": 5283
+    },
+    {
+      "path": "src/core/font.js",
+      "sha256": "c094f1d3a9f94478a255f1cc81aa7ccd2c2ba7a97fc1227a29d268acc1f2ec7c",
+      "bytes": 5399
+    },
+    {
+      "path": "src/core/fx.js",
+      "sha256": "a959c5f7b1c15ba8e07cb26e5b1ccc0bce0aef54ca14cf01f9d6e794cf4e5a0b",
+      "bytes": 5107
+    },
+    {
+      "path": "src/core/index.js",
+      "sha256": "ef5966a6365dbbe8a990867b6c7f3fc61922428e5f2e61262a3a430c119bf02d",
+      "bytes": 908
+    },
+    {
+      "path": "src/core/math.js",
+      "sha256": "da45e1ed43f7d119dd80fbe97c7de2b35b4ea95dea8781671c296ee5942ac0bc",
+      "bytes": 6102
+    },
+    {
+      "path": "src/core/painter.js",
+      "sha256": "5b8ada6a25cdf1e63ae3684cc56276c61306558dc0a3a827a6a39ab038f74681",
+      "bytes": 16717
+    },
+    {
+      "path": "src/core/particles.js",
+      "sha256": "867e58baf522278b4aad383c7224c599cff9ba93268b5eac9485a39a3809477b",
+      "bytes": 3242
+    },
+    {
+      "path": "src/core/poses.js",
+      "sha256": "829f9b59ac883061afb9e952d6b608363ec7678bd00b026c538046685af88139",
+      "bytes": 2236
+    },
+    {
+      "path": "src/core/rig.js",
+      "sha256": "5af3f455b18f9feb9f060732fb457529c6c76975a309c72171aa4e88b31aa70c",
+      "bytes": 28452
+    },
+    {
+      "path": "src/core/scene.js",
+      "sha256": "520a465f771829162dde114880224eb30efbab3cff859cb8a24a28e49d8e198c",
+      "bytes": 1683
+    },
+    {
+      "path": "src/core/shapes.js",
+      "sha256": "3e28f77e25b3083949f083c74304ead6826b7b1da20a658ccb114ab531fc8898",
+      "bytes": 2225
+    },
+    {
+      "path": "src/core/sim.js",
+      "sha256": "517febe05b72de9d07e3596c019b9bb01e1f97a74089a30fa80e9e98849ba4b0",
+      "bytes": 19530
+    },
+    {
+      "path": "src/fx/arcane/_lib.js",
+      "sha256": "08615fc869f6b6a171f630fdccc42696cb14639ec7ccb93bc350130549bcf37a",
+      "bytes": 8608
+    },
+    {
+      "path": "src/fx/arcane/mana-burst.js",
+      "sha256": "5e13cd03df803020cdae40c62b9113548d41ca1a1c268c6221616413840b06ee",
+      "bytes": 6567
+    },
+    {
+      "path": "src/fx/holy/_lib.js",
+      "sha256": "6768e3763ff7c5d5294308cb92137319a979ff365881dc3b101f3f2a01e6ec27",
+      "bytes": 8983
+    },
+    {
+      "path": "src/fx/holy/heal-aoe.js",
+      "sha256": "f9e9d5523abdff4a003d6661a2bcbca7432897018592b5c86a3c72efea8d6c3a",
+      "bytes": 8071
+    },
+    {
+      "path": "src/fx/impacts/_lib.js",
+      "sha256": "0f47f85f805295eac267f159e27ce88a8766bbcd4e3b31c75359c97471861d9f",
+      "bytes": 10310
+    },
+    {
+      "path": "src/fx/impacts/shield-block.js",
+      "sha256": "04c5f971c93483e208655529a66e7fbbe39bd0f9c2d8a49947e8d49fda0a0df8",
+      "bytes": 6319
+    },
+    {
+      "path": "src/fx/melee/_lib.js",
+      "sha256": "e81ce122e878fec4d510ae17e8849fa5b8e0c70aa96caa6350157bf0d87f31f9",
+      "bytes": 11083
+    },
+    {
+      "path": "src/fx/melee/sword-slash.js",
+      "sha256": "3abcde4466df41bddd1da0c9c9824aa2450185de39c61c3b7d156272dcc9327a",
+      "bytes": 6587
+    },
+    {
+      "path": "tools/lib/fxlib.mjs",
+      "sha256": "4667773a1b83c9c64498006caa7349f65c9f19ddc61be94e72ba94554faa6431",
+      "bytes": 13018
+    },
+    {
+      "path": "tools/lib/png.mjs",
+      "sha256": "19da8ce363e7a4722fa49f06dd9066e07e83262c24da14a496b39a793111ed7c",
+      "bytes": 1521
+    }
+  ]
+}
