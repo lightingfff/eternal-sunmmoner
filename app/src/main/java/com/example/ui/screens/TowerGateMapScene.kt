@@ -2,6 +2,7 @@ package com.example.ui.screens
 
 import android.content.res.AssetManager
 import android.graphics.BitmapFactory
+import android.graphics.Bitmap
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -22,6 +23,8 @@ import com.example.game.pixel.PixelSpriteRenderer.drawCharacterSprite
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
+import java.security.MessageDigest
+import org.json.JSONObject
 
 /** Authored 960x540 composition. One uniform transform for art, VFX and touch/accessibility.
  * Ground art uses .72 oblique compression; upright architecture is never vertically squashed.
@@ -60,12 +63,45 @@ internal val NexusArches = listOf(
  * No asset IO, random generation or masonry allocation in a frame.
  */
 internal class TowerGateMapArt(private val assets: AssetManager) {
-  private fun load(name: String): ImageBitmap = assets.open("tower_gate_map/$name.png").use {
-    requireNotNull(BitmapFactory.decodeStream(it)).asImageBitmap()
+  private val names = listOf("eternal_gate_court", "three_gate_nexus", "engraved_door_leaves")
+  internal var sourcePack = "tower_gate_map"; private set
+  internal var retainedBytes = 0L; private set
+  private fun prepare(root: String, checked: Boolean): List<ImageBitmap> {
+    val owned = mutableListOf<Bitmap>()
+    try {
+      val meta = if (checked) assets.open("$root/manifest.json").bufferedReader().use { JSONObject(it.readText()) } else null
+      if (meta != null) require(meta.getInt("version") == 1 && meta.getJSONArray("assets").length() == 3)
+      for ((i, name) in names.withIndex()) {
+        val bytes = assets.open("$root/$name.png").use { it.readBytes() }
+        require(bytes.size in 1..4_000_000)
+        if (meta != null) {
+          val entry = meta.getJSONArray("assets").getJSONObject(i)
+          require(entry.getString("id") == name && entry.getString("file") == "$name.png")
+          require(MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) } == entry.getString("sha256"))
+        }
+        val bitmap = requireNotNull(BitmapFactory.decodeByteArray(bytes, 0, bytes.size,
+          BitmapFactory.Options().apply { inScaled = false; inPreferredConfig = Bitmap.Config.ARGB_8888 }))
+        owned += bitmap
+        require(bitmap.width == (if (i == 2) 144 else 960) && bitmap.height == (if (i == 2) 240 else 540))
+        require(!bitmap.hasAlpha() || bitmap.isPremultiplied)
+      }
+      val total = owned.sumOf { it.allocationByteCount.toLong() }
+      require(total <= 4_285_440L)
+      val result = owned.map { it.asImageBitmap() }
+      retainedBytes = total
+      sourcePack = root
+      return result
+    } catch (error: Throwable) {
+      owned.forEach { if (!it.isRecycled) it.recycle() }
+      throw error
+    }
   }
-  val court = load("eternal_gate_court")
-  val nexus = load("three_gate_nexus")
-  val doors = load("engraved_door_leaves")
+  private val images = try { prepare("art_completion_v1/gates", true) } catch (error: Exception) {
+    prepare("tower_gate_map", false)
+  } catch (error: OutOfMemoryError) { prepare("tower_gate_map", false) }
+  val court = images[0]
+  val nexus = images[1]
+  val doors = images[2]
   val courtMask = CourtArch.path()
   val nexusMasks = NexusArches.map { it.path() }
 }

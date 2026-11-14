@@ -1,0 +1,19 @@
+Create an ORIGINAL production game spritesheet for ETERNAL SUMMONER. ELDER TREANT boss: huge ancient oak creature, thick root legs, enormous bark-covered arms ending in wooden claws, deeply carved expressive knot face, broad twisting branch crown and a compact turquoise heart crystal embedded in its hollow chest. Gnarled amber-brown wood, moss, a few muted olive leaves; thick sculpted side planes and split bark textures. Threatening fantasy boss, never a rectangular box, not a cute sapling. Detailed master pixel-art with clean compact color clusters and precise silhouette, upper-left pale warm light and cool shaded right side. Full upright body in 3/4 oblique RPG camera about40degrees above ground, faces RIGHT throughout, front and right side visible. No floor, no cast shadow, no standalone VFX, no text/UI/grid lines.
+
+EXACT layout:6 columns x2 rows on wide LANDSCAPE transparent PNG,12 complete clearly separated figures, one per equal cell, all share body size, camera angle, logical root X and ground baseline90%ofcellheight. Keep enough transparent margins around branch crown, every root, horizontal attack arm and fully collapsed tree. No figures overlap or clip out of cells. Actual different animation poses, not translated duplicates.
+
+Frame order left-to-right top row then bottom row:
+1 idle guardian stance, two root feet planted, arms hanging wide.
+2 idle bark-chest breath and branches sway slightly, right claw flexes.
+3 walking right: left root leg steps forward, right arm swings forward.
+4 walking down-contact phase: body lowered, right root pulling past left, arms opposed.
+5 walking right: right root leg steps ahead, left arm forward, branch crown twists.
+6 walking passing/up phase: body higher, trailing left root lifted, branches sway.
+7 melee attack anticipation: massive right root arm pulled behind shoulder, knees bend.
+8 melee CONTACT: heavy right arm thrust/slam fully forward toward right at torso level, torso rotates with force, root legs brace; no impact VFX.
+9 melee recovery: arm lowers back and trunk leans forward, roots remain planted.
+10 hurt recoil: chest turns away, claw protects the heart crystal, branch crown pitches back.
+11 collapse: kneeling broken-root posture, body half-height, arms falling.
+12 defeat: the complete treant fallen onto its side, long root limbs and branch crown spread horizontally on ground; considerably lower than standing and same anatomical size, not shrunk.
+
+Prioritize real anatomy and wood volume readable after nearest-neighbor normalization into128x144runtimecells. Every cell includes the same complete being with same gear and branch structure, collapse does not become an unrelated log. Transparent alpha only, no checkerboard or colored backdrop. Original uncopyrighted design.

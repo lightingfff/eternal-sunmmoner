@@ -16,7 +16,10 @@ object SanctuaryEnvironmentShadows {
     }; close()
   } }
   internal fun sprite(obs: WorldObstacle): ImageBitmap? = with(PixelStructureAtlas) {
+    CompletionInteriorAtlas.entry(obs.propKind)?.let { return it.image }
     when (obs.propKind) {
+      PropKind.CRIMSON_CRYSTAL -> crimsonCrystalSprite
+      PropKind.TATTERED_BANNER -> tatteredBannerSprite
       PropKind.SAKURA_BLOSSOM_TREE -> if (obs.id.hashCode() and 1 == 0) sakuraTreeSpriteA else sakuraTreeSpriteB
       PropKind.OAK_TREE -> oakTreeSprite
       PropKind.MYSTIC_PLUM_TREE -> mysticPlumTreeSprite
@@ -125,10 +128,12 @@ object SanctuaryEnvironmentShadows {
     val bounds = ObliqueSpriteGeometry.bounds(bitmap)
     val scale = ObliqueSpriteGeometry.pixelScale(obs.propKind)
     val tree = ObliqueSpriteGeometry.isTree(obs.propKind)
-    val depth = if(obs.footprintDepthNorth>0f) obs.footprintDepthNorth else bitmap.width*scale*(if(tree) .5f else .35f)
+    val depth = if (obs.propKind == PropKind.TATTERED_BANNER) 4f
+      else if(obs.footprintDepthNorth>0f) obs.footprintDepthNorth else bitmap.width*scale*(if(tree) .5f else .35f)
     val height = (bounds.visibleHeight*scale-depth*ObliqueCamera.OBLIQUE_Y_SCALE).coerceAtLeast(8f)*obs.scale
     val foot = (ObliqueSpriteGeometry.drawFootOffset(obs.propKind,bitmap)-bounds.bottomPadding*scale)*obs.scale
-    val hw = (if(tree) bitmap.width*scale*.13f else if(obs.footprintHalfW>0f) obs.footprintHalfW else bitmap.width*scale*.34f)*obs.scale
+    val hw = (if (obs.propKind == PropKind.TATTERED_BANNER) 4f * scale
+      else if(tree) bitmap.width*scale*.13f else if(obs.footprintHalfW>0f) obs.footprintHalfW else bitmap.width*scale*.34f)*obs.scale
     val hd = (if(tree) hw*.42f else if(obs.footprintDepthNorth>0f) obs.footprintDepthNorth*.22f*obs.scale else hw*.22f).coerceAtLeast(2.5f)
     val contact = Path().apply {
       moveTo(-hw*.95f,-hd*.55f);lineTo(-hw*.62f,-hd);lineTo(hw*.75f,-hd)

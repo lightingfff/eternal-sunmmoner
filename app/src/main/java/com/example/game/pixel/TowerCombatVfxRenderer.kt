@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.example.game.combat.CombatAoEEffect
@@ -18,6 +19,7 @@ import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
 import kotlin.math.roundToInt
+import kotlin.math.atan2
 
 /** Bounded, local execution feedback: no bitmap creation, screen bloom, or gameplay side effects. */
 internal object TowerCombatVfxRenderer {
@@ -38,14 +40,25 @@ internal object TowerCombatVfxRenderer {
     val white=Color(0xFFFFF4D6).copy(alpha=alpha)
     val spread=fx.maxRadius*(.35f+.65f*p)*zoom
     TowerCombatFxAtlas.frame(fx.style,p)?.let { frame ->
-      val scale=(if(fx.style==CombatFxStyle.GUARD) {
-        if (TowerCombatFxAtlas.sourcePack == "pixelfx_v1") 1.70f else 1.18f
+      val expanded = TowerCombatFxAtlas.sourcePack == "art_completion_v1/effects"
+      val scale=(if (expanded) when (fx.style) {
+        CombatFxStyle.GUARD -> 1.70f
+        CombatFxStyle.ARCANE -> (fx.maxRadius / 48f).coerceIn(1.8f, 2.8f)
+        CombatFxStyle.CLEAVE -> (fx.maxRadius / 45f).coerceIn(1.8f, 2.6f)
+        CombatFxStyle.HOLY -> (fx.maxRadius / 60f).coerceIn(1.8f, 2.4f)
+        CombatFxStyle.SHADOW -> 2.2f
+        CombatFxStyle.IMPACT -> (fx.maxRadius / 28f).coerceIn(1f, 1.8f)
+        CombatFxStyle.SHIELD_IMPACT -> 1.3f
+        CombatFxStyle.SLAM -> (fx.maxRadius / 60f).coerceIn(1.8f, 2.8f)
+        else -> 1.5f
+      } else if(fx.style==CombatFxStyle.GUARD) {
+        if (TowerCombatFxAtlas.sourcePack == "pixelfx_v1" || TowerCombatFxAtlas.sourcePack == "art_completion_v1/effects") 1.70f else 1.18f
       } else 1.50f)*zoom
       drawImage(frame.image,
         dstOffset=IntOffset((x-frame.pivotX*scale).roundToInt(),(y-frame.pivotY*scale).roundToInt()),
         dstSize=IntSize((frame.image.width*scale).roundToInt().coerceAtLeast(1),
           (frame.image.height*scale).roundToInt().coerceAtLeast(1)),
-        alpha=(1f-p*.65f),filterQuality=FilterQuality.None)
+        alpha=if (expanded && fx.style == CombatFxStyle.HOLY) (1f-p)*(1f-p) else (1f-p*.65f),filterQuality=FilterQuality.None)
       return
     }
     when(fx.style) {
@@ -138,6 +151,15 @@ internal object TowerCombatVfxRenderer {
     val x=ObliqueCamera.worldToScreenX(projectile.x,camX,zoom,size.width/2f)
     val y=ObliqueCamera.worldToScreenY(projectile.y,camY,zoom,size.height/2f,elevationZ=28f)
     if(x < -60f || x > size.width+60f || y < -60f || y > size.height+60f) return
+    CompletionProjectileAtlas.frame(projectile.visual, projectile.remainingLife)?.let { frame ->
+      val angle = atan2(projectile.vy * ObliqueCamera.OBLIQUE_Y_SCALE, projectile.vx) * 180f / Math.PI.toFloat()
+      withTransform({ rotate(angle, Offset(x, y)) }) {
+        drawImage(frame.image, dstOffset = IntOffset((x - frame.pivotX * zoom).roundToInt(), (y - frame.pivotY * zoom).roundToInt()),
+          dstSize = IntSize((48f * zoom).roundToInt().coerceAtLeast(1), (32f * zoom).roundToInt().coerceAtLeast(1)),
+          filterQuality = FilterQuality.None)
+      }
+      return
+    }
     val magnitude=hypot(projectile.vx,projectile.vy*.72f).coerceAtLeast(.001f)
     val dx=projectile.vx/magnitude;val dy=projectile.vy*.72f/magnitude
     val nx=-dy;val ny=dx

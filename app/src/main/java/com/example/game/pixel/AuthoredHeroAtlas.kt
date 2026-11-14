@@ -86,11 +86,15 @@ internal object AuthoredHeroAtlas {
     }
   }
 
-  fun portrait(name: String?): ImageBitmap? = heroes[name]?.portrait
+  fun portrait(name: String?, type: HeroClassType? = null): ImageBitmap? =
+    heroes[name]?.takeIf { type == null || it.type == type }?.portrait
+
+  /** Identity is independent of optional bitmap availability. */
+  fun knownClass(name: String?): HeroClassType? = roster.firstOrNull { it.first.equals(name, ignoreCase = true) }?.second
 
   fun frame(name: String?, type: HeroClassType, moving: Boolean, attackProgress: Float,
     hurtFlash: Float, resting: Boolean, hpFraction: Float, timeSec: Float,
-    back: Boolean, skill: Boolean): Frame? {
+    back: Boolean, skill: Boolean, contactTimeline: Boolean = name == "Kaelen"): Frame? {
     val hero = heroes[name]?.takeIf { it.type == type } ?: return null
     val index = when {
       hpFraction <= 0f -> 11
@@ -98,7 +102,7 @@ internal object AuthoredHeroAtlas {
       resting -> 10
       attackProgress > .001f -> {
         val elapsed = (1f - attackProgress.coerceIn(0f, 1f))
-        if (name == "Kaelen") {
+        if (contactTimeline) {
           val duration = if (skill) .72f else .48f
           val contact = if (skill) .30f else .22f
           when {

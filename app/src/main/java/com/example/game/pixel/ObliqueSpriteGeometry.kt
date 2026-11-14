@@ -26,7 +26,8 @@ internal object ObliqueSpriteGeometry {
     PropKind.SAKURA_BLOSSOM_TREE, PropKind.CYPRESS_CONIFER_TREE -> true
     else -> false
   }
-  fun pixelScale(kind: PropKind) = when(kind) {
+  fun pixelScale(kind: PropKind) = CompletionInteriorAtlas.entry(kind)?.pixelScale ?: when(kind) {
+    PropKind.CRIMSON_CRYSTAL, PropKind.TATTERED_BANNER -> 1f
     PropKind.OAK_TREE, PropKind.MYSTIC_PLUM_TREE -> 2.05f
     PropKind.GARDEN_HEDGE_BUSH -> 1.9f
     PropKind.FLOWER_PLANTER_BED -> 1f
@@ -39,10 +40,14 @@ internal object ObliqueSpriteGeometry {
     PropKind.OBSIDIAN_COLUMN, PropKind.RUINED_PILLAR, PropKind.MOSSY_BOULDER, PropKind.STREET_LANTERN,
     PropKind.BARREL_CLUSTER, PropKind.WOODEN_BENCH_34, PropKind.STONE_BALUSTRADE_RAIL,
     PropKind.STONE_RETAINING_WALL, PropKind.TERRACE_CLIFF_WALL, PropKind.TRAINING_STRIKING_POST,
-    PropKind.TRAINING_DUMMY, PropKind.WEAPON_RACK, PropKind.ANCIENT_MONOLITH, PropKind.SUMMON_OBELISK -> 4f
+    PropKind.TRAINING_DUMMY, PropKind.WEAPON_RACK, PropKind.ANCIENT_MONOLITH, PropKind.SUMMON_OBELISK,
+    PropKind.CRIMSON_CRYSTAL, PropKind.TATTERED_BANNER -> 4f
     else -> 6f
   }
   // The existing building art/door locations are preserved. Trees are explicitly grounded at obs.y.
   fun drawFootOffset(kind: PropKind, image: ImageBitmap): Float =
-    if (isTree(kind)) bounds(image).bottomPadding * pixelScale(kind) else footOffset(kind)
+    if (CompletionInteriorAtlas.entry(kind)?.image === image)
+      (image.height - CompletionInteriorAtlas.entry(kind)!!.pivotY) * pixelScale(kind)
+    else if (isTree(kind) || (kind == PropKind.ROYAL_STATUE && CompletionPropAtlas.image("royal_statue") != null))
+      bounds(image).bottomPadding * pixelScale(kind) else footOffset(kind)
 }

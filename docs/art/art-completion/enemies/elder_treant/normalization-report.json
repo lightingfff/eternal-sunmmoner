@@ -1,0 +1,344 @@
+{
+  "metadata": {
+    "version": 1,
+    "type": "ELDER_TREANT",
+    "frame": [
+      128,
+      144
+    ],
+    "pivot": [
+      64,
+      134
+    ],
+    "columns": 12,
+    "rows": 1,
+    "world_scale": 1.05,
+    "atlas_file": "atlas.png",
+    "atlas_sha256": "ef19d9a3441a2298c6a23c356beb6d931cc550b3b8951b345524938da4dbff8e",
+    "frame_order": [
+      "idle0",
+      "idle1",
+      "walk0",
+      "walk1",
+      "walk2",
+      "walk3",
+      "anticipation",
+      "contact",
+      "recovery",
+      "hurt",
+      "collapse",
+      "defeat"
+    ],
+    "retained_rgba_bytes": 884736,
+    "native_generated_dimensions_claimed": false,
+    "left_direction": "Mirrored by runtime at draw; no separately authored left claim",
+    "source": {
+      "file": "docs/art/art-completion/enemies/source/elder_treant.png",
+      "sha256": "945f6de2187f24960fb6c5dafc0ded427072ac288c71cc2a9f66f25334092c81",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "grid": [
+        6,
+        2
+      ],
+      "alpha_threshold": 96
+    },
+    "normalization": {
+      "fixed_scale": 0.32,
+      "fixed_root_x": 181,
+      "row_baselines": [
+        340,
+        333
+      ],
+      "logical_source_cell": [
+        362,
+        362
+      ],
+      "extraction": "Connected silhouettes plus nearest detached clusters; no weapon crop at nominal cell boundaries",
+      "per_frame_recentering": false,
+      "per_frame_rescaling": false
+    },
+    "unique_pose_hashes": [
+      "d7a1967bc76f6327dbdcfe1b1ac7649597fdd21a2f9610b12833883d3854fe1b",
+      "1b2b8348f75009dea017417c3987b822bbe0119011db4b6f708b3af26c5543ad",
+      "2bd5a490911552136a35edc53af792ba80307156db5decf46abe5dccd4685158",
+      "7f1a9a2afd3d8e243518dd176e35aa6e43710cf1d2932e75852c6df2b83e556f",
+      "b3d9b3c416d76e15501c40329cb498ac1119cd5b17b05ebaf8682d777d7a8c8e",
+      "0928ad1f6ba62d00f09c56b7f58f2120318147a156516fa9b0a24a3bff93bc7a",
+      "601400f322df33e2c345337562509844e715a66c7863b4e39e784734af993cf2",
+      "8bf53526c70f57befff77746537642f8eb37b48014c5fd78d8599d94cc830239",
+      "0a15a50151c7b2beaaa1798e413c926971a1000c7fc94fbbe777274245b125c7",
+      "d92962de3687afd33b0b8d4084f2dea6d23454761e89c2ff6b92b2a8657a02e1",
+      "24836fe6efa4dc05639c7b8d972bb963a365232b00f5a2417dd99f0e4aceda36",
+      "f6a5dab414e84f72f2346b8f490ff7ec5370aee007be77270fe4e59f5da9db9e"
+    ]
+  },
+  "poses": [
+    {
+      "pose": "idle0",
+      "source_bounds": [
+        15,
+        7,
+        335,
+        340
+      ],
+      "source_opaque_pixels": 62296,
+      "paste": [
+        11,
+        27
+      ],
+      "output_bounds": [
+        11,
+        27,
+        113,
+        134
+      ],
+      "output_opaque_pixels": 6378,
+      "clipped_pixels": 0
+    },
+    {
+      "pose": "idle1",
+      "source_bounds": [
+        385,
+        7,
+        697,
+        340
+      ],
+      "source_opaque_pixels": 61656,
+      "paste": [
+        13,
+        27
+      ],
+      "output_bounds": [
+        13,
+        27,
+        113,
+        134
+      ],
+      "output_opaque_pixels": 6360,
+      "clipped_pixels": 0
+    },
+    {
+      "pose": "walk0",
+      "source_bounds": [
+        749,
+        9,
+        1076,
+        333
+      ],
+      "source_opaque_pixels": 56033,
+      "paste": [
+        14,
+        28
+      ],
+      "output_bounds": [
+        14,
+        28,
+        119,
+        132
+      ],
+      "output_opaque_pixels": 5796,
+      "clipped_pixels": 0
+    },
+    {
+      "pose": "walk1",
+      "source_bounds": [
+        1102,
+        13,
+        1426,
+        336
+      ],
+      "source_opaque_pixels": 59795,
+      "paste": [
+        11,
+        29
+      ],
+      "output_bounds": [
+        11,
+        29,
+        115,
+        132
+      ],
+      "output_opaque_pixels": 6118,
+      "clipped_pixels": 0
+    },
+    {
+      "pose": "walk2",
+      "source_bounds": [
+        1466,
+        10,
+        1795,
+        328
+      ],
+      "source_opaque_pixels": 54939,
+      "paste": [
+        12,
+        28
+      ],
+      "output_bounds": [
+        12,
+        28,
+        117,
+        130
+      ],
+      "output_opaque_pixels": 5631,
+      "clipped_pixels": 0
+    },
+    {
+      "pose": "walk3",
+      "source_bounds": [
+        1846,
+        8,
+        2166,
+        330
+      ],
+      "source_opaque_pixels": 55956,
+      "paste": [
+        18,
+        28
+      ],
+      "output_bounds": [
+        18,
+        28,
+        120,
+        131
+      ],
+      "output_opaque_pixels": 5712,
+      "clipped_pixels": 0
+    },
+    {
+      "pose": "anticipation",
+      "source_bounds": [
+        13,
+        11,
+        344,
+        328
+      ],
+      "source_opaque_pixels": 57001,
+      "paste": [
+        10,
+        31
+      ],
+      "output_bounds": [
+        10,
+        31,
+        116,
+        132
+      ],
+      "output_opaque_pixels": 5803,
+      "clipped_pixels": 0
+    },
+    {
+      "pose": "contact",
+      "source_bounds": [
+        368,
+        15,
+        724,
+        331
+      ],
+      "source_opaque_pixels": 53566,
+      "paste": [
+        8,
+        32
+      ],
+      "output_bounds": [
+        8,
+        32,
+        122,
+        133
+      ],
+      "output_opaque_pixels": 5478,
+      "clipped_pixels": 0
+    },
+    {
+      "pose": "recovery",
+      "source_bounds": [
+        742,
+        17,
+        1065,
+        332
+      ],
+      "source_opaque_pixels": 58286,
+      "paste": [
+        12,
+        33
+      ],
+      "output_bounds": [
+        12,
+        33,
+        115,
+        134
+      ],
+      "output_opaque_pixels": 5952,
+      "clipped_pixels": 0
+    },
+    {
+      "pose": "hurt",
+      "source_bounds": [
+        1093,
+        11,
+        1403,
+        333
+      ],
+      "source_opaque_pixels": 58741,
+      "paste": [
+        8,
+        31
+      ],
+      "output_bounds": [
+        8,
+        31,
+        107,
+        134
+      ],
+      "output_opaque_pixels": 5995,
+      "clipped_pixels": 0
+    },
+    {
+      "pose": "collapse",
+      "source_bounds": [
+        1441,
+        31,
+        1787,
+        323
+      ],
+      "source_opaque_pixels": 52713,
+      "paste": [
+        4,
+        37
+      ],
+      "output_bounds": [
+        4,
+        37,
+        115,
+        130
+      ],
+      "output_opaque_pixels": 5388,
+      "clipped_pixels": 0
+    },
+    {
+      "pose": "defeat",
+      "source_bounds": [
+        1800,
+        95,
+        2171,
+        325
+      ],
+      "source_opaque_pixels": 45317,
+      "paste": [
+        3,
+        58
+      ],
+      "output_bounds": [
+        3,
+        58,
+        122,
+        132
+      ],
+      "output_opaque_pixels": 4675,
+      "clipped_pixels": 0
+    }
+  ]
+}

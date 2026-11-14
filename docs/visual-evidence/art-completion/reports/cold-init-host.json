@@ -1,0 +1,23 @@
+{
+  "observedColdLoad": true,
+  "lobbyInitWallMs": 508.382274,
+  "firstTowerDecodeWallMs": 98.860246,
+  "firstGateDecodeWallMs": 32.489923,
+  "averageWarmPreloadMs": 0.00557466,
+  "retainedPixelBanks": {
+    "materials": 4456448,
+    "namedHeroes": 3858432,
+    "hall": 220832,
+    "originalEnemies": 3538944,
+    "effects": 2359296,
+    "projectiles": 122880,
+    "additionalClasses": 3858432,
+    "additionalEnemies": 3538944,
+    "surfaces": 1048576,
+    "props": 56192,
+    "interiors": 225984,
+    "gates": 4285440
+  },
+  "retainedPixelTotalBytes": 27570400,
+  "note": "Native host CPU timing and bitmap-bank bytes; excludes other legacy\/UI caches, shared geometry, transient source sheets, Java\/native overhead and GPU. Not physical phone launch\/FPS\/heat evidence."
+}

@@ -1,0 +1,293 @@
+{
+  "version": 1,
+  "file": "vfx.png",
+  "frame": [
+    96,
+    96
+  ],
+  "pivot": [
+    48,
+    84
+  ],
+  "columns": 8,
+  "rows": [
+    "guard",
+    "arcane",
+    "cleave",
+    "holy",
+    "shadow",
+    "impact",
+    "shield_impact",
+    "slam"
+  ],
+  "sha256": "b96d620aa723aee0a68457037182dce59fcd56b5c930cce6f0342e20cc548871",
+  "rgba_bytes": 2359296,
+  "source_commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+  "license": "MIT",
+  "selections": [
+    {
+      "style": "guard",
+      "effect": "impacts/shield-block",
+      "source_frames": [
+        1,
+        3,
+        6,
+        9,
+        13,
+        17,
+        22,
+        29
+      ],
+      "source_pivot": [
+        40,
+        88
+      ],
+      "execution_anchor_x_offset": 0,
+      "execution_anchor_y_offset": 0,
+      "fixed_row_scale": 0.5542168674698795,
+      "source_sheet_sha256": "f0315268a8dc4e214783bce95866a3cd1cdc0415647781afc900b4cb6f5808ee",
+      "sampled_pose_hashes": [
+        "7778d14f45d316a429a4f1b4b9b448bda0e01de3f4d851ca34d4f333fe7e70ef",
+        "da6db9be36eae0b8d113704de9945c8814fce4332bd9372c85ca237232c78d4d",
+        "ee722017d7d603f8a697510557f564088fe3214527d2959e197ea398ae220d5c",
+        "799cda6efd0d38397e842e0eaf69b6c8cc19dc67447e1d13360c1c2d68a5f321",
+        "7ce9f81659ba42f2a5bb807320e18f01146aefc3fb1f9bb0157896085c400433",
+        "acbc9c673ad9ccb8bcb3b7765e2e5c2a08c21a6739abc4902314ab848c16140f",
+        "85b02e35205d89003c936290dc7991d371472b8b2d6493cdaf87cf86a615d3d5",
+        "f5616411a6af9c4700c63f9c46c9d0aad80916a7ee200033ca1f6e1102010aea"
+      ],
+      "simulation_timing_changed": false
+    },
+    {
+      "style": "arcane",
+      "effect": "arcane/mana-burst",
+      "source_frames": [
+        7,
+        8,
+        10,
+        14,
+        20,
+        27,
+        36,
+        48
+      ],
+      "source_pivot": [
+        104,
+        124
+      ],
+      "execution_anchor_x_offset": 0,
+      "execution_anchor_y_offset": 0,
+      "fixed_row_scale": 0.4,
+      "source_sheet_sha256": "4fb6dccfe86b80e134570aad5bd87e97489ac705db857e338689a98a80a5fa98",
+      "sampled_pose_hashes": [
+        "435bd5f1c3bff041bb8cba41d1372b1ba15feae1a3e503a92959248d781946aa",
+        "d336fec164b466de7036bdb12617cdaaa4d2344a9887590811dbee54de627104",
+        "29bbb95a916db3ec6aa653dcb20f80c2289be8d6cb4db5dbee90b3f6d44fa3b5",
+        "d3c528f2a5ddfe2c8718485e76c5b5ee9336ce341cb819e45d1fcc031ffccd2d",
+        "4f9c3f8464d00b41a228ba532a3cf8579c8405961da1816cabc9596637851452",
+        "bea26be40ba542d1612e370cd82d0873e3894e561486c394fcc7de1df695f85d",
+        "3817243bf29ef3a8d53b41c119ff688b522480d2b367405cce2b663f5cbc2861",
+        "c0006e33e3d19f46353a16a248200a85f098e1cc15e32df3642cb7dad0434abf"
+      ],
+      "simulation_timing_changed": false
+    },
+    {
+      "style": "cleave",
+      "effect": "melee/spin-slash",
+      "source_frames": [
+        2,
+        4,
+        6,
+        8,
+        10,
+        13,
+        17,
+        19
+      ],
+      "source_pivot": [
+        104,
+        84
+      ],
+      "execution_anchor_x_offset": 0,
+      "execution_anchor_y_offset": 0,
+      "fixed_row_scale": 0.45544554455445546,
+      "source_sheet_sha256": "1ff8825eb5c2a0d87e6cec110aa62b39493657a6ce7e867c678ade4d90d81c24",
+      "sampled_pose_hashes": [
+        "b37742652368fb99166560cda1fb9f8182a81dd0630b88bc4229a73c22f29a14",
+        "2613b69f49de7cd4fba3679ddc8d00aa44ca169fd307874e3a865137255e8156",
+        "4f6d1d84e30b298a9bb381ab41b7dae1eb05c1d723e40e4155747e76a415256a",
+        "c09c76f3e644d7514e5479b307a2b467bc16ea20c2a178fed259c61e2594a12b",
+        "86811ef91419a9aa0e1f66a82761bf2956a880a175fd41d45bb966377fdff4f1",
+        "36f4b94eb63544226ebac7334a2127eaa4d30b178a39f16eed45faaeeb77fa27",
+        "280271fc4f9e267c6853b2d176dbc5a74895ba5e46fd2200c22c0a2767076ec3",
+        "ce60a29b3184b76ca2ca31c7f83bd4edfaaa1fb64d0cc4e472f6b7fefadea770"
+      ],
+      "simulation_timing_changed": false
+    },
+    {
+      "style": "holy",
+      "effect": "holy/sunburst",
+      "source_frames": [
+        0,
+        3,
+        7,
+        11,
+        17,
+        23,
+        31,
+        41
+      ],
+      "source_pivot": [
+        64,
+        64
+      ],
+      "execution_anchor_x_offset": 0,
+      "execution_anchor_y_offset": 32,
+      "fixed_row_scale": 0.43478260869565216,
+      "source_sheet_sha256": "eae5e6dfa5b58b41d82a29ddb37753c664380d31aba2fd21b8f51cea1898b780",
+      "sampled_pose_hashes": [
+        "69691b8e42485bb969f464d12b0c2ec5bde3df7d770888643b07d8fa8c91636b",
+        "4d9c16be33d93b938ee9540851378031c161037e7cdad65083f1087b656a3e9b",
+        "11663247ad81de9f40230a9d223a88f9cf5460b751cb0cd3b8658d48289ca0a7",
+        "865a1383b5e1b65cdbf9a37b8387ad9ba1cdef9950f002a332c545ca29fe3455",
+        "de5633c92cab8e523552ab870cc22eaaf39bda2a59e0f0213f9df277b6869765",
+        "c17ac7d62c4f9f33349e05a59698752253c00fa18908208fcc79f263cab7c33c",
+        "901839d08cc5e41bc90a9c20030aac98e37f2399b4621d2b8d9fa737e96cf401",
+        "aea424c989a6a12abe2542cded671cec144ace276ee3757c7a34e21047b5bac6"
+      ],
+      "simulation_timing_changed": false
+    },
+    {
+      "style": "shadow",
+      "effect": "melee/dagger-flurry",
+      "source_frames": [
+        3,
+        5,
+        7,
+        9,
+        11,
+        14,
+        18,
+        23
+      ],
+      "source_pivot": [
+        36,
+        86
+      ],
+      "execution_anchor_x_offset": 60,
+      "execution_anchor_y_offset": 0,
+      "fixed_row_scale": 0.5882352941176471,
+      "source_sheet_sha256": "98c547354c974a745e767837fa6ad74fdd2033241b4e719b4758792f25e5e8df",
+      "sampled_pose_hashes": [
+        "159b6630a32100a756b45743bb8c25f3cf6fe8b0bcaf5de57f136b36493d6294",
+        "78743eeda8a2a729a36bcc606e01dab93ff4c56056cde20ab10f751f7e7a7991",
+        "8b297a79c00cf96b5bd78f9dbb2313bbd4c021124d944fd59b9cdf029872c39d",
+        "64570cab5c2689172198441d82438a2bf85ae0d3c4613fb9374a96de2f3d8454",
+        "a1a4ed43cf14f4bd84114ddc3b33c7f4fbd103a530a99c926b3d25eb8acc0e76",
+        "0967ed8e3369a352f10de31e10d95dfba6440b133ecb8d11fe19b9af11a40670",
+        "360282be7d7e369cb39ef00957bcd048498ceeada0944a6356ef5d0ede57ac7e",
+        "ba8c8cca1f98878ce30cb0d3c2498a6d110adb465ef87d7bbd3304a970123c89"
+      ],
+      "simulation_timing_changed": false
+    },
+    {
+      "style": "impact",
+      "effect": "impacts/hit-spark",
+      "source_frames": [
+        0,
+        1,
+        2,
+        3,
+        5,
+        7,
+        10,
+        11
+      ],
+      "source_pivot": [
+        44,
+        64
+      ],
+      "execution_anchor_x_offset": 0,
+      "execution_anchor_y_offset": 0,
+      "fixed_row_scale": 0.6133333333333333,
+      "source_sheet_sha256": "5f765f260f4c598e282a11df79c07022a7b5e6768f737692985fd7b5936c4856",
+      "sampled_pose_hashes": [
+        "d50cc2c50cbc2ab327421ec2be8364cdd38df1d450d0bd1eea79ddcacb03d5f2",
+        "6f20d3aed3888d9149af09c069db84bc8ef5a3ac3527b5d0c00c8bb31bc3207d",
+        "e6293af5050973aa1ee4501cf19485d3d8e35e905b1255f997c0703cbabb19da",
+        "208d479fd98f8cba78073c3d77b55e331265d0fd3822caf9c41e215d2856cb62",
+        "b700f0cd0c0ff92565a82f6d8c999c5b34cc54f8ce9a518b9d31dc05932733a6",
+        "bf78b0723d7798162aaed1595609b7f8751f8fa1dee061453ef658e3c93fd60f",
+        "69ce9e2633acb10e9faa0e57666f2b61698d5f6ca3b860e79d4e002202abc629",
+        "34c73f181f673e97b8d59e0343912f6088a827e773e3f00f9ba738d33ce7263f"
+      ],
+      "simulation_timing_changed": false
+    },
+    {
+      "style": "shield_impact",
+      "effect": "impacts/shield-block",
+      "source_frames": [
+        2,
+        4,
+        7,
+        10,
+        14,
+        19,
+        24,
+        30
+      ],
+      "source_pivot": [
+        40,
+        88
+      ],
+      "execution_anchor_x_offset": 0,
+      "execution_anchor_y_offset": 0,
+      "fixed_row_scale": 0.6052631578947368,
+      "source_sheet_sha256": "f0315268a8dc4e214783bce95866a3cd1cdc0415647781afc900b4cb6f5808ee",
+      "sampled_pose_hashes": [
+        "f94d20332818701eb03905576741d343bd93d0a7f4e5488a45163646d844f288",
+        "fec8a6c8e0c1599451d16bbaa75ae75e0deeae5855d604d1d3df6bf13ec6d8ef",
+        "c5b68330de05ef3c768291cf07bc31f1c1b863f965dc1d223650085e76f49164",
+        "898fc78ef5f643b6d21c9d636937db5787dda8dd5251d04becad71cf0b52c3df",
+        "427bc1ce4ded3e25615bad25e729a6ba4b4375545e2b9a36431d1183e6d7b83c",
+        "5d251b6b562d82d8b6f2afd5e0b5de72888377f1d7407981b7aac542d4d15996",
+        "cb4a8a067a5f305d878171da7d94e0d2694d67930d2e47510899a5bc4faf1504",
+        "a3948ced5de0d6845d0cb3435dadb84a5f5ce7dab78a870082da29f04192fb1d"
+      ],
+      "simulation_timing_changed": false
+    },
+    {
+      "style": "slam",
+      "effect": "impacts/ground-slam",
+      "source_frames": [
+        0,
+        2,
+        4,
+        7,
+        12,
+        18,
+        27,
+        40
+      ],
+      "source_pivot": [
+        144,
+        164
+      ],
+      "execution_anchor_x_offset": 0,
+      "execution_anchor_y_offset": 0,
+      "fixed_row_scale": 0.23255813953488372,
+      "source_sheet_sha256": "2855cbf58a004f5abc446a313b68d3058017e5d9421e60656fe11524cecb2b56",
+      "sampled_pose_hashes": [
+        "5ef1324abbb4d9c313a4e49206e375146d5d7159eabe2b937947941ae897d815",
+        "6a215cdd75c330b734d308267ba98938478085dbc0b5a59f040578f61ea08f83",
+        "d1590e7f512be552b614774ffbb71ba6ef776f44de7334192ca34443eaac317d",
+        "84390a8573b5fae7ee220f54471530396a4c167dd2a1d32b10f8478741a38167",
+        "4d609175db7e7666f9cd14ba09e469a54aaeb2ed27a482b1cd2eeb8b5829bb96",
+        "7fcce1e556d3c8757381a1b7cc4ae645350041fea7d8e127cb0424cf2e7257e1",
+        "e148c40b2286ca4458d4243f58985cb46453665e8410b74efa78d64c935d91a1",
+        "6634f367c177ab629934e4d7b20916c8e01c930b1102cf4692d8e11fa240a6e6"
+      ],
+      "simulation_timing_changed": false
+    }
+  ]
+}

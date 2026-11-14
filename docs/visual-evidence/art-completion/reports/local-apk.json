@@ -1,0 +1,12 @@
+{
+  "result": "PASS",
+  "bytes": 47235798,
+  "sha256": "10cf1f941b6c1ad6176f2be05b60ebe3efa1e09f771ba2933a2273e0f58a5041",
+  "verifiedNewRuntimeEntries": 45,
+  "zipCRC": "PASS",
+  "apksigner": "PASS",
+  "applicationId": "com.aistudio.eternalsummoner.kvrpzm",
+  "signingCertificateSha256": "b6ae9520912a8fc2308abfc299c34c593b237c9b15bb7b1b766471eb8180109f",
+  "device": "NOT TESTED; no ADB devices",
+  "signingNote": "Original local key unchanged; differs from existing CI debug key. Use CI artifact for device testing."
+}

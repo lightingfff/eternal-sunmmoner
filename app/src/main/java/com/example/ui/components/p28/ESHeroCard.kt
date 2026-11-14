@@ -62,7 +62,7 @@ fun ESHeroCard(
   val nameplate = ESP28Assets.image("card_nameplate")
   val starOn = ESP28Assets.image("rarity_star_on")
   val starOff = ESP28Assets.image("rarity_star_off")
-  val portrait = remember(hero.name) { PremiumPortraits.get(hero.name) }
+  val portrait = remember(hero.name, hero.classType) { PremiumPortraits.get(hero.name, hero.classType) }
   val injured = hero.isCurrentlyInjured()
 
   Box(
@@ -160,7 +160,7 @@ fun ESMiniHeroPortrait(
 ) {
   val backdrop = ESP28Assets.image("card_backdrop")
   val frame = ESP28Assets.image("card_frame_bronze")
-  val portrait = remember(heroName) { PremiumPortraits.get(heroName) }
+  val portrait = remember(heroName, heroClass) { PremiumPortraits.get(heroName, heroClass) }
   Box(modifier = modifier.size(sizeDp).clip(RoundedCornerShape(8.dp))) {
     if (backdrop != null) {
       Image(backdrop, null, Modifier.fillMaxSize(), contentScale = ContentScale.FillBounds)
