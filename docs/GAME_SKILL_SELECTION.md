@@ -49,13 +49,6 @@ về model/provider, media, marketing, 3D hoặc quản trị không thuộc ph�
 7 skill bảo trì repo nguồn không được tự kích hoạt để rebase, merge hay gửi bình luận.
 Xem từng tên và phân loại trong [CATALOG.md](skill-library/scenario/CATALOG.md).
 
-## Lời nhắc lần sau
-
-“Tôi sẽ dùng **[1–3 skill phù hợp]** cho **[phần việc]**, giữ camera 2.5D và pipeline
-Kotlin/Compose hiện có.” Sprite work kết hợp thêm `ai-game-spritesheets` đã lưu trước đó.
-Chỉ đọc nguồn liên quan. Giữ license và nguồn gốc khi tái sử dụng; không cần dịch vụ trả
-phí để đọc hướng dẫn. Các file này là bộ nhớ trong repository, không phải huấn luyện mô hình.
-
 ## Bổ sung Character Animation Creator / Meowa / Scenario hiện tại
 
 Đọc [adapter character-asset-pipeline](../.agents/skills/character-asset-pipeline/SKILL.md)
@@ -70,3 +63,10 @@ Bản ZIP 174 file trên vẫn giữ nguyên để đối chiếu; 163 file trù
 64px/6-frame của nguồn. Meowa map 2:1/top-down và workbench web không thay camera .72
 hay engine native. Provider chưa được cài/gọi; không tự phát sinh chi phí. Đọc đúng
 phần cần dùng, không nạp/chạy toàn bộ thư viện cho mỗi tác vụ.
+
+## Lời nhắc lần sau
+
+“Tôi sẽ dùng **[1–3 skill phù hợp]** cho **[phần việc]**, giữ camera 2.5D và pipeline
+Kotlin/Compose hiện có.” Sprite work kết hợp thêm `ai-game-spritesheets` đã lưu trước đó.
+Chỉ đọc nguồn liên quan. Giữ license và nguồn gốc khi tái sử dụng; không cần dịch vụ trả
+phí để đọc hướng dẫn. Các file này là bộ nhớ trong repository, không phải huấn luyện mô hình.
