@@ -1,0 +1,15 @@
+{
+  "result": "PASS",
+  "sourceCommit": "22f0b463e7a5e579904dd6211a520321035526f7",
+  "version": "7.0.2",
+  "sourceFiles": 90,
+  "sourceBytes": 487203,
+  "skillMainTexts": 15,
+  "retainedSkillSupportFiles": 65,
+  "authoredLocalLinks": 31,
+  "originalCheckoutChecked": true,
+  "appendOnlyRouterAndTaskScopeChecked": true,
+  "activation": "INACTIVE_REFERENCE_ONLY",
+  "behavioralEvals": "NOT RUN",
+  "androidBuild": "NOT RUN; documentation only"
+}
