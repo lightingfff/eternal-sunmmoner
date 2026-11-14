@@ -83,6 +83,9 @@ jobs:
       - name: Validate assets (PNG CRC, manifest SHA, package consistency)
         run: python3 tools/validate_assets.py
 
+      - name: Test optional artifact retrieval and strict integrity handling
+        run: python3 -m unittest discover -s tools -p 'test_verify_uploaded_apk_artifact.py' -v
+
       - name: Add temporary Google Sign-In resource
         run: |
           mkdir -p app/src/debug/res/values
@@ -143,43 +146,38 @@ jobs:
           if-no-files-found: warn
           retention-days: 3
 
-      - name: Record artifact upload outcome (quota is a WARN, not a build failure)
+      - name: Record optional artifact upload availability
         if: always()
         run: |
           if [ "${{ steps.upload.outcome }}" = "success" ]; then
             echo "ARTIFACT UPLOAD: OK" | tee -a "$GITHUB_STEP_SUMMARY"
           else
-            echo "ARTIFACT UPLOAD BLOCKED BY QUOTA (not a build error; the Release below is the download path)" \
+            echo "ARTIFACT UPLOAD UNAVAILABLE (see upload step; not an APK build error)" \
               | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "Main releases use runner files; PRs do not publish releases." | tee -a "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Verify the uploaded artifact ZIP (skipped when the quota blocked it)
-        # This step used to fail the build whenever the artifact store refused the upload.
-        # It cannot: the Release above is the delivery path. When the upload did succeed,
-        # this still proves the artifact is real bytes and not an HTML error page.
+      - name: Verify uploaded artifact bytes (retry retrieval; report unavailable mirror)
+        # Transport unavailability is a WARN for this optional mirror. Fetched bytes
+        # must still match the runner distribution and pass ZIP/hash/signature checks.
         if: steps.upload.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
           ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
         run: |
           set -euo pipefail
-          archive="$RUNNER_TEMP/Eternal-Summoner-APK.zip"
-          extracted="$RUNNER_TEMP/verified-apk-artifact"
-          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip" > "$archive"
-          if head -c 500 "$archive" | grep -qi "<html"; then echo "FAIL: artifact is an HTML error page"; exit 1; fi
-          file "$archive" | tee -a "$GITHUB_STEP_SUMMARY"
-          unzip -t "$archive"
-          mkdir -p "$extracted"
-          unzip -q "$archive" -d "$extracted"
-          (cd "$extracted" && sha256sum -c SHA256SUMS --ignore-missing)
-          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$extracted/Eternal-Summoner-debug.apk"
-          echo 'Artifact ZIP, CRC, inner APK signature and SHA-256 all verified.' | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 tools/verify_uploaded_apk_artifact.py \
+            --repository "$GITHUB_REPOSITORY" \
+            --artifact-id "$ARTIFACT_ID" \
+            --reference-dir app/build/apk-distribution \
+            --apksigner "$ANDROID_HOME/build-tools/36.0.0/apksigner" \
+            --report "$RUNNER_TEMP/artifact-verification.json"
 
-      - name: Skip note when the artifact store was unavailable
+      - name: Skip note when the artifact upload was unavailable
         if: steps.upload.outcome != 'success'
         run: |
-          echo "Artifact ZIP verification SKIPPED: upload blocked by quota." | tee -a "$GITHUB_STEP_SUMMARY"
-          echo "The APK itself is published in the Release step below." | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "Artifact ZIP verification SKIPPED: upload did not complete." | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "Main releases use the verified runner APK; PRs do not publish releases." | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Publish APK direct to GitHub Release (no artifact store involved)
         # push-to-main only. PRs never publish a release; a fork PR has no write token,
