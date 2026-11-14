@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "entrypoints_indexed": 181,
+  "retained_source_files_hash_verified": 64,
+  "unchanged_scenario_entrypoints_hash_verified": 163,
+  "scenario_delta": {
+    "unchanged": 163,
+    "changed": 11,
+    "added": 5
+  },
+  "python_files_ast_parsed_without_execution": 11,
+  "retained_json_files_parsed": 3,
+  "project_authored_local_links_verified": 199,
+  "character_remote_metadata_records": 16,
+  "character_source_bytes_retained": false,
+  "upstream_full_security_audit": false,
+  "upstream_provider_or_script_executed": false,
+  "paid_calls_or_remote_uploads": false,
+  "apk_build_or_device_test": "NOT RUN: reference-only task"
+}

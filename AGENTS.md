@@ -28,6 +28,16 @@ When Arena Agent Mode develops or refines ETERNAL SUMMONER, first read `.agents/
 ## Arena specialist skill orchestration
 When Arena works on ETERNAL SUMMONER, read `.agents/skills/eternal-summoner-skill-router/SKILL.md` and `.agents/skills/eternal-arena-quality-loop/SKILL.md`, then select relevant specialist skills by actual task. Preserve the original AGENTS.md and all project contracts. Use native parallel subagents only if verified available; otherwise execute roles sequentially with file ownership and honest role labels. Require baseline, real tests/render/playthrough evidence, targeted corrections (at most 3 rounds), final QA and PR for owner. Never fake CI or device measurements. Never auto-merge.
 
+## User's character and asset pipeline preference
+
+For character animation, combat VFX or environment asset preparation, also read
+`.agents/skills/character-asset-pipeline/SKILL.md`. It adapts the user-requested
+Character Animation Creator, Meowa and current Scenario libraries to existing
+Kotlin/Compose atlas, pivot and simulation timing contracts. Use the pinned catalog
+in `docs/skill-library/character-assets/`; select relevant guidance only. Keep
+provider runners inactive unless a later task authorizes their actual use. Source
+defaults do not override the game's camera, atlas format, memory or hit timing.
+
 ## Twelve real-agent GitHub dispatch (2026-11)
 
 For all new agent instances (A01–A12), first read `docs/agents/START_HERE.md`, `docs/agents/ROLE_MATRIX.md`, `docs/agents/CLAIM_PROTOCOL.md` and the assigned `.agents/skills/es-aXX-*/SKILL.md`. Existing instructions above remain authoritative. Work originates from independently numbered GitHub Issues linked from #39. Post `[CLAIM]` in the task issue only after checking `STATE: READY`, unmet dependencies, other live claims and file ownership; blocked/backlog means read-only triage. Post a real `[HANDOFF]` with PR/SHA/checks, then receive independent review. User is sole merge approver. Codex owns critical battle/save/events reviews outside the twelve standard roles. Do not assume skills/comments auto-launch agents, imply live GitHub polling or fabricate separate agent sessions. Read the live task status; docs/agents/PHASE0_TASKS.md is a snapshot.

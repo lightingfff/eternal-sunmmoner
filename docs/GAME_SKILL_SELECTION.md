@@ -49,6 +49,21 @@ về model/provider, media, marketing, 3D hoặc quản trị không thuộc ph�
 7 skill bảo trì repo nguồn không được tự kích hoạt để rebase, merge hay gửi bình luận.
 Xem từng tên và phân loại trong [CATALOG.md](skill-library/scenario/CATALOG.md).
 
+## Bổ sung Character Animation Creator / Meowa / Scenario hiện tại
+
+Đọc [adapter character-asset-pipeline](../.agents/skills/character-asset-pipeline/SKILL.md)
+và [ghi chú áp dụng](skill-library/character-assets/READING_NOTES.md) khi làm nhân vật,
+animation, VFX hoặc map/texture. [Danh mục mới](skill-library/character-assets/CATALOG.md)
+bao phủ 1 skill Character, 1 skill Meowa nhiều module và 179 skill Scenario hiện tại.
+Bản ZIP 174 file trên vẫn giữ nguyên để đối chiếu; 163 file trùng dùng lại qua hash,
+5 skill mới và 11 file thay đổi được lưu ở overlay, không cài lặp cả thư viện.
+
+Ưu tiên kiểm tra direction, motion thật, loop seam, anchor liên động tác và hit-frame
+đúng simulation. Loader Tower hiện có cell/pivot/timing riêng, không tự đổi sang default
+64px/6-frame của nguồn. Meowa map 2:1/top-down và workbench web không thay camera .72
+hay engine native. Provider chưa được cài/gọi; không tự phát sinh chi phí. Đọc đúng
+phần cần dùng, không nạp/chạy toàn bộ thư viện cho mỗi tác vụ.
+
 ## Lời nhắc lần sau
 
 “Tôi sẽ dùng **[1–3 skill phù hợp]** cho **[phần việc]**, giữ camera 2.5D và pipeline
