@@ -217,14 +217,22 @@ fun ESLoadingOverlay(
         )
       } else if (tip != null) {
         Spacer(Modifier.height(if (compact) 10.dp else 14.dp))
-        ESLoadingTipPanel(tip = tip, compact = compact)
+        ESLoadingTipPanel(
+          tip = tip,
+          compact = compact,
+          largeFontScale = fontScale >= 1.15f,
+        )
       }
     }
   }
 }
 
 @Composable
-private fun ESLoadingTipPanel(tip: String, compact: Boolean) {
+private fun ESLoadingTipPanel(
+  tip: String,
+  compact: Boolean,
+  largeFontScale: Boolean,
+) {
   Surface(
     modifier = Modifier
       .fillMaxWidth()
@@ -256,7 +264,8 @@ private fun ESLoadingTipPanel(tip: String, compact: Boolean) {
         color = ESTokens.IvoryPaper,
         style = if (compact) MaterialTheme.typography.bodySmall else MaterialTheme.typography.bodyMedium,
         textAlign = TextAlign.Center,
-        maxLines = if (compact) 3 else 2,
+        // Avoid ellipsizing a gameplay tip solely because the system font is enlarged.
+        maxLines = if (compact || largeFontScale) 3 else 2,
         overflow = TextOverflow.Ellipsis,
         modifier = Modifier.testTag("es_loading_tip"),
       )

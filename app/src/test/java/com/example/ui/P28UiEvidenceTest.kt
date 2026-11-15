@@ -196,8 +196,16 @@ class P28UiEvidenceTest {
     rule.onNodeWithText(stage).assertIsDisplayed()
     rule.onNodeWithText(tip).assertIsDisplayed()
     rule.onNodeWithTag("es_loading_progress_track").assertDoesNotExist()
-    assertTrue("Bootstrap stage must remain within the viewport", stageBounds.left >= root.left && stageBounds.right <= root.right)
-    assertTrue("Gameplay tip must remain within the viewport", tipBounds.left >= root.left && tipBounds.right <= root.right)
+    assertTrue(
+      "Bootstrap stage must remain within the viewport",
+      stageBounds.left >= root.left && stageBounds.top >= root.top &&
+        stageBounds.right <= root.right && stageBounds.bottom <= root.bottom,
+    )
+    assertTrue(
+      "Gameplay tip must remain within the viewport",
+      tipBounds.left >= root.left && tipBounds.top >= root.top &&
+        tipBounds.right <= root.right && tipBounds.bottom <= root.bottom,
+    )
     capture(view(), "loading_guest_bootstrap_port_360_font130")
   }
 
