@@ -27,6 +27,7 @@ import com.example.game.pixel.SanctuaryArtAssets
 import com.example.ui.components.p28.ESHeroCard
 import com.example.ui.components.p28.ESLoadingOverlay
 import com.example.ui.components.p28.ESLoadingState
+import com.example.ui.components.p28.ESLoadingTips
 import com.example.ui.components.p28.ESMiniHeroPortrait
 import com.example.ui.components.p28.ESNoticeStack
 import com.example.ui.components.HeroManagementDialog
@@ -141,16 +142,29 @@ class P28UiEvidenceTest {
 
   @Test @Config(qualifiers = "w360dp-h640dp-port-xhdpi")
   fun loadingOverlayPortrait() {
-    val view = content { ESLoadingOverlay(ESLoadingState.Determinate("Đang triệu hồi linh hồn...", 0.62f)) }
+    val tip = ESLoadingTips.all[0]
+    val view = content {
+      ESLoadingOverlay(ESLoadingState.Determinate("Đang triệu hồi linh hồn...", 0.62f, tip = tip))
+    }
     rule.onNodeWithTag("es_loading_stage").assertExists()
     rule.onNodeWithText("Đang triệu hồi", substring = true).assertExists()
+    rule.onNodeWithTag("es_loading_tip_panel").assertExists()
+    rule.onNodeWithText(tip).assertExists()
+    rule.onNodeWithTag("es_loading_progress_track").assertExists()
+    rule.onNodeWithTag("es_loading_progress_fill").assertExists()
     capture(view(), "loading_port_360")
   }
 
   @Test @Config(qualifiers = "w800dp-h360dp-land-xhdpi")
   fun loadingOverlayLandscape() {
-    val view = content { ESLoadingOverlay(ESLoadingState.Indeterminate("Đang đồng bộ dữ liệu người chơi...")) }
+    val tip = ESLoadingTips.all[1]
+    val view = content {
+      ESLoadingOverlay(ESLoadingState.Indeterminate("Đang đồng bộ dữ liệu người chơi...", tip = tip))
+    }
     rule.onNodeWithText("đồng bộ", substring = true).assertExists()
+    rule.onNodeWithTag("es_loading_tip_panel").assertExists()
+    rule.onNodeWithText(tip).assertExists()
+    rule.onNodeWithTag("es_loading_progress_track").assertDoesNotExist()
     capture(view(), "loading_land_800")
   }
 

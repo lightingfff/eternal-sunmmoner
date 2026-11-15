@@ -95,27 +95,39 @@ class P28ComponentsTest {
 
   // NOTE: this Compose test version forbids calling setContent twice per test,
   // so each loading state gets its own @Test (and its own compose rule).
-  @Test fun loadingOverlayShowsRealStageText() {
+  @Test fun loadingOverlayShowsRealStageAndAccurateTipWithoutFakeProgress() {
+    val tip = ESLoadingTips.all.first()
     rule.setContent {
-      ESLoadingOverlay(ESLoadingState.Indeterminate("Đang nạp bản đồ Tháp..."))
+      ESLoadingOverlay(ESLoadingState.Indeterminate("Đang nạp bản đồ Tháp...", tip = tip))
     }
     rule.onNodeWithTag("es_loading_stage").assertExists()
     rule.onNodeWithText("Đang nạp bản đồ Tháp", substring = true).assertExists()
+    rule.onNodeWithTag("es_loading_tip_panel").assertExists()
+    rule.onNodeWithText(tip).assertExists()
+    rule.onNodeWithTag("es_loading_progress_track").assertDoesNotExist()
   }
 
-  @Test fun loadingOverlayShowsErrorState() {
+  @Test fun loadingTipPoolCyclesThroughDistinctEntries() {
+    val selected = List(ESLoadingTips.all.size) { ESLoadingTips.next() }
+    assertEquals(ESLoadingTips.all.size, selected.toSet().size)
+    assertEquals(ESLoadingTips.all.toSet(), selected.toSet())
+  }
+
+  @Test fun loadingOverlayShowsErrorStateWithoutGameplayTipOrProgress() {
     rule.setContent {
       ESLoadingOverlay(ESLoadingState.Failed("Không thể đọc dữ liệu lưu"))
     }
-    // Failed state renders the message on BOTH the stage tag and the error tag,
-    // so assert the tags here; text binding is covered by loadingOverlayShowsRealStageText.
+    // Failed state renders the message on BOTH the stage tag and the error tag.
     rule.onNodeWithTag("es_loading_error").assertExists()
     rule.onNodeWithTag("es_loading_stage").assertExists()
+    rule.onNodeWithTag("es_loading_tip_panel").assertDoesNotExist()
+    rule.onNodeWithTag("es_loading_progress_track").assertDoesNotExist()
   }
 
   @Test fun loadingOverlayHiddenWhenHidden() {
     rule.setContent { ESLoadingOverlay(ESLoadingState.Hidden) }
     rule.onNodeWithTag("es_loading_stage").assertDoesNotExist()
+    rule.onNodeWithTag("es_loading_tip_panel").assertDoesNotExist()
   }
 
   @Test fun heroCardBindsNameAndRarityFromHeroRecord() {
