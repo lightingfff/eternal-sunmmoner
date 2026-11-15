@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.progressBarRangeInfo
@@ -159,6 +160,7 @@ fun ESLoadingOverlay(
         overflow = TextOverflow.Ellipsis,
         modifier = Modifier
           .fillMaxWidth()
+          .semantics { liveRegion = LiveRegionMode.Polite }
           .testTag("es_loading_stage"),
       )
 

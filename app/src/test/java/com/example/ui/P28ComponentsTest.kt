@@ -2,6 +2,7 @@ package com.example.ui
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
@@ -106,7 +107,9 @@ class P28ComponentsTest {
     rule.setContent {
       ESLoadingOverlay(ESLoadingState.Indeterminate("Đang nạp bản đồ Tháp...", tip = tip))
     }
-    rule.onNodeWithTag("es_loading_stage").assertExists()
+    rule.onNodeWithTag("es_loading_stage").assertExists().assert(
+      SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite),
+    )
     rule.onNodeWithText("Đang nạp bản đồ Tháp", substring = true).assertExists()
     rule.onNodeWithTag("es_loading_tip_panel").assertExists()
     rule.onNodeWithText(tip).assertExists()
