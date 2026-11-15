@@ -1,0 +1,143 @@
+Activity Resolver Table:
+  Schemes:
+      genericidp:
+        ac0da63 com.aistudio.eternalsummoner.kvrpzm/com.google.firebase.auth.internal.GenericIdpActivity filter 2395660
+          Action: "android.intent.action.VIEW"
+          Category: "android.intent.category.DEFAULT"
+          Category: "android.intent.category.BROWSABLE"
+          Scheme: "genericidp"
+          Authority: "firebase.auth": -1
+          Path: "PatternMatcher{LITERAL: /}"
+      recaptcha:
+        8fb3719 com.aistudio.eternalsummoner.kvrpzm/com.google.firebase.auth.internal.RecaptchaActivity filter 41643de
+          Action: "android.intent.action.VIEW"
+          Category: "android.intent.category.DEFAULT"
+          Category: "android.intent.category.BROWSABLE"
+          Scheme: "recaptcha"
+          Authority: "firebase.auth": -1
+          Path: "PatternMatcher{LITERAL: /}"
+
+  Non-Data Actions:
+      android.intent.action.MAIN:
+        e8a561d com.aistudio.eternalsummoner.kvrpzm/com.example.MainActivity filter e91b092
+          Action: "android.intent.action.MAIN"
+          Category: "android.intent.category.LAUNCHER"
+
+Receiver Resolver Table:
+  Non-Data Actions:
+      androidx.profileinstaller.action.SAVE_PROFILE:
+        1dcb9bf com.aistudio.eternalsummoner.kvrpzm/androidx.profileinstaller.ProfileInstallReceiver filter 2bebfea
+          Action: "androidx.profileinstaller.action.SAVE_PROFILE"
+      androidx.profileinstaller.action.INSTALL_PROFILE:
+        1dcb9bf com.aistudio.eternalsummoner.kvrpzm/androidx.profileinstaller.ProfileInstallReceiver filter 44d788c
+          Action: "androidx.profileinstaller.action.INSTALL_PROFILE"
+      androidx.profileinstaller.action.SKIP_FILE:
+        1dcb9bf com.aistudio.eternalsummoner.kvrpzm/androidx.profileinstaller.ProfileInstallReceiver filter 7ff2bd5
+          Action: "androidx.profileinstaller.action.SKIP_FILE"
+      androidx.profileinstaller.action.BENCHMARK_OPERATION:
+        1dcb9bf com.aistudio.eternalsummoner.kvrpzm/androidx.profileinstaller.ProfileInstallReceiver filter 2ad32db
+          Action: "androidx.profileinstaller.action.BENCHMARK_OPERATION"
+
+Permissions:
+  Permission [com.aistudio.eternalsummoner.kvrpzm.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION] (99f9178):
+    sourcePackage=com.aistudio.eternalsummoner.kvrpzm
+    uid=10071 gids=null type=0 prot=signature
+    perm=Permission{970f649 com.aistudio.eternalsummoner.kvrpzm.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION}
+
+Registered ContentProviders:
+  com.aistudio.eternalsummoner.kvrpzm/com.google.firebase.provider.FirebaseInitProvider:
+    Provider{5994b4e com.aistudio.eternalsummoner.kvrpzm/com.google.firebase.provider.FirebaseInitProvider}
+  com.aistudio.eternalsummoner.kvrpzm/androidx.startup.InitializationProvider:
+    Provider{38b046f com.aistudio.eternalsummoner.kvrpzm/androidx.startup.InitializationProvider}
+
+ContentProvider Authorities:
+  [com.aistudio.eternalsummoner.kvrpzm.firebaseinitprovider]:
+    Provider{5994b4e com.aistudio.eternalsummoner.kvrpzm/com.google.firebase.provider.FirebaseInitProvider}
+      applicationInfo=ApplicationInfo{a64e57c com.aistudio.eternalsummoner.kvrpzm}
+  [com.aistudio.eternalsummoner.kvrpzm.androidx-startup]:
+    Provider{38b046f com.aistudio.eternalsummoner.kvrpzm/androidx.startup.InitializationProvider}
+      applicationInfo=ApplicationInfo{4c9ae05 com.aistudio.eternalsummoner.kvrpzm}
+
+Key Set Manager:
+  [com.aistudio.eternalsummoner.kvrpzm]
+      Signing KeySets: 8
+
+Packages:
+  Package [com.aistudio.eternalsummoner.kvrpzm] (9c2ce5a):
+    userId=10071
+    pkg=Package{66d788b com.aistudio.eternalsummoner.kvrpzm}
+    codePath=/data/app/~~zBzGvxnQafpF-isZSdyj_Q==/com.aistudio.eternalsummoner.kvrpzm-8JFFLkPGUyRCSO23n_mqOg==
+    resourcePath=/data/app/~~zBzGvxnQafpF-isZSdyj_Q==/com.aistudio.eternalsummoner.kvrpzm-8JFFLkPGUyRCSO23n_mqOg==
+    legacyNativeLibraryDir=/data/app/~~zBzGvxnQafpF-isZSdyj_Q==/com.aistudio.eternalsummoner.kvrpzm-8JFFLkPGUyRCSO23n_mqOg==/lib
+    primaryCpuAbi=x86_64
+    secondaryCpuAbi=null
+    versionCode=1 minSdk=24 targetSdk=36
+    versionName=1.0
+    splits=[base]
+    apkSigningVersion=2
+    applicationInfo=ApplicationInfo{66d788b com.aistudio.eternalsummoner.kvrpzm}
+    flags=[ DEBUGGABLE HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
+    privateFlags=[ PRIVATE_FLAG_ACTIVITIES_RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION ALLOW_AUDIO_PLAYBACK_CAPTURE PARTIALLY_DIRECT_BOOT_AWARE PRIVATE_FLAG_ALLOW_NATIVE_HEAP_POINTER_TAGGING ]
+    forceQueryable=false
+    queriesPackages=[]
+    dataDir=/data/user/0/com.aistudio.eternalsummoner.kvrpzm
+    supportsScreens=[small, medium, large, xlarge, resizeable, anyDensity]
+    timeStamp=2026-11-15 10:55:30
+    firstInstallTime=2026-11-15 10:55:33
+    lastUpdateTime=2026-11-15 10:55:33
+    signatures=PackageSignatures{dd8dd68 version:2, signatures:[b90873c5], past signatures:[]}
+    installPermissionsFixed=true
+    pkgFlags=[ DEBUGGABLE HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
+    declared permissions:
+      com.aistudio.eternalsummoner.kvrpzm.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION: prot=signature, INSTALLED
+    requested permissions:
+      android.permission.INTERNET
+      android.permission.ACCESS_NETWORK_STATE
+      android.permission.VIBRATE
+      android.permission.USE_BIOMETRIC
+      android.permission.USE_FINGERPRINT
+      com.google.android.providers.gsf.permission.READ_GSERVICES
+      com.aistudio.eternalsummoner.kvrpzm.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+    install permissions:
+      android.permission.INTERNET: granted=true
+      android.permission.ACCESS_NETWORK_STATE: granted=true
+      android.permission.USE_FINGERPRINT: granted=true
+      com.aistudio.eternalsummoner.kvrpzm.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION: granted=true
+      android.permission.VIBRATE: granted=true
+      android.permission.USE_BIOMETRIC: granted=true
+    User 0: ceDataInode=123224 installed=true hidden=false suspended=false distractionFlags=0 stopped=true notLaunched=true enabled=0 instant=false virtual=false
+      gids=[3003]
+      runtime permissions:
+
+Queries:
+  system apps queryable: false
+  queries via package name:
+  queries via intent:
+  queryable via interaction:
+    User 0:
+
+Package Changes:
+  Sequence number=1
+  User 0:
+    seq=0, package=com.aistudio.eternalsummoner.kvrpzm
+
+
+Dexopt state:
+  [com.aistudio.eternalsummoner.kvrpzm]
+    path: /data/app/~~zBzGvxnQafpF-isZSdyj_Q==/com.aistudio.eternalsummoner.kvrpzm-8JFFLkPGUyRCSO23n_mqOg==/base.apk
+      x86_64: [status=run-from-apk] [reason=unknown]
+
+
+Compiler stats:
+  [com.aistudio.eternalsummoner.kvrpzm]
+    (No recorded stats)
+
+APEX session state:
+
+Active APEX packages:
+
+
+Inactive APEX packages:
+
+
+Factory APEX packages:

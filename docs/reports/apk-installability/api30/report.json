@@ -1,0 +1,162 @@
+{
+  "status": "PASS",
+  "installation_verified": true,
+  "scope": "Fresh emulator PackageManager install; not a physical-phone test",
+  "serial": "emulator-5582",
+  "apk": {
+    "path": "/workspace/apk-invalid-investigation/release-392/Eternal-Summoner-debug.apk",
+    "bytes": 47235814,
+    "sha256": "8417389a8df36f9f05547f802123ce10e52fa0da1517572856b471bcedb8df9a",
+    "application_id": "com.aistudio.eternalsummoner.kvrpzm",
+    "version_code": 1,
+    "version_name": "1.0",
+    "launchable_activity": "com.example.MainActivity",
+    "debuggable": true,
+    "certificate_sha256": [
+      "9d179477ce35520d6af58f29864c94d60ae4c8ca283e84541cd08192534a8b2b"
+    ],
+    "signature_schemes": {
+      "v1": false,
+      "v2": true,
+      "v3": false,
+      "v3.1": false,
+      "v4": false
+    },
+    "native_abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "signature_verified": true,
+    "zip_crc_verified": true
+  },
+  "commands": [
+    {
+      "argv": [
+        "/workspace/toolchains/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5582",
+        "shell",
+        "getprop",
+        "ro.kernel.qemu"
+      ],
+      "exit_code": 0,
+      "stdout": "1\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/workspace/toolchains/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5582",
+        "shell",
+        "getprop",
+        "sys.boot_completed"
+      ],
+      "exit_code": 0,
+      "stdout": "1\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/workspace/toolchains/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5582",
+        "shell",
+        "getprop",
+        "ro.build.version.sdk"
+      ],
+      "exit_code": 0,
+      "stdout": "30\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/workspace/toolchains/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5582",
+        "shell",
+        "getprop",
+        "ro.build.fingerprint"
+      ],
+      "exit_code": 0,
+      "stdout": "Android/sdk_slim_x86_64/generic_x86_64:11/RSR1.210722.030/10147527:userdebug/test-keys\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/workspace/toolchains/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5582",
+        "shell",
+        "getprop",
+        "ro.product.cpu.abilist"
+      ],
+      "exit_code": 0,
+      "stdout": "x86_64,x86\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/workspace/toolchains/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5582",
+        "shell",
+        "pm",
+        "path",
+        "com.aistudio.eternalsummoner.kvrpzm"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/workspace/toolchains/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5582",
+        "install",
+        "--no-streaming",
+        "/workspace/apk-invalid-investigation/release-392/Eternal-Summoner-debug.apk"
+      ],
+      "exit_code": 0,
+      "stdout": "Performing Push Install\nSuccess\n",
+      "stderr": "/workspace/apk-invalid-investigation/release-392/Eternal-Summoner-debug.apk: 1 file pushed, 0 skipped. 56.3 MB/s (47235814 bytes in 0.800s)\n"
+    },
+    {
+      "argv": [
+        "/workspace/toolchains/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5582",
+        "shell",
+        "pm",
+        "path",
+        "com.aistudio.eternalsummoner.kvrpzm"
+      ],
+      "exit_code": 0,
+      "stdout": "package:/data/app/~~zBzGvxnQafpF-isZSdyj_Q==/com.aistudio.eternalsummoner.kvrpzm-8JFFLkPGUyRCSO23n_mqOg==/base.apk\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/workspace/toolchains/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5582",
+        "shell",
+        "dumpsys",
+        "package",
+        "com.aistudio.eternalsummoner.kvrpzm"
+      ],
+      "exit_code": 0,
+      "stdout": "Activity Resolver Table:\n  Schemes:\n      genericidp:\n        ac0da63 com.aistudio.eternalsummoner.kvrpzm/com.google.firebase.auth.internal.GenericIdpActivity filter 2395660\n          Action: \"android.intent.action.VIEW\"\n          Category: \"android.intent.category.DEFAULT\"\n          Category: \"android.intent.category.BROWSABLE\"\n          Scheme: \"genericidp\"\n          Authority: \"firebase.auth\": -1\n          Path: \"PatternMatcher{LITERAL: /}\"\n      recaptcha:\n        8fb3719 com.aistudio.eternalsummoner.kvrpzm/com.google.firebase.auth.internal.RecaptchaActivity filter 41643de\n          Action: \"android.intent.action.VIEW\"\n          Category: \"android.intent.category.DEFAULT\"\n          Category: \"android.intent.category.BROWSABLE\"\n          Scheme: \"recaptcha\"\n          Authority: \"firebase.auth\": -1\n          Path: \"PatternMatcher{LITERAL: /}\"\n\n  Non-Data Actions:\n      android.intent.action.MAIN:\n        e8a561d com.aistudio.eternalsummoner.kvrpzm/com.example.MainActivity filter e91b092\n          Action: \"android.intent.action.MAIN\"\n          Category: \"android.intent.category.LAUNCHER\"\n\nReceiver Resolver Table:\n  Non-Data Actions:\n      androidx.profileinstaller.action.SAVE_PROFILE:\n        1dcb9bf com.aistudio.eternalsummoner.kvrpzm/androidx.profileinstaller.ProfileInstallReceiver filter 2bebfea\n          Action: \"androidx.profileinstaller.action.SAVE_PROFILE\"\n      androidx.profileinstaller.action.INSTALL_PROFILE:\n        1dcb9bf com.aistudio.eternalsummoner.kvrpzm/androidx.profileinstaller.ProfileInstallReceiver filter 44d788c\n          Action: \"androidx.profileinstaller.action.INSTALL_PROFILE\"\n      androidx.profileinstaller.action.SKIP_FILE:\n        1dcb9bf com.aistudio.eternalsummoner.kvrpzm/androidx.profileinstaller.ProfileInstallReceiver filter 7ff2bd5\n          Action: \"androidx.profileinstaller.action.SKIP_FILE\"\n      androidx.profileinstaller.action.BENCHMARK_OPERATION:\n        1dcb9bf com.aistudio.eternalsummoner.kvrpzm/androidx.profileinstaller.ProfileInstallReceiver filter 2ad32db\n          Action: \"androidx.profileinstaller.action.BENCHMARK_OPERATION\"\n\nPermissions:\n  Permission [com.aistudio.eternalsummoner.kvrpzm.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION] (99f9178):\n    sourcePackage=com.aistudio.eternalsummoner.kvrpzm\n    uid=10071 gids=null type=0 prot=signature\n    perm=Permission{970f649 com.aistudio.eternalsummoner.kvrpzm.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION}\n\nRegistered ContentProviders:\n  com.aistudio.eternalsummoner.kvrpzm/com.google.firebase.provider.FirebaseInitProvider:\n    Provider{5994b4e com.aistudio.eternalsummoner.kvrpzm/com.google.firebase.provider.FirebaseInitProvider}\n  com.aistudio.eternalsummoner.kvrpzm/androidx.startup.InitializationProvider:\n    Provider{38b046f com.aistudio.eternalsummoner.kvrpzm/androidx.startup.InitializationProvider}\n\nContentProvider Authorities:\n  [com.aistudio.eternalsummoner.kvrpzm.firebaseinitprovider]:\n    Provider{5994b4e com.aistudio.eternalsummoner.kvrpzm/com.google.firebase.provider.FirebaseInitProvider}\n      applicationInfo=ApplicationInfo{a64e57c com.aistudio.eternalsummoner.kvrpzm}\n  [com.aistudio.eternalsummoner.kvrpzm.androidx-startup]:\n    Provider{38b046f com.aistudio.eternalsummoner.kvrpzm/androidx.startup.InitializationProvider}\n      applicationInfo=ApplicationInfo{4c9ae05 com.aistudio.eternalsummoner.kvrpzm}\n\nKey Set Manager:\n  [com.aistudio.eternalsummoner.kvrpzm]\n      Signing KeySets: 8\n\nPackages:\n  Package [com.aistudio.eternalsummoner.kvrpzm] (9c2ce5a):\n    userId=10071\n    pkg=Package{66d788b com.aistudio.eternalsummoner.kvrpzm}\n    codePath=/data/app/~~zBzGvxnQafpF-isZSdyj_Q==/com.aistudio.eternalsummoner.kvrpzm-8JFFLkPGUyRCSO23n_mqOg==\n    resourcePath=/data/app/~~zBzGvxnQafpF-isZSdyj_Q==/com.aistudio.eternalsummoner.kvrpzm-8JFFLkPGUyRCSO23n_mqOg==\n    legacyNativeLibraryDir=/data/app/~~zBzGvxnQafpF-isZSdyj_Q==/com.aistudio.eternalsummoner.kvrpzm-8JFFLkPGUyRCSO23n_mqOg==/lib\n    primaryCpuAbi=x86_64\n    secondaryCpuAbi=null\n    versionCode=1 minSdk=24 targetSdk=36\n    versionName=1.0\n    splits=[base]\n    apkSigningVersion=2\n    applicationInfo=ApplicationInfo{66d788b com.aistudio.eternalsummoner.kvrpzm}\n    flags=[ DEBUGGABLE HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]\n    privateFlags=[ PRIVATE_FLAG_ACTIVITIES_RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION ALLOW_AUDIO_PLAYBACK_CAPTURE PARTIALLY_DIRECT_BOOT_AWARE PRIVATE_FLAG_ALLOW_NATIVE_HEAP_POINTER_TAGGING ]\n    forceQueryable=false\n    queriesPackages=[]\n    dataDir=/data/user/0/com.aistudio.eternalsummoner.kvrpzm\n    supportsScreens=[small, medium, large, xlarge, resizeable, anyDensity]\n    timeStamp=2026-11-15 10:55:30\n    firstInstallTime=2026-11-15 10:55:33\n    lastUpdateTime=2026-11-15 10:55:33\n    signatures=PackageSignatures{dd8dd68 version:2, signatures:[b90873c5], past signatures:[]}\n    installPermissionsFixed=true\n    pkgFlags=[ DEBUGGABLE HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]\n    declared permissions:\n      com.aistudio.eternalsummoner.kvrpzm.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION: prot=signature, INSTALLED\n    requested permissions:\n      android.permission.INTERNET\n      android.permission.ACCESS_NETWORK_STATE\n      android.permission.VIBRATE\n      android.permission.USE_BIOMETRIC\n      android.permission.USE_FINGERPRINT\n      com.google.android.providers.gsf.permission.READ_GSERVICES\n      com.aistudio.eternalsummoner.kvrpzm.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION\n    install permissions:\n      android.permission.INTERNET: granted=true\n      android.permission.ACCESS_NETWORK_STATE: granted=true\n      android.permission.USE_FINGERPRINT: granted=true\n      com.aistudio.eternalsummoner.kvrpzm.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION: granted=true\n      android.permission.VIBRATE: granted=true\n      android.permission.USE_BIOMETRIC: granted=true\n    User 0: ceDataInode=123224 installed=true hidden=false suspended=false distractionFlags=0 stopped=true notLaunched=true enabled=0 instant=false virtual=false\n      gids=[3003]\n      runtime permissions:\n\nQueries:\n  system apps queryable: false\n  queries via package name:\n  queries via intent:\n  queryable via interaction:\n    User 0:\n\nPackage Changes:\n  Sequence number=1\n  User 0:\n    seq=0, package=com.aistudio.eternalsummoner.kvrpzm\n\n\nDexopt state:\n  [com.aistudio.eternalsummoner.kvrpzm]\n    path: /data/app/~~zBzGvxnQafpF-isZSdyj_Q==/com.aistudio.eternalsummoner.kvrpzm-8JFFLkPGUyRCSO23n_mqOg==/base.apk\n      x86_64: [status=run-from-apk] [reason=unknown]\n\n\nCompiler stats:\n  [com.aistudio.eternalsummoner.kvrpzm]\n    (No recorded stats)\n\nAPEX session state:\n\nActive APEX packages:\n\n\nInactive APEX packages:\n\n\nFactory APEX packages:\n\n\n",
+      "stderr": ""
+    }
+  ],
+  "device": {
+    "sdk": "30",
+    "fingerprint": "Android/sdk_slim_x86_64/generic_x86_64:11/RSR1.210722.030/10147527:userdebug/test-keys",
+    "abis": "x86_64,x86"
+  },
+  "installed_package_path": "package:/data/app/~~zBzGvxnQafpF-isZSdyj_Q==/com.aistudio.eternalsummoner.kvrpzm-8JFFLkPGUyRCSO23n_mqOg==/base.apk"
+}

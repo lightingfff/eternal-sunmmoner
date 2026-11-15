@@ -34,11 +34,9 @@ device fingerprint, prior absence and installation output are retained in the
 `api35/` evidence. The emulator runs in software because this Cloud host has no
 `/dev/kvm`; it is not a Samsung/physical-phone measurement.
 
-The owner's reported rejection remains **UNRESOLVED**. This successful emulator
-install narrows the investigation; it does not establish which bytes/installer
-condition produced the owner's error or prove the problem fixed. A second API30
-check and exact-HEAD CI are reported separately in the Issue/PR handoff as they
-complete. An exploratory `am start -W` timed out under software emulation; that
+The exact release APK also passed a fresh PackageManager install on Android11/API30; raw evidence is in `api30/`. An earlier probe found the local emulator unavailable after a sibling VM shutdown; that was not an APK rejection.
+
+The owner's reported rejection remains **UNRESOLVED**. These successful emulator installs narrow the investigation; they do not establish which installer condition produced the owner's error or prove it fixed. Exact-HEAD CI is reported separately in the Issue/PR handoff as it completes. An exploratory `am start -W` timed out under software emulation; that
 is not counted as a passing launch or a measured phone performance result. The
 later log shows a drawn activity after44seconds and an input ANR on this software
 emulator. Both observations remain recorded limitations, not a successful launch
@@ -77,7 +75,7 @@ retrieval change.
 - Never uninstalls, clears data, changes signing/identity or retries by suppressing
   a failing installation.
 
-Ten decision tests use explicitly simulated ADB output and cover invalid-package
+Eleven decision tests use explicitly simulated ADB output and cover invalid-package
 failures even with exit0, misleading success text, missing post-install metadata,
 timeouts, physical targets, unbooted emulators and preservation of an existing app.
 Those tests are not installation evidence; the API35 raw PackageManager result is.
@@ -106,7 +104,7 @@ a verifier code path; the app's minimum remains24. Android24+ still verifies v2.
 The verifier's v1-only META-INF warnings do not authorize deleting those payloads;
 they are retained and protected by v2.
 
-Seven ZIP-payload fixture tests reject changed/deleted/extra/duplicated code or
+Eight ZIP-payload/metadata fixture tests reject changed/deleted/extra/duplicated code or
 metadata and altered compression. They are not cryptographic signing evidence.
 Separately, real local SDK signing verified a local-keyb6ae... source/candidate
 pair and preserved all1,082 non-signature entries and their compression/order;
@@ -147,3 +145,22 @@ missing installation check and real evidence; it does not claim to repair an
 unreproduced Samsung rejection. Exact-SHA independent review and owner-only merge
 remain required. Physical installation and the failing file's identity/rejection
 code remain unverified.
+
+## First CI result and verification-tool correction
+
+On d5e5fc3, actual CI fresh installs of the original APK passed on API30 and35.
+Both compatibility jobs failed closed before creating a candidate: the selected
+runner verifier returned no fingerprint to the existing metadata parser. This was
+not a changed-key finding: the recorded APK SHA was exactly the original release
+SHA8417389a..., which the local SDK36.0.0 verified as the canonical9d17... signer.
+No compatibility APK was uploaded from those failed jobs.
+
+The probe and compatibility helper now explicitly select the producer's pinned
+SDK build-tools36.0.0 rather than accepting an executable from PATH or a different
+SDK version. CI installs that verification tool version and records the prior
+verifier's public output for diagnosis. Missing signer metadata is classified as
+a metadata/tool error before installation/signing, not proof of key rotation.
+Two additional tests pin SDK selection and missing-metadata refusal;19 total
+fixture tests pass. These changes affect verification tools only, not application
+min/targetSDK or signing configuration. Final CI and canonical candidate results
+are reported on the PR/issue for the reviewed SHA.
