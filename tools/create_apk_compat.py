@@ -17,7 +17,8 @@ import subprocess
 import sys
 import zipfile
 
-from verify_apk_update import AuditError, compare, find_tool, inspect_apk, run_tool, sha256_file
+from verify_apk_update import AuditError, compare, inspect_apk, run_tool, sha256_file
+from check_apk_installability import sdk_tool
 
 APK_NAME = "Eternal-Summoner-compat.apk"
 SIGNATURE_ENTRY = re.compile(r"META-INF/(?:MANIFEST\.MF|[^/]+\.(?:SF|RSA|DSA|EC))", re.I)
@@ -60,10 +61,12 @@ def create(source: Path, keystore: Path, sdk: str, output: Path, expected_certif
         raise ValueError("Output APK must be new and separate from the source")
     if not keystore.is_file():
         raise ValueError("Original debug keystore is unavailable; no replacement key will be generated")
-    signer = find_tool("apksigner", None, sdk)
-    aapt2 = find_tool("aapt2", None, sdk)
-    aligner = find_tool("zipalign", None, sdk)
+    signer = sdk_tool(sdk, "apksigner")
+    aapt2 = sdk_tool(sdk, "aapt2")
+    aligner = sdk_tool(sdk, "zipalign")
     original = inspect_apk(source, signer, aapt2)
+    if len(original["certificate_sha256"]) != 1:
+        raise ValueError("Verified source certificate metadata is unavailable; this is not evidence of a changed signing key")
     if expected_certificate is not None:
         if not re.fullmatch(r"[0-9a-fA-F]{64}", expected_certificate):
             raise ValueError("Expected certificate must be a SHA256 digest")

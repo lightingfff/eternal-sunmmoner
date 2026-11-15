@@ -4,11 +4,21 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
-from check_apk_installability import ACTIVITY, PACKAGE, probe
+from check_apk_installability import ACTIVITY, PACKAGE, probe, sdk_tool
 
 
 class InstallProbeTest(unittest.TestCase):
+    def test_tool_selection_pins_sdk_version_instead_of_searching_path(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            expected = Path(tmp) / "build-tools" / "36.0.0" / "apksigner"
+            expected.parent.mkdir(parents=True)
+            expected.write_text("fixture only")
+            expected.chmod(0o755)
+            with patch("verify_apk_update.shutil.which", side_effect=AssertionError("PATH must not override SDK")):
+                self.assertEqual(expected.resolve(), sdk_tool(tmp, "apksigner"))
+
     def run_case(self, install=None, present=False, serial="emulator-5580", boot="1", qemu="1",
                  after_path=True, dumpsys_error=False):
         calls = []

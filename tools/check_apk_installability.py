@@ -20,6 +20,11 @@ class ProbeError(Exception):
     pass
 
 
+def sdk_tool(sdk: str | Path, name: str) -> Path:
+    """Use the producer's known build-tools, not an unrelated executable on PATH."""
+    return find_tool(name, str(Path(sdk) / "build-tools" / "36.0.0" / name), str(sdk))
+
+
 def probe(adb: Path, serial: str, apk: Path, metadata: dict, output: Path,
           timeout: int = 300, runner=subprocess.run) -> dict:
     output.mkdir(parents=True, exist_ok=True)
@@ -100,9 +105,11 @@ def main() -> int:
         adb = args.sdk_root / "platform-tools" / "adb"
         if not adb.is_file():
             raise ProbeError(f"ADB not found: {adb}")
-        signer = find_tool("apksigner", None, str(args.sdk_root))
-        aapt2 = find_tool("aapt2", None, str(args.sdk_root))
+        signer = sdk_tool(args.sdk_root, "apksigner")
+        aapt2 = sdk_tool(args.sdk_root, "aapt2")
         metadata = inspect_apk(args.apk, signer, aapt2)
+        if len(metadata["certificate_sha256"]) != 1:
+            raise ProbeError("Verified APK certificate metadata could not be read; no install attempted")
         result = probe(adb, args.serial, args.apk.resolve(), metadata, args.output, args.timeout)
         print(json.dumps(result, indent=2))
         return 0 if result["installation_verified"] else 1
