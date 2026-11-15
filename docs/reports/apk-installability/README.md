@@ -39,7 +39,10 @@ install narrows the investigation; it does not establish which bytes/installer
 condition produced the owner's error or prove the problem fixed. A second API30
 check and exact-HEAD CI are reported separately in the Issue/PR handoff as they
 complete. An exploratory `am start -W` timed out under software emulation; that
-is not counted as a passing launch or a measured phone performance result.
+is not counted as a passing launch or a measured phone performance result. The
+later log shows a drawn activity after44seconds and an input ANR on this software
+emulator. Both observations remain recorded limitations, not a successful launch
+test or an explanation for the owner's installation rejection.
 
 ## Concrete verification gap corrected
 
@@ -51,6 +54,11 @@ and downloaded bytes are checked; APK contents are never rewritten. The existing
 producer's default PR checkout can be GitHub's synthetic merge with main; the
 recorded producer metadata identifies that run rather than claiming a separately
 rebuilt byte-for-byte HEAD APK.
+
+The matrix checks both original and compatibility signing profiles on separate
+fresh API30/API35 emulators. A missing/failed producer artifact blocks the test;
+only diagnostic upload is optional. Compatibility APK upload requires successful
+signing/payload checks and actual installation in that matrix job.
 
 The new workflow does not modify the publishing workflow or its signing/cache
 configuration. It is a PR check for review, not yet a dependency that blocks the
@@ -73,6 +81,40 @@ Ten decision tests use explicitly simulated ADB output and cover invalid-package
 failures even with exit0, misleading success text, missing post-install metadata,
 timeouts, physical targets, unbooted emulators and preservation of an existing app.
 Those tests are not installation evidence; the API35 raw PackageManager result is.
+
+## Controlled signing-envelope compatibility experiment
+
+The owner confirms downloading the exact provided APK link. AOSP installation does
+not explain the Samsung rejection. A separately named `Eternal-Summoner-compat.apk`
+therefore tests one variable: add JAR/v1 alongside v2, with the same existing
+certificate. Absence of v1 is a **hypothesis**, not a proved cause or a fixed bug.
+The original APK/release and application signing configuration remain untouched.
+
+`tools/create_apk_compat.py` uses the existing debug key, never generates one and
+refuses a missing key, an unexpected source certificate or a changed candidate
+identity. CI restores the original cache without saving/replacing it and pins
+the expected canonical9d17... release certificate. No keystore enters artifacts.
+On failure a newly created candidate is removed, not distributed.
+
+Checks compare every non-signature ZIP entry's bytes and compression and record
+ordering/offset differences. Signing necessarily changes the ZIP/signing envelope;
+this is not a byte-identical whole APK. Manifest/dex/resources/native code remain
+byte-identical, preserving package, min/targetSDK, versions and launcher. Final
+signed bytes pass16KiB ZIP alignment, normal v2 verification for API24..36 and
+separate JAR/v1 verification using verifier API23 bounds. The latter only selects
+a verifier code path; the app's minimum remains24. Android24+ still verifies v2.
+The verifier's v1-only META-INF warnings do not authorize deleting those payloads;
+they are retained and protected by v2.
+
+Seven ZIP-payload fixture tests reject changed/deleted/extra/duplicated code or
+metadata and altered compression. They are not cryptographic signing evidence.
+Separately, real local SDK signing verified a local-keyb6ae... source/candidate
+pair and preserved all1,082 non-signature entries and their compression/order;
+1,054 entry offsets changed while final alignment passed. That local candidate
+is **not** a user update for the canonical9d17... channel. A real wrong-key test
+against release392 is also recorded: the helper rejects the mismatch and removes
+its output. The actual downloadable CI candidate must independently match the
+canonical release key, pass fresh installs and receive exact-SHA review.
 
 ## Commands
 
