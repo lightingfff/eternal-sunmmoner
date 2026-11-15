@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.assertIsDisplayed
@@ -104,6 +105,14 @@ class P28UiEvidenceTest {
     return { view }
   }
 
+  private fun assertWithinViewport(label: String, bounds: Rect, viewport: Rect) {
+    assertTrue(
+      "$label must fit wholly inside the viewport (content=$bounds, viewport=$viewport)",
+      bounds.left >= viewport.left && bounds.top >= viewport.top &&
+        bounds.right <= viewport.right && bounds.bottom <= viewport.bottom,
+    )
+  }
+
   @Test @Config(qualifiers = "w360dp-h640dp-port-xhdpi")
   fun heroCardPortrait() {
     val view = content {
@@ -151,12 +160,17 @@ class P28UiEvidenceTest {
     val view = content {
       ESLoadingOverlay(ESLoadingState.Determinate("Đang triệu hồi linh hồn...", 0.62f, tip = tip))
     }
-    rule.onNodeWithTag("es_loading_stage").assertExists()
-    rule.onNodeWithText("Đang triệu hồi", substring = true).assertExists()
-    rule.onNodeWithTag("es_loading_tip_panel").assertExists()
-    rule.onNodeWithText(tip).assertExists()
+    val viewport = rule.onRoot().fetchSemanticsNode().boundsInRoot
+    val stageBounds = rule.onNodeWithTag("es_loading_stage")
+      .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+    val tipBounds = rule.onNodeWithTag("es_loading_tip_panel")
+      .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+    rule.onNodeWithText("Đang triệu hồi", substring = true).assertIsDisplayed()
+    rule.onNodeWithText(tip).assertIsDisplayed()
     rule.onNodeWithTag("es_loading_progress_track").assertExists()
     rule.onNodeWithTag("es_loading_progress_fill").assertExists()
+    assertWithinViewport("Portrait loading stage", stageBounds, viewport)
+    assertWithinViewport("Portrait gameplay tip", tipBounds, viewport)
     capture(view(), "loading_port_360")
   }
 
@@ -166,11 +180,37 @@ class P28UiEvidenceTest {
     val view = content {
       ESLoadingOverlay(ESLoadingState.Indeterminate("Đang đồng bộ dữ liệu người chơi...", tip = tip))
     }
-    rule.onNodeWithText("đồng bộ", substring = true).assertExists()
-    rule.onNodeWithTag("es_loading_tip_panel").assertExists()
-    rule.onNodeWithText(tip).assertExists()
+    val viewport = rule.onRoot().fetchSemanticsNode().boundsInRoot
+    val stageBounds = rule.onNodeWithTag("es_loading_stage")
+      .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+    val tipBounds = rule.onNodeWithTag("es_loading_tip_panel")
+      .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+    rule.onNodeWithText("đồng bộ", substring = true).assertIsDisplayed()
+    rule.onNodeWithText(tip).assertIsDisplayed()
     rule.onNodeWithTag("es_loading_progress_track").assertDoesNotExist()
+    assertWithinViewport("Landscape loading stage", stageBounds, viewport)
+    assertWithinViewport("Landscape gameplay tip", tipBounds, viewport)
     capture(view(), "loading_land_800")
+  }
+
+  @Test @Config(qualifiers = "w360dp-h640dp-port-xhdpi")
+  fun loadingOverlayErrorPortraitShowsDistinctAccessibleDetail() {
+    val message = "Không thể đọc dữ liệu lưu"
+    val view = content {
+      ESLoadingOverlay(ESLoadingState.Failed(message))
+    }
+    val viewport = rule.onRoot().fetchSemanticsNode().boundsInRoot
+    val stageBounds = rule.onNodeWithTag("es_loading_stage")
+      .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+    val errorBounds = rule.onNodeWithTag("es_loading_error_panel")
+      .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+    rule.onNodeWithText("Không thể tải dữ liệu").assertIsDisplayed()
+    rule.onNodeWithText(message).assertIsDisplayed()
+    rule.onNodeWithTag("es_loading_tip_panel").assertDoesNotExist()
+    rule.onNodeWithTag("es_loading_progress_track").assertDoesNotExist()
+    assertWithinViewport("Error loading stage", stageBounds, viewport)
+    assertWithinViewport("Error detail panel", errorBounds, viewport)
+    capture(view(), "loading_error_port_360")
   }
 
   @Test @Config(qualifiers = "w360dp-h640dp-port-xhdpi")
@@ -196,16 +236,8 @@ class P28UiEvidenceTest {
     rule.onNodeWithText(stage).assertIsDisplayed()
     rule.onNodeWithText(tip).assertIsDisplayed()
     rule.onNodeWithTag("es_loading_progress_track").assertDoesNotExist()
-    assertTrue(
-      "Bootstrap stage must remain within the viewport",
-      stageBounds.left >= root.left && stageBounds.top >= root.top &&
-        stageBounds.right <= root.right && stageBounds.bottom <= root.bottom,
-    )
-    assertTrue(
-      "Gameplay tip must remain within the viewport",
-      tipBounds.left >= root.left && tipBounds.top >= root.top &&
-        tipBounds.right <= root.right && tipBounds.bottom <= root.bottom,
-    )
+    assertWithinViewport("Large-font bootstrap stage", stageBounds, root)
+    assertWithinViewport("Large-font gameplay tip", tipBounds, root)
     capture(view(), "loading_guest_bootstrap_port_360_font130")
   }
 

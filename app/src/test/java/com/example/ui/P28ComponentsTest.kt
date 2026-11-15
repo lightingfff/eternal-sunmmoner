@@ -8,6 +8,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import com.example.data.model.HeroClassType
@@ -112,6 +113,8 @@ class P28ComponentsTest {
     )
     rule.onNodeWithText("Đang nạp bản đồ Tháp", substring = true).assertExists()
     rule.onNodeWithTag("es_loading_tip_panel").assertExists()
+    rule.onNodeWithTag("es_loading_tip_heading").assertExists()
+    rule.onNodeWithTag("es_loading_tip").assertExists()
     rule.onNodeWithText(tip).assertExists()
     rule.onNodeWithTag("es_loading_progress_track").assertDoesNotExist()
   }
@@ -164,13 +167,22 @@ class P28ComponentsTest {
     assertProgress(1.25f, 1f)
   }
 
-  @Test fun loadingOverlayShowsErrorStateWithoutGameplayTipOrProgress() {
+  @Test fun loadingOverlayShowsOneAccessibleErrorDetailWithoutTipOrProgress() {
+    val message = "Không thể đọc dữ liệu lưu"
     rule.setContent {
-      ESLoadingOverlay(ESLoadingState.Failed("Không thể đọc dữ liệu lưu"))
+      ESLoadingOverlay(ESLoadingState.Failed(message))
     }
-    // Failed state renders the message on BOTH the stage tag and the error tag.
-    rule.onNodeWithTag("es_loading_error").assertExists()
+    rule.onNodeWithText("Không thể tải dữ liệu").assertExists()
     rule.onNodeWithTag("es_loading_stage").assertExists()
+    rule.onNodeWithTag("es_loading_error_panel").assertExists()
+    rule.onNodeWithTag("es_loading_error").assertExists().assert(
+      SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite),
+    )
+    assertEquals(
+      "Error details should not be duplicated in the stage heading",
+      1,
+      rule.onAllNodesWithText(message).fetchSemanticsNodes().size,
+    )
     rule.onNodeWithTag("es_loading_tip_panel").assertDoesNotExist()
     rule.onNodeWithTag("es_loading_progress_track").assertDoesNotExist()
   }

@@ -57,8 +57,8 @@ sealed interface ESLoadingState {
 }
 
 /**
- * Verified, concise player tips. The cursor advances only when a loading overlay enters
- * composition; it never drives progress or delays completion. Copy is grounded in the
+ * Verified, concise player tips. The cursor advances only when a loading entry needs a
+ * fallback tip; it never drives progress or delays completion. Copy is grounded in the
  * current Tower gate/floor/squad checks in SummonerViewModel.
  */
 internal object ESLoadingTips {
@@ -91,18 +91,25 @@ fun ESLoadingOverlay(
   val track = ESP28Assets.image("progress_track")
   val fill = ESP28Assets.image("progress_fill")
   val fontScale = LocalDensity.current.fontScale
-  val fallbackTip = remember { ESLoadingTips.next() }
+  val largeFontScale = fontScale >= 1.15f
   val stage = when (state) {
     is ESLoadingState.Indeterminate -> state.stage
     is ESLoadingState.Determinate -> state.stage
-    is ESLoadingState.Failed -> state.message
+    is ESLoadingState.Failed -> "Không thể tải dữ liệu"
     ESLoadingState.Hidden -> ""
   }
-  val tip = when (state) {
-    is ESLoadingState.Indeterminate -> state.tip?.takeIf { it.isNotBlank() } ?: fallbackTip
-    is ESLoadingState.Determinate -> state.tip?.takeIf { it.isNotBlank() } ?: fallbackTip
+  val requestedTip = when (state) {
+    is ESLoadingState.Indeterminate -> state.tip
+    is ESLoadingState.Determinate -> state.tip
     is ESLoadingState.Failed, ESLoadingState.Hidden -> null
   }
+  val needsFallbackTip =
+    (state is ESLoadingState.Indeterminate || state is ESLoadingState.Determinate) &&
+      requestedTip.isNullOrBlank()
+  val fallbackTip = remember(needsFallbackTip) {
+    if (needsFallbackTip) ESLoadingTips.next() else null
+  }
+  val tip = requestedTip?.takeIf { it.isNotBlank() } ?: fallbackTip
 
   BoxWithConstraints(
     modifier = modifier.fillMaxSize().background(Color(0xFF0A0E18)),
@@ -153,9 +160,9 @@ fun ESLoadingOverlay(
         style = if (compact) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleMedium,
         textAlign = TextAlign.Center,
         maxLines = when {
-          compact && fontScale >= 1.15f -> 4
+          compact && largeFontScale -> 4
           compact -> 3
-          fontScale >= 1.15f -> 6
+          largeFontScale -> 6
           else -> 4
         },
         overflow = TextOverflow.Ellipsis,
@@ -206,21 +213,34 @@ fun ESLoadingOverlay(
 
       if (state is ESLoadingState.Failed) {
         Spacer(Modifier.height(10.dp))
-        Text(
-          text = state.message,
-          color = ESTokens.DangerGarnet,
-          style = MaterialTheme.typography.bodyMedium,
-          textAlign = TextAlign.Center,
+        Surface(
           modifier = Modifier
             .fillMaxWidth()
-            .testTag("es_loading_error"),
-        )
+            .testTag("es_loading_error_panel"),
+          shape = CutCornerShape(
+            topStart = 8.dp, topEnd = 2.dp, bottomEnd = 8.dp, bottomStart = 2.dp,
+          ),
+          color = Color(0xE6111823),
+          border = BorderStroke(1.dp, ESTokens.DangerGarnet.copy(alpha = 0.82f)),
+        ) {
+          Text(
+            text = state.message,
+            color = ESTokens.IvoryPaper,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(horizontal = 14.dp, vertical = 10.dp)
+              .semantics { liveRegion = LiveRegionMode.Polite }
+              .testTag("es_loading_error"),
+          )
+        }
       } else if (tip != null) {
         Spacer(Modifier.height(if (compact) 10.dp else 14.dp))
         ESLoadingTipPanel(
           tip = tip,
           compact = compact,
-          largeFontScale = fontScale >= 1.15f,
+          largeFontScale = largeFontScale,
         )
       }
     }
@@ -237,7 +257,9 @@ private fun ESLoadingTipPanel(
     modifier = Modifier
       .fillMaxWidth()
       .testTag("es_loading_tip_panel"),
-    shape = CutCornerShape(topStart = 8.dp, topEnd = 2.dp, bottomEnd = 8.dp, bottomStart = 2.dp),
+    shape = CutCornerShape(
+      topStart = 8.dp, topEnd = 2.dp, bottomEnd = 8.dp, bottomStart = 2.dp,
+    ),
     color = Color(0xE6111823),
     border = BorderStroke(1.dp, ESTokens.AntiqueGold.copy(alpha = 0.78f)),
   ) {
