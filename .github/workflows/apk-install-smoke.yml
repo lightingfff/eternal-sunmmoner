@@ -89,12 +89,16 @@ jobs:
           import os, subprocess, sys
           from pathlib import Path
           sys.path.insert(0, 'tools')
-          from verify_apk_update import find_tool
-          signer = find_tool('apksigner', None, os.environ['ANDROID_HOME'])
-          print('Prior selected verifier:', signer, flush=True)
-          result = subprocess.run([str(signer), 'verify', '--verbose', '--print-certs', str(Path(os.environ['RUNNER_TEMP']) / 'apk-under-test/Eternal-Summoner-debug.apk')], text=True, capture_output=True, check=True)
-          print(result.stdout)
-          print(result.stderr)
+          from verify_apk_update import AuditError, find_tool
+          try:
+              signer = find_tool('apksigner', None, os.environ['ANDROID_HOME'])
+              print('Prior selected verifier:', signer, flush=True)
+              result = subprocess.run([str(signer), 'verify', '--verbose', '--print-certs', str(Path(os.environ['RUNNER_TEMP']) / 'apk-under-test/Eternal-Summoner-debug.apk')], text=True, capture_output=True, check=True, timeout=30)
+              print(result.stdout)
+              print(result.stderr)
+          except (AuditError, OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
+              print('Prior-verifier diagnostic unavailable:', type(error).__name__)
+              print('Mandatory pinned verification still follows before install/upload.')
           PY
           SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager | head -n 1)
           "$SDKMANAGER" --install 'build-tools;36.0.0'
