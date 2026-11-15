@@ -1,0 +1,6 @@
+Starting: Intent { cmp=com.aistudio.eternalsummoner.kvrpzm/com.example.MainActivity }
+Status: timeout
+LaunchState: UNKNOWN (-1)
+Activity: com.aistudio.eternalsummoner.kvrpzm/com.example.MainActivity
+WaitTime: 18938
+Complete
