@@ -11,6 +11,7 @@ import com.example.game.pixel.SanctuaryArtAssets
 import com.example.ui.components.p28.ESHeroCard
 import com.example.ui.components.p28.ESLoadingOverlay
 import com.example.ui.components.p28.ESLoadingState
+import com.example.ui.components.p28.ESLoadingTips
 import com.example.ui.components.p28.ESP28Assets
 import com.example.ui.components.p28.GameNoticeUi
 import com.example.ui.components.p28.NoticeCenter
