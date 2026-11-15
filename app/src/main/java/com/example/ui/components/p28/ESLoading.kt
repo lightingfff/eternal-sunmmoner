@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.heading
@@ -87,6 +88,7 @@ fun ESLoadingOverlay(
   val sigil = ESP28Assets.image("loading_sigil")
   val track = ESP28Assets.image("progress_track")
   val fill = ESP28Assets.image("progress_fill")
+  val fontScale = LocalDensity.current.fontScale
   val fallbackTip = remember { ESLoadingTips.next() }
   val stage = when (state) {
     is ESLoadingState.Indeterminate -> state.stage
@@ -148,7 +150,12 @@ fun ESLoadingOverlay(
         color = if (state is ESLoadingState.Failed) ESTokens.DangerGarnet else ESTokens.IvoryPaper,
         style = if (compact) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleMedium,
         textAlign = TextAlign.Center,
-        maxLines = if (compact) 3 else 4,
+        maxLines = when {
+          compact && fontScale >= 1.15f -> 4
+          compact -> 3
+          fontScale >= 1.15f -> 6
+          else -> 4
+        },
         overflow = TextOverflow.Ellipsis,
         modifier = Modifier
           .fillMaxWidth()

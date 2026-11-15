@@ -12,13 +12,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.example.data.model.HeroClassType
 import com.example.data.model.HeroRecord
@@ -37,6 +41,7 @@ import com.example.ui.components.p28.NoticeCenter
 import com.example.ui.components.p28.NoticePriority
 import java.io.File
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -168,7 +173,33 @@ class P28UiEvidenceTest {
     capture(view(), "loading_land_800")
   }
 
+  @Test @Config(qualifiers = "w360dp-h640dp-port-xhdpi")
+  fun loadingOverlayLongGuestBootstrapCopyStaysVisibleAtLargeFontScale() {
+    val stage = "Đang triệu hồi Thánh Địa (The Sanctuary)... • " +
+      "Khôi phục Hồ Sơ Khách & dữ liệu Thánh Địa trên thiết bị • " +
+      "⚡ Chế độ Khách ngoại tuyến — đám mây chưa cấu hình"
+    val tip = ESLoadingTips.all[3]
+    val view = content {
+      val platformDensity = LocalDensity.current
+      CompositionLocalProvider(
+        LocalDensity provides Density(platformDensity.density, fontScale = 1.3f),
+      ) {
+        ESLoadingOverlay(ESLoadingState.Indeterminate(stage, tip = tip))
+      }
+    }
 
+    val root = rule.onRoot().fetchSemanticsNode().boundsInRoot
+    val stageBounds = rule.onNodeWithTag("es_loading_stage")
+      .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+    val tipBounds = rule.onNodeWithTag("es_loading_tip_panel")
+      .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+    rule.onNodeWithText(stage).assertIsDisplayed()
+    rule.onNodeWithText(tip).assertIsDisplayed()
+    rule.onNodeWithTag("es_loading_progress_track").assertDoesNotExist()
+    assertTrue("Bootstrap stage must remain within the viewport", stageBounds.left >= root.left && stageBounds.right <= root.right)
+    assertTrue("Gameplay tip must remain within the viewport", tipBounds.left >= root.left && tipBounds.right <= root.right)
+    capture(view(), "loading_guest_bootstrap_port_360_font130")
+  }
 
   @Test @Config(qualifiers = "w360dp-h640dp-port-xhdpi")
   fun heroManagementDialogWiresRealHeroCardsAndCallbacks() {

@@ -1,6 +1,11 @@
 package com.example.ui
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -109,9 +114,51 @@ class P28ComponentsTest {
   }
 
   @Test fun loadingTipPoolCyclesThroughDistinctEntries() {
+    assertTrue("Keep at least four gameplay tips", ESLoadingTips.all.size >= 4)
+    assertTrue("Keep the verified infirmary route tip", ESLoadingTips.all.any { "Điều dưỡng" in it })
     val selected = List(ESLoadingTips.all.size) { ESLoadingTips.next() }
     assertEquals(ESLoadingTips.all.size, selected.toSet().size)
     assertEquals(ESLoadingTips.all.toSet(), selected.toSet())
+  }
+
+  @Test fun loadingProgressSemanticsAndFillFollowOnlyTheMeasuredFraction() {
+    val measuredFraction = mutableStateOf(0f)
+    rule.setContent {
+      ESLoadingOverlay(
+        ESLoadingState.Determinate(
+          stage = "Đang khôi phục hồ sơ...",
+          fraction = measuredFraction.value,
+          tip = ESLoadingTips.all.first(),
+        ),
+      )
+    }
+
+    fun assertProgress(input: Float, expected: Float) {
+      rule.runOnIdle { measuredFraction.value = input }
+      rule.waitForIdle()
+      rule.onNodeWithTag("es_loading_progress_track").assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.ProgressBarRangeInfo,
+          ProgressBarRangeInfo(expected, 0f..1f),
+        ),
+      )
+      if (expected == 0f) {
+        rule.onNodeWithTag("es_loading_progress_fill").assertDoesNotExist()
+      } else {
+        val trackWidth = rule.onNodeWithTag("es_loading_progress_track")
+          .fetchSemanticsNode().boundsInRoot.width
+        val fillWidth = rule.onNodeWithTag("es_loading_progress_fill")
+          .fetchSemanticsNode().boundsInRoot.width
+        assertEquals("fill width follows the supplied measured fraction", expected, fillWidth / trackWidth, 0.02f)
+      }
+    }
+
+    assertProgress(0f, 0f)
+    assertProgress(0.62f, 0.62f)
+    assertProgress(1f, 1f)
+    assertProgress(Float.NaN, 0f)
+    assertProgress(-0.25f, 0f)
+    assertProgress(1.25f, 1f)
   }
 
   @Test fun loadingOverlayShowsErrorStateWithoutGameplayTipOrProgress() {
