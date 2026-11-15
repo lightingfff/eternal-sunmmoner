@@ -4,11 +4,22 @@ import tempfile
 import unittest
 import warnings
 import zipfile
+from unittest.mock import patch
 
-from create_apk_compat import verify_payload
+from create_apk_compat import create, verify_payload
 
 
 class CompatibilityPayloadTest(unittest.TestCase):
+    def test_missing_certificate_metadata_cannot_start_signing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp); key = root / "fixture.keystore"; key.write_bytes(b"not a real key")
+            with patch("create_apk_compat.sdk_tool", return_value=Path("fixture-tool")), \
+                    patch("create_apk_compat.inspect_apk", return_value={"certificate_sha256": []}), \
+                    patch("create_apk_compat.subprocess.run") as signer:
+                with self.assertRaisesRegex(ValueError, "metadata is unavailable"):
+                    create(root / "source.apk", key, str(root), root / "out", "9d" * 32)
+                signer.assert_not_called()
+
     def compare(self, entries, *, compression=zipfile.ZIP_STORED, duplicate=False):
         with tempfile.TemporaryDirectory() as tmp:
             source, target = Path(tmp) / "source.apk", Path(tmp) / "compat.apk"

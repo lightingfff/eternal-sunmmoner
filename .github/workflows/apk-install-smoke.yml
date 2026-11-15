@@ -82,6 +82,26 @@ jobs:
           python3 tools/package_apk.py --verify "$RUNNER_TEMP/apk-under-test"
           cp "$RUNNER_TEMP/apk-producer.json" "$RUNNER_TEMP/apk-under-test/producer.json"
           echo "APK_TO_INSTALL=$RUNNER_TEMP/apk-under-test/Eternal-Summoner-debug.apk" >> "$GITHUB_ENV"
+      - name: Record the runner's prior verifier and install matching verification tools
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os, subprocess, sys
+          from pathlib import Path
+          sys.path.insert(0, 'tools')
+          from verify_apk_update import AuditError, find_tool
+          try:
+              signer = find_tool('apksigner', None, os.environ['ANDROID_HOME'])
+              print('Prior selected verifier:', signer, flush=True)
+              result = subprocess.run([str(signer), 'verify', '--verbose', '--print-certs', str(Path(os.environ['RUNNER_TEMP']) / 'apk-under-test/Eternal-Summoner-debug.apk')], text=True, capture_output=True, check=True, timeout=30)
+              print(result.stdout)
+              print(result.stderr)
+          except (AuditError, OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
+              print('Prior-verifier diagnostic unavailable:', type(error).__name__)
+              print('Mandatory pinned verification still follows before install/upload.')
+          PY
+          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager | head -n 1)
+          "$SDKMANAGER" --install 'build-tools;36.0.0'
       - name: Restore the existing signing key for the compatibility candidate
         if: matrix.profile == 'compat'
         uses: actions/cache/restore@v4
