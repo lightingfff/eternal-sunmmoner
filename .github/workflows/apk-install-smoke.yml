@@ -1,0 +1,151 @@
+name: APK fresh-install smoke
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'gradle/**'
+      - 'gradle.properties'
+      - '*.gradle.kts'
+      - 'tools/package_apk.py'
+      - 'tools/verify_apk_update.py'
+      - 'tools/check_apk_installability.py'
+      - 'tools/test_check_apk_installability.py'
+      - 'tools/create_apk_compat.py'
+      - 'tools/test_create_apk_compat.py'
+      - '.github/workflows/apk-install-smoke.yml'
+      - '.github/workflows/main.yml'
+  workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: Completed main.yml build run for this exact branch HEAD
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: apk-install-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  install:
+    name: Install ${{ matrix.profile }} API ${{ matrix.api }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [30, 35]
+        profile: [original, compat]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Test probe failure handling
+        run: python3 -m unittest discover -s tools -p 'test_*apk*.py' -v
+      - name: Download the exact APK from its existing build workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          REQUESTED_RUN: ${{ inputs.build_run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          build_run="$REQUESTED_RUN"
+          if [ -z "$build_run" ]; then
+            for attempt in $(seq 1 60); do
+              build_run=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/main.yml/runs?head_sha=$SOURCE_SHA&per_page=20" \
+                --jq '.workflow_runs | sort_by(.id) | last | .id // empty')
+              if [ -n "$build_run" ]; then
+                state=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$build_run" --jq .status)
+                if [ "$state" = completed ]; then break; fi
+              fi
+              sleep 15
+            done
+          fi
+          case "$build_run" in ''|*[!0-9]*) echo 'No valid APK build run was found'; exit 1;; esac
+          expected_workflow=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/main.yml" --jq .id)
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$build_run" > "$RUNNER_TEMP/apk-producer.json"
+          jq -e --arg sha "$SOURCE_SHA" --argjson workflow "$expected_workflow" \
+            '.head_sha == $sha and .workflow_id == $workflow and .status == "completed" and .conclusion == "success"' \
+            "$RUNNER_TEMP/apk-producer.json"
+          gh run download "$build_run" --repo "$GITHUB_REPOSITORY" --name Eternal-Summoner-APK --dir "$RUNNER_TEMP/apk-under-test"
+          python3 tools/package_apk.py --verify "$RUNNER_TEMP/apk-under-test"
+          cp "$RUNNER_TEMP/apk-producer.json" "$RUNNER_TEMP/apk-under-test/producer.json"
+          echo "APK_TO_INSTALL=$RUNNER_TEMP/apk-under-test/Eternal-Summoner-debug.apk" >> "$GITHUB_ENV"
+      - name: Record the runner's prior verifier and install matching verification tools
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os, subprocess, sys
+          from pathlib import Path
+          sys.path.insert(0, 'tools')
+          from verify_apk_update import AuditError, find_tool
+          try:
+              signer = find_tool('apksigner', None, os.environ['ANDROID_HOME'])
+              print('Prior selected verifier:', signer, flush=True)
+              result = subprocess.run([str(signer), 'verify', '--verbose', '--print-certs', str(Path(os.environ['RUNNER_TEMP']) / 'apk-under-test/Eternal-Summoner-debug.apk')], text=True, capture_output=True, check=True, timeout=30)
+              print(result.stdout)
+              print(result.stderr)
+          except (AuditError, OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
+              print('Prior-verifier diagnostic unavailable:', type(error).__name__)
+              print('Mandatory pinned verification still follows before install/upload.')
+          PY
+          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager | head -n 1)
+          "$SDKMANAGER" --install 'build-tools;36.0.0'
+      - name: Restore the existing signing key for the compatibility candidate
+        if: matrix.profile == 'compat'
+        uses: actions/cache/restore@v4
+        with:
+          path: debug.keystore
+          key: debug-keystore-v1
+      - name: Verify and create the same-key signing-envelope candidate
+        if: matrix.profile == 'compat'
+        run: |
+          python3 tools/create_apk_compat.py --apk "$APK_TO_INSTALL" --keystore debug.keystore --sdk-root "$ANDROID_HOME" --output app/build/apk-compat --expected-certificate-sha256 9d179477ce35520d6af58f29864c94d60ae4c8ca283e84541cd08192534a8b2b
+          echo "APK_TO_INSTALL=$GITHUB_WORKSPACE/app/build/apk-compat/Eternal-Summoner-compat.apk" >> "$GITHUB_ENV"
+      - name: Enable emulator hardware acceleration
+        run: |
+          test -c /dev/kvm
+          sudo chmod a+rw /dev/kvm
+      - name: Install without test-only bypass on a fresh Android emulator
+        uses: ReactiveCircus/android-emulator-runner@4c44018e59b437e86cdfc41da381398f93ed8808
+        with:
+          api-level: ${{ matrix.api }}
+          target: aosp_atd
+          arch: x86_64
+          ram-size: 2048M
+          disk-size: 4G
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: python3 tools/check_apk_installability.py --apk "$APK_TO_INSTALL" --serial emulator-5554 --sdk-root "$ANDROID_HOME" --output "app/build/apk-install-api${{ matrix.api }}"
+      - name: Retain successfully verified and installed compatibility APK
+        if: success() && matrix.profile == 'compat'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Eternal-Summoner-compat-api${{ matrix.api }}
+          path: |
+            app/build/apk-compat/Eternal-Summoner-compat.apk
+            app/build/apk-compat/SHA256SUMS
+            app/build/apk-compat/compat-report.json
+          retention-days: 7
+          compression-level: 0
+      - name: Retain installation evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-install-${{ matrix.profile }}-api${{ matrix.api }}
+          path: |
+            app/build/apk-install-api${{ matrix.api }}/
+            ${{ runner.temp }}/apk-under-test/producer.json
+          if-no-files-found: warn
+          retention-days: 7

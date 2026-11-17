@@ -126,7 +126,8 @@ object PixelStructureAtlas {
     SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/wooden_bench.png")
       ?: SanctuaryArtAssets.assetSafe("sanctuary_p03/wooden_bench.png") ?: woodenBenchFallback
   private val woodenBenchFallback: ImageBitmap by lazy { buildWoodenBench34() }
-  val arcaneBookshelfSprite: ImageBitmap by lazy { buildArcaneBookshelf34() }
+  val arcaneBookshelfSprite: ImageBitmap get() = CompletionInteriorAtlas.image("bookshelf") ?: arcaneBookshelfFallback
+  private val arcaneBookshelfFallback: ImageBitmap by lazy { buildArcaneBookshelf34() }
   // P27B-V5 CP5 (debt A, last big P03 block): the perimeter curtain wall was the dark
   // blue-grey P03 slab (luma 75) repeated around an ivory island. Same 88x48 tile, same
   // tiling, new ivory art; the tile is rotated to its least-visible joint because a
@@ -138,15 +139,20 @@ object PixelStructureAtlas {
   private val stoneRetainingWallFallback: ImageBitmap by lazy { buildStoneRetainingWall() }
 
   // 3/4 Restaurant Interior Furnishings (Reference 2)
-  val tavernCounterSprite: ImageBitmap by lazy { buildTavernCounterBar() }
+  val tavernCounterSprite: ImageBitmap get() = CompletionInteriorAtlas.image("tavern_counter") ?: tavernCounterFallback
+  private val tavernCounterFallback: ImageBitmap by lazy { buildTavernCounterBar() }
   val tavernShelfBarrelsSprite: ImageBitmap by lazy { buildTavernShelfBarrels() }
   val tavernFireplaceFrames: List<ImageBitmap> by lazy { (0..2).map { buildTavernFireplace(it) } }
-  val tavernLongTableSprite: ImageBitmap by lazy { buildTavernLongTable() }
+  val tavernLongTableSprite: ImageBitmap get() = CompletionInteriorAtlas.image("long_table") ?: tavernLongTableFallback
+  private val tavernLongTableFallback: ImageBitmap by lazy { buildTavernLongTable() }
 
   // Monumental Statues, Columns, Braziers & Multi-Layered 3/4 Trees
   val obsidianColumnSprite: ImageBitmap get() = SanctuaryArtAssets.image("pillar") ?: obsidianColumnSpriteFallback
   private val obsidianColumnSpriteFallback: ImageBitmap by lazy { buildObsidianColumn() }
-  val royalStatueSprite: ImageBitmap by lazy { buildRoyalStatue() }
+  val royalStatueSprite: ImageBitmap get() = CompletionPropAtlas.image("royal_statue") ?: royalStatueFallback
+  private val royalStatueFallback: ImageBitmap by lazy { buildRoyalStatue() }
+  val crimsonCrystalSprite: ImageBitmap? get() = CompletionPropAtlas.image("crimson_crystal")
+  val tatteredBannerSprite: ImageBitmap? get() = CompletionPropAtlas.image("tattered_banner")
   val oakTreeSprite: ImageBitmap get() = SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/oak.png")
       ?: SanctuaryArtAssets.image("oak") ?: oakTreeSpriteFallback
   private val oakTreeSpriteFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(0, 112, 136) }

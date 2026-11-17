@@ -666,10 +666,9 @@ fun SanctuaryLobbyScreen(
       val drawables = depthQueue.ordered(layout.obstacles,lobbyEngine.heroActors)
       var visibleDrawables = 0
 
-      if (!lobbyEngine.isInsideInterior) {
-        with(com.example.game.pixel.SanctuaryEnvironmentShadows) {
-          drawGroundShadows(layout.obstacles, camX, camY, zoom)
-        }
+      with(com.example.game.pixel.SanctuaryEnvironmentShadows) {
+        drawGroundShadows(layout.obstacles, camX, camY, zoom,
+          clipToIsland = !lobbyEngine.isInsideInterior, groundWidth = layout.width, groundHeight = layout.height)
       }
       drawables.forEach { item ->
         // Share the existing renderer's generous margins; also skip offscreen canopy work.
@@ -696,7 +695,7 @@ fun SanctuaryLobbyScreen(
             zoom = zoom,
             timeSec = animTimeSec,
             highestClearedFloor = highestClearedFloorInt,
-            renderShadow = if (lobbyEngine.isInsideInterior) true else null,
+            renderShadow = null,
           )
           is LobbyDrawableItem.Master -> {} // External Commander is observing from outside world
           is LobbyDrawableItem.HeroNpc -> {

@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "id": "summoning_hall",
+  "file": "summoning_hall.png",
+  "width": 268,
+  "height": 206,
+  "sha256": "cbe76a21714995230c77e821249a083a0a46bad0ba2167a44e25ed612f540ead",
+  "source": "docs/art/art-depth-reforge/source/summoning-hall-imagegen.png",
+  "source_sha256": "adcb353a871bd934e27aec40d9e07d921c1f468e8d042bdf3479e6db70745988",
+  "source_dimensions": [
+    1430,
+    1100
+  ],
+  "source_bbox": [
+    72,
+    44,
+    1335,
+    1083
+  ],
+  "normalized_scale": 0.17709335899903753,
+  "origin": "hosted imagegen edit of original temple; original armory used as material style reference",
+  "world_geometry_changed": false,
+  "native_generated_dimensions_claimed": false
+}

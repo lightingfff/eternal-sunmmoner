@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -61,12 +62,13 @@ fun ESHeroCard(
   val nameplate = ESP28Assets.image("card_nameplate")
   val starOn = ESP28Assets.image("rarity_star_on")
   val starOff = ESP28Assets.image("rarity_star_off")
-  val portrait = remember(hero.name) { PremiumPortraits.get(hero.name) }
+  val portrait = remember(hero.name, hero.classType) { PremiumPortraits.get(hero.name, hero.classType) }
   val injured = hero.isCurrentlyInjured()
 
   Box(
     modifier = modifier
       .aspectRatio(2f / 3f)
+      .shadow(if (selected) 6.dp else 2.dp, RoundedCornerShape(10.dp))
       .clip(RoundedCornerShape(10.dp))
       .clickable(enabled = !injured) { onClick() }
       .then(
@@ -158,7 +160,7 @@ fun ESMiniHeroPortrait(
 ) {
   val backdrop = ESP28Assets.image("card_backdrop")
   val frame = ESP28Assets.image("card_frame_bronze")
-  val portrait = remember(heroName) { PremiumPortraits.get(heroName) }
+  val portrait = remember(heroName, heroClass) { PremiumPortraits.get(heroName, heroClass) }
   Box(modifier = modifier.size(sizeDp).clip(RoundedCornerShape(8.dp))) {
     if (backdrop != null) {
       Image(backdrop, null, Modifier.fillMaxSize(), contentScale = ContentScale.FillBounds)

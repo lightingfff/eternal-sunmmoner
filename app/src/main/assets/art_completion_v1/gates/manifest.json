@@ -1,0 +1,188 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "id": "eternal_gate_court",
+      "file": "eternal_gate_court.png",
+      "width": 960,
+      "height": 540,
+      "sha256": "708021d65475b5fd0b1d975ebc395aeeb4b3c8cca45b5ef4b4b96b15756b0514",
+      "rgba_bytes": 2073600,
+      "source": "docs/art/art-completion/gates/source/eternal_gate_court.png",
+      "source_sha256": "56457a52756f4daf056cd371753a92fd83b09b30ea28890213b239afa0787348",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "source_origin": "genuine hosted imagegen edit",
+      "normalization": "nearest resample; fixed scene registration where declared;256color palette; no generated geometry/actor/portal state changes",
+      "registration": null,
+      "native_generated_dimensions_claimed": false
+    },
+    {
+      "id": "three_gate_nexus",
+      "file": "three_gate_nexus.png",
+      "width": 960,
+      "height": 540,
+      "sha256": "9103be4603db4e4bb84f3cd5534a74afd2882b659d6344b5e5fbfcb55f72a1cb",
+      "rgba_bytes": 2073600,
+      "source": "docs/art/art-completion/gates/source/three_gate_nexus.png",
+      "source_sha256": "c094e525a6bc576a2fd25c3795d162a947c4741ba7aed49fbaffc725c2761715",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "source_origin": "genuine hosted imagegen edit",
+      "normalization": "nearest resample; fixed scene registration where declared;256color palette; no generated geometry/actor/portal state changes",
+      "registration": {
+        "method": "global monotonic nearest coordinate registration",
+        "horizontal_source_to_runtime": [
+          [
+            0,
+            0
+          ],
+          [
+            157,
+            158
+          ],
+          [
+            250,
+            252
+          ],
+          [
+            420,
+            420
+          ],
+          [
+            539,
+            540
+          ],
+          [
+            709,
+            708
+          ],
+          [
+            803,
+            802
+          ],
+          [
+            959,
+            959
+          ]
+        ],
+        "vertical_source_to_runtime": [
+          [
+            0,
+            0
+          ],
+          [
+            78,
+            85
+          ],
+          [
+            138,
+            145
+          ],
+          [
+            145,
+            159
+          ],
+          [
+            191,
+            206
+          ],
+          [
+            259,
+            285
+          ],
+          [
+            302,
+            323
+          ],
+          [
+            539,
+            539
+          ]
+        ]
+      },
+      "native_generated_dimensions_claimed": false
+    },
+    {
+      "id": "engraved_door_leaves",
+      "file": "engraved_door_leaves.png",
+      "width": 144,
+      "height": 240,
+      "sha256": "29d24be488bd5ef93c97692629b02594fc7530716aa3f78f2e265d3836b751d8",
+      "rgba_bytes": 138240,
+      "source": "docs/art/art-completion/gates/source/engraved_door_leaves.png",
+      "source_sha256": "3751b982b7e06b2a2f388e3314dd52077fcfb55d72e0f8184d6e436dbbd8c64a",
+      "source_dimensions": [
+        971,
+        1619
+      ],
+      "source_origin": "genuine hosted imagegen edit",
+      "normalization": "nearest resample; fixed scene registration where declared;256color palette; no generated geometry/actor/portal state changes",
+      "registration": null,
+      "native_generated_dimensions_claimed": false
+    }
+  ],
+  "retained_rgba_bytes": 4285440,
+  "architecture_camera": "existing oblique 2.5D composition",
+  "runtime_geometry_changed": false,
+  "cutscene_timing_changed": false,
+  "mask_alignment": {
+    "eternal_gate_court": [
+      {
+        "center_x": 480,
+        "base": 326,
+        "radius": 72,
+        "height": 231,
+        "runtime_aperture_pixels": 30966,
+        "bright_pixels_in_runtime_aperture": 262,
+        "bright_pixels_in_four_pixel_inset": 0,
+        "inset_core_pixels": 28274,
+        "inset_core_dark_fraction": 1.0,
+        "note": "Orange marks non-dark pixels touched by existing runtime aperture; cyan is actual unchanged mask boundary. Interior is not painted over by normalizer."
+      }
+    ],
+    "three_gate_nexus": [
+      {
+        "center_x": 205,
+        "base": 323,
+        "radius": 47,
+        "height": 164,
+        "runtime_aperture_pixels": 14416,
+        "bright_pixels_in_runtime_aperture": 308,
+        "bright_pixels_in_four_pixel_inset": 0,
+        "inset_core_pixels": 12580,
+        "inset_core_dark_fraction": 1.0,
+        "note": "Orange marks non-dark pixels touched by existing runtime aperture; cyan is actual unchanged mask boundary. Interior is not painted over by normalizer."
+      },
+      {
+        "center_x": 480,
+        "base": 285,
+        "radius": 60,
+        "height": 200,
+        "runtime_aperture_pixels": 22398,
+        "bright_pixels_in_runtime_aperture": 766,
+        "bright_pixels_in_four_pixel_inset": 0,
+        "inset_core_pixels": 20096,
+        "inset_core_dark_fraction": 1.0,
+        "note": "Orange marks non-dark pixels touched by existing runtime aperture; cyan is actual unchanged mask boundary. Interior is not painted over by normalizer."
+      },
+      {
+        "center_x": 755,
+        "base": 323,
+        "radius": 47,
+        "height": 164,
+        "runtime_aperture_pixels": 14416,
+        "bright_pixels_in_runtime_aperture": 465,
+        "bright_pixels_in_four_pixel_inset": 0,
+        "inset_core_pixels": 12580,
+        "inset_core_dark_fraction": 1.0,
+        "note": "Orange marks non-dark pixels touched by existing runtime aperture; cyan is actual unchanged mask boundary. Interior is not painted over by normalizer."
+      }
+    ]
+  },
+  "review_status": "Asset normalization only; coordinator must inspect actual runtime opening overlay"
+}

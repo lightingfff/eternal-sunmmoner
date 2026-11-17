@@ -1,0 +1,629 @@
+{
+  "hero": "Kaelen",
+  "frame": [
+    128,
+    112
+  ],
+  "pivot": [
+    64,
+    104
+  ],
+  "columns": 12,
+  "rows": [
+    "front_right",
+    "back_right"
+  ],
+  "world_scale": 1.16,
+  "frame_order": [
+    "idle0",
+    "idle1",
+    "walk0",
+    "walk1",
+    "walk2",
+    "walk3",
+    "anticipation",
+    "contact",
+    "recovery",
+    "hurt",
+    "collapse",
+    "defeat"
+  ],
+  "atlas_file": "kaelen.png",
+  "atlas_sha256": "eed46e057625716d1adac906a34d7c96ec6ab39b512ebe22c16b3ecbc8eafbe4",
+  "portrait_file": "portrait.png",
+  "portrait_sha256": "c0caf02f56e063e065081320e9bb8bc09924f86a5e029ab87cc4919c844f1981",
+  "retained_rgba_bytes": 1458176,
+  "native_generated_dimensions_claimed": false,
+  "normalization": "reviewed one scale/root per action strip, nearest normalization; original imagegen poses; no invented missing frames",
+  "unique_pose_hashes": [
+    "f6f36bb9f9617f18b6a39488859bf2b8a375912f6575a8539af30139944debcf",
+    "0130fa45cc7d5530749ca1d751c737fa4682d2691f451b9f0c54ce9b51e240ef",
+    "06e789d74cc0f35eef5b51a14012a5a408887488d278338a67f1e1939bbc3a19",
+    "b0cf1081ca6686a77b5fdbd67f85e7249abf9fe4ff04eac6335016d4a246cd56",
+    "579f45e6525f9c5a556f53cf0071e037a56a0950623ff2827aee1eaa09cc1b70",
+    "a673fe2e702625d61e1e7ade826f96b339ff8a5356c43cf20e51f8e35bde24e3",
+    "f020c4d552336af2d3f1c884957b87c23171560f732e81a2325d592623fa45db",
+    "dfb5a7757cc8a9a7e44ef7ba70b4e0e3618ed7d682d61082df5dea907abc4256",
+    "901449708044115f472228296420fb27b140437080b977755849b1bf9cad051b",
+    "34b6cc76a1ffb2d436a298e6cf56d3d1feccbccccf2352a27c37e19c5706f291",
+    "195abcc901d428b40559ac73f87fea4ecd787b5bc14dd0d1ade370dd686ee9d4",
+    "3568986e68c591d3a574e770b507fe9b69b854f7e147e7adbbe36057c7e28e74",
+    "7a9ef3299a487e05ff16f4531f84496366e34746d5e62ff6a953d79f16186da2",
+    "94d448f43dbbb73dc799fe095e8450eddaebe1521227e9be13f99cc527b6c3c4",
+    "0d8d61ae997f7d6d5b759a261c9fbce77074990b8d73779b41593634de8ac204",
+    "fc115593c60b82c8589f2bb611dc1f0403d26fd680ca06bb1382316d49d989d5",
+    "eec69a37e451473ca27e453b7ae596c266f91333fec9a9385cb19216558d116b",
+    "a3ba50e0a3eb09671fef9f54348df97e21292b78edff4ecfa164c37b3a160f8b",
+    "5b8997adba184d37439ef0d4acaec79f9fac93b8cb08a328d906d9ffd91caa27",
+    "70aaae943c6452e0fe6fa19ee6565fd641722690d18bfb36cc50c2f89c754851",
+    "7a35c17745b9ff5e13a30f416676560a50ded72aa1da59600890cac54ff056e6",
+    "df6bc35dae9cae8edc729e98459a906e85c76d472ab071f6f4e2b15cf318b255",
+    "7d4e16a1c88ea3dbf6ecfa600b38d63a2d09cf5fd12150136c42971a61dc2a05",
+    "6834156a51b6150c99f98c1567260676d8d8b498d427b26d5e2af920a273a0c6"
+  ],
+  "sources": {
+    "idle_front": {
+      "file": "docs/art/art-depth-reforge/hero-production/kaelen/sources/idle-front.png",
+      "sha256": "e6d59e3f025b4c23b29d6ed4a94219051047b6b04778acdb7556d5b53c8c511a",
+      "source_row": 0,
+      "source_rows": 1,
+      "count": 2,
+      "root_x": 475,
+      "baseline": 833,
+      "anatomical_top": 39,
+      "target_anatomical_height": 74,
+      "fixed_clip_scale": 0.09319899244332494,
+      "per_frame_recentering": false,
+      "frames": [
+        {
+          "index": 0,
+          "source_span": [
+            186,
+            725
+          ],
+          "paste": [
+            37,
+            26
+          ],
+          "bbox": [
+            37,
+            30,
+            87,
+            104
+          ],
+          "opaque_pixels": 1714
+        },
+        {
+          "index": 1,
+          "source_span": [
+            1038,
+            1612
+          ],
+          "paste": [
+            34,
+            26
+          ],
+          "bbox": [
+            34,
+            30,
+            87,
+            104
+          ],
+          "opaque_pixels": 1719
+        }
+      ]
+    },
+    "idle_back": {
+      "file": "docs/art/art-depth-reforge/hero-production/kaelen/sources/idle-back.png",
+      "sha256": "cf8d9a16969aff11eb0f073e033b45fb6a41432368cafb79b278c4f11c3c5b9d",
+      "source_row": 0,
+      "source_rows": 1,
+      "count": 2,
+      "root_x": 490,
+      "baseline": 812,
+      "anatomical_top": 62,
+      "target_anatomical_height": 74,
+      "fixed_clip_scale": 0.09866666666666667,
+      "per_frame_recentering": false,
+      "frames": [
+        {
+          "index": 0,
+          "source_span": [
+            245,
+            722
+          ],
+          "paste": [
+            40,
+            24
+          ],
+          "bbox": [
+            40,
+            30,
+            87,
+            105
+          ],
+          "opaque_pixels": 1631
+        },
+        {
+          "index": 1,
+          "source_span": [
+            1101,
+            1610
+          ],
+          "paste": [
+            37,
+            24
+          ],
+          "bbox": [
+            37,
+            30,
+            87,
+            105
+          ],
+          "opaque_pixels": 1666
+        }
+      ]
+    },
+    "walk_front": {
+      "file": "docs/art/art-depth-reforge/hero-production/kaelen/sources/walk-front-v1.png",
+      "sha256": "560bbfc4fc74eabe37d3075932b21552c413a45334a315c9088dd2e81b9e4e9b",
+      "source_row": 0,
+      "source_rows": 1,
+      "count": 4,
+      "root_x": 230,
+      "baseline": 727,
+      "anatomical_top": 151,
+      "target_anatomical_height": 74,
+      "fixed_clip_scale": 0.1284722222222222,
+      "per_frame_recentering": false,
+      "frames": [
+        {
+          "index": 0,
+          "source_span": [
+            22,
+            409
+          ],
+          "paste": [
+            37,
+            11
+          ],
+          "bbox": [
+            37,
+            32,
+            87,
+            104
+          ],
+          "opaque_pixels": 1572
+        },
+        {
+          "index": 1,
+          "source_span": [
+            467,
+            826
+          ],
+          "paste": [
+            37,
+            11
+          ],
+          "bbox": [
+            37,
+            30,
+            83,
+            104
+          ],
+          "opaque_pixels": 1458
+        },
+        {
+          "index": 2,
+          "source_span": [
+            903,
+            1295
+          ],
+          "paste": [
+            37,
+            11
+          ],
+          "bbox": [
+            37,
+            33,
+            87,
+            104
+          ],
+          "opaque_pixels": 1516
+        },
+        {
+          "index": 3,
+          "source_span": [
+            1360,
+            1734
+          ],
+          "paste": [
+            38,
+            11
+          ],
+          "bbox": [
+            38,
+            31,
+            86,
+            104
+          ],
+          "opaque_pixels": 1399
+        }
+      ]
+    },
+    "walk_back": {
+      "file": "docs/art/art-depth-reforge/hero-production/kaelen/sources/walk-back.png",
+      "sha256": "f33d737ab5fd2cdbb89f7d4951b825b1dbcb3a52013708c97759a0790f944763",
+      "source_row": 0,
+      "source_rows": 1,
+      "count": 4,
+      "root_x": 315,
+      "baseline": 666,
+      "anatomical_top": 30,
+      "target_anatomical_height": 74,
+      "fixed_clip_scale": 0.11635220125786164,
+      "per_frame_recentering": false,
+      "frames": [
+        {
+          "index": 0,
+          "source_span": [
+            52,
+            491
+          ],
+          "paste": [
+            33,
+            27
+          ],
+          "bbox": [
+            33,
+            31,
+            84,
+            104
+          ],
+          "opaque_pixels": 1616
+        },
+        {
+          "index": 1,
+          "source_span": [
+            625,
+            1034
+          ],
+          "paste": [
+            37,
+            27
+          ],
+          "bbox": [
+            37,
+            31,
+            85,
+            102
+          ],
+          "opaque_pixels": 1476
+        },
+        {
+          "index": 2,
+          "source_span": [
+            1124,
+            1577
+          ],
+          "paste": [
+            32,
+            27
+          ],
+          "bbox": [
+            32,
+            31,
+            85,
+            104
+          ],
+          "opaque_pixels": 1587
+        },
+        {
+          "index": 3,
+          "source_span": [
+            1705,
+            2120
+          ],
+          "paste": [
+            36,
+            27
+          ],
+          "bbox": [
+            36,
+            30,
+            84,
+            102
+          ],
+          "opaque_pixels": 1410
+        }
+      ]
+    },
+    "attack_front": {
+      "file": "docs/art/art-depth-reforge/hero-production/kaelen/sources/attack-front.png",
+      "sha256": "d20e2eb2bf36bf1d3f43d7551a79ee49844048f60abebba523a703a80b727cec",
+      "source_row": 0,
+      "source_rows": 1,
+      "count": 3,
+      "root_x": 300,
+      "baseline": 667,
+      "anatomical_top": 118,
+      "target_anatomical_height": 74,
+      "fixed_clip_scale": 0.13479052823315119,
+      "per_frame_recentering": false,
+      "frames": [
+        {
+          "index": 0,
+          "source_span": [
+            34,
+            473
+          ],
+          "paste": [
+            28,
+            14
+          ],
+          "bbox": [
+            28,
+            17,
+            87,
+            104
+          ],
+          "opaque_pixels": 2637
+        },
+        {
+          "index": 1,
+          "source_span": [
+            683,
+            1468
+          ],
+          "paste": [
+            18,
+            14
+          ],
+          "bbox": [
+            18,
+            34,
+            124,
+            104
+          ],
+          "opaque_pixels": 2681
+        },
+        {
+          "index": 2,
+          "source_span": [
+            1511,
+            1986
+          ],
+          "paste": [
+            32,
+            14
+          ],
+          "bbox": [
+            32,
+            31,
+            96,
+            104
+          ],
+          "opaque_pixels": 2420
+        }
+      ]
+    },
+    "attack_back": {
+      "file": "docs/art/art-depth-reforge/hero-production/kaelen/sources/attack-back.png",
+      "sha256": "317d1e8944c73a321ddd96aa2d0fae96efe35a7cb230022f549f817911be62f6",
+      "source_row": 0,
+      "source_rows": 1,
+      "count": 3,
+      "root_x": 300,
+      "baseline": 684,
+      "anatomical_top": 120,
+      "target_anatomical_height": 74,
+      "fixed_clip_scale": 0.13120567375886524,
+      "per_frame_recentering": false,
+      "frames": [
+        {
+          "index": 0,
+          "source_span": [
+            39,
+            531
+          ],
+          "paste": [
+            30,
+            14
+          ],
+          "bbox": [
+            30,
+            16,
+            95,
+            104
+          ],
+          "opaque_pixels": 2796
+        },
+        {
+          "index": 1,
+          "source_span": [
+            773,
+            1448
+          ],
+          "paste": [
+            31,
+            14
+          ],
+          "bbox": [
+            31,
+            19,
+            120,
+            103
+          ],
+          "opaque_pixels": 2677
+        },
+        {
+          "index": 2,
+          "source_span": [
+            1506,
+            2133
+          ],
+          "paste": [
+            32,
+            14
+          ],
+          "bbox": [
+            32,
+            24,
+            114,
+            104
+          ],
+          "opaque_pixels": 2635
+        }
+      ]
+    },
+    "damage_front": {
+      "file": "docs/art/art-depth-reforge/hero-production/kaelen/sources/damage-front.png",
+      "sha256": "18d2bc845cf90fd5d74bd2fb8dbe8dd2921d7f01695a96b45653989613e78891",
+      "source_row": 0,
+      "source_rows": 1,
+      "count": 3,
+      "root_x": 335,
+      "baseline": 637,
+      "anatomical_top": 93,
+      "target_anatomical_height": 74,
+      "fixed_clip_scale": 0.13602941176470587,
+      "per_frame_recentering": false,
+      "frames": [
+        {
+          "index": 0,
+          "source_span": [
+            87,
+            574
+          ],
+          "paste": [
+            30,
+            17
+          ],
+          "bbox": [
+            30,
+            30,
+            96,
+            102
+          ],
+          "opaque_pixels": 2103
+        },
+        {
+          "index": 1,
+          "source_span": [
+            693,
+            1317
+          ],
+          "paste": [
+            14,
+            17
+          ],
+          "bbox": [
+            15,
+            55,
+            99,
+            102
+          ],
+          "opaque_pixels": 1800
+        },
+        {
+          "index": 2,
+          "source_span": [
+            1446,
+            2122
+          ],
+          "paste": [
+            18,
+            17
+          ],
+          "bbox": [
+            18,
+            79,
+            110,
+            103
+          ],
+          "opaque_pixels": 1304
+        }
+      ]
+    },
+    "damage_back": {
+      "file": "docs/art/art-depth-reforge/hero-production/kaelen/sources/damage-back.png",
+      "sha256": "3912ff011294d9ba9b75b88d64ee5ea466d237ce7347de453dcb944c896f8a98",
+      "source_row": 0,
+      "source_rows": 1,
+      "count": 3,
+      "root_x": 330,
+      "baseline": 659,
+      "anatomical_top": 35,
+      "target_anatomical_height": 74,
+      "fixed_clip_scale": 0.11858974358974358,
+      "per_frame_recentering": false,
+      "frames": [
+        {
+          "index": 0,
+          "source_span": [
+            75,
+            560
+          ],
+          "paste": [
+            34,
+            26
+          ],
+          "bbox": [
+            34,
+            30,
+            92,
+            104
+          ],
+          "opaque_pixels": 2065
+        },
+        {
+          "index": 1,
+          "source_span": [
+            654,
+            1315
+          ],
+          "paste": [
+            17,
+            26
+          ],
+          "bbox": [
+            17,
+            51,
+            95,
+            104
+          ],
+          "opaque_pixels": 1973
+        },
+        {
+          "index": 2,
+          "source_span": [
+            1390,
+            2133
+          ],
+          "paste": [
+            18,
+            26
+          ],
+          "bbox": [
+            18,
+            72,
+            106,
+            103
+          ],
+          "opaque_pixels": 1511
+        }
+      ]
+    }
+  },
+  "portrait_source": {
+    "file": "docs/art/art-depth-reforge/hero-production/kaelen/sources/canonical-upgraded.png",
+    "sha256": "29e7dfffd399b40567978bbe694b452c8b1a2baf6822e834f746d58eff1c1ec3",
+    "crop": [
+      105,
+      145,
+      345,
+      445
+    ],
+    "method": "crop of actual generated canonical art, not a separately painted bust"
+  }
+}

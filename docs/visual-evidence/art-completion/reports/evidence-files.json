@@ -1,0 +1,267 @@
+[
+  {
+    "file": "README.md",
+    "bytes": 6574,
+    "sha256": "37ebb24d0c7fa51dab2519c37217e7b8311c29e5304eb5c0977bdff5deeb7bb1"
+  },
+  {
+    "file": "after/architecture/arch_cypress_actor_behind.png",
+    "bytes": 1395979,
+    "sha256": "d90d97587634ca2796209dfe20cf50aafb4d73d8288d41b262118ee7cb79b686"
+  },
+  {
+    "file": "after/architecture/arch_cypress_actor_front.png",
+    "bytes": 1396608,
+    "sha256": "ebc204d99b86708a7d459c23e4eede5b64c7447f999ff89fa461a988fdc10590"
+  },
+  {
+    "file": "after/architecture/arch_slice_door_actor.png",
+    "bytes": 1456787,
+    "sha256": "c3345149922bc8a0b57157bbbf7594d93f7579da486b7f289d66ed26cf2ecb82"
+  },
+  {
+    "file": "after/gates/court_closed.png",
+    "bytes": 1068693,
+    "sha256": "ae202d92fc49701f898ce1e61db54334977933707cc133a121e4f49958db0fa2"
+  },
+  {
+    "file": "after/gates/court_open.png",
+    "bytes": 1092824,
+    "sha256": "0f0f33ca3eba0a7022ef66026f78d57b7912d0167287a06a0d60f8683b10522c"
+  },
+  {
+    "file": "after/gates/court_parting.png",
+    "bytes": 1111520,
+    "sha256": "2793d9cc62a82f17901961b5f15bc302356cd1d760d6d0f6085b696beb7e6a5e"
+  },
+  {
+    "file": "after/gates/nexus_landscape.png",
+    "bytes": 1031166,
+    "sha256": "7e5a6d8e2fa2cf8dbc77606bf621f869b467104608d8054d7410f039679feafc"
+  },
+  {
+    "file": "after/production-input/production_landscape_short_02_placed_flag.png",
+    "bytes": 535548,
+    "sha256": "6f8ff05c94feb8411cf7a9006b108921a66f4f200bd7c80f01d38946f0b62723"
+  },
+  {
+    "file": "after/production-input/production_landscape_short_03_resume.png",
+    "bytes": 538277,
+    "sha256": "eef6212a13a120153e63897cf8a21e0f2e3f8ebbd7c4793143cf031fde3e2e3f"
+  },
+  {
+    "file": "after/production-input/production_portrait_02_placed_flag.png",
+    "bytes": 607530,
+    "sha256": "a36168d568217b393d657aab064bcd4c57c43797c8f8e14fb226a87c777c819a"
+  },
+  {
+    "file": "after/production-input/production_portrait_03_resume.png",
+    "bytes": 616823,
+    "sha256": "1887953466347e03edbb62b5396db6dabeaba945d0d7e6f7e739065993f4ecac"
+  },
+  {
+    "file": "after/specimens/actors_z0.36_idle.png",
+    "bytes": 1194032,
+    "sha256": "b78f6c98a6682b983d5f798590b0abd6b5cdce82ede1555764313670719184f3"
+  },
+  {
+    "file": "after/specimens/actors_z0.88_defeat.png",
+    "bytes": 2205642,
+    "sha256": "2fad92d2e06f164a41c0504bbaaf4915468cf034c1b0b504b9016483589cfa7e"
+  },
+  {
+    "file": "after/specimens/actors_z0.88_idle.png",
+    "bytes": 2239479,
+    "sha256": "3ff63392fee1872511324be7e6024980e49f40e2dbc64a82fb07601088a0ed13"
+  },
+  {
+    "file": "after/specimens/actors_z1.48_execution.png",
+    "bytes": 1740671,
+    "sha256": "3b8e4373e6a2f566ea999def93dd9dbab14c433ee8350b567031ba2c582604cc"
+  },
+  {
+    "file": "after/specimens/biome_CRIMSON_CAVERN_z1.48.png",
+    "bytes": 718479,
+    "sha256": "4c18b3c6bcde7f0a3825b7586fbe27f40b73c259c1828e03a4ef44937b04ec66"
+  },
+  {
+    "file": "after/specimens/biome_SUNKEN_RUINS_z0.88.png",
+    "bytes": 998920,
+    "sha256": "02b48eeb78e7afb5f7906ea996597cfdaed4d713a620b426b71a02e9e3dde342"
+  },
+  {
+    "file": "after/specimens/execution-and-flight.png",
+    "bytes": 60628,
+    "sha256": "b09a56d21239978a76fb07facd475628b71af650bcc9d8345810acfd36884f1f"
+  },
+  {
+    "file": "after/specimens/interior_ARMORY_INTERIOR.png",
+    "bytes": 493104,
+    "sha256": "0d18e82ed01bf96baf761f027be76dd117c06b8f19cb685f0e79b7418e66eb17"
+  },
+  {
+    "file": "after/specimens/interior_ARMORY_INTERIOR_overview.png",
+    "bytes": 150737,
+    "sha256": "1a7a0d02028527ed2681b661ba9a7709e5d177406c90aa2cc439d0c0c0de92fa"
+  },
+  {
+    "file": "after/specimens/interior_DORMITORY_INTERIOR.png",
+    "bytes": 486944,
+    "sha256": "9fcbd10816b8a31b91398aae9ea14a003041f2c35e12480f92f1a96b0ede5037"
+  },
+  {
+    "file": "after/specimens/interior_DORMITORY_INTERIOR_overview.png",
+    "bytes": 146849,
+    "sha256": "7843ff3e026cffee4a97c77c359e5069c0000a4201a256a2ed70d190965d30c5"
+  },
+  {
+    "file": "after/specimens/interior_RESTAURANT_INTERIOR.png",
+    "bytes": 457714,
+    "sha256": "39768eff997bc4199c80ef4b3b2f7077232d5e98420aab6b40ae1e82e8eb92ff"
+  },
+  {
+    "file": "after/specimens/interior_TRAINING_HALL_INTERIOR.png",
+    "bytes": 481248,
+    "sha256": "48bffdf1687c5744ebc106de02da86f909654bcae3979673c4a22087a4f69c29"
+  },
+  {
+    "file": "after/specimens/ui_800x360.png",
+    "bytes": 179407,
+    "sha256": "5ce1d76c6d939affc05d3ffc411d9289ed88aab92d5c580adcd25bb6f9732846"
+  },
+  {
+    "file": "after/specimens/ui_portrait.png",
+    "bytes": 157371,
+    "sha256": "44b36de5e63090cc051d61114d7e425e290ede64dc50086a78a0f50b46f28370"
+  },
+  {
+    "file": "after/world/p28d_hall_day_z036.png",
+    "bytes": 1025619,
+    "sha256": "02db0c58d4e1f8e0d114180158fa8bdceac359be7ed2ef840550513700366cb9"
+  },
+  {
+    "file": "after/world/p28d_hall_day_z088.png",
+    "bytes": 1278290,
+    "sha256": "4634cf12bfc1ea1f82b9f5c41872923241948df83a2519422ed860596bad6cf3"
+  },
+  {
+    "file": "after/world/p28d_hall_day_z148.png",
+    "bytes": 1083161,
+    "sha256": "be468c8c1bb81850c4e67f756eead5bbb2889b836d5fad27361618c672b2cb76"
+  },
+  {
+    "file": "after/world/p28d_hall_night_z148.png",
+    "bytes": 1011362,
+    "sha256": "c87dcae7b483a1e33a83059df7abf55f4e3f9333011b8e689590101802a72562"
+  },
+  {
+    "file": "before/gates/court_closed.png",
+    "bytes": 104944,
+    "sha256": "65564299e26157a83ed2d0a597155ccd4d8a61bbfa8d6cf519224dc9530eeef6"
+  },
+  {
+    "file": "before/gates/court_open.png",
+    "bytes": 227523,
+    "sha256": "3f9bbc073330c4d0e1ddbb056bdcee5ac4480e39d41e01257203bdb1ff920ee5"
+  },
+  {
+    "file": "before/gates/court_parting.png",
+    "bytes": 198142,
+    "sha256": "39cd026de64ac50b2d09a5df19838bcaf3f80ff0fec23272156eb392c85d77ba"
+  },
+  {
+    "file": "before/gates/nexus_landscape.png",
+    "bytes": 240716,
+    "sha256": "c675ed670aca4f6a1e509126e763841b280b46c2ed0dfc657526be8434ef0142"
+  },
+  {
+    "file": "before/specimens/actors_z0.36_idle.png",
+    "bytes": 1190850,
+    "sha256": "3a92eeb7208735043cfba96046e8028c1dbe936ce5ae8ca196fb6a2db382b994"
+  },
+  {
+    "file": "before/specimens/actors_z0.88_defeat.png",
+    "bytes": 2195230,
+    "sha256": "c327edd6d0b7addce2393a236ac8ee96f8d55718939179cf7d166c1761fc30db"
+  },
+  {
+    "file": "before/specimens/actors_z0.88_idle.png",
+    "bytes": 2202163,
+    "sha256": "0bc9de444f5e02df882b343a6c8d593b1e2ba70af561e85cf10ece1d611f697a"
+  },
+  {
+    "file": "before/specimens/actors_z1.48_execution.png",
+    "bytes": 1925030,
+    "sha256": "c9294b01757dd67c5b933b722ea0dd359fe6071445180f771d1d1eac796f6c61"
+  },
+  {
+    "file": "before/specimens/biome_CRIMSON_CAVERN_z1.48.png",
+    "bytes": 686323,
+    "sha256": "edca3767d9c3d42799267636cc945e9a1ce6f66c2a068127f762f5644cddda24"
+  },
+  {
+    "file": "before/specimens/biome_SUNKEN_RUINS_z0.88.png",
+    "bytes": 909627,
+    "sha256": "fe8ed6159fb059e9aad3f75f047b81302417bad32501537c4ea7e27f4d28b5b1"
+  },
+  {
+    "file": "before/specimens/interior_ARMORY_INTERIOR.png",
+    "bytes": 469097,
+    "sha256": "1995e16d6451016963d67e444455e960c54eb65658ab47856720848cd00b0f67"
+  },
+  {
+    "file": "before/specimens/interior_DORMITORY_INTERIOR.png",
+    "bytes": 457290,
+    "sha256": "b8a8fa5eb58b078815469c93e831a91d4e7e17cba04e0758cc37a4ffe680b05c"
+  },
+  {
+    "file": "before/world/p28d_hall_day_z036.png",
+    "bytes": 913566,
+    "sha256": "3c9b4fde1943bc1933ddf1af385cb9c600cb8ea60a47530c8786745621fa6b88"
+  },
+  {
+    "file": "before/world/p28d_hall_day_z088.png",
+    "bytes": 1086120,
+    "sha256": "227695ad1b9c0940a2556599f6e8d47d0206871438dec7449d319d79a17f014d"
+  },
+  {
+    "file": "before/world/p28d_hall_day_z148.png",
+    "bytes": 997124,
+    "sha256": "738f0287ee7bbecaf6c9391a99b8ea8a37004236728426ffa656de19c4c5a1d0"
+  },
+  {
+    "file": "before/world/p28d_hall_night_z148.png",
+    "bytes": 929891,
+    "sha256": "c6c59987f1588fd4d53b74438432e2ca3dddf3319707e6297944586328c5cc74"
+  },
+  {
+    "file": "fixtures/ArtCompletionBeforeCaptureTest.kt",
+    "bytes": 7563,
+    "sha256": "257c4f22273ad44e1e42a5454e74d4357babc76b7f50b81ee86ece24c6da987a"
+  },
+  {
+    "file": "reports/asset-validation.json",
+    "bytes": 641,
+    "sha256": "53628d8323048c81ef1362aeb7b71007fbceb7ade6a1d19e4734aa57d1bb9a8b"
+  },
+  {
+    "file": "reports/cold-init-host.json",
+    "bytes": 777,
+    "sha256": "6ae8f8809c1c2b1564f951ca418a599a553621682703375f19b6996b99f85537"
+  },
+  {
+    "file": "reports/frame-probe-host.json",
+    "bytes": 236,
+    "sha256": "d311bccb609cb8a9fc8bba3f3c4b50bad83e44f65e5de2613840f5c77b1658d2"
+  },
+  {
+    "file": "reports/local-apk.json",
+    "bytes": 522,
+    "sha256": "9383fe3d0cc2f3b27dea8734ba49425470e0dbbc3ca06081598aa966c0bebbdd"
+  },
+  {
+    "file": "reports/tests.json",
+    "bytes": 9661,
+    "sha256": "9bcb809d4c5a076d6e197ac60e8771b1ddea7813ae1e6c3cdad34fe849f847c5"
+  }
+]

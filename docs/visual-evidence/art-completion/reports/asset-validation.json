@@ -1,0 +1,22 @@
+{
+  "result": "PASS",
+  "new_hero_poses": 72,
+  "total_authored_hero_poses": 144,
+  "new_enemy_poses": 48,
+  "total_one_facing_enemy_poses": 96,
+  "execution_frames": 64,
+  "projectile_frames": 20,
+  "original_new_props": 11,
+  "surfaces": 4,
+  "gate_images": 3,
+  "class_bytes": 3858432,
+  "extended_enemy_bytes": 3538944,
+  "prop_banks": {
+    "props": 56192,
+    "interiors": 225984
+  },
+  "gate_bytes": 4285440,
+  "original_enemy_effect_projectile_bytes": 6021120,
+  "listed_retained_pixel_bank_bytes": 27570400,
+  "note": "Pixel banks only; not total process/GPU or device memory. Source-decode transients and other caches excluded."
+}

@@ -11,11 +11,9 @@ import kotlin.math.sqrt
 import kotlin.random.Random
 
 /**
- * FantasyHd128Atlas: True 128x128 Ultra-Detailed Dark-Fantasy HD-2D Terrain & Interior Floor Atlas.
- *
- * Renders 4x the texel density (16,384 pixels per tile instead of 4,096) while preserving the
- * exact 64x64 world-unit tile grid (`WORLD_TILE_UNITS = 64f`) and `OBLIQUE_Y_SCALE = 0.72f`
- * foreshortening across Sanctuary Lobby, Building Interiors, and all 5 Tower Biomes.
+ * Terrain and interior materials on the existing 64-world-unit grid and .72 ground projection.
+ * Prefer authored continuous 64px cells when preloaded; retain procedural 128px materials
+ * as the optional-pack fallback. Callers select continuous cells through ArtDepthAssets.tile.
  */
 object FantasyHd128Atlas {
 
@@ -25,27 +23,27 @@ object FantasyHd128Atlas {
   // ==================== 1. SANCTUARY LOBBY 128x128 TILES ====================
 
   val hdSanctuaryGrassTiles: List<ImageBitmap> by lazy {
-    (0 until 8).map { createHdSanctuaryGrassTile(it) }
+    ArtDepthAssets.family("sanctuary_grass") ?: (0 until 8).map { createHdSanctuaryGrassTile(it) }
   }
 
   val hdSanctuaryStoneTiles: List<ImageBitmap> by lazy {
-    (0 until 8).map { createHdPlazaFlagstoneTile(it) }
+    ArtDepthAssets.family("limestone") ?: (0 until 8).map { createHdPlazaFlagstoneTile(it) }
   }
 
   val hdSanctuaryCausewayTiles: List<ImageBitmap> by lazy {
-    (0 until 8).map { createHdCobbleCausewayTile(it) }
+    ArtDepthAssets.family("cobble") ?: (0 until 8).map { createHdCobbleCausewayTile(it) }
   }
 
   val hdSanctuarySandTiles: List<ImageBitmap> by lazy {
-    (0 until 6).map { createHdTrainingSandTile(it) }
+    ArtDepthAssets.family("sand") ?: (0 until 6).map { createHdTrainingSandTile(it) }
   }
 
   val hdSanctuaryCurbTiles: List<ImageBitmap> by lazy {
-    (0 until 4).map { createHdCurbStoneTile(it) }
+    ArtDepthAssets.family("rock") ?: (0 until 4).map { createHdCurbStoneTile(it) }
   }
 
   val hdSanctuaryGravelTiles: List<ImageBitmap> by lazy {
-    (0 until 4).map { createHdGravelVergeTile(it) }
+    ArtDepthAssets.family("soil") ?: (0 until 4).map { createHdGravelVergeTile(it) }
   }
 
   val hdPlazaCenterMedallion: ImageBitmap by lazy {
@@ -55,59 +53,59 @@ object FantasyHd128Atlas {
   // ==================== 2. BUILDING INTERIOR 128x128 TILES ====================
 
   val hdTavernOakPlankTiles: List<ImageBitmap> by lazy {
-    (0 until 6).map { createHdOakPlankTile(it) }
+    ArtDepthAssets.family("oak") ?: (0 until 6).map { createHdOakPlankTile(it) }
   }
 
   val hdInteriorMarbleFlagstoneTiles: List<ImageBitmap> by lazy {
-    (0 until 6).map { createHdInteriorMarbleTile(it) }
+    ArtDepthAssets.family("marble") ?: (0 until 6).map { createHdInteriorMarbleTile(it) }
   }
 
   val hdArmoryForgeBasaltTiles: List<ImageBitmap> by lazy {
-    (0 until 4).map { createHdArmoryForgeTile(it) }
+    ArtDepthAssets.family("forge") ?: (0 until 4).map { createHdArmoryForgeTile(it) }
   }
 
   val hdDormitoryTapestryTiles: List<ImageBitmap> by lazy {
-    (0 until 4).map { createHdDormitoryTapestryTile(it) }
+    ArtDepthAssets.family("carpet") ?: (0 until 4).map { createHdDormitoryTapestryTile(it) }
   }
 
   // ==================== 3. INSIDE TOWER BIOME 128x128 TILES ====================
 
   val hdMeadowGrassTiles: List<ImageBitmap> by lazy {
-    (0 until 6).map { createHdMeadowGrassTile(it) }
+    ArtDepthAssets.family("meadow_grass") ?: (0 until 6).map { createHdMeadowGrassTile(it) }
   }
   val hdMeadowPathTiles: List<ImageBitmap> by lazy {
-    (0 until 4).map { createHdMeadowPathTile(it) }
+    ArtDepthAssets.family("soil") ?: (0 until 4).map { createHdMeadowPathTile(it) }
   }
   val hdMeadowBorderTiles: List<ImageBitmap> by lazy {
-    (0 until 4).map { createHdMeadowBorderTile(it) }
+    ArtDepthAssets.family("sanctuary_grass") ?: (0 until 4).map { createHdMeadowBorderTile(it) }
   }
 
   val hdElderwoodFloorTiles: List<ImageBitmap> by lazy {
-    (0 until 6).map { createHdElderwoodFloorTile(it) }
+    ArtDepthAssets.family("forest_moss") ?: (0 until 6).map { createHdElderwoodFloorTile(it) }
   }
   val hdElderwoodPathTiles: List<ImageBitmap> by lazy {
-    (0 until 4).map { createHdElderwoodPathTile(it) }
+    ArtDepthAssets.family("leaf_litter") ?: (0 until 4).map { createHdElderwoodPathTile(it) }
   }
 
   val hdSunkenRuinsFloorTiles: List<ImageBitmap> by lazy {
-    (0 until 6).map { createHdSunkenRuinsFloorTile(it) }
+    ArtDepthAssets.family("ruin") ?: (0 until 6).map { createHdSunkenRuinsFloorTile(it) }
   }
   val hdSunkenRuinsPathTiles: List<ImageBitmap> by lazy {
-    (0 until 4).map { createHdSunkenRuinsPathTile(it) }
+    ArtDepthAssets.family("limestone") ?: (0 until 4).map { createHdSunkenRuinsPathTile(it) }
   }
 
   val hdCrimsonCavernFloorTiles: List<ImageBitmap> by lazy {
-    (0 until 6).map { createHdCrimsonCavernFloorTile(it) }
+    ArtDepthAssets.family("volcanic") ?: (0 until 6).map { createHdCrimsonCavernFloorTile(it) }
   }
   val hdCrimsonCavernPathTiles: List<ImageBitmap> by lazy {
-    (0 until 4).map { createHdCrimsonCavernPathTile(it) }
+    ArtDepthAssets.family("forge") ?: (0 until 4).map { createHdCrimsonCavernPathTile(it) }
   }
 
   val hdFallenStarFloorTiles: List<ImageBitmap> by lazy {
-    (0 until 6).map { createHdFallenStarFloorTile(it) }
+    ArtDepthAssets.family("star_stone") ?: (0 until 6).map { createHdFallenStarFloorTile(it) }
   }
   val hdFallenStarPathTiles: List<ImageBitmap> by lazy {
-    (0 until 4).map { createHdFallenStarPathTile(it) }
+    ArtDepthAssets.family("marble") ?: (0 until 4).map { createHdFallenStarPathTile(it) }
   }
 
   fun biomeFloorTiles(biome: BiomeTheme): List<ImageBitmap> = when (biome) {

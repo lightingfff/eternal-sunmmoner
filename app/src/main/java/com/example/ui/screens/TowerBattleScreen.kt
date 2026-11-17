@@ -297,8 +297,9 @@ fun TowerBattleScreen(
 
   val artContext = androidx.compose.ui.platform.LocalContext.current.applicationContext
   LaunchedEffect(artContext, state.selectedFloor.floorNumber) {
-    if (state.selectedFloor.floorNumber == 1) kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
       com.example.game.pixel.TowerMonsterAtlas.preload(artContext)
+      com.example.game.pixel.CompletionProjectileAtlas.preload(artContext)
       com.example.game.pixel.TowerCombatFxAtlas.preload(artContext)
       com.example.ui.components.ExpeditionRewardIcons.preload(artContext)
     }
@@ -714,7 +715,7 @@ fun TowerBattleScreen(
               val mission = combatEngine.lostCourier
               drawTowerMonster(e,camX,camY,zoom,animTimeSec,
                 marked = !e.dead && combatEngine.designatedTargetId == e.id,
-                authored = combatEngine.floorSpec.floorNumber == 1,
+                authored = true,
                 charging = mission?.eliteEnemyId == e.id && mission.eliteTelegraph != null,
                 recovering = mission?.eliteEnemyId == e.id && mission.eliteRecoveryRemaining > 0f)
             }
@@ -1304,7 +1305,9 @@ fun TowerBattleScreen(
               RoundedCornerShape(10.dp),
             )
             .testTag("pinned_dodge_move_button")
-            .clickable { combatEngine.issueTacticalOrder(TacticalOrder.MOVE_TO) },
+            .clickable(enabled = battleInputEnabled) {
+              acknowledgeBattleInput { combatEngine.issueTacticalOrder(TacticalOrder.MOVE_TO) }
+            },
         ) {
           Column(
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),

@@ -1,6 +1,7 @@
 package com.example.game.pixel
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -28,6 +29,16 @@ import kotlin.math.sin
  * 3. Custom 3/4 Interactive Stations, Flower Planters & Tower Exploration Nodes
  */
 object InteriorWorldRenderer {
+  private val wallMaterialMask = Path()
+  private fun DrawScope.stoneWallMaterial(left: Float, top: Float, width: Float, height: Float,
+    zoom: Float, tone: Int) {
+    wallMaterialMask.reset()
+    wallMaterialMask.addRect(Rect(left, top, left + width, top + height))
+    with(ArchitectureSurfaceArt) {
+      drawSurface("limestone", wallMaterialMask, Offset(left, top),
+        Offset(.7f * zoom, 0f), Offset(0f, .7f * zoom), alpha = .85f, tone = tone)
+    }
+  }
 
   fun DrawScope.drawInteriorBackFacade(
     biome: BiomeTheme,
@@ -118,6 +129,7 @@ object InteriorWorldRenderer {
       BiomeTheme.TRAINING_HALL_INTERIOR -> {
         // High ashlar-stone & timber Dojo Hall with class heraldic banners & sunlit clerestory windows
         drawRect(Color(0xFF8A857C), Offset(roomL, wallTop), Size(roomW, wallHeightPx))
+        stoneWallMaterial(roomL, wallTop, roomW, wallHeightPx, zoom, 1)
         drawRect(Color(0xFF57534E), Offset(roomL, wallTop), Size(roomW, 15f * zoom))
         drawRect(Color(0xFF44403C), Offset(roomL, wallBaseY - 12f * zoom), Size(roomW, 12f * zoom))
 
@@ -159,6 +171,7 @@ object InteriorWorldRenderer {
       BiomeTheme.ARMORY_INTERIOR -> {
         // Forged dark-stone & iron Armory Guildhouse with glowing central smelter arch & tool racks
         drawRect(Color(0xFF475569), Offset(roomL, wallTop), Size(roomW, wallHeightPx))
+        stoneWallMaterial(roomL, wallTop, roomW, wallHeightPx, zoom, 2)
         drawRect(Color(0xFF1E293B), Offset(roomL, wallTop), Size(roomW, 16f * zoom))
         drawRect(Color(0xFF0F172A), Offset(roomL, wallBaseY - 12f * zoom), Size(roomW, 12f * zoom))
 

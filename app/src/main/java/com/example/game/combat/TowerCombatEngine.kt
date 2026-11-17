@@ -135,11 +135,6 @@ class TowerCombatEngine(
   var bonusDiscoveryMana: Long = 0L
     private set
 
-  internal fun addExpeditionManaBonus(amount: Long) {
-    require(amount >= 0L) { "Expedition mana bonus cannot be negative." }
-    bonusDiscoveryMana = Math.addExact(bonusDiscoveryMana, amount)
-  }
-
   var stage: MissionStage = MissionStage.INTRO_DIALOGUE
   var eventWaveTriggered: Boolean = false
     private set
@@ -537,7 +532,7 @@ class TowerCombatEngine(
       return
     }
 
-    // 4. Otherwise update Move-To tactical beacon if currently in MOVE_TO mode OR during active boss telegraph hazard!
+    // 5. Otherwise update Move-To tactical beacon if currently in MOVE_TO mode OR during active boss telegraph hazard!
     val isTelegraphHazard = lostCourier?.eliteTelegraph != null
     if (activeOrder == TacticalOrder.MOVE_TO || isTelegraphHazard) {
       claimManualNavigation()
@@ -1082,7 +1077,21 @@ class TowerCombatEngine(
       color = if (isSkill) Color(0xFFF5B841) else Color(0xFFF8FAFC),
       isLarge = isSkill,
     )
-    if (enemy.hp <= 0) {
+    finishEnemyDamage(enemy)
+  }
+
+  /** Courier stones retain their authored fixed damage while sharing ordinary death cleanup. */
+  internal fun applyCourierSupportDamage(enemy: EnemyCombatUnit, damage: Int) {
+    if (enemy.dead || damage <= 0) return
+    val applied = minOf(enemy.hp.coerceAtLeast(0), damage)
+    enemy.hp = (enemy.hp - damage).coerceAtLeast(0)
+    enemy.hurtFlash = 0.8f
+    floatingTexts += FloatingCombatText(enemy.x, enemy.y - 38f, "-$applied", Color(0xFF38BDF8))
+    finishEnemyDamage(enemy)
+  }
+
+  private fun finishEnemyDamage(enemy: EnemyCombatUnit) {
+    if (enemy.hp <= 0 && !enemy.dead) {
       enemy.dead = true
       aoeEffects += CombatAoEEffect(enemy.x, enemy.y, 58f * enemy.archetype.scale, Color(0xFFEF4444), duration = 0.48f)
       if (designatedTargetId == enemy.id) {

@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "type": "FOREST_WRAITH",
+  "frame": [
+    128,
+    144
+  ],
+  "pivot": [
+    64,
+    134
+  ],
+  "columns": 12,
+  "rows": 1,
+  "world_scale": 0.82,
+  "atlas_file": "atlas.png",
+  "atlas_sha256": "c8c7958994a60f4abef5506c12ceecbb4f923288833afca5afac0ab0f3e9395e",
+  "frame_order": [
+    "idle0",
+    "idle1",
+    "walk0",
+    "walk1",
+    "walk2",
+    "walk3",
+    "anticipation",
+    "contact",
+    "recovery",
+    "hurt",
+    "collapse",
+    "defeat"
+  ],
+  "retained_rgba_bytes": 884736,
+  "native_generated_dimensions_claimed": false,
+  "left_direction": "Mirrored by runtime at draw; no separately authored left claim",
+  "source": {
+    "file": "docs/art/art-completion/enemies/source/forest_wraith.png",
+    "sha256": "0284ed9a729ea3291782e208400afe1675186664407ac4cfe7c1353f37addefc",
+    "dimensions": [
+      2172,
+      724
+    ],
+    "grid": [
+      6,
+      2
+    ],
+    "alpha_threshold": 96
+  },
+  "normalization": {
+    "fixed_scale": 0.33,
+    "fixed_root_x": 181,
+    "row_baselines": [
+      343,
+      336
+    ],
+    "logical_source_cell": [
+      362,
+      362
+    ],
+    "extraction": "Connected silhouettes plus nearest detached clusters; no weapon crop at nominal cell boundaries",
+    "per_frame_recentering": false,
+    "per_frame_rescaling": false
+  },
+  "unique_pose_hashes": [
+    "21fed36f9ac607b6b158f10fd878d4cceb52f2d906a383e55320f5d28199266f",
+    "c85a409aea266efa2a06f4fb9c63c2304ff0be8700fa080447ac413e2f07d9dd",
+    "84f13c5efb8e07b7e908e1927b6922bf808af5cae70c62560e7d70e873bd7f26",
+    "d636d21c9067f3ccaad46e10521d190d959f791d22fbaaaf77e2b844902e7efa",
+    "47ae3f60ca3150681efb50bf0c9db7964b31f877e8cf979854b4ef2c4b187e2f",
+    "08556f3542a3c16d6a0680a4824773c0794075f7d93de108cf9b89f7ea16c987",
+    "31c3ceaf8811f4dded3c48fee35104fe8c1c1871c8162cf20552a85dc1a7d97c",
+    "e961c4cff51852d6a43a0905407b8519b139e30c930c342a42ffac681b687295",
+    "641d64bf80fdf7cdc32485d9214cffb91f87e8e8e3e0bb8c67d401871624d8f4",
+    "8804bd637bff8dc8e72338871d4b7818f4c1b5b6e9fe9de9faf53149321b134f",
+    "594a45ca9fb49e25e05916434f2efcb2d7774b79f75cb22e6b4eba9ffe9cd3f5",
+    "ed68eb133899c21ff657825170ea2f9179cd1664a7cc0c8096006894cc14ba6a"
+  ]
+}

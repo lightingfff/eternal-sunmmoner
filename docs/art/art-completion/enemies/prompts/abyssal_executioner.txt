@@ -1,0 +1,19 @@
+Create an ORIGINAL production game spritesheet for ETERNAL SUMMONER. ABYSSAL EXECUTIONER boss: towering heavy dark-gunmetal blackened plate-armored executioner, abyssal spiked closed helmet with a narrow crimson eye slit and a restrained long deep-crimson plume, a torn wine-red waist tabard/cape, immense short-haft double-edged greataxe with aged silver cutting edges and red rune in the haft. Brutal sculpted articulated anatomy; beveled steel plates, layered shoulder armor, gauntlets, belt and armored knee/boot shapes. Rich dark-fantasy master pixel-art, clear crisp clusters, controlled colors, upper-left warm pale highlight and cool near-black right planes, crimson accents small enough to preserve readability. Full upright body in 3/4 oblique RPG view about40degrees above ground, facesRIGHT for everypose, front/rightsidevisible. No ground/castshadow, no groundcircle, no standaloneVFX/text/UI/grid.
+
+EXACT layout6columns by2rows equalcells on WIDE LANDSCAPE transparentPNG. Twelve complete separate figures, one percell. Same anatomicalscale, character/gear, view andcenter-root in allcells. Groundbaseline90%ofcellheight. Generous transparentpaddingkeeps helmet/plume/axehead/boots and fallenbodyinsideeachcell. Axe must be short enough for128x144runtimecells; show samephysicalaxe in allframes. Nooverlap betweenfigures.
+
+Frameorder lefttorighttoprow thenbottomrow:
+1 idle neutral guard, axe held diagonallylow.
+2 idle chestbreath and slightplumesway, gauntletsretighten.
+3 walking right, left armoredlegleading, rightarmforward.
+4 low contactphase, rightfoot passing, bodyweightlowered.
+5 walking right, rightlegleading, leftarmforward, axeheldsafe.
+6 highpassingphase, lefttrailingfootlifted, armorhipsrotate.
+7 powerful meleeanticipation: both hands raise greataxe over near shoulder, elbowsbent, kneesbraced.
+8 CONTACT: greataxe swings and extends fullyforward right at chestheight, torso rotated andfrontlegbraced; NOswoosh/slashimpacteffect.
+9 recovery: axe loweredforward, shoulderslean thenreturn.
+10 hurt recoil: armorknockedback, torso twists away, plume follows.
+11 collapse: one kneeonfloor, axe drops beside him, bodyhalf-height.
+12 defeated: whole armoredexecutioner lying on sideonground withplumeandaxe within cell, much lowerthanidle, same anatomicalsize (notshrunk).
+
+Give actual differentlimbposes with alternatingwalkcontacts, notcopiedframes shiftedaround. Transparentrealalpha, no checkerboard. Originaluncopyrighteddesign, richmodel-likevolume readableafternearestnormalization.

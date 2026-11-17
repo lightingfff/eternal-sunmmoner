@@ -1,0 +1,367 @@
+{
+  "version": 1,
+  "source": "Original hosted imagegen material atlas; normalized derivatives, not native64 claims",
+  "source_sha256": "c465361e576ae02a4af8f2876ad8bf828c56b27703a0060798bf7d0f7c9f58b2",
+  "source_dimensions": [
+    1254,
+    1254
+  ],
+  "world_tile_units": 64,
+  "camera_ground_y": 0.72,
+  "families": [
+    {
+      "id": "sanctuary_grass",
+      "file": "sanctuary_grass.png",
+      "width": 256,
+      "height": 256,
+      "cell": [
+        64,
+        64
+      ],
+      "grid": [
+        4,
+        4
+      ],
+      "sha256": "467e3c6a56bad05e050b27aa052a4e4b7ad6daf689f199fd8f0cf799547e7a3c",
+      "rgba_bytes": 262144,
+      "opaque": true,
+      "source_panel": [
+        0,
+        0
+      ],
+      "edge_pixels_equal": true
+    },
+    {
+      "id": "meadow_grass",
+      "file": "meadow_grass.png",
+      "width": 256,
+      "height": 256,
+      "cell": [
+        64,
+        64
+      ],
+      "grid": [
+        4,
+        4
+      ],
+      "sha256": "6e5e8e03b177f2b635978d9f17e28d21185e126d06b37db94d4791e051311770",
+      "rgba_bytes": 262144,
+      "opaque": true,
+      "source_panel": [
+        1,
+        0
+      ],
+      "edge_pixels_equal": true
+    },
+    {
+      "id": "forest_moss",
+      "file": "forest_moss.png",
+      "width": 256,
+      "height": 256,
+      "cell": [
+        64,
+        64
+      ],
+      "grid": [
+        4,
+        4
+      ],
+      "sha256": "e5afc0277bf2decc4adbc1296e50c37acb9dbd84c60680f7a66fc906ccdb04ef",
+      "rgba_bytes": 262144,
+      "opaque": true,
+      "source_panel": [
+        2,
+        0
+      ],
+      "edge_pixels_equal": true
+    },
+    {
+      "id": "limestone",
+      "file": "limestone.png",
+      "width": 256,
+      "height": 256,
+      "cell": [
+        64,
+        64
+      ],
+      "grid": [
+        4,
+        4
+      ],
+      "sha256": "369af3d2f1dac3818298c6aca8b68a842764c6842844574dc29a86d13be43eb7",
+      "rgba_bytes": 262144,
+      "opaque": true,
+      "source_panel": [
+        3,
+        0
+      ],
+      "edge_pixels_equal": true
+    },
+    {
+      "id": "cobble",
+      "file": "cobble.png",
+      "width": 256,
+      "height": 256,
+      "cell": [
+        64,
+        64
+      ],
+      "grid": [
+        4,
+        4
+      ],
+      "sha256": "f70635d9b365bbbedd6d9549de74622ea65ff985ce2eeb842cf65c8c750421b2",
+      "rgba_bytes": 262144,
+      "opaque": true,
+      "source_panel": [
+        0,
+        1
+      ],
+      "edge_pixels_equal": true
+    },
+    {
+      "id": "soil",
+      "file": "soil.png",
+      "width": 256,
+      "height": 256,
+      "cell": [
+        64,
+        64
+      ],
+      "grid": [
+        4,
+        4
+      ],
+      "sha256": "3b79bd903df21c2133d9603584b2f8ffe20c7501cb440d90d11d6ae16fa455f9",
+      "rgba_bytes": 262144,
+      "opaque": true,
+      "source_panel": [
+        1,
+        1
+      ],
+      "edge_pixels_equal": true
+    },
+    {
+      "id": "sand",
+      "file": "sand.png",
+      "width": 256,
+      "height": 256,
+      "cell": [
+        64,
+        64
+      ],
+      "grid": [
+        4,
+        4
+      ],
+      "sha256": "38d1b1d216ff074a92b94fb5afee36f2d6114403b4267edbf1165db4d741a72d",
+      "rgba_bytes": 262144,
+      "opaque": true,
+      "source_panel": [
+        2,
+        1
+      ],
+      "edge_pixels_equal": true
+    },
+    {
+      "id": "oak",
+      "file": "oak.png",
+      "width": 256,
+      "height": 256,
+      "cell": [
+        64,
+        64
+      ],
+      "grid": [
+        4,
+        4
+      ],
+      "sha256": "912abf4990354dde392293626767eaf6b76d13db30a9226e031be426f3c21941",
+      "rgba_bytes": 262144,
+      "opaque": true,
+      "source_panel": [
+        3,
+        1
+      ],
+      "edge_pixels_equal": true
+    },
+    {
+      "id": "marble",
+      "file": "marble.png",
+      "width": 256,
+      "height": 256,
+      "cell": [
+        64,
+        64
+      ],
+      "grid": [
+        4,
+        4
+      ],
+      "sha256": "3eb04aaf208dca0ddb9632fb93aa56d20cf7ce74f33c3e481dbbd7376a1522b5",
+      "rgba_bytes": 262144,
+      "opaque": true,
+      "source_panel": [
+        0,
+        2
+      ],
+      "edge_pixels_equal": true
+    },
+    {
+      "id": "forge",
+      "file": "forge.png",
+      "width": 256,
+      "height": 256,
+      "cell": [
+        64,
+        64
+      ],
+      "grid": [
+        4,
+        4
+      ],
+      "sha256": "8c73ad39f7154efea84c5e1e35cd0e49589484aae543061350ff9d01ed504608",
+      "rgba_bytes": 262144,
+      "opaque": true,
+      "source_panel": [
+        1,
+        2
+      ],
+      "edge_pixels_equal": true
+    },
+    {
+      "id": "carpet",
+      "file": "carpet.png",
+      "width": 256,
+      "height": 256,
+      "cell": [
+        64,
+        64
+      ],
+      "grid": [
+        4,
+        4
+      ],
+      "sha256": "dc9ca24a8419f9413f734460b503f6cad901586c9145904009793e4b4c796169",
+      "rgba_bytes": 262144,
+      "opaque": true,
+      "source_panel": [
+        2,
+        2
+      ],
+      "edge_pixels_equal": true
+    },
+    {
+      "id": "leaf_litter",
+      "file": "leaf_litter.png",
+      "width": 256,
+      "height": 256,
+      "cell": [
+        64,
+        64
+      ],
+      "grid": [
+        4,
+        4
+      ],
+      "sha256": "7e400864fbb411653610849d1f41d760fd5de280d5f914095e13154587d1fc02",
+      "rgba_bytes": 262144,
+      "opaque": true,
+      "source_panel": [
+        3,
+        2
+      ],
+      "edge_pixels_equal": true
+    },
+    {
+      "id": "ruin",
+      "file": "ruin.png",
+      "width": 256,
+      "height": 256,
+      "cell": [
+        64,
+        64
+      ],
+      "grid": [
+        4,
+        4
+      ],
+      "sha256": "010c609a073fef882a7b693f4180a2070572e23a06db9deb34d33b723bf4dc33",
+      "rgba_bytes": 262144,
+      "opaque": true,
+      "source_panel": [
+        0,
+        3
+      ],
+      "edge_pixels_equal": true
+    },
+    {
+      "id": "volcanic",
+      "file": "volcanic.png",
+      "width": 256,
+      "height": 256,
+      "cell": [
+        64,
+        64
+      ],
+      "grid": [
+        4,
+        4
+      ],
+      "sha256": "635a075ba565ba5dae986d6c56ede71fef054edeccc574fc64af11a5cf119e7e",
+      "rgba_bytes": 262144,
+      "opaque": true,
+      "source_panel": [
+        1,
+        3
+      ],
+      "edge_pixels_equal": true
+    },
+    {
+      "id": "star_stone",
+      "file": "star_stone.png",
+      "width": 256,
+      "height": 256,
+      "cell": [
+        64,
+        64
+      ],
+      "grid": [
+        4,
+        4
+      ],
+      "sha256": "3caca4f2f2b45eafc454aa7a181e62f9b9398dfadf84ad0ecda23969707a2562",
+      "rgba_bytes": 262144,
+      "opaque": true,
+      "source_panel": [
+        2,
+        3
+      ],
+      "edge_pixels_equal": true
+    },
+    {
+      "id": "rock",
+      "file": "rock.png",
+      "width": 256,
+      "height": 256,
+      "cell": [
+        64,
+        64
+      ],
+      "grid": [
+        4,
+        4
+      ],
+      "sha256": "b8f4ae406d67a4ae832ac3ec22c7d9b182683bf031e929940be7ebbb14aaaed3",
+      "rgba_bytes": 262144,
+      "opaque": true,
+      "source_panel": [
+        3,
+        3
+      ],
+      "edge_pixels_equal": true
+    }
+  ],
+  "sampling": "64px cells preserve 4x4 spatial order; periodic macro sheet, nearest-neighbor",
+  "decoded_family_cells_bytes": 4194304
+}

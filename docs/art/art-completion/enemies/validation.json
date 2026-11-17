@@ -1,0 +1,37 @@
+{
+  "result": "PASS",
+  "enemies": [
+    {
+      "type": "FOREST_WRAITH",
+      "poses": 12,
+      "retained_bytes": 884736,
+      "atlas_sha256": "c8c7958994a60f4abef5506c12ceecbb4f923288833afca5afac0ab0f3e9395e",
+      "clipped_pixels": 0
+    },
+    {
+      "type": "ELDER_TREANT",
+      "poses": 12,
+      "retained_bytes": 884736,
+      "atlas_sha256": "ef19d9a3441a2298c6a23c356beb6d931cc550b3b8951b345524938da4dbff8e",
+      "clipped_pixels": 0
+    },
+    {
+      "type": "RUIN_SENTINEL",
+      "poses": 12,
+      "retained_bytes": 884736,
+      "atlas_sha256": "e573386d520abb581e2fa678e70ebc952c6a963fd6444d4f99a8880c09c373c9",
+      "clipped_pixels": 0
+    },
+    {
+      "type": "ABYSSAL_EXECUTIONER",
+      "poses": 12,
+      "retained_bytes": 884736,
+      "atlas_sha256": "4a58806ce244dc5a525276788a5c38759b2286cdb24697c669b5915640042b22",
+      "clipped_pixels": 0
+    }
+  ],
+  "total_frames": 48,
+  "retained_rgba_bytes": 3538944,
+  "physical_device_validation": "NOT TESTED",
+  "runtime_integration": "Root task; not claimed by asset writer"
+}

@@ -1,0 +1,156 @@
+{
+  "version": 1,
+  "file": "vfx.png",
+  "frame": [
+    96,
+    96
+  ],
+  "pivot": [
+    48,
+    84
+  ],
+  "columns": 8,
+  "rows": [
+    "guard",
+    "arcane",
+    "cleave",
+    "holy"
+  ],
+  "sha256": "6078700376e1ead6bac7e9643c660b35239e23bfa1c6c44d16d1bc21b36e5490",
+  "rgba_bytes": 1179648,
+  "source_repository": "https://github.com/patch-gg/pixelfx",
+  "source_commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+  "license": "MIT; see LICENSE and NOTICE.md",
+  "selections": [
+    {
+      "style": "guard",
+      "effect": "impacts/shield-block",
+      "source_frames": [
+        1,
+        3,
+        6,
+        9,
+        13,
+        17,
+        22,
+        29
+      ],
+      "source_fps": 30,
+      "source_pivot": [
+        40,
+        88
+      ],
+      "fixed_row_scale": 0.5542168674698795,
+      "sampled_pose_hashes": [
+        "7778d14f45d316a429a4f1b4b9b448bda0e01de3f4d851ca34d4f333fe7e70ef",
+        "da6db9be36eae0b8d113704de9945c8814fce4332bd9372c85ca237232c78d4d",
+        "ee722017d7d603f8a697510557f564088fe3214527d2959e197ea398ae220d5c",
+        "799cda6efd0d38397e842e0eaf69b6c8cc19dc67447e1d13360c1c2d68a5f321",
+        "7ce9f81659ba42f2a5bb807320e18f01146aefc3fb1f9bb0157896085c400433",
+        "acbc9c673ad9ccb8bcb3b7765e2e5c2a08c21a6739abc4902314ab848c16140f",
+        "85b02e35205d89003c936290dc7991d371472b8b2d6493cdaf87cf86a615d3d5",
+        "f5616411a6af9c4700c63f9c46c9d0aad80916a7ee200033ca1f6e1102010aea"
+      ],
+      "source_sheet_sha256": "f0315268a8dc4e214783bce95866a3cd1cdc0415647781afc900b4cb6f5808ee",
+      "timing": "execution-only window; no source wind-up/hit-stop imported; simulation unchanged"
+    },
+    {
+      "style": "arcane",
+      "effect": "arcane/mana-burst",
+      "source_frames": [
+        7,
+        8,
+        10,
+        14,
+        20,
+        27,
+        36,
+        48
+      ],
+      "source_fps": 30,
+      "source_pivot": [
+        104,
+        124
+      ],
+      "fixed_row_scale": 0.4,
+      "sampled_pose_hashes": [
+        "435bd5f1c3bff041bb8cba41d1372b1ba15feae1a3e503a92959248d781946aa",
+        "d336fec164b466de7036bdb12617cdaaa4d2344a9887590811dbee54de627104",
+        "29bbb95a916db3ec6aa653dcb20f80c2289be8d6cb4db5dbee90b3f6d44fa3b5",
+        "d3c528f2a5ddfe2c8718485e76c5b5ee9336ce341cb819e45d1fcc031ffccd2d",
+        "4f9c3f8464d00b41a228ba532a3cf8579c8405961da1816cabc9596637851452",
+        "bea26be40ba542d1612e370cd82d0873e3894e561486c394fcc7de1df695f85d",
+        "3817243bf29ef3a8d53b41c119ff688b522480d2b367405cce2b663f5cbc2861",
+        "c0006e33e3d19f46353a16a248200a85f098e1cc15e32df3642cb7dad0434abf"
+      ],
+      "source_sheet_sha256": "4fb6dccfe86b80e134570aad5bd87e97489ac705db857e338689a98a80a5fa98",
+      "timing": "execution-only window; no source wind-up/hit-stop imported; simulation unchanged"
+    },
+    {
+      "style": "cleave",
+      "effect": "melee/sword-slash",
+      "source_frames": [
+        2,
+        3,
+        4,
+        6,
+        9,
+        12,
+        14,
+        16
+      ],
+      "source_fps": 30,
+      "source_pivot": [
+        44,
+        92
+      ],
+      "fixed_row_scale": 0.5822784810126582,
+      "sampled_pose_hashes": [
+        "37dad766d565877d1cd692add282ab5f3ef139ee21a4ab8b5d70f69a97c2fc1d",
+        "cb95f8c1b28f8e316d13b45b5c15805a8445a4b53e82dbd36ab12ffe117ba767",
+        "38678f284a08b5efa3a774c99655373502c6b668763bdfdba899d5ce183df295",
+        "f0f3f0798515d93ed6d84022d3cf3e9d61c3bb2f886d371cd21fabdb5fee0fff",
+        "468896970a3a18635b2ee69e3d3eb22887e5c634bc8b1764d62b5cd4531b082d",
+        "9a1663ed6567b6f40145bce35b3fcf7124099e7bfda1910b3b3bede7bc5ac9d7",
+        "a993668ecb65893fac0af3c61dc98742bcd394dc4064a55ae5502f7ee842f66a",
+        "99c020d1ae80fd4ac160870e103edee52c4ad9d297cd47a48ffc0ad253b7d5f7"
+      ],
+      "source_sheet_sha256": "bd6fb8613a8b294753c1ebf69cd14e7628f1c26d0fac276e7a2afdd742a28173",
+      "timing": "execution-only window; no source wind-up/hit-stop imported; simulation unchanged"
+    },
+    {
+      "style": "holy",
+      "effect": "holy/heal-aoe",
+      "source_frames": [
+        10,
+        13,
+        17,
+        23,
+        31,
+        40,
+        54,
+        72
+      ],
+      "source_fps": 30,
+      "source_pivot": [
+        128,
+        104
+      ],
+      "fixed_row_scale": 0.3225806451612903,
+      "sampled_pose_hashes": [
+        "2fe208c97658b2e7af73d32f9b62e9b8a4ed6b34d91cc2f3062d839460577de1",
+        "8cc583597f53efceea4ee656eb6d213ca47d543fd8763af5c967f054bf99ad85",
+        "434b641b63cbae21550685548b0aa3555cd20ee805f3e3f09772234decc015cd",
+        "a08dff35f6ba7fb179ce4925fc9ac4f39633d7e2019e93bf92d0031e850036f1",
+        "6748f4bfadfe67d8276de054a0e7ee6b25ae0caf5749c80dc978c17432ec26d6",
+        "cc66c97ca9fdb8b435eaf86917d53a97497a3f4a7d78d95f3f65f8f2b7d06d4a",
+        "924233d008489a769c2e69bdd42f290e3fbc314feb1e0c347232a5f1d8a6f826",
+        "48071dddc9258e9f84c2465acd27a6a467ef854870e2ee03aa3d3d1dc85b63fd"
+      ],
+      "source_sheet_sha256": "a43564ef74628f53988f6b2b95e7b83b817dc88a730e8a7c5d6e1107ec83e914",
+      "timing": "execution-only window; no source wind-up/hit-stop imported; simulation unchanged"
+    }
+  ],
+  "left_direction": "existing execution-origin policy; source art only, no stock actor",
+  "simulation_damage_timing_changed": false
+}

@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "source": "docs/art/art-completion/surfaces/source.png",
+  "source_sha256": "afd683683f8a0e1074f434117b9cea6db592f2a8904ac351f8cb84c7e58b52e7",
+  "source_dimensions": [
+    1254,
+    1254
+  ],
+  "native_generated_dimensions_claimed": false,
+  "normalization": "Per quadrant nearest256, symmetric12px wrap,128colour palette; original source retained",
+  "retained_rgba_bytes": 1048576,
+  "materials": [
+    {
+      "id": "cliff",
+      "file": "cliff.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "99ffa4904583ac81f567aa5c0669277c159ce921bbba2be95a2272f665372b5e"
+    },
+    {
+      "id": "limestone",
+      "file": "limestone.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "4ce56d4bb96a89848b2bdd85034578ac9e21edb0374895770184c1e0b2bb4406"
+    },
+    {
+      "id": "carpet",
+      "file": "carpet.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "c6d2ac98ded45d2030975d251c7f78d343b22558a5d0d9171ccbbecf14b106ac"
+    },
+    {
+      "id": "canal",
+      "file": "canal.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "c026adbbe3eb396a6bf35e701f9652e9f90b11454341cb9685e79d0219f5d91a"
+    }
+  ]
+}

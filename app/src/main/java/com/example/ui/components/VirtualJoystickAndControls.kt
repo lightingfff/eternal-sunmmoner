@@ -1,6 +1,7 @@
 package com.example.ui.components
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -26,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -43,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import com.example.data.model.HeroClassType
 import com.example.game.pixel.FantasyHd128CharacterAtlas
 import com.example.game.pixel.FantasyHd128Structures
+import com.example.game.pixel.PremiumPortraits
 import com.example.ui.theme.ArcaneViolet
 import com.example.ui.theme.BorderRune
 import com.example.ui.theme.ObsidianVoid
@@ -209,6 +212,7 @@ fun PixelHeroPortraitAvatar(
   modifier: Modifier = Modifier,
   heroName: String? = null,
 ) {
+  val portrait = remember(heroName, heroClass) { PremiumPortraits.get(heroName, heroClass) }
   val bg = when (heroClass) {
     HeroClassType.KNIGHT -> Color(0xFF234876)
     HeroClassType.ARCHER -> Color(0xFF1F543D)
@@ -231,7 +235,9 @@ fun PixelHeroPortraitAvatar(
       .border(1.5.dp, SummonerGold.copy(alpha = 0.85f), RoundedCornerShape(10.dp)),
     contentAlignment = Alignment.Center,
   ) {
-    Canvas(modifier = Modifier.size(sizeDp * 0.92f)) {
+    if (portrait != null) {
+      Image(portrait, contentDescription = null, modifier = Modifier.size(sizeDp * .92f), contentScale = ContentScale.Crop)
+    } else Canvas(modifier = Modifier.size(sizeDp * 0.92f)) {
       val baseSprite = if (heroClass == null) {
         FantasyHd128CharacterAtlas.masterSheet.idleRight.first()
       } else {

@@ -1,0 +1,19 @@
+Create an ORIGINAL production game spritesheet for ETERNAL SUMMONER. A forest wraith: skeletal feminine woodland revenant face under a ragged deep-indigo hood, long torn cobalt-blue robes, thin branchlike arms, dull steel bracers, a small cold cyan heart gem and pale wispy lower robe; threatening elongated silhouette. Detailed sculpted pixel art, rich small coherent clusters, beveled cloth folds and readable skeletal hands, upper-left warm pale key and cool right shade. Not a square or geometric placeholder, not a cartoon. Full upright body shown in 3/4 oblique RPG view from a camera about 40 degrees above ground; faces RIGHT throughout, visible front and right side. No cast shadow, no ground circle, no standalone magic effects, no text/UI/grid lines.
+
+EXACT layout: 6 columns by 2 rows of equal cells on a wide LANDSCAPE PNG. Twelve complete figures total, one per cell, generous transparent margins. Same character size, camera, center-root and foot/robe ground baseline in every cell. Do not crop hood, limbs, robe, weapon or fallen body; keep all figures separated. Transparent background, genuine alpha. Each row has same cell dimensions; all cells share foot baseline at 90% of cell height.
+
+Frame order left-to-right top row then bottom row:
+1 idle neutral ready, arms relaxed.
+2 idle breathing, hood raised slightly, fingers loosened.
+3 walk right, left knee/robe extension leading, right arm forward.
+4 walk right, lowered weight, robe dragging backward, right foot passing.
+5 walk right, right leg leading, left arm forward.
+6 walk right, higher passing phase with lifted trailing foot and robe sway.
+7 ranged attack anticipation: torso twists back, one clawed hand drawn behind shoulder.
+8 ranged attack release: right hand thrust fully forward, fingers spread, robe trails; NO projectile or glow cloud.
+9 ranged recovery: arm lowers, torso leans forward then settles.
+10 hurt recoil: shoulder hit, head bends, clutching ribs.
+11 collapse: body kneeling/curling down, limbs still readable.
+12 defeated: robe and hood collapsed sideways on ground with visible skull and arm, distinctly lower than idle.
+
+Make actual different limb poses, not translated duplicates; preserve the same logical foot/root baseline. Never shrink attack/collapse figures to equal bounding-box heights. Final low-resolution runtime cells will be128x144; keep details readable after nearest-neighbor normalization. Original art only; no specific copyrighted character.

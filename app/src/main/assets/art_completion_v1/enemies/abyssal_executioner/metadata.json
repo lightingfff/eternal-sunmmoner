@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "type": "ABYSSAL_EXECUTIONER",
+  "frame": [
+    128,
+    144
+  ],
+  "pivot": [
+    64,
+    134
+  ],
+  "columns": 12,
+  "rows": 1,
+  "world_scale": 1.05,
+  "atlas_file": "atlas.png",
+  "atlas_sha256": "4a58806ce244dc5a525276788a5c38759b2286cdb24697c669b5915640042b22",
+  "frame_order": [
+    "idle0",
+    "idle1",
+    "walk0",
+    "walk1",
+    "walk2",
+    "walk3",
+    "anticipation",
+    "contact",
+    "recovery",
+    "hurt",
+    "collapse",
+    "defeat"
+  ],
+  "retained_rgba_bytes": 884736,
+  "native_generated_dimensions_claimed": false,
+  "left_direction": "Mirrored by runtime at draw; no separately authored left claim",
+  "source": {
+    "file": "docs/art/art-completion/enemies/source/abyssal_executioner.png",
+    "sha256": "d1f5178df320380a687eff3ff602805f65d9ef3234199ae6b5961f6d6a5def54",
+    "dimensions": [
+      2172,
+      724
+    ],
+    "grid": [
+      6,
+      2
+    ],
+    "alpha_threshold": 96
+  },
+  "normalization": {
+    "fixed_scale": 0.3,
+    "fixed_root_x": 185,
+    "row_baselines": [
+      352,
+      356
+    ],
+    "logical_source_cell": [
+      362,
+      362
+    ],
+    "extraction": "Connected silhouettes plus nearest detached clusters; no weapon crop at nominal cell boundaries",
+    "per_frame_recentering": false,
+    "per_frame_rescaling": false
+  },
+  "unique_pose_hashes": [
+    "8ecd9b2f25f7e225846ef67cb35b3ffe0ae85ab244898a67e07aaf1a6f0b2919",
+    "751c9b1a1907485926c3e967f9c53f366b48e86325191dadf31cb4a22cbf445b",
+    "b1cabba6dd6fcc4f2593da2f8fddfdce94efc2d267a6d821a9ccb4eb58b2b95e",
+    "51737d2aa10ff28fe9d882787125c2e1ab109c81ac145a8a86a29b25758e21b9",
+    "e2359fd0bcb9b640ca84d355a1119bc28b1368720fba7828d36cff4406bad952",
+    "75f16f55e5c4e7895d078b11da0f20c9167324e251e3112df9d5c4745e70c4ca",
+    "b7bca76174cd24fc3c2b0568e1766422e4086f749160751abbcde7a072914dfd",
+    "4219eba95122879b69ded82688d616d4b883ba4c2e35009124052a8ca9e2d180",
+    "f103b5c6039c0e392f6f776259c820326e3adfbb8f28bb25b32fd01984bef598",
+    "273288daa4f84f29c06da17272184031832da9239924127328fd73a773d32f0a",
+    "69194250b80de06db3b8467e5f9f64c7379170753a81f6b537b28fb42cd5ee55",
+    "a9b27cf44512e2723bec4ffd60e0b5c470a8097a75bbe086940950b1616019e0"
+  ]
+}

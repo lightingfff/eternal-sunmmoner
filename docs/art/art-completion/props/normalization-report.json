@@ -1,0 +1,140 @@
+{
+  "version": 1,
+  "pack": "art_completion_v1/props",
+  "source": "docs/art/art-completion/props/source/three-props-v1.png",
+  "source_sha256": "c8d6275bc61febb49d28ce87b5ee30fb3a45a23264a48817d77127699b4ea2a0",
+  "source_dimensions": [
+    2172,
+    724
+  ],
+  "origin": "Genuine original hosted imagegen output; normalized derivatives, not native-size claims",
+  "generator_output": "/workspace/generated_images/exec-e9b2a027-661e-49a2-bc96-065e14346281.png",
+  "projection": "2.5D oblique .72 ground; upright sprite height; NW key/cool right shade",
+  "props": [
+    {
+      "id": "royal_statue",
+      "file": "royal_statue.png",
+      "width": 52,
+      "height": 88,
+      "pivot": [
+        26,
+        82
+      ],
+      "alpha_bbox": [
+        7,
+        3,
+        45,
+        82
+      ],
+      "sha256": "262a90e790c13948dfaf53266ea3ee3970fa98974e2d58397a469d38333b9f72",
+      "rgba_bytes": 18304,
+      "source_column": 0,
+      "source_panel": [
+        0,
+        0,
+        724,
+        724
+      ],
+      "source_alpha_bbox": [
+        200,
+        9,
+        535,
+        707
+      ],
+      "fixed_scale": 0.11461318051575932,
+      "paste": [
+        7,
+        2
+      ],
+      "alpha_threshold": 96,
+      "unique_rgb_colors": 128,
+      "normalization": "single uniform static-prop scale; nearest; binary alpha;128-color palette",
+      "clipped_opaque_pixels": 0
+    },
+    {
+      "id": "crimson_crystal",
+      "file": "crimson_crystal.png",
+      "width": 48,
+      "height": 64,
+      "pivot": [
+        24,
+        60
+      ],
+      "alpha_bbox": [
+        3,
+        4,
+        44,
+        60
+      ],
+      "sha256": "a6a083c8919c490c1a40b948a39a71e8f3551ebdabd933991eeecc5761c40033",
+      "rgba_bytes": 12288,
+      "source_column": 1,
+      "source_panel": [
+        724,
+        0,
+        1448,
+        724
+      ],
+      "source_alpha_bbox": [
+        137,
+        78,
+        540,
+        634
+      ],
+      "fixed_scale": 0.10071942446043165,
+      "paste": [
+        3,
+        4
+      ],
+      "alpha_threshold": 96,
+      "unique_rgb_colors": 128,
+      "normalization": "single uniform static-prop scale; nearest; binary alpha;128-color palette",
+      "clipped_opaque_pixels": 0
+    },
+    {
+      "id": "tattered_banner",
+      "file": "tattered_banner.png",
+      "width": 80,
+      "height": 80,
+      "pivot": [
+        40,
+        76
+      ],
+      "alpha_bbox": [
+        37,
+        11,
+        72,
+        76
+      ],
+      "sha256": "9fb883a08b71b85c1923f8fedae425c4c64f10d0edfd48d4a9d6c3e0c00c4793",
+      "rgba_bytes": 25600,
+      "source_column": 2,
+      "source_panel": [
+        1448,
+        0,
+        2172,
+        724
+      ],
+      "source_alpha_bbox": [
+        245,
+        8,
+        623,
+        698
+      ],
+      "fixed_scale": 0.0935672514619883,
+      "paste": [
+        37,
+        11
+      ],
+      "alpha_threshold": 96,
+      "unique_rgb_colors": 127,
+      "normalization": "single uniform static-prop scale; nearest; binary alpha;128-color palette",
+      "clipped_opaque_pixels": 0,
+      "source_pole_x": 281,
+      "pole_anchor_x": 40
+    }
+  ],
+  "retained_rgba_bytes": 56192,
+  "runtime_shadow_baked": false,
+  "native_generated_dimensions_claimed": false
+}

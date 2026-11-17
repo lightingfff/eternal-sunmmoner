@@ -1,0 +1,623 @@
+{
+  "hero": "Vesper",
+  "frame": [
+    112,
+    112
+  ],
+  "pivot": [
+    56,
+    104
+  ],
+  "columns": 12,
+  "rows": [
+    "front_right",
+    "back_right"
+  ],
+  "world_scale": 1.08,
+  "frame_order": [
+    "idle0",
+    "idle1",
+    "walk0",
+    "walk1",
+    "walk2",
+    "walk3",
+    "anticipation",
+    "contact",
+    "recovery",
+    "hurt",
+    "collapse",
+    "defeat"
+  ],
+  "atlas_file": "vesper.png",
+  "atlas_sha256": "03befc3acf35ca078ad37f0f2adfff18bc17ab599a2f938d1796e46852a531c3",
+  "portrait_file": "portrait.png",
+  "portrait_sha256": "30bd28c084b60fb1cf52a2dfdb63186d21945641d158197f63d074da11546e4a",
+  "retained_rgba_bytes": 1286144,
+  "native_generated_dimensions_claimed": false,
+  "normalization": "reviewed one scale/root per action strip, nearest normalization; original imagegen poses; no invented missing frames",
+  "unique_pose_hashes": [
+    "2008162e9cfe46c1513bf7002181e0cba0cc51ac0957ae59559b50707d9c284b",
+    "0d28a7d31f1f6a08968d3a7476144446f53bece9acaa3882e3e414f66a781e97",
+    "00c62fc924a1229d07110aabdf685412d6c7dba061652b491b0b7a86d33df368",
+    "f9bfcdcf411352496a4afa7596cd322a1272601fc330644209eb78e5c3f112cd",
+    "7105da83349184375795a3fa902f31d3fec54b40a85cc16d758cca0759f2198c",
+    "e29c29cdc3510f29b90cfae15765beca2f97947f134f50437d9f968c6778a0ef",
+    "ff8b7fac5df39222362342d094c51f92525cb9dde7b78b55ca8af9d3756d8759",
+    "ffb35e5721cc8dc933de1ddb1de5ef097caa30800af2c1aefcf0ac55fb0deb47",
+    "7e9eff540366733d8aed1224fc788f946cdc34c18514384e7c632f1af447e392",
+    "0b75b53e895f468df01c18cf3a8e616d5fe37a390a7608ce412e6d8180b2566d",
+    "71a3dd6ee38eefcbc07f3dca155441c8e217c7343084070f0f7a96399f57c298",
+    "84088c59b5d6c7498070c6c63b6a39a2be924569dda05df3c3dac7e93310a2d7",
+    "59f0799904ff0ef377b4412ff223ea61cb74dc25f336cd6ed0217cb48db6ac57",
+    "54a7d97e2076094cd576538ba7c280788d3ae915e3ab614201072e5a78588239",
+    "4ff1786cecb343bf3ff9fd22e9bf6121ab70f41ac2538c767884252cf84cf927",
+    "6cf1e2cea56a8b92c128aa408084a9a4eebd8133d2ce4317d719704e8dc09ad0",
+    "13418aa9eb78a86230218bbd31d1953afdbfd877f5eba1ba3834656fc487bbeb",
+    "66957b05c96339f4e576d597167692376f51c9fc4127b51f942604bdafe9d2b4",
+    "b919e64530cf9c3d188b1ed002ee93b1368cb6891af317282c572a8b1fde1497",
+    "606625c1defea8e62d15244bb0c428ac574d66c0662101cc738ca3904f6f117d",
+    "16d906fd6289a8e62ad9641d257ff0faa62795b6ca0326bcac113e1c8eb5b6ca",
+    "6299f551b494fc24d1954b1abe9d4f22874dbdc008b17488cc2aab885e85dfe5",
+    "2814f960045d1ceba5825bf5cc63f9098436fdc67b97d449bcb0d88b92f3d030",
+    "4b3d79042120b083374bf47fda3c7eee3b4ff10d8733a34520c5fdda7d3c8b53"
+  ],
+  "sources": {
+    "idle_front": {
+      "file": "docs/art/art-depth-reforge/hero-production/vesper/source/idle.png",
+      "sha256": "f648045b8508e9852d6feafd8d0aaac49920ddd664336e03b57fde2cbe5a27b5",
+      "source_row": 0,
+      "source_rows": 2,
+      "count": 2,
+      "root_x": 300,
+      "baseline": 686,
+      "anatomical_top": 33,
+      "target_anatomical_height": 80,
+      "fixed_clip_scale": 0.1225114854517611,
+      "per_frame_recentering": false,
+      "frames": [
+        {
+          "index": 0,
+          "source_span": [
+            118,
+            443
+          ],
+          "paste": [
+            34,
+            20
+          ],
+          "bbox": [
+            34,
+            24,
+            74,
+            104
+          ],
+          "opaque_pixels": 1884
+        },
+        {
+          "index": 1,
+          "source_span": [
+            590,
+            913
+          ],
+          "paste": [
+            25,
+            20
+          ],
+          "bbox": [
+            25,
+            24,
+            65,
+            104
+          ],
+          "opaque_pixels": 1890
+        }
+      ]
+    },
+    "idle_back": {
+      "file": "docs/art/art-depth-reforge/hero-production/vesper/source/idle.png",
+      "sha256": "f648045b8508e9852d6feafd8d0aaac49920ddd664336e03b57fde2cbe5a27b5",
+      "source_row": 1,
+      "source_rows": 2,
+      "count": 2,
+      "root_x": 290,
+      "baseline": 703,
+      "anatomical_top": 29,
+      "target_anatomical_height": 80,
+      "fixed_clip_scale": 0.11869436201780416,
+      "per_frame_recentering": false,
+      "frames": [
+        {
+          "index": 0,
+          "source_span": [
+            112,
+            446
+          ],
+          "paste": [
+            35,
+            21
+          ],
+          "bbox": [
+            35,
+            25,
+            75,
+            104
+          ],
+          "opaque_pixels": 1831
+        },
+        {
+          "index": 1,
+          "source_span": [
+            580,
+            913
+          ],
+          "paste": [
+            26,
+            21
+          ],
+          "bbox": [
+            26,
+            24,
+            66,
+            105
+          ],
+          "opaque_pixels": 1824
+        }
+      ]
+    },
+    "walk_front": {
+      "file": "docs/art/art-depth-reforge/hero-production/vesper/source/walk-front.png",
+      "sha256": "316b33da5402734df3b65349ac0782e73ab3b6e1ff0b1915822220bd01383e16",
+      "source_row": 0,
+      "source_rows": 1,
+      "count": 4,
+      "root_x": 300,
+      "baseline": 701,
+      "anatomical_top": 15,
+      "target_anatomical_height": 80,
+      "fixed_clip_scale": 0.11661807580174927,
+      "per_frame_recentering": false,
+      "frames": [
+        {
+          "index": 0,
+          "source_span": [
+            45,
+            501
+          ],
+          "paste": [
+            26,
+            22
+          ],
+          "bbox": [
+            26,
+            24,
+            79,
+            103
+          ],
+          "opaque_pixels": 2003
+        },
+        {
+          "index": 1,
+          "source_span": [
+            643,
+            1004
+          ],
+          "paste": [
+            33,
+            22
+          ],
+          "bbox": [
+            33,
+            24,
+            75,
+            103
+          ],
+          "opaque_pixels": 1668
+        },
+        {
+          "index": 2,
+          "source_span": [
+            1127,
+            1589
+          ],
+          "paste": [
+            26,
+            22
+          ],
+          "bbox": [
+            26,
+            25,
+            80,
+            103
+          ],
+          "opaque_pixels": 1982
+        },
+        {
+          "index": 3,
+          "source_span": [
+            1734,
+            2094
+          ],
+          "paste": [
+            33,
+            22
+          ],
+          "bbox": [
+            33,
+            24,
+            75,
+            103
+          ],
+          "opaque_pixels": 1705
+        }
+      ]
+    },
+    "walk_back": {
+      "file": "docs/art/art-depth-reforge/hero-production/vesper/source/walk-back.png",
+      "sha256": "773219b74d407134a6b46c8600fd457830057747d8a4e9c69a735a6b854a1f80",
+      "source_row": 0,
+      "source_rows": 1,
+      "count": 4,
+      "root_x": 285,
+      "baseline": 692,
+      "anatomical_top": 18,
+      "target_anatomical_height": 80,
+      "fixed_clip_scale": 0.11869436201780416,
+      "per_frame_recentering": false,
+      "frames": [
+        {
+          "index": 0,
+          "source_span": [
+            42,
+            509
+          ],
+          "paste": [
+            27,
+            22
+          ],
+          "bbox": [
+            27,
+            24,
+            82,
+            104
+          ],
+          "opaque_pixels": 2064
+        },
+        {
+          "index": 1,
+          "source_span": [
+            627,
+            1003
+          ],
+          "paste": [
+            32,
+            22
+          ],
+          "bbox": [
+            32,
+            24,
+            77,
+            104
+          ],
+          "opaque_pixels": 1829
+        },
+        {
+          "index": 2,
+          "source_span": [
+            1128,
+            1551
+          ],
+          "paste": [
+            27,
+            22
+          ],
+          "bbox": [
+            27,
+            24,
+            77,
+            104
+          ],
+          "opaque_pixels": 1963
+        },
+        {
+          "index": 3,
+          "source_span": [
+            1722,
+            2098
+          ],
+          "paste": [
+            33,
+            22
+          ],
+          "bbox": [
+            33,
+            24,
+            78,
+            104
+          ],
+          "opaque_pixels": 1803
+        }
+      ]
+    },
+    "attack_front": {
+      "file": "docs/art/art-depth-reforge/hero-production/vesper/source/cast-front.png",
+      "sha256": "b1927d3ee6eb17844231017eba4e3ca67d148956234ba2c2feda2d98b15ed6e3",
+      "source_row": 0,
+      "source_rows": 1,
+      "count": 3,
+      "root_x": 300,
+      "baseline": 692,
+      "anatomical_top": 80,
+      "target_anatomical_height": 80,
+      "fixed_clip_scale": 0.13071895424836602,
+      "per_frame_recentering": false,
+      "frames": [
+        {
+          "index": 0,
+          "source_span": [
+            54,
+            563
+          ],
+          "paste": [
+            24,
+            14
+          ],
+          "bbox": [
+            24,
+            17,
+            91,
+            105
+          ],
+          "opaque_pixels": 3368
+        },
+        {
+          "index": 1,
+          "source_span": [
+            749,
+            1433
+          ],
+          "paste": [
+            20,
+            14
+          ],
+          "bbox": [
+            20,
+            22,
+            109,
+            105
+          ],
+          "opaque_pixels": 3592
+        },
+        {
+          "index": 2,
+          "source_span": [
+            1498,
+            1996
+          ],
+          "paste": [
+            23,
+            14
+          ],
+          "bbox": [
+            23,
+            17,
+            88,
+            105
+          ],
+          "opaque_pixels": 2964
+        }
+      ]
+    },
+    "attack_back": {
+      "file": "docs/art/art-depth-reforge/hero-production/vesper/source/cast-back.png",
+      "sha256": "38d75657716e7e790e5ba1e189289478e41ccfb37f4f7976f534fa43f075f7ad",
+      "source_row": 0,
+      "source_rows": 1,
+      "count": 3,
+      "root_x": 300,
+      "baseline": 697,
+      "anatomical_top": 79,
+      "target_anatomical_height": 80,
+      "fixed_clip_scale": 0.12944983818770225,
+      "per_frame_recentering": false,
+      "frames": [
+        {
+          "index": 0,
+          "source_span": [
+            117,
+            539
+          ],
+          "paste": [
+            32,
+            14
+          ],
+          "bbox": [
+            32,
+            18,
+            87,
+            104
+          ],
+          "opaque_pixels": 2678
+        },
+        {
+          "index": 1,
+          "source_span": [
+            785,
+            1426
+          ],
+          "paste": [
+            25,
+            14
+          ],
+          "bbox": [
+            25,
+            16,
+            108,
+            104
+          ],
+          "opaque_pixels": 3027
+        },
+        {
+          "index": 2,
+          "source_span": [
+            1558,
+            2017
+          ],
+          "paste": [
+            31,
+            14
+          ],
+          "bbox": [
+            31,
+            18,
+            90,
+            104
+          ],
+          "opaque_pixels": 2704
+        }
+      ]
+    },
+    "damage_front": {
+      "file": "docs/art/art-depth-reforge/hero-production/vesper/source/hurt-defeat-clean.png",
+      "sha256": "0169c43d1699f3e93902b2ae9535f7fe68cd48c4433ba45c830480c138e027ff",
+      "source_row": 0,
+      "source_rows": 2,
+      "count": 3,
+      "root_x": 235,
+      "baseline": 486,
+      "anatomical_top": 18,
+      "target_anatomical_height": 77,
+      "fixed_clip_scale": 0.16452991452991453,
+      "per_frame_recentering": false,
+      "frames": [
+        {
+          "index": 0,
+          "source_span": [
+            32,
+            380
+          ],
+          "paste": [
+            23,
+            24
+          ],
+          "bbox": [
+            23,
+            27,
+            80,
+            104
+          ],
+          "opaque_pixels": 2380
+        },
+        {
+          "index": 1,
+          "source_span": [
+            495,
+            896
+          ],
+          "paste": [
+            15,
+            24
+          ],
+          "bbox": [
+            15,
+            40,
+            81,
+            103
+          ],
+          "opaque_pixels": 2232
+        },
+        {
+          "index": 2,
+          "source_span": [
+            984,
+            1519
+          ],
+          "paste": [
+            11,
+            24
+          ],
+          "bbox": [
+            11,
+            75,
+            99,
+            104
+          ],
+          "opaque_pixels": 1610
+        }
+      ]
+    },
+    "damage_back": {
+      "file": "docs/art/art-depth-reforge/hero-production/vesper/source/hurt-defeat-clean.png",
+      "sha256": "0169c43d1699f3e93902b2ae9535f7fe68cd48c4433ba45c830480c138e027ff",
+      "source_row": 1,
+      "source_rows": 2,
+      "count": 3,
+      "root_x": 230,
+      "baseline": 488,
+      "anatomical_top": 14,
+      "target_anatomical_height": 77,
+      "fixed_clip_scale": 0.16244725738396623,
+      "per_frame_recentering": false,
+      "frames": [
+        {
+          "index": 0,
+          "source_span": [
+            24,
+            378
+          ],
+          "paste": [
+            23,
+            25
+          ],
+          "bbox": [
+            23,
+            27,
+            81,
+            104
+          ],
+          "opaque_pixels": 2282
+        },
+        {
+          "index": 1,
+          "source_span": [
+            503,
+            895
+          ],
+          "paste": [
+            17,
+            25
+          ],
+          "bbox": [
+            17,
+            39,
+            81,
+            104
+          ],
+          "opaque_pixels": 2169
+        },
+        {
+          "index": 2,
+          "source_span": [
+            976,
+            1517
+          ],
+          "paste": [
+            11,
+            25
+          ],
+          "bbox": [
+            11,
+            74,
+            99,
+            103
+          ],
+          "opaque_pixels": 1563
+        }
+      ]
+    }
+  },
+  "portrait_source": {
+    "file": "docs/art/art-depth-reforge/hero-production/vesper/source/portrait-source.png",
+    "sha256": "18b4edf89a606ad69c159ac630aedf0b9d519a478b498d88f894e08212cd7183",
+    "method": "hosted_imagegen portrait"
+  }
+}

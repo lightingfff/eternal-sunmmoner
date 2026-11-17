@@ -1,0 +1,413 @@
+{
+  "version": 1,
+  "file": "projectiles.png",
+  "sha256": "20664f4fc40db7e5250be9b5fef68d6f2d32203866fe9459f223b85e27b1b357",
+  "frame": [
+    48,
+    32
+  ],
+  "pivot": [
+    40,
+    16
+  ],
+  "columns": 4,
+  "rows": [
+    "BOLT",
+    "ARROW",
+    "ARCANE",
+    "HOLY",
+    "HOSTILE_ARROW"
+  ],
+  "retained_rgba_bytes": 122880,
+  "source": "docs/art/art-completion/projectiles/source.png",
+  "source_dimensions": [
+    1448,
+    1086
+  ],
+  "source_sha256": "951bab7b51d9e881c4e59e218e897ae2085bfc63cce5dbc0c906ed064c2da963",
+  "origin": "Original hosted imagegen flight glyphs; normalized, not native48 claims",
+  "anchor_policy": "One scale per row; physical opaque tip registered per source pose; no trajectory imported",
+  "simulation_changed": false,
+  "clips": [
+    {
+      "visual": "BOLT",
+      "fixed_row_scale": 0.13818181818181818,
+      "frames": [
+        {
+          "source_tip": [
+            317,
+            128.0
+          ],
+          "paste": [
+            -4,
+            -2
+          ],
+          "bbox": [
+            6,
+            12,
+            40,
+            19
+          ]
+        },
+        {
+          "source_tip": [
+            317,
+            128.0
+          ],
+          "paste": [
+            -4,
+            -2
+          ],
+          "bbox": [
+            3,
+            11,
+            40,
+            20
+          ]
+        },
+        {
+          "source_tip": [
+            317,
+            128.0
+          ],
+          "paste": [
+            -4,
+            -2
+          ],
+          "bbox": [
+            3,
+            12,
+            40,
+            19
+          ]
+        },
+        {
+          "source_tip": [
+            317,
+            128.0
+          ],
+          "paste": [
+            -4,
+            -2
+          ],
+          "bbox": [
+            4,
+            12,
+            40,
+            19
+          ]
+        }
+      ],
+      "unique_pose_hashes": [
+        "17ebc77822617b8be761ed5caf98c407ebd800cd91a4201b86a0ff0b87e3eaf3",
+        "2cb285906dfb9e6b275223c77a2478a8d0dec691e9417d30391a2dc23a10defb",
+        "cf5b808b2c6348b4f3a2905bbdb67a955bc08c33fdcdf1557f1784c1525a5309",
+        "e09443771a788a70239c37f5cbb8c65275f272c4872c025cb96b52697ae56178"
+      ]
+    },
+    {
+      "visual": "ARROW",
+      "fixed_row_scale": 0.1371841155234657,
+      "frames": [
+        {
+          "source_tip": [
+            317,
+            125.5
+          ],
+          "paste": [
+            -3,
+            -1
+          ],
+          "bbox": [
+            6,
+            13,
+            41,
+            20
+          ]
+        },
+        {
+          "source_tip": [
+            317,
+            125.5
+          ],
+          "paste": [
+            -3,
+            -1
+          ],
+          "bbox": [
+            4,
+            13,
+            41,
+            21
+          ]
+        },
+        {
+          "source_tip": [
+            317,
+            125.5
+          ],
+          "paste": [
+            -3,
+            -1
+          ],
+          "bbox": [
+            3,
+            12,
+            41,
+            21
+          ]
+        },
+        {
+          "source_tip": [
+            317,
+            125.0
+          ],
+          "paste": [
+            -3,
+            -1
+          ],
+          "bbox": [
+            3,
+            13,
+            41,
+            20
+          ]
+        }
+      ],
+      "unique_pose_hashes": [
+        "91ff28b445915ffbd2eb8dc9cb7d52508620b2a734a35f60a51691fe36fcf2f0",
+        "fba7d7cf2b4ca8e8d4da175ab13aaf6eeaed88aefec094017c6a3b9388908edb",
+        "791693023afd899cda359a167624b36b801a924e0601cfabe2d43a2d599cf9c3",
+        "f7245a55e5eba3f767515b964dd6a669447dd1fdf608d4df62bf8e747ed68bce"
+      ]
+    },
+    {
+      "visual": "ARCANE",
+      "fixed_row_scale": 0.13818181818181818,
+      "frames": [
+        {
+          "source_tip": [
+            316,
+            107.0
+          ],
+          "paste": [
+            -4,
+            1
+          ],
+          "bbox": [
+            2,
+            12,
+            40,
+            20
+          ]
+        },
+        {
+          "source_tip": [
+            316,
+            107.5
+          ],
+          "paste": [
+            -4,
+            1
+          ],
+          "bbox": [
+            2,
+            11,
+            40,
+            21
+          ]
+        },
+        {
+          "source_tip": [
+            315,
+            107.5
+          ],
+          "paste": [
+            -4,
+            1
+          ],
+          "bbox": [
+            2,
+            11,
+            40,
+            21
+          ]
+        },
+        {
+          "source_tip": [
+            316,
+            107.0
+          ],
+          "paste": [
+            -4,
+            1
+          ],
+          "bbox": [
+            3,
+            12,
+            40,
+            21
+          ]
+        }
+      ],
+      "unique_pose_hashes": [
+        "8b479cde9a6581f2a229b2c29fca41dac9fd667d0f5b27eff798a3c880416909",
+        "20abe6dc14fdf500650b6ba653822ec3e669eeda545c228795424032a1cf2b02",
+        "da34ce08183fff9b2a7bc53e2df24f7deada957551b289f962957e189a4a5553",
+        "5c83c3249d9aa948da9084d350ea85e3fac9853760d7cca046da20594d213fed"
+      ]
+    },
+    {
+      "visual": "HOLY",
+      "fixed_row_scale": 0.13818181818181818,
+      "frames": [
+        {
+          "source_tip": [
+            317,
+            91.0
+          ],
+          "paste": [
+            -4,
+            3
+          ],
+          "bbox": [
+            2,
+            10,
+            40,
+            20
+          ]
+        },
+        {
+          "source_tip": [
+            316,
+            91.5
+          ],
+          "paste": [
+            -4,
+            3
+          ],
+          "bbox": [
+            2,
+            9,
+            40,
+            21
+          ]
+        },
+        {
+          "source_tip": [
+            316,
+            91.5
+          ],
+          "paste": [
+            -4,
+            3
+          ],
+          "bbox": [
+            3,
+            9,
+            40,
+            21
+          ]
+        },
+        {
+          "source_tip": [
+            316,
+            91.5
+          ],
+          "paste": [
+            -4,
+            3
+          ],
+          "bbox": [
+            2,
+            10,
+            40,
+            21
+          ]
+        }
+      ],
+      "unique_pose_hashes": [
+        "cfa680f648e83821b0929298ce57b9ba4976d60e6b91ca752efa9ea58b477117",
+        "6957ca9715cae0ba701933f2ec3a9fe652b9b3fe0e0292e6f1231c8c96f248a0",
+        "eff49a7fea68141b23f22e70a193a89e4a1885e9a623d2b602db86758f5e4ac8",
+        "39deedeb2e1b468e79ef4a0cf1520d3d09fd18971afa096fa8b0cfc9b99c1921"
+      ]
+    },
+    {
+      "visual": "HOSTILE_ARROW",
+      "fixed_row_scale": 0.13620071684587814,
+      "frames": [
+        {
+          "source_tip": [
+            317,
+            82.0
+          ],
+          "paste": [
+            -3,
+            5
+          ],
+          "bbox": [
+            3,
+            13,
+            40,
+            21
+          ]
+        },
+        {
+          "source_tip": [
+            317,
+            82.0
+          ],
+          "paste": [
+            -3,
+            5
+          ],
+          "bbox": [
+            3,
+            12,
+            40,
+            21
+          ]
+        },
+        {
+          "source_tip": [
+            317,
+            82.0
+          ],
+          "paste": [
+            -3,
+            5
+          ],
+          "bbox": [
+            3,
+            13,
+            40,
+            21
+          ]
+        },
+        {
+          "source_tip": [
+            316,
+            82.5
+          ],
+          "paste": [
+            -3,
+            5
+          ],
+          "bbox": [
+            4,
+            13,
+            40,
+            21
+          ]
+        }
+      ],
+      "unique_pose_hashes": [
+        "7a4a80af3d7f4e25459eaf35902bc1dbb285289235f4d1b124880b3744043aa5",
+        "68196606e3d2afd53ea5e34ce0c36a69ef5e2080d851d787cc0fac7a880f3af7",
+        "afb8721b46d80141c0b2f151c9c8ebe48f11fe47e28f0d8686d88cbd4fa68e4d",
+        "afc85a138375ba7fda1b564d8e50816972846569b7c08229706cd67b60ceb53c"
+      ]
+    }
+  ]
+}

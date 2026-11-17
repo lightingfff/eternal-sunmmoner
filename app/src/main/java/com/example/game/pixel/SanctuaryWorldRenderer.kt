@@ -35,6 +35,25 @@ import kotlin.math.sin
  * 6. Tall continuous pale-limestone crenellated perimeter fortress walls, North Arched Gate Tunnel & Physical Island Expansions
  */
 object SanctuaryWorldRenderer {
+  private val surfaceRectangle = Path()
+  private fun DrawScope.surfaceRect(name: String, rect: Rect, origin: Offset, zoom: Float,
+    ground: Boolean, tone: Int = 0) {
+    val mask = surfaceRectangle.apply { reset(); addRect(rect) }
+    with(ArchitectureSurfaceArt) {
+      drawSurface(name, mask, origin, Offset(.7f * zoom, 0f),
+        Offset(0f, .7f * zoom * if (ground) ObliqueCamera.OBLIQUE_Y_SCALE else 1f), tone = tone)
+    }
+  }
+
+  private fun DrawScope.surfaceFace(mask: Path, x0: Float, y0: Float, x1: Float, y1: Float,
+    length: Float, zoom: Float, tone: Int) {
+    if (length < .01f) return
+    with(ArchitectureSurfaceArt) {
+      drawSurface("limestone", mask, Offset(x0, y0),
+        Offset((x1 - x0) / length * .7f, (y1 - y0) / length * .7f),
+        Offset(0f, .7f * zoom), tone = tone)
+    }
+  }
 
   /**
    * Screen height of one 64 x 64 world tile, in px, below which the grass base switches to
@@ -149,21 +168,25 @@ object SanctuaryWorldRenderer {
       val startTy = ((minWy / worldTileSize).toInt() - 1).coerceAtLeast(4)
       val endTy = ((maxWy / worldTileSize).toInt() + 1).coerceAtMost(38)
 
-      // 3A. 128x128 Ultra-Detailed HD-2D Fantasy Sunlit Emerald-Moss Grass Lawn Across Entire Island
+      // Continuous authored grass macros; procedural tile fallback retains the existing ground grid.
       val hdGrassTiles = FantasyHd128Atlas.hdSanctuaryGrassTiles
-      for (ty in startTy..endTy) {
-        val wy = ty * worldTileSize
-        val dstY = sy(wy).roundToInt()
-        for (tx in startTx..endTx) {
-          val wx = tx * worldTileSize
-          val dstX = sx(wx).roundToInt()
-          val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
-          drawImage(
-            image = hdGrassTiles[hash % hdGrassTiles.size],
-            dstOffset = IntOffset(dstX, dstY),
-            dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
-            filterQuality = FilterQuality.None,
-          )
+      val macroDrawn = with(ArtDepthAssets) {
+        drawGrassMacros(startTx, endTx, startTy, endTy, ::sx, { sy(it) }, zoom)
+      }
+      if (!macroDrawn) {
+        for (ty in startTy..endTy) {
+          val wy = ty * worldTileSize
+          val dstY = sy(wy).roundToInt()
+          for (tx in startTx..endTx) {
+            val wx = tx * worldTileSize
+            val dstX = sx(wx).roundToInt()
+            drawImage(
+              image = ArtDepthAssets.tile(hdGrassTiles, tx, ty),
+              dstOffset = IntOffset(dstX, dstY),
+              dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
+              filterQuality = FilterQuality.None,
+            )
+          }
         }
       }
 
@@ -317,9 +340,8 @@ object SanctuaryWorldRenderer {
         for (tx in 6..21) {
           val wx = tx * worldTileSize
           val dstX = sx(wx).roundToInt()
-          val hash = ((tx * 49297) xor (ty * 91813)) and 0x7FFFFFFF
           drawImage(
-            image = sandTiles[hash % sandTiles.size],
+            image = ArtDepthAssets.tile(sandTiles, tx, ty),
             dstOffset = IntOffset(dstX, dstY),
             dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
             filterQuality = FilterQuality.None,
@@ -352,8 +374,7 @@ object SanctuaryWorldRenderer {
     for (ty in rows) for (tx in columns) {
       // The road verge ring is a clip ring: tiles fully outside the road cannot contribute.
       if (roadPaths != null && !SanctuaryRoadCoverage.mayContainRoad(roadPaths, tx, ty, roadExtraWorld)) continue
-      val index = ((tx * 73856093 xor ty * 19349663) and 0x7fffffff) % tiles.size
-      drawImage(tiles[index], dstOffset=IntOffset(sx(tx*64f).roundToInt(),sy(ty*64f,0f).roundToInt()),
+      drawImage(ArtDepthAssets.tile(tiles, tx, ty), dstOffset=IntOffset(sx(tx*64f).roundToInt(),sy(ty*64f,0f).roundToInt()),
         dstSize=IntSize((64*zoom).roundToInt().coerceAtLeast(1)+1,(64*zoom*ObliqueCamera.OBLIQUE_Y_SCALE).roundToInt().coerceAtLeast(1)+1),filterQuality=FilterQuality.None)
     }
   }
@@ -427,9 +448,8 @@ object SanctuaryWorldRenderer {
           if (wx > 2460f) continue
           if (!SanctuaryRoadCoverage.mayContainRoad(paths, tx, ty)) continue
           val dstX = sx(wx).roundToInt()
-          val hash = ((tx * 73856093) xor (ty * 19349663)) and 0x7FFFFFFF
           drawImage(
-            image = cobbleTiles[hash % cobbleTiles.size],
+            image = ArtDepthAssets.tile(cobbleTiles, tx, ty),
             dstOffset = IntOffset(dstX, dstY),
             dstSize = IntSize(tileScreenW + 1, tileScreenH + 1),
             filterQuality = FilterQuality.None,
@@ -683,11 +703,9 @@ object SanctuaryWorldRenderer {
       close()
     }
     drawPath(leftCliff, Color(0xFF2A2E3A))
-    // Strata lines on left cliff for depth
-    for (frac in listOf(0.25f, 0.55f, 0.80f)) {
-      val ly = dropMain * frac
-      drawPath(leftCliff, Color(0xFF1E2028).copy(alpha = 0.35f), style = Stroke(width = (1.0f*zoom).coerceAtLeast(0.7f)))
-      // subtle horizontal strata via extra path would clutter — keep minimal
+    with(ArchitectureSurfaceArt) {
+      drawSurface("cliff", leftCliff, Offset(sx(0f), sy(2350f, 0f)),
+        Offset(1.15f * zoom, 0f), Offset(0f, 1.15f * zoom), tone = 1)
     }
 
     val centerChasm = Path().apply {
@@ -715,6 +733,10 @@ object SanctuaryWorldRenderer {
       close()
     }
     drawPath(rightCliff, Color(0xFF242735))
+    with(ArchitectureSurfaceArt) {
+      drawSurface("cliff", rightCliff, Offset(sx(0f), sy(2350f, 0f)),
+        Offset(1.15f * zoom, 0f), Offset(0f, 1.15f * zoom), tone = 2)
+    }
 
     for (cxWorld in listOf(560f to 2040f, 880f to 2340f, 1160f to 2370f, 2060f to 2370f, 2360f to 2330f, 2660f to 2040f)) {
       val rx = sx(cxWorld.first)
@@ -727,6 +749,10 @@ object SanctuaryWorldRenderer {
         close()
       }
       drawPath(crag, if (cxWorld.first < 1600f) Color(0xFF3A3F4A) else Color(0xFF2B2E38))
+      with(ArchitectureSurfaceArt) {
+        drawSurface("cliff", crag, Offset(sx(0f), sy(2350f, 0f)),
+          Offset(.85f * zoom, 0f), Offset(0f, .85f * zoom), tone = if (cxWorld.first < 1600f) 0 else 1)
+      }
     }
 
     drawPath(leftCliff, Color(0xFF28211F), style = Stroke(width = (2.2f * zoom).coerceAtLeast(1.2f)))
@@ -963,6 +989,7 @@ object SanctuaryWorldRenderer {
         // Carved stone canal banks + deep shadow lip
         drawLine(Color(0xFF141E30), p0, p1, strokeWidth = wPx * 1.32f, cap = androidx.compose.ui.graphics.StrokeCap.Round)
         drawLine(Color(0xFFD6CFC2), p0, p1, strokeWidth = wPx * 1.18f, cap = androidx.compose.ui.graphics.StrokeCap.Round)
+        with(ArchitectureSurfaceArt) { drawCanalBank(p0, p1, wPx * 1.18f, Offset(sx(0f), sy(0f, 0f)), zoom) }
         // Deep sapphire outer water
         drawLine(Color(0xFF0369A1), p0, p1, strokeWidth = wPx * 0.96f, cap = androidx.compose.ui.graphics.StrokeCap.Round)
         // Luminous turquoise-cyan inner current
@@ -1135,7 +1162,7 @@ object SanctuaryWorldRenderer {
       for (ty in 10..28) for (tx in 21..39) {
         val hash = ((tx * 73856093 xor ty * 19349663) and 0x7fffffff)
         drawImage(
-          image = tiles[hash % tiles.size],
+          image = ArtDepthAssets.tile(tiles, tx, ty),
           dstOffset = IntOffset(sx(tx * 64f).roundToInt(), sy(ty * 64f, 0f).roundToInt()),
           dstSize = IntSize(tw, th),
           filterQuality = FilterQuality.None,
@@ -1321,6 +1348,10 @@ object SanctuaryWorldRenderer {
       close()
     }
     drawPath(runner, Color(0xFF881337))
+    with(ArchitectureSurfaceArt) {
+      drawSurface("carpet", runner, Offset(sx(0f), sy(0f, 0f)),
+        Offset(.55f * zoom, 0f), Offset(0f, .55f * zoom * ObliqueCamera.OBLIQUE_Y_SCALE))
+    }
     drawPath(runner, Color(0xFFF5B841), style = Stroke(width = 2f * zoom))
   }
 
@@ -1340,8 +1371,11 @@ object SanctuaryWorldRenderer {
 
     // Front vertical ashlar stone cliff-wall under the gatehouse deck
     drawRect(Color(0xFF2E3038), Offset(platL, platB), Size(platW, 42f * zoom))
+    surfaceRect("limestone", Rect(platL, platB, platR, platB + 42f * zoom),
+      Offset(sx(0f), platB), zoom, ground = false, tone = 1)
     drawRect(Color(0xFF45413B), Offset(platL, platB), Size(platW, 42f * zoom), style = Stroke(width = 1.6f * zoom))
     drawRect(Color(0xFF3A3D4A), Offset(platL, platT), Size(platW, platH))
+    surfaceRect("limestone", Rect(platL, platT, platR, platB), Offset(sx(0f), sy(0f, 0f)), zoom, ground = true)
     drawRect(Color(0xFF1A1C24), Offset(platL, platT), Size(platW, platH), style = Stroke(width = 2f * zoom))
 
     // Stone slab grid lines on gate platform
@@ -1366,6 +1400,10 @@ object SanctuaryWorldRenderer {
       close()
     }
     drawPath(leftWingStairs, Color(0xFFB5B0A6))
+    with(ArchitectureSurfaceArt) {
+      drawSurface("limestone", leftWingStairs, Offset(sx(0f), sy(0f, 0f)),
+        Offset(.7f * zoom, 0f), Offset(0f, .7f * zoom * ObliqueCamera.OBLIQUE_Y_SCALE))
+    }
     drawPath(leftWingStairs, Color(0xFF3E3B36), style = Stroke(width = 1.5f * zoom))
 
     val rightWingStairs = Path().apply {
@@ -1376,6 +1414,10 @@ object SanctuaryWorldRenderer {
       close()
     }
     drawPath(rightWingStairs, Color(0xFFB5B0A6))
+    with(ArchitectureSurfaceArt) {
+      drawSurface("limestone", rightWingStairs, Offset(sx(0f), sy(0f, 0f)),
+        Offset(.7f * zoom, 0f), Offset(0f, .7f * zoom * ObliqueCamera.OBLIQUE_Y_SCALE))
+    }
     drawPath(rightWingStairs, Color(0xFF3E3B36), style = Stroke(width = 1.5f * zoom))
 
     // Center entrance steps
@@ -1475,6 +1517,8 @@ object SanctuaryWorldRenderer {
       topLeft = Offset(innerLeft, top0Y),
       size = innerSize,
     )
+    surfaceRect("limestone", Rect(Offset(innerLeft, top0Y), innerSize), Offset(cx, top0Y),
+      zoom, ground = false, tone = if (isWestSide) 0 else 1)
     // See drawFortressWall: geometry drawn in code needs its own night response, otherwise
     // it stays bright while the sky and grass go night-blue.
     with(HdrLightResponse) {
@@ -1539,6 +1583,8 @@ object SanctuaryWorldRenderer {
     // atlas entry, which is why repainting an asset did not change it.
     // Repainted to the P27B-V5 limestone family; geometry is untouched.
     drawPath(extFace, if (x0 < 1600f) Color(0xFFB9AF9C) else Color(0xFFAFA592))
+    surfaceFace(extFace, base0X, top0Y, base1X, top1Y, hypot(x1 - x0, y1 - y0), zoom,
+      if (x0 < 1600f) 0 else 1)
     // Night: this face is code, not a sprite, so it needs its own absorption or it stays
     // bright while the sky and grass go night-blue (debt C, resurfacing on the ring).
     with(HdrLightResponse) {
@@ -1629,6 +1675,7 @@ object SanctuaryWorldRenderer {
     // drawFortressWall). Charcoal here was what still showed as a dark band after the
     // atlas art was replaced, because this face is drawn in code, not from a PNG.
     drawPath(facePath, Color(0xFFB9AF9C))
+    surfaceFace(facePath, base0X, top0Y, base1X, top1Y, hypot(x1 - x0, y1 - y0), zoom, 0)
 
     // Recessed architectural wall panels & horizontal ashlar courses
     for (c in 1..4) {
@@ -1758,12 +1805,8 @@ object SanctuaryWorldRenderer {
       // AO under southern gate platform
       val gL = sx(1380f); val gR = sx(1840f); val gB = sy(2390f, 0f)
       drawOval(Color(0xFF060A14).copy(alpha = 0.36f), Offset(gL - 12f*zoom, gB - 6f*zoom), Size((gR-gL)+24f*zoom, 26f*zoom))
-      // Building foot AO — Tower Gate, Summoning Hall, Dorms, Armory, Synthesis, Restaurant
-      drawBuildingAO(sx(1960f)-50f*zoom, sy(635f,0f)-6f*zoom, 100f*zoom, 18f*zoom, alpha=0.32f)
-      drawBuildingAO(sx(2380f)-60f*zoom, sy(1930f,0f)-6f*zoom, 120f*zoom, 16f*zoom, alpha=0.30f)
-      drawBuildingAO(sx(1105f)-42f*zoom, sy(955f,0f)-5f*zoom, 84f*zoom, 14f*zoom, alpha=0.28f)
-      drawBuildingAO(sx(995f)-42f*zoom, sy(685f,0f)-5f*zoom, 84f*zoom, 14f*zoom, alpha=0.28f)
-      drawBuildingAO(sx(825f)-42f*zoom, sy(820f,0f)-5f*zoom, 84f*zoom, 14f*zoom, alpha=0.28f)
+      // Building contact belongs to drawProp at each live obstacle anchor.
+      // A second hardcoded AO list drifted away from moved doors/facades.
       // Tree canopy AO — oak/pine/sakura clusters produce rich darkening under foliage mass
       drawTreeCanopyAO(sx(750f), sy(920f,0f), 34f*zoom, 12f*zoom, alpha=0.28f)
       drawTreeCanopyAO(sx(1280f), sy(640f,0f), 28f*zoom, 10f*zoom, alpha=0.26f)

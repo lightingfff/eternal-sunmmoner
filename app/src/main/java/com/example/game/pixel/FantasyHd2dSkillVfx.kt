@@ -109,6 +109,9 @@ object FantasyHd2dSkillVfx {
       blendMode = BlendMode.Plus,
     )
 
+    // Authored execution clips are emitted by the simulation at contact/release.
+    // Keep the subtle foot light; avoid a second generic circle burst over the real effect.
+    if (!isMaster && TowerCombatFxAtlas.hasAuthoredExecution) return
     if (attackAnimProgress <= 0.04f && !skillAnimation) return
 
     // 2. Active Combat / Skill Expanding Foreshortened Runic Sigil on Ground
@@ -184,6 +187,7 @@ object FantasyHd2dSkillVfx {
     skillAnimation: Boolean,
     timeSec: Float,
   ) {
+    if (!isMaster && TowerCombatFxAtlas.hasAuthoredExecution) return
     if (attackAnimProgress <= 0.05f && !skillAnimation) return
 
     val pal = paletteFor(heroClass, isMaster)
