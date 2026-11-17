@@ -1,7 +1,14 @@
 package com.example.ui
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import com.example.data.model.HeroClassType
@@ -11,6 +18,7 @@ import com.example.game.pixel.SanctuaryArtAssets
 import com.example.ui.components.p28.ESHeroCard
 import com.example.ui.components.p28.ESLoadingOverlay
 import com.example.ui.components.p28.ESLoadingState
+import com.example.ui.components.p28.ESLoadingTips
 import com.example.ui.components.p28.ESP28Assets
 import com.example.ui.components.p28.GameNoticeUi
 import com.example.ui.components.p28.NoticeCenter
@@ -95,27 +103,94 @@ class P28ComponentsTest {
 
   // NOTE: this Compose test version forbids calling setContent twice per test,
   // so each loading state gets its own @Test (and its own compose rule).
-  @Test fun loadingOverlayShowsRealStageText() {
+  @Test fun loadingOverlayShowsRealStageAndAccurateTipWithoutFakeProgress() {
+    val tip = ESLoadingTips.all.first()
     rule.setContent {
-      ESLoadingOverlay(ESLoadingState.Indeterminate("Đang nạp bản đồ Tháp..."))
+      ESLoadingOverlay(ESLoadingState.Indeterminate("Đang nạp bản đồ Tháp...", tip = tip))
     }
-    rule.onNodeWithTag("es_loading_stage").assertExists()
+    rule.onNodeWithTag("es_loading_stage").assertExists().assert(
+      SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite),
+    )
     rule.onNodeWithText("Đang nạp bản đồ Tháp", substring = true).assertExists()
+    rule.onNodeWithTag("es_loading_tip_panel").assertExists()
+    rule.onNodeWithTag("es_loading_tip_heading").assertExists()
+    rule.onNodeWithTag("es_loading_tip").assertExists()
+    rule.onNodeWithText(tip).assertExists()
+    rule.onNodeWithTag("es_loading_progress_track").assertDoesNotExist()
   }
 
-  @Test fun loadingOverlayShowsErrorState() {
+  @Test fun loadingTipPoolCyclesThroughDistinctEntries() {
+    assertTrue("Keep at least four gameplay tips", ESLoadingTips.all.size >= 4)
+    assertTrue("Keep the verified infirmary route tip", ESLoadingTips.all.any { "Điều dưỡng" in it })
+    val selected = List(ESLoadingTips.all.size) { ESLoadingTips.next() }
+    assertEquals(ESLoadingTips.all.size, selected.toSet().size)
+    assertEquals(ESLoadingTips.all.toSet(), selected.toSet())
+  }
+
+  @Test fun loadingProgressSemanticsAndFillFollowOnlyTheMeasuredFraction() {
+    val measuredFraction = mutableStateOf(0f)
     rule.setContent {
-      ESLoadingOverlay(ESLoadingState.Failed("Không thể đọc dữ liệu lưu"))
+      ESLoadingOverlay(
+        ESLoadingState.Determinate(
+          stage = "Đang khôi phục hồ sơ...",
+          fraction = measuredFraction.value,
+          tip = ESLoadingTips.all.first(),
+        ),
+      )
     }
-    // Failed state renders the message on BOTH the stage tag and the error tag,
-    // so assert the tags here; text binding is covered by loadingOverlayShowsRealStageText.
-    rule.onNodeWithTag("es_loading_error").assertExists()
+
+    fun assertProgress(input: Float, expected: Float) {
+      rule.runOnIdle { measuredFraction.value = input }
+      rule.waitForIdle()
+      rule.onNodeWithTag("es_loading_progress_track").assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.ProgressBarRangeInfo,
+          ProgressBarRangeInfo(expected, 0f..1f),
+        ),
+      )
+      if (expected == 0f) {
+        rule.onNodeWithTag("es_loading_progress_fill").assertDoesNotExist()
+      } else {
+        val trackWidth = rule.onNodeWithTag("es_loading_progress_track")
+          .fetchSemanticsNode().boundsInRoot.width
+        val fillWidth = rule.onNodeWithTag("es_loading_progress_fill")
+          .fetchSemanticsNode().boundsInRoot.width
+        assertEquals("fill width follows the supplied measured fraction", expected, fillWidth / trackWidth, 0.02f)
+      }
+    }
+
+    assertProgress(0f, 0f)
+    assertProgress(0.62f, 0.62f)
+    assertProgress(1f, 1f)
+    assertProgress(Float.NaN, 0f)
+    assertProgress(-0.25f, 0f)
+    assertProgress(1.25f, 1f)
+  }
+
+  @Test fun loadingOverlayShowsOneAccessibleErrorDetailWithoutTipOrProgress() {
+    val message = "Không thể đọc dữ liệu lưu"
+    rule.setContent {
+      ESLoadingOverlay(ESLoadingState.Failed(message))
+    }
+    rule.onNodeWithText("Không thể tải dữ liệu").assertExists()
     rule.onNodeWithTag("es_loading_stage").assertExists()
+    rule.onNodeWithTag("es_loading_error_panel").assertExists()
+    rule.onNodeWithTag("es_loading_error").assertExists().assert(
+      SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite),
+    )
+    assertEquals(
+      "Error details should not be duplicated in the stage heading",
+      1,
+      rule.onAllNodesWithText(message).fetchSemanticsNodes().size,
+    )
+    rule.onNodeWithTag("es_loading_tip_panel").assertDoesNotExist()
+    rule.onNodeWithTag("es_loading_progress_track").assertDoesNotExist()
   }
 
   @Test fun loadingOverlayHiddenWhenHidden() {
     rule.setContent { ESLoadingOverlay(ESLoadingState.Hidden) }
     rule.onNodeWithTag("es_loading_stage").assertDoesNotExist()
+    rule.onNodeWithTag("es_loading_tip_panel").assertDoesNotExist()
   }
 
   @Test fun heroCardBindsNameAndRarityFromHeroRecord() {

@@ -176,6 +176,20 @@ class LivingExpeditionPlaythroughTest {
       if (courierChoice == CourierChoice.RECOVER_SUPPLIES && mission.choice != null && !supplyTripFinished &&
         !(intercepted && !protectedAfterScout)) {
         if (!mission.suppliesRecovered) {
+          // Clear threats around the courier before resuming the side trip. Combat
+          // orders intentionally interrupt supply navigation; don't leave the escort
+          // exposed to the crossing ambush while collecting the alternate reward.
+          val courierThreat = engine.enemies.filter { enemy ->
+            !enemy.dead && hypot(enemy.x - mission.courier.x, enemy.y - mission.courier.y) <= 500f
+          }.minByOrNull { enemy -> hypot(enemy.x - mission.courier.x, enemy.y - mission.courier.y) }
+          if (courierThreat != null) {
+            if (engine.designatedTargetId != courierThreat.id ||
+              engine.activeOrder !in setOf(TacticalOrder.ATTACK_TARGET, TacticalOrder.FOCUS_FIRE)) {
+              engine.onBattlefieldTapped(courierThreat.x, courierThreat.y)
+              engine.issueTacticalOrder(TacticalOrder.FOCUS_FIRE)
+            }
+            continue
+          }
           if (!engine.navigatingCourierSupplies && engine.navigateToCourierSupplies()) record("START_SUPPLY_TRAIL")
           if (engine.collectCourierSupplies()) record("SUPPLIES_PICKED_UP")
         } else if (!engine.navigatingCourierSupplies) {

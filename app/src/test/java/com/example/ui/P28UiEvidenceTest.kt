@@ -12,13 +12,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.example.data.model.HeroClassType
 import com.example.data.model.HeroRecord
@@ -27,6 +32,7 @@ import com.example.game.pixel.SanctuaryArtAssets
 import com.example.ui.components.p28.ESHeroCard
 import com.example.ui.components.p28.ESLoadingOverlay
 import com.example.ui.components.p28.ESLoadingState
+import com.example.ui.components.p28.ESLoadingTips
 import com.example.ui.components.p28.ESMiniHeroPortrait
 import com.example.ui.components.p28.ESNoticeStack
 import com.example.ui.components.HeroManagementDialog
@@ -36,6 +42,7 @@ import com.example.ui.components.p28.NoticeCenter
 import com.example.ui.components.p28.NoticePriority
 import java.io.File
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -98,6 +105,14 @@ class P28UiEvidenceTest {
     return { view }
   }
 
+  private fun assertWithinViewport(label: String, bounds: Rect, viewport: Rect) {
+    assertTrue(
+      "$label must fit wholly inside the viewport (content=$bounds, viewport=$viewport)",
+      bounds.left >= viewport.left && bounds.top >= viewport.top &&
+        bounds.right <= viewport.right && bounds.bottom <= viewport.bottom,
+    )
+  }
+
   @Test @Config(qualifiers = "w360dp-h640dp-port-xhdpi")
   fun heroCardPortrait() {
     val view = content {
@@ -141,20 +156,90 @@ class P28UiEvidenceTest {
 
   @Test @Config(qualifiers = "w360dp-h640dp-port-xhdpi")
   fun loadingOverlayPortrait() {
-    val view = content { ESLoadingOverlay(ESLoadingState.Determinate("Đang triệu hồi linh hồn...", 0.62f)) }
-    rule.onNodeWithTag("es_loading_stage").assertExists()
-    rule.onNodeWithText("Đang triệu hồi", substring = true).assertExists()
+    val tip = ESLoadingTips.all[0]
+    val view = content {
+      ESLoadingOverlay(ESLoadingState.Determinate("Đang triệu hồi linh hồn...", 0.62f, tip = tip))
+    }
+    val viewport = rule.onRoot().fetchSemanticsNode().boundsInRoot
+    val stageBounds = rule.onNodeWithTag("es_loading_stage")
+      .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+    val tipBounds = rule.onNodeWithTag("es_loading_tip_panel")
+      .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+    rule.onNodeWithText("Đang triệu hồi", substring = true).assertIsDisplayed()
+    rule.onNodeWithText(tip).assertIsDisplayed()
+    rule.onNodeWithTag("es_loading_progress_track").assertExists()
+    rule.onNodeWithTag("es_loading_progress_fill").assertExists()
+    assertWithinViewport("Portrait loading stage", stageBounds, viewport)
+    assertWithinViewport("Portrait gameplay tip", tipBounds, viewport)
     capture(view(), "loading_port_360")
   }
 
   @Test @Config(qualifiers = "w800dp-h360dp-land-xhdpi")
   fun loadingOverlayLandscape() {
-    val view = content { ESLoadingOverlay(ESLoadingState.Indeterminate("Đang đồng bộ dữ liệu người chơi...")) }
-    rule.onNodeWithText("đồng bộ", substring = true).assertExists()
+    val tip = ESLoadingTips.all[1]
+    val view = content {
+      ESLoadingOverlay(ESLoadingState.Indeterminate("Đang đồng bộ dữ liệu người chơi...", tip = tip))
+    }
+    val viewport = rule.onRoot().fetchSemanticsNode().boundsInRoot
+    val stageBounds = rule.onNodeWithTag("es_loading_stage")
+      .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+    val tipBounds = rule.onNodeWithTag("es_loading_tip_panel")
+      .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+    rule.onNodeWithText("đồng bộ", substring = true).assertIsDisplayed()
+    rule.onNodeWithText(tip).assertIsDisplayed()
+    rule.onNodeWithTag("es_loading_progress_track").assertDoesNotExist()
+    assertWithinViewport("Landscape loading stage", stageBounds, viewport)
+    assertWithinViewport("Landscape gameplay tip", tipBounds, viewport)
     capture(view(), "loading_land_800")
   }
 
+  @Test @Config(qualifiers = "w360dp-h640dp-port-xhdpi")
+  fun loadingOverlayErrorPortraitShowsDistinctAccessibleDetail() {
+    val message = "Không thể đọc dữ liệu lưu"
+    val view = content {
+      ESLoadingOverlay(ESLoadingState.Failed(message))
+    }
+    val viewport = rule.onRoot().fetchSemanticsNode().boundsInRoot
+    val stageBounds = rule.onNodeWithTag("es_loading_stage")
+      .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+    val errorBounds = rule.onNodeWithTag("es_loading_error_panel")
+      .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+    rule.onNodeWithText("Không thể tải dữ liệu").assertIsDisplayed()
+    rule.onNodeWithText(message).assertIsDisplayed()
+    rule.onNodeWithTag("es_loading_tip_panel").assertDoesNotExist()
+    rule.onNodeWithTag("es_loading_progress_track").assertDoesNotExist()
+    assertWithinViewport("Error loading stage", stageBounds, viewport)
+    assertWithinViewport("Error detail panel", errorBounds, viewport)
+    capture(view(), "loading_error_port_360")
+  }
 
+  @Test @Config(qualifiers = "w360dp-h640dp-port-xhdpi")
+  fun loadingOverlayLongGuestBootstrapCopyStaysVisibleAtLargeFontScale() {
+    val stage = "Đang triệu hồi Thánh Địa (The Sanctuary)... • " +
+      "Khôi phục Hồ Sơ Khách & dữ liệu Thánh Địa trên thiết bị • " +
+      "⚡ Chế độ Khách ngoại tuyến — đám mây chưa cấu hình"
+    val tip = ESLoadingTips.all[3]
+    val view = content {
+      val platformDensity = LocalDensity.current
+      CompositionLocalProvider(
+        LocalDensity provides Density(platformDensity.density, fontScale = 1.3f),
+      ) {
+        ESLoadingOverlay(ESLoadingState.Indeterminate(stage, tip = tip))
+      }
+    }
+
+    val root = rule.onRoot().fetchSemanticsNode().boundsInRoot
+    val stageBounds = rule.onNodeWithTag("es_loading_stage")
+      .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+    val tipBounds = rule.onNodeWithTag("es_loading_tip_panel")
+      .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+    rule.onNodeWithText(stage).assertIsDisplayed()
+    rule.onNodeWithText(tip).assertIsDisplayed()
+    rule.onNodeWithTag("es_loading_progress_track").assertDoesNotExist()
+    assertWithinViewport("Large-font bootstrap stage", stageBounds, root)
+    assertWithinViewport("Large-font gameplay tip", tipBounds, root)
+    capture(view(), "loading_guest_bootstrap_port_360_font130")
+  }
 
   @Test @Config(qualifiers = "w360dp-h640dp-port-xhdpi")
   fun heroManagementDialogWiresRealHeroCardsAndCallbacks() {
