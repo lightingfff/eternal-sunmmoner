@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -20,7 +21,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -42,6 +43,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ui.components.FantasySkin
+import com.example.ui.components.FantasySurface
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -112,7 +115,11 @@ fun ESLoadingOverlay(
   val tip = requestedTip?.takeIf { it.isNotBlank() } ?: fallbackTip
 
   BoxWithConstraints(
-    modifier = modifier.fillMaxSize().background(Color(0xFF0A0E18)),
+    modifier = modifier
+      .fillMaxSize()
+      // Do not forward touches to a route while its real loading state is visible.
+      .pointerInput(Unit) { awaitPointerEventScope { while (true) awaitPointerEvent() } }
+      .background(Color(0xFF0A0E18)),
   ) {
     val compact = maxHeight < 420.dp
     if (bg != null) {
@@ -213,15 +220,15 @@ fun ESLoadingOverlay(
 
       if (state is ESLoadingState.Failed) {
         Spacer(Modifier.height(10.dp))
-        Surface(
-          modifier = Modifier
-            .fillMaxWidth()
-            .testTag("es_loading_error_panel"),
+        FantasySurface(
+          modifier = Modifier.fillMaxWidth().testTag("es_loading_error_panel"),
           shape = CutCornerShape(
             topStart = 8.dp, topEnd = 2.dp, bottomEnd = 8.dp, bottomStart = 2.dp,
           ),
           color = Color(0xE6111823),
           border = BorderStroke(1.dp, ESTokens.DangerGarnet.copy(alpha = 0.82f)),
+          frameAssetId = FantasySkin.PanelFrameId,
+          compactFrame = true,
         ) {
           Text(
             text = state.message,
@@ -253,18 +260,42 @@ private fun ESLoadingTipPanel(
   compact: Boolean,
   largeFontScale: Boolean,
 ) {
-  Surface(
+  val panelShape = CutCornerShape(
+    topStart = 8.dp, topEnd = 2.dp, bottomEnd = 8.dp, bottomStart = 2.dp,
+  )
+
+  Box(
     modifier = Modifier
+      .widthIn(max = 480.dp)
       .fillMaxWidth()
+      .aspectRatio(2.6f)
       .testTag("es_loading_tip_panel"),
-    shape = CutCornerShape(
-      topStart = 8.dp, topEnd = 2.dp, bottomEnd = 8.dp, bottomStart = 2.dp,
-    ),
-    color = Color(0xE6111823),
-    border = BorderStroke(1.dp, ESTokens.AntiqueGold.copy(alpha = 0.78f)),
+    contentAlignment = Alignment.Center,
   ) {
+    FantasySurface(
+      modifier = Modifier.matchParentSize(),
+      shape = panelShape,
+      color = Color(0xE6111823),
+      border = if (ESP28Assets.image("loading_tip_frame") == null) {
+        BorderStroke(1.dp, ESTokens.AntiqueGold.copy(alpha = 0.78f))
+      } else {
+        null
+      },
+      frameAssetId = "loading_tip_frame",
+      frameCornerInset = 18.dp,
+      compactFrame = true,
+    ) {}
     Column(
-      modifier = Modifier.padding(horizontal = 14.dp, vertical = if (compact) 9.dp else 12.dp),
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(
+          horizontal = 36.dp,
+          vertical = when {
+            largeFontScale -> 2.dp
+            compact -> 4.dp
+            else -> 6.dp
+          },
+        ),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       Text(
@@ -284,7 +315,7 @@ private fun ESLoadingTipPanel(
       Text(
         text = tip,
         color = ESTokens.IvoryPaper,
-        style = if (compact) MaterialTheme.typography.bodySmall else MaterialTheme.typography.bodyMedium,
+        style = if (compact || largeFontScale) MaterialTheme.typography.bodySmall else MaterialTheme.typography.bodyMedium,
         textAlign = TextAlign.Center,
         // Avoid ellipsizing a gameplay tip solely because the system font is enlarged.
         maxLines = if (compact || largeFontScale) 3 else 2,

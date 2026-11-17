@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import com.example.game.pixel.SanctuaryArtAssets
+import com.example.ui.theme.ESDesignTokens
 import org.json.JSONObject
 
 /**
@@ -14,17 +15,17 @@ import org.json.JSONObject
  * the dark manhwa theme.
  */
 object ESTokens {
-  val InkBlack = Color(0xFF10131A)
-  val MidnightSlate = Color(0xFF1B2730)
+  val InkBlack = ESDesignTokens.backdrop
+  val MidnightSlate = ESDesignTokens.panelRaised
   val BronzeDeep = Color(0xFF4B362A)
-  val BronzeMid = Color(0xFF8C694B)
-  val AntiqueGold = Color(0xFFD9BD7A)
-  val IvoryPaper = Color(0xFFF0E8D8)
-  val FrostSilver = Color(0xFFB6C5CB)
-  val MysticCyan = Color(0xFF7CBFD3)
-  val QuietViolet = Color(0xFF9F91BF)
-  val DangerGarnet = Color(0xFFC96D70)
-  val SuccessSage = Color(0xFF92B49A)
+  val BronzeMid = ESDesignTokens.goldMuted
+  val AntiqueGold = ESDesignTokens.gold
+  val IvoryPaper = ESDesignTokens.textPrimary
+  val FrostSilver = ESDesignTokens.textSecondary
+  val MysticCyan = ESDesignTokens.cyan
+  val QuietViolet = ESDesignTokens.violet
+  val DangerGarnet = ESDesignTokens.danger
+  val SuccessSage = ESDesignTokens.success
   val DarkText = Color(0xFF2E3438)
 
   val spaceXs = 4.dp

@@ -25,7 +25,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.example.data.model.HeroClassType
 import com.example.data.model.HeroRecord
 import com.example.game.pixel.PremiumPortraits
+import com.example.ui.theme.ESDesignTokens
 
 /**
  * P28 hero card — the full portrait card (REF-01 language, original art).
@@ -70,15 +73,16 @@ fun ESHeroCard(
       .aspectRatio(2f / 3f)
       .shadow(if (selected) 6.dp else 2.dp, RoundedCornerShape(10.dp))
       .clip(RoundedCornerShape(10.dp))
-      .clickable(enabled = !injured) { onClick() }
+      .clickable(enabled = !injured, role = Role.Button) { onClick() }
       .then(
         if (selected) Modifier.border(2.dp, ESTokens.AntiqueGold, RoundedCornerShape(10.dp))
         else Modifier
       )
       .semantics {
+        this.selected = selected
         contentDescription =
           "${hero.name}, cấp ${hero.level}, $rarity sao, ${hero.classType.labelVi}" +
-            if (injured) ", đang dưỡng thương" else ""
+            if (injured) ", đang dưỡng thương, không thể xuất trận" else if (selected) ", đang trong đội" else ""
       },
   ) {
     if (backdrop != null) {
@@ -103,6 +107,20 @@ fun ESHeroCard(
           text = hero.classType.labelVi.firstOrNull()?.toString() ?: "?",
           color = ESTokens.FrostSilver.copy(alpha = 0.8f),
           style = MaterialTheme.typography.displaySmall,
+        )
+      }
+    }
+    if (injured) {
+      Box(
+        modifier = Modifier.fillMaxSize().background(ESDesignTokens.scrim.copy(alpha = 0.58f)),
+        contentAlignment = Alignment.Center,
+      ) {
+        Text(
+          "DƯỠNG\nTHƯƠNG",
+          color = ESDesignTokens.warning,
+          style = MaterialTheme.typography.labelMedium,
+          maxLines = 2,
+          fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
         )
       }
     }

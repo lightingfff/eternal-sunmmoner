@@ -1,5 +1,8 @@
 package com.example.ui.screens
 
+import com.example.ui.components.FantasyIconButton
+import com.example.ui.components.FantasySurface
+import com.example.ui.components.FantasyChoiceButton
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,10 +35,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -78,12 +78,9 @@ import com.example.performance.SceneFrameLoop
 import com.example.ui.components.FantasyButton as Button
 import com.example.ui.components.FantasySkin
 import com.example.ui.theme.ArcaneViolet
-import com.example.ui.theme.CrimsonBlood
-import com.example.ui.theme.EmeraldVitality
+import com.example.ui.theme.ESDesignTokens
 import com.example.ui.theme.ObsidianVoid
-import com.example.ui.theme.ParchmentLight
 import com.example.ui.theme.PortalCyan
-import com.example.ui.theme.RuneSilver
 import com.example.ui.theme.SummonerGold
 import kotlin.math.PI
 import kotlin.math.cos
@@ -125,7 +122,7 @@ fun AuthGateScreen(
   BoxWithConstraints(
     modifier = Modifier
       .fillMaxSize()
-      .background(Color(0xFF091526)),
+      .background(ESDesignTokens.backdrop),
   ) {
     val isLandscape = maxWidth > maxHeight
 
@@ -169,20 +166,20 @@ fun AuthGateScreen(
         .windowInsetsPadding(WindowInsets.safeDrawing)
         .padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
-      IconButton(
+      FantasyIconButton(
         onClick = onOpenSettings,
         modifier = Modifier
           .align(Alignment.TopEnd)
           .size(48.dp)
           .clip(RoundedCornerShape(12.dp))
-          .background(Color(0xC20E1E36))
-          .border(1.2.dp, PortalCyan.copy(alpha = 0.80f), RoundedCornerShape(12.dp))
+          .background(ESDesignTokens.panelRaised.copy(alpha = 0.76f))
+          .border(1.2.dp, ESDesignTokens.cyan.copy(alpha = 0.80f), RoundedCornerShape(12.dp))
           .testTag("login_settings_button"),
       ) {
         Icon(
           imageVector = Icons.Default.Settings,
           contentDescription = "Cài đặt & Tài khoản",
-          tint = SummonerGold,
+          tint = ESDesignTokens.gold,
         )
       }
     }
@@ -200,38 +197,49 @@ fun AuthGateScreen(
           modifier = Modifier.weight(1.05f),
           verticalArrangement = Arrangement.Center,
         ) {
-          Surface(
-            shape = RoundedCornerShape(8.dp),
-            color = Color(0xB80B1B32),
-            modifier = Modifier.border(1.dp, PortalCyan.copy(alpha = 0.78f), RoundedCornerShape(8.dp)),
+          FantasySurface(
+            modifier = Modifier
+              .fillMaxWidth()
+              .border(1.dp, ESDesignTokens.cyan.copy(alpha = 0.62f), RoundedCornerShape(16.dp)),
+            shape = RoundedCornerShape(16.dp),
+            color = ESDesignTokens.panel,
+            frameCornerInset = 16.dp,
           ) {
-            Row(
-              modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-              verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.spacedBy(6.dp),
+            Column(
+              modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
+              verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-              Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = PortalCyan, modifier = Modifier.size(16.dp))
+              Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+              ) {
+                Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = ESDesignTokens.cyan, modifier = Modifier.size(16.dp))
+                Text(
+                  text = "SYSTEM AWAKENING • DARK FANTASY 2.5D",
+                  style = MaterialTheme.typography.labelSmall,
+                  color = ESDesignTokens.cyan,
+                  fontWeight = FontWeight.Bold,
+                  maxLines = 1,
+                  overflow = TextOverflow.Ellipsis,
+                )
+              }
               Text(
-                text = "[ SYSTEM AWAKENING • DARK FANTASY 2.5D ]",
-                style = MaterialTheme.typography.labelSmall,
-                color = PortalCyan,
-                fontWeight = FontWeight.Bold,
+                text = "ETERNAL SUMMONER",
+                style = MaterialTheme.typography.displaySmall,
+                color = ESDesignTokens.gold,
+                fontWeight = FontWeight.ExtraBold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+              )
+              Text(
+                text = stringResource(id = R.string.auth_subtitle),
+                style = MaterialTheme.typography.bodyMedium,
+                color = ESDesignTokens.textPrimary,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
               )
             }
           }
-          Spacer(modifier = Modifier.height(8.dp))
-          Text(
-            text = "ETERNAL SUMMONER",
-            style = MaterialTheme.typography.displaySmall,
-            color = SummonerGold,
-            fontWeight = FontWeight.ExtraBold,
-          )
-          Spacer(modifier = Modifier.height(6.dp))
-          Text(
-            text = stringResource(id = R.string.auth_subtitle),
-            style = MaterialTheme.typography.bodyMedium,
-            color = ParchmentLight,
-          )
         }
 
         AuthSignInCard(
@@ -549,7 +557,7 @@ private fun AuthSignInCard(
   modifier: Modifier = Modifier,
   showFullCrestHeader: Boolean = false,
 ) {
-  Surface(
+  FantasySurface(
     modifier = modifier
       .drawWithContent {
         drawContent()
@@ -559,8 +567,8 @@ private fun AuthSignInCard(
         val pad = 4.dp.toPx()
         val w = size.width
         val h = size.height
-        val glowCol = PortalCyan.copy(alpha = 0.88f)
-        val goldCol = SummonerGold.copy(alpha = 0.92f)
+        val glowCol = ESDesignTokens.cyan.copy(alpha = 0.88f)
+        val goldCol = ESDesignTokens.gold.copy(alpha = 0.92f)
 
         // Top-Left Bracket
         drawLine(glowCol, Offset(pad, pad), Offset(pad + bracketLen, pad), strokeW)
@@ -581,7 +589,7 @@ private fun AuthSignInCard(
           brush = Brush.verticalGradient(
             colors = listOf(
               Color.Transparent,
-              PortalCyan.copy(alpha = 0.10f),
+              ESDesignTokens.cyan.copy(alpha = 0.10f),
               Color.Transparent,
             ),
             startY = (scanY - 24f).coerceAtLeast(0f),
@@ -592,9 +600,9 @@ private fun AuthSignInCard(
           cornerRadius = CornerRadius(22.dp.toPx(), 22.dp.toPx()),
         )
       }
-      .border(1.5.dp, PortalCyan.copy(alpha = 0.78f), RoundedCornerShape(22.dp)),
+      .border(1.5.dp, ESDesignTokens.cyan.copy(alpha = 0.78f), RoundedCornerShape(22.dp)),
     shape = RoundedCornerShape(22.dp),
-    color = Color(0xD40B1A30),
+    color = ESDesignTokens.panel,
     tonalElevation = 12.dp,
   ) {
     Column(
@@ -604,21 +612,21 @@ private fun AuthSignInCard(
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       // Manhwa System Awakening Header Strip
-      Surface(
+      FantasySurface(
         shape = RoundedCornerShape(8.dp),
-        color = Color(0x98102644),
-        modifier = Modifier.border(1.dp, PortalCyan.copy(alpha = 0.65f), RoundedCornerShape(8.dp)),
+        color = ESDesignTokens.panelRaised.copy(alpha = 0.60f),
+        modifier = Modifier.border(1.dp, ESDesignTokens.cyan.copy(alpha = 0.65f), RoundedCornerShape(8.dp)),
       ) {
         Row(
           modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-          Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = PortalCyan, modifier = Modifier.size(14.dp))
+          Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = ESDesignTokens.cyan, modifier = Modifier.size(14.dp))
           Text(
             text = "SYSTEM NOTIFICATION • KHỞI ĐỘNG HỆ THỐNG",
             style = MaterialTheme.typography.labelSmall,
-            color = PortalCyan,
+            color = ESDesignTokens.cyan,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
           )
@@ -630,7 +638,7 @@ private fun AuthSignInCard(
         Text(
           text = "ETERNAL SUMMONER",
           style = MaterialTheme.typography.headlineMedium,
-          color = SummonerGold,
+          color = ESDesignTokens.gold,
           fontWeight = FontWeight.ExtraBold,
           textAlign = TextAlign.Center,
         )
@@ -638,7 +646,7 @@ private fun AuthSignInCard(
         Text(
           text = stringResource(id = R.string.auth_subtitle),
           style = MaterialTheme.typography.bodySmall,
-          color = RuneSilver,
+          color = ESDesignTokens.textSecondary,
           textAlign = TextAlign.Center,
         )
         Spacer(modifier = Modifier.height(10.dp))
@@ -650,8 +658,8 @@ private fun AuthSignInCard(
         modifier = Modifier
           .fillMaxWidth()
           .clip(RoundedCornerShape(12.dp))
-          .background(Color(0xA4132846))
-          .border(1.dp, PortalCyan.copy(alpha = 0.52f), RoundedCornerShape(12.dp))
+          .background(ESDesignTokens.panelHighlight.copy(alpha = 0.64f))
+          .border(1.dp, ESDesignTokens.cyan.copy(alpha = 0.52f), RoundedCornerShape(12.dp))
           .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -659,7 +667,7 @@ private fun AuthSignInCard(
         Icon(
           imageVector = Icons.Default.Shield,
           contentDescription = null,
-          tint = if (hasExistingGuestSave) EmeraldVitality else SummonerGold,
+          tint = if (hasExistingGuestSave) ESDesignTokens.success else ESDesignTokens.gold,
           modifier = Modifier.size(20.dp),
         )
         Text(
@@ -669,7 +677,7 @@ private fun AuthSignInCard(
             "[THỨC TỈNH] Bước vào Thánh Địa ngay với Hồ Sơ Khách hoặc đồng bộ Khế Ước Google Cloud."
           },
           style = MaterialTheme.typography.bodySmall,
-          color = ParchmentLight,
+          color = ESDesignTokens.textPrimary,
         )
       }
 
@@ -678,7 +686,7 @@ private fun AuthSignInCard(
         Text(
           text = errorMessage,
           style = MaterialTheme.typography.bodySmall,
-          color = CrimsonBlood,
+          color = ESDesignTokens.danger,
           textAlign = TextAlign.Center,
         )
       }
@@ -695,7 +703,7 @@ private fun AuthSignInCard(
           .testTag("continue_as_guest_button"),
         shape = RoundedCornerShape(12.dp),
         colors = FantasySkin.buttonColors(
-          containerColor = SummonerGold,
+          containerColor = ESDesignTokens.gold,
           contentColor = ObsidianVoid,
         ),
       ) {
@@ -703,9 +711,9 @@ private fun AuthSignInCard(
         Spacer(modifier = Modifier.width(6.dp))
         Text(
           text = if (hasExistingGuestSave) {
-            "Continue as Guest • Tiếp Tục Hồ Sơ Khách"
+            "Tiếp tục hồ sơ khách"
           } else {
-            "Continue as Guest • Chơi Ngay (Khách)"
+            "Chơi ngay • Hồ sơ khách"
           },
           style = MaterialTheme.typography.labelLarge,
           fontWeight = FontWeight.Bold,
@@ -717,7 +725,7 @@ private fun AuthSignInCard(
       Spacer(modifier = Modifier.height(10.dp))
 
       // 2. GOOGLE CLOUD SIGN-IN
-      OutlinedButton(
+      FantasyChoiceButton(
         onClick = onGoogleSignInClick,
         enabled = !isLoading,
         modifier = Modifier
@@ -729,16 +737,16 @@ private fun AuthSignInCard(
         if (isLoading) {
           CircularProgressIndicator(
             modifier = Modifier.size(20.dp),
-            color = PortalCyan,
+            color = ESDesignTokens.cyan,
             strokeWidth = 2.4.dp,
           )
         } else {
-          Icon(Icons.Default.CloudSync, contentDescription = null, tint = PortalCyan, modifier = Modifier.size(18.dp))
+          Icon(Icons.Default.CloudSync, contentDescription = null, tint = ESDesignTokens.cyan, modifier = Modifier.size(18.dp))
           Spacer(modifier = Modifier.width(6.dp))
           Text(
-            text = "Sign in with Google • Đồng Bộ Đám Mây",
+            text = "Đăng nhập Google • Đồng bộ đám mây",
             style = MaterialTheme.typography.labelLarge,
-            color = ParchmentLight,
+            color = ESDesignTokens.textPrimary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
           )

@@ -1,7 +1,7 @@
 {
  "pack": "ui_p28",
- "version": 1,
- "note": "Original P28 'Astral Reliquary' UI assets. AI-generated art (generate_image) post-processed for alpha/size; silver/obsidian frames and progress/buttons/icons are procedural derivatives drawn with PIL. No reference artwork, faces, names, logos or text baked in. Text/rarity/stats always rendered from game state in code.",
+ "version": 2,
+ "note": "Original P28 'Astral Reliquary' UI assets. AI-generated art is post-processed for alpha/size; some frames, progress elements and icons are procedural derivatives. No reference artwork, faces, names, logos or text are baked in. UI labels, rarity and stats are rendered from live game state.",
  "assets": {
   "card_frame_bronze": {
    "id": "card_frame_bronze",
@@ -126,6 +126,28 @@
    "sha256": "21706825a10630e779400718929604119e8f429fcb68b6c4f82dd16566f8427f",
    "method": "ai-generated original (post-processed alpha/resize)"
   },
+  "loading_tip_frame": {
+   "id": "loading_tip_frame",
+   "path": "ui_p28/loading/loading_tip_frame.png",
+   "use": "transparent frame behind live loading tip text",
+   "width": 576,
+   "height": 192,
+   "transparency": true,
+   "sha256": "b80025cee9a2924f812c622d718e213f248f44760afe4e9cc122a87943039d42",
+   "method": "AI-generated original (checkerboard removed, alpha processed and resized)",
+   "nineSliceInsetPx": 56
+  },
+  "global_panel_frame": {
+   "id": "global_panel_frame",
+   "path": "ui_p28/chrome/global_panel_frame.png",
+   "use": "shared transparent frame for Lobby, Tower and management panels",
+   "width": 576,
+   "height": 384,
+   "transparency": true,
+   "sha256": "2e0a29ad6d95dc820bebab2889e8a8f4be812dd2c2d91ec05dd91addf6d8a944",
+   "method": "AI-generated original; chroma-keyed to alpha and resized",
+   "nineSliceInsetPx": 56
+  },
   "progress_track": {
    "id": "progress_track",
    "path": "ui_p28/loading/progress_track.png",
@@ -151,24 +173,24 @@
   "button_primary": {
    "id": "button_primary",
    "path": "ui_p28/controls/button_primary.png",
-   "use": "9-slice primary button face",
-   "width": 288,
-   "height": 96,
+   "use": "9-slice gold action button behind live Compose label",
+   "width": 576,
+   "height": 192,
    "transparency": true,
-   "sha256": "f965f364979c7595b0628ca25077e49acd891a4292b8252a9feea1de9c5a9053",
-   "method": "procedural (PIL vector draw)",
-   "nineSliceInsetPx": 24
+   "sha256": "3d7ff214a05aebad1bf6b7bed377f4920d8948f59477c10216384098bff89485",
+   "method": "AI-generated original; chroma-keyed to alpha and resized",
+   "nineSliceInsetPx": 56
   },
   "button_secondary": {
    "id": "button_secondary",
    "path": "ui_p28/controls/button_secondary.png",
-   "use": "9-slice secondary button face",
-   "width": 288,
-   "height": 96,
+   "use": "9-slice violet choice button behind live Compose label",
+   "width": 576,
+   "height": 192,
    "transparency": true,
-   "sha256": "c723d2ff020a6ba8bf5654221835887dfbbf074c684a922379754dadf31799d7",
-   "method": "procedural (PIL vector draw)",
-   "nineSliceInsetPx": 24
+   "sha256": "ed0a005505aebb2c839d637587dee7e3d6b6ff81a154758d702404214ae39b3f",
+   "method": "AI-generated original; chroma-keyed to alpha and resized",
+   "nineSliceInsetPx": 56
   },
   "icon_event": {
    "id": "icon_event",

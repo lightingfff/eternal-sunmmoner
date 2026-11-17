@@ -1,5 +1,9 @@
 package com.example.ui.screens
 
+import com.example.ui.components.FantasyTextButton
+import com.example.ui.components.FantasyIconButton
+import com.example.ui.components.FantasySurface
+import com.example.ui.components.FantasyChoiceButton
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.offset
@@ -53,14 +57,10 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -195,9 +195,15 @@ fun FloorSelectionScreen(
     }
     if (playing) {
       // Only a small optional skip control. The architecture and effects stay unobscured.
-      Text("Bỏ qua ›", color = ParchmentLight, modifier = Modifier.align(Alignment.TopEnd)
-        .windowInsetsPadding(WindowInsets.safeDrawing).padding(12.dp)
-        .testTag("skip_gate_cutscene_button").clickable { playing = false }.padding(12.dp))
+      FantasyTextButton(
+        onClick = { playing = false },
+        modifier = Modifier.align(Alignment.TopEnd)
+          .windowInsetsPadding(WindowInsets.safeDrawing).padding(12.dp)
+          .testTag("skip_gate_cutscene_button"),
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp),
+      ) {
+        Text("Bỏ qua ›", color = ParchmentLight, style = MaterialTheme.typography.bodyLarge)
+      }
     } else {
       val density = LocalDensity.current
       val viewport = GateMapViewport(with(density) { maxWidth.toPx() }, with(density) { maxHeight.toPx() })
@@ -213,12 +219,12 @@ fun FloorSelectionScreen(
     }
     if (selectedGate != null) {
       Dialog(onDismissRequest = { selectedGateId = null }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Surface(Modifier.fillMaxWidth(.92f).fillMaxHeight(.88f).widthIn(max = 850.dp)
+        FantasySurface(Modifier.fillMaxWidth(.92f).fillMaxHeight(.88f).widthIn(max = 850.dp)
           .testTag("nexus_floor_picker"), color = Color(0xF20C1C2D), shape = RoundedCornerShape(18.dp)) {
           Column(Modifier.padding(16.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
               Text(selectedGate.shortVi, color = selectedGate.primaryColor, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
-              IconButton(onClick = { selectedGateId = null }, modifier = Modifier.testTag("close_nexus_floor_picker")) {
+              FantasyIconButton(onClick = { selectedGateId = null }, modifier = Modifier.testTag("close_nexus_floor_picker")) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Trở lại ba cổng", tint = ParchmentLight)
               }
             }
@@ -229,8 +235,16 @@ fun FloorSelectionScreen(
             }) }
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
               listOf("Tất cả", "Thám thính", "Phòng thủ", "Thủ lĩnh").forEachIndexed { index, title ->
-                OutlinedButton(onClick = { activeTab = index }, modifier = Modifier.testTag("portal_tab_$index")) {
-                  Text(title, color = if (activeTab == index) selectedGate.primaryColor else ParchmentLight)
+                FantasyChoiceButton(
+                  onClick = { activeTab = index },
+                  selected = activeTab == index,
+                  modifier = Modifier.testTag("portal_tab_$index"),
+                  contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                ) {
+                  Text(
+                    title,
+                    color = if (activeTab == index) selectedGate.primaryColor else ParchmentLight,
+                  )
                 }
               }
             }
@@ -243,7 +257,7 @@ fun FloorSelectionScreen(
             LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
               items(floors, key = { it.floorNumber }) { floor ->
                 val unlocked = floor.floorNumber <= highestCleared + 1
-                Surface(Modifier.fillMaxWidth().testTag("floor_card_${floor.floorNumber}")
+                FantasySurface(Modifier.fillMaxWidth().testTag("floor_card_${floor.floorNumber}")
                   .clickable(enabled = unlocked) { onSelectFloor(floor) }, color = Color(0xFF172B40), shape = RoundedCornerShape(12.dp)) {
                   FloorDetailsBody(floor, unlocked, selectedGate.primaryColor, { onSelectFloor(floor) }, Modifier.padding(12.dp))
                 }
@@ -283,7 +297,7 @@ private fun FloorBannerBox(
         ),
     )
 
-    Surface(
+    FantasySurface(
       shape = RoundedCornerShape(8.dp),
       color = Color(0xB80E203A),
       modifier = Modifier
@@ -323,7 +337,7 @@ private fun FloorBannerBox(
       }
     }
 
-    Surface(
+    FantasySurface(
       shape = RoundedCornerShape(8.dp),
       color = Color(0xB80E203A),
       modifier = Modifier
@@ -398,7 +412,7 @@ private fun FloorDetailsBody(
       verticalArrangement = Arrangement.spacedBy(5.dp),
     ) {
       floor.knownMonstersVi.forEach { monsterName ->
-        Surface(
+        FantasySurface(
           shape = RoundedCornerShape(6.dp),
           color = Color(0x981A2C48),
           modifier = Modifier.border(1.dp, CrimsonBlood.copy(alpha = 0.55f), RoundedCornerShape(6.dp)),
@@ -519,7 +533,7 @@ fun SquadPreparationScreen(
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       // Compact Responsive Top Bar (Zero text wrapping on 360dp phones!)
-      Surface(
+      FantasySurface(
         shape = RoundedCornerShape(14.dp),
         color = Color(0xC4132238),
         modifier = Modifier
@@ -532,7 +546,7 @@ fun SquadPreparationScreen(
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-          IconButton(
+          FantasyIconButton(
             onClick = onBack,
             modifier = Modifier.size(48.dp).testTag("back_to_floors_button"),
           ) {
@@ -560,7 +574,7 @@ fun SquadPreparationScreen(
             )
           }
 
-          OutlinedButton(
+          FantasyChoiceButton(
             onClick = { onOpenFacility(FacilityType.ARMORY) },
             modifier = Modifier.heightIn(min = 48.dp).testTag("prep_open_armory_button"),
             shape = RoundedCornerShape(10.dp),
@@ -573,7 +587,7 @@ fun SquadPreparationScreen(
             }
           }
 
-          OutlinedButton(
+          FantasyChoiceButton(
             onClick = { onOpenFacility(FacilityType.HERO_QUARTERS) },
             modifier = Modifier.heightIn(min = 48.dp).testTag("prep_open_quarters_button"),
             shape = RoundedCornerShape(10.dp),
@@ -604,7 +618,7 @@ fun SquadPreparationScreen(
             .weight(1f),
           horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-          Surface(
+          FantasySurface(
             shape = RoundedCornerShape(16.dp),
             color = FantasySkin.Panel.copy(alpha = 0.93f),
             modifier = Modifier
@@ -699,7 +713,7 @@ fun SquadPreparationScreen(
         }
       } else {
         // Narrow Portrait: Stacked Briefing Card + Weighted Roster List!
-        Surface(
+        FantasySurface(
           shape = RoundedCornerShape(14.dp),
           color = FantasySkin.Panel.copy(alpha = 0.93f),
           modifier = Modifier
@@ -806,7 +820,7 @@ private fun SquadHeroRosterList(
       val weapon = state.equipment.firstOrNull { it.id == hero.equippedWeaponId }
       val armor = state.equipment.firstOrNull { it.id == hero.equippedArmorId }
 
-      Surface(
+      FantasySurface(
         shape = RoundedCornerShape(12.dp),
         color = if (selected) Color(0xC81C2E50) else Color(0xAD15253E),
         modifier = Modifier

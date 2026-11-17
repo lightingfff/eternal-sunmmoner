@@ -1,5 +1,9 @@
 package com.example.ui.screens
 
+import com.example.ui.components.FantasyTextButton
+import com.example.ui.components.FantasyIconButton
+import com.example.ui.components.FantasySurface
+import com.example.ui.components.FantasyChoiceButton
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -38,16 +42,11 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Bolt
 import com.example.ui.components.FantasyButton as Button
 import com.example.ui.components.FantasySkin
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,7 +55,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -76,7 +74,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -114,6 +114,7 @@ import com.example.ui.components.p28.ESNoticeFrame
 import com.example.ui.components.p28.NoticePriority
 import com.example.ui.components.VirtualTouchJoystick
 import com.example.ui.theme.ArcaneViolet
+import com.example.ui.theme.ESDesignTokens
 import com.example.ui.theme.BorderRune
 import com.example.ui.theme.CrimsonBlood
 import com.example.ui.theme.EmeraldVitality
@@ -219,7 +220,7 @@ fun HeroAgencyAlertCard(
   onDismiss: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
-  Surface(
+  FantasySurface(
     modifier = modifier.testTag("hero_agency_alert").border(1.dp, Color(0xFFC9BEA2), RoundedCornerShape(8.dp)),
     shape = RoundedCornerShape(8.dp), color = Color(0xEE141519),
   ) {
@@ -229,13 +230,13 @@ fun HeroAgencyAlertCard(
       Text(message, color = Color(0xFFF4F0E4), style = MaterialTheme.typography.labelSmall,
         maxLines = 2, overflow = TextOverflow.Ellipsis)
       Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-        TextButton(onClick = onRegroup, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("hero_alert_regroup"),
+        FantasyTextButton(onClick = onRegroup, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("hero_alert_regroup"),
           contentPadding = PaddingValues(horizontal = 2.dp, vertical = 2.dp)) { Text("Tập hợp", style = MaterialTheme.typography.labelSmall, maxLines = 1) }
-        TextButton(onClick = onProtect, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("hero_alert_protect"),
+        FantasyTextButton(onClick = onProtect, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("hero_alert_protect"),
           contentPadding = PaddingValues(horizontal = 2.dp, vertical = 2.dp)) { Text("Bảo vệ", style = MaterialTheme.typography.labelSmall, maxLines = 1) }
-        TextButton(onClick = onRetreat, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("hero_alert_retreat"),
+        FantasyTextButton(onClick = onRetreat, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("hero_alert_retreat"),
           contentPadding = PaddingValues(horizontal = 2.dp, vertical = 2.dp)) { Text("Rút lui", style = MaterialTheme.typography.labelSmall, maxLines = 1) }
-        TextButton(onClick = onDismiss, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("hero_alert_dismiss"),
+        FantasyTextButton(onClick = onDismiss, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("hero_alert_dismiss"),
           contentPadding = PaddingValues(horizontal = 2.dp, vertical = 2.dp)) { Text("Đóng", style = MaterialTheme.typography.labelSmall, maxLines = 1) }
       }
     }
@@ -805,11 +806,11 @@ fun TowerBattleScreen(
             drawLine(PortalCyan,Offset(sx-10f*zoom,sy),Offset(sx+10f*zoom,sy),2f*zoom)
             drawLine(PortalCyan,Offset(sx,sy-7f*zoom),Offset(sx,sy+7f*zoom),2f*zoom)
             val label = textMeasurer.measure(fieldTarget?.labelVi ?: if(journey.canInteract) "Khảo sát tại đây" else "Lối tới mục tiêu",
-              style=TextStyle(color=PortalCyan,fontSize=9.5.sp,fontWeight=FontWeight.Bold))
+              style=TextStyle(color=ESDesignTokens.cyan,fontSize=9.5.sp,fontWeight=FontWeight.Bold))
             val ly=sy-46f*zoom
             if(ly in (topHudSafePx+8f)..(size.height-96f)) {
               val lx=(sx-label.size.width/2f).coerceIn(12f,(size.width-label.size.width-12f).coerceAtLeast(12f))
-              drawRoundRect(Color(0xDD0D1322),Offset(lx-6f,ly-2f),Size(label.size.width+12f,label.size.height+4f),CornerRadius(6f,6f))
+              drawRoundRect(ESDesignTokens.panelInset.copy(alpha = 0.94f),Offset(lx-6f,ly-2f),Size(label.size.width+12f,label.size.height+4f),CornerRadius(6f,6f))
               drawText(label,topLeft=Offset(lx,ly))
             }
           }
@@ -825,10 +826,10 @@ fun TowerBattleScreen(
           drawLine(SummonerGold,Offset(sx-8f*zoom,sy),Offset(sx+8f*zoom,sy),2f*zoom)
           drawLine(SummonerGold,Offset(sx,sy-6f*zoom),Offset(sx,sy+6f*zoom),2f*zoom)
           val label = textMeasurer.measure("Tiếp vận • tới gần rồi thu hồi",
-            style = TextStyle(color=SummonerGold,fontSize=9.5.sp,fontWeight=FontWeight.Bold))
+            style = TextStyle(color=ESDesignTokens.gold,fontSize=9.5.sp,fontWeight=FontWeight.Bold))
           val ly = sy - 42f*zoom
           if (sx in 18f..(size.width-18f) && ly in (topHudSafePx+8f)..(size.height-96f)) {
-            drawRoundRect(Color(0xDD0D1322),Offset(sx-label.size.width/2f-6f,ly-2f),
+            drawRoundRect(ESDesignTokens.panelInset.copy(alpha = 0.94f),Offset(sx-label.size.width/2f-6f,ly-2f),
               Size(label.size.width+12f,label.size.height+4f),CornerRadius(6f,6f))
             drawText(label,topLeft=Offset(sx-label.size.width/2f,ly))
           }
@@ -840,13 +841,13 @@ fun TowerBattleScreen(
         val nx = ObliqueCamera.worldToScreenX(node.x, camX, zoom, halfW)
         val ny = ObliqueCamera.worldToScreenY(node.y, camY, zoom, halfH, elevationZ = 62f)
         if (nx in 18f..(size.width - 18f) && ny in (topHudSafePx + 8f)..(size.height - 96f)) {
-          val badgeColor = if (node.kind == DiscoveryNodeKind.HEALING_SHRINE) EmeraldVitality else SummonerGold
+          val badgeColor = if (node.kind == DiscoveryNodeKind.HEALING_SHRINE) ESDesignTokens.success else ESDesignTokens.gold
           val measured = textMeasurer.measure(
             text = "✦ ${node.titleVi}",
             style = TextStyle(color = badgeColor, fontSize = 9.5.sp, fontWeight = FontWeight.Bold),
           )
           drawRoundRect(
-            color = Color(0x9E12243E),
+            color = ESDesignTokens.panelInset.copy(alpha = 0.94f),
             topLeft = Offset(nx - measured.size.width / 2f - 6f, ny - 2f),
             size = Size(measured.size.width + 12f, measured.size.height + 4f),
             cornerRadius = CornerRadius(6f, 6f),
@@ -861,10 +862,10 @@ fun TowerBattleScreen(
         if (bx in -80f..(size.width + 80f) && by in 24f..size.height) {
           val measured = textMeasurer.measure(
             text = "★ BOSS: ${boss.archetype.nameVi}",
-            style = TextStyle(color = Color(0xFFFDA4AF), fontSize = 11.sp, fontWeight = FontWeight.ExtraBold),
+            style = TextStyle(color = ESDesignTokens.danger, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold),
           )
           drawRoundRect(
-            color = Color(0xB82A0E1B),
+            color = ESDesignTokens.panelInset.copy(alpha = 0.96f),
             topLeft = Offset(bx - measured.size.width / 2f - 6f, by - 3f),
             size = Size(measured.size.width + 12f, measured.size.height + 6f),
             cornerRadius = CornerRadius(6f, 6f),
@@ -919,7 +920,7 @@ fun TowerBattleScreen(
           horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
           // Left: Compact Master HP + Floor Objective Pill
-          Surface(
+          FantasySurface(
             shape = RoundedCornerShape(12.dp),
             color = FantasySkin.Panel.copy(alpha = 0.90f),
             modifier = Modifier
@@ -973,7 +974,7 @@ fun TowerBattleScreen(
           }
 
           // Right: Live Tactical Minimap + Retreat Icon
-          Surface(
+          FantasySurface(
             shape = RoundedCornerShape(10.dp),
             color = Color(0x8A102038),
             modifier = Modifier
@@ -1016,7 +1017,7 @@ fun TowerBattleScreen(
           val offers = combatEngine.fieldRewardOffers
           if (offers.isNotEmpty()) {
             val urgentDecision = combatEngine.lostCourier?.livingExpedition?.decision?.id?.let { it != "extraction" } == true
-            IconButton(onClick = { showFieldRewards = !showFieldRewards }, enabled = battleInputEnabled && !urgentDecision,
+            FantasyIconButton(onClick = { showFieldRewards = !showFieldRewards }, enabled = battleInputEnabled && !urgentDecision,
               modifier = Modifier.size(48.dp).testTag("field_reward_open").semantics {
                 contentDescription = "Chiến lợi phẩm: ${offers.size} túi chưa chọn"
               }) {
@@ -1034,7 +1035,7 @@ fun TowerBattleScreen(
             }
           }
 
-          IconButton(
+          FantasyIconButton(
             onClick = { showRetreatConfirm = true },
             modifier = Modifier
               .size(48.dp)
@@ -1156,7 +1157,7 @@ fun TowerBattleScreen(
 
         // Compact Targeted Enemy / Boss HP Bar (only when locked on or Boss active)
         if (focusedEnemy != null) {
-          Surface(
+          FantasySurface(
             shape = RoundedCornerShape(8.dp),
             color = Color(0xDD1F0B14),
             modifier = Modifier
@@ -1196,7 +1197,7 @@ fun TowerBattleScreen(
         }
 
         if (combatEngine.awaitingMoveToTap) {
-          Surface(
+          FantasySurface(
             shape = RoundedCornerShape(8.dp),
             color = SummonerGold,
             modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -1215,7 +1216,7 @@ fun TowerBattleScreen(
 
     // 3. Mid-Mission Manhwa Event Cut-In Banner
     if (combatEngine.stage == MissionStage.EVENT_CUTSCENE_BANNER) {
-      Surface(
+      FantasySurface(
         shape = RoundedCornerShape(14.dp),
         color = Color(0xEE1A0B18),
         modifier = Modifier
@@ -1290,7 +1291,7 @@ fun TowerBattleScreen(
 
         val isHazardAlert = combatEngine.lostCourier?.eliteTelegraph != null
         val isMoveActive = combatEngine.activeOrder == TacticalOrder.MOVE_TO || combatEngine.awaitingMoveToTap
-        Surface(
+        FantasySurface(
           shape = RoundedCornerShape(10.dp),
           color = when {
             isHazardAlert -> CrimsonBlood
@@ -1305,7 +1306,8 @@ fun TowerBattleScreen(
               RoundedCornerShape(10.dp),
             )
             .testTag("pinned_dodge_move_button")
-            .clickable(enabled = battleInputEnabled) {
+            .semantics { selected = isMoveActive }
+            .clickable(role = Role.Button, enabled = battleInputEnabled) {
               acknowledgeBattleInput { combatEngine.issueTacticalOrder(TacticalOrder.MOVE_TO) }
             },
         ) {
@@ -1346,14 +1348,17 @@ fun TowerBattleScreen(
           horizontalArrangement = Arrangement.spacedBy(5.dp),
           verticalAlignment = Alignment.CenterVertically,
         ) {
-          Surface(
+          FantasySurface(
             shape = RoundedCornerShape(9.dp),
             color = if (combatEngine.awaitingMoveToTap || combatEngine.activeOrder == TacticalOrder.MOVE_TO)
               SummonerGold else Color(0xEE17364A),
             modifier = Modifier.width(86.dp).heightIn(min = 56.dp)
               .border(1.dp, SummonerGold, RoundedCornerShape(9.dp))
               .testTag("order_move_to")
-              .clickable(enabled = battleInputEnabled) {
+              .semantics {
+                selected = combatEngine.awaitingMoveToTap || combatEngine.activeOrder == TacticalOrder.MOVE_TO
+              }
+              .clickable(role = Role.Button, enabled = battleInputEnabled) {
                 acknowledgeBattleInput { combatEngine.issueTacticalOrder(TacticalOrder.MOVE_TO) }
               },
           ) {
@@ -1378,7 +1383,7 @@ fun TowerBattleScreen(
         ) {
           TacticalOrder.entries.filter { it != TacticalOrder.MOVE_TO }.forEach { order ->
             val isSelected = combatEngine.activeOrder == order
-            Surface(
+            FantasySurface(
               shape = RoundedCornerShape(9.dp),
               color = if (isSelected) SummonerGold else Color(0xA4172944),
               modifier = Modifier
@@ -1389,7 +1394,10 @@ fun TowerBattleScreen(
                   RoundedCornerShape(9.dp),
                 )
                 .testTag("order_${order.name.lowercase()}")
-                .clickable(enabled = battleInputEnabled) { acknowledgeBattleInput { combatEngine.issueTacticalOrder(order) } },
+                .semantics { selected = isSelected }
+                .clickable(role = Role.Button, enabled = battleInputEnabled) {
+                  acknowledgeBattleInput { combatEngine.issueTacticalOrder(order) }
+                },
             ) {
               Column(
                 modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp),
@@ -1441,7 +1449,7 @@ fun TowerBattleScreen(
           .padding(14.dp),
         contentAlignment = Alignment.BottomCenter,
       ) {
-        Surface(
+        FantasySurface(
           shape = RoundedCornerShape(18.dp),
           color = Color(0xCE132238),
           modifier = Modifier
@@ -1535,7 +1543,7 @@ fun TowerBattleScreen(
           .padding(16.dp),
         contentAlignment = Alignment.Center,
       ) {
-        Surface(
+        FantasySurface(
           shape = RoundedCornerShape(18.dp),
           color = Color(0xD4132238),
           modifier = Modifier
@@ -1564,7 +1572,7 @@ fun TowerBattleScreen(
               horizontalArrangement = Arrangement.End,
               verticalAlignment = Alignment.CenterVertically,
             ) {
-              OutlinedButton(
+              FantasyChoiceButton(
                 onClick = { showRetreatConfirm = false },
                 modifier = Modifier.heightIn(min = 48.dp),
               ) {
@@ -1610,7 +1618,7 @@ fun TowerBattleScreen(
           .padding(14.dp),
         contentAlignment = Alignment.Center,
       ) {
-        Surface(
+        FantasySurface(
           shape = RoundedCornerShape(20.dp),
           color = Color(0xD4132238),
           modifier = Modifier
@@ -1669,7 +1677,7 @@ fun TowerBattleScreen(
                 )
               }
             } else {
-              Surface(
+              FantasySurface(
                 shape = RoundedCornerShape(12.dp),
                 color = Color(0x98162842),
                 modifier = Modifier.fillMaxWidth(),
@@ -1693,7 +1701,7 @@ fun TowerBattleScreen(
                       ?: state.heroes.firstOrNull { it.name == "Kaelen" }
                       ?: activeSquadRecords.firstOrNull()
 
-                    Surface(
+                    FantasySurface(
                       shape = RoundedCornerShape(10.dp),
                       color = ObsidianVoid.copy(alpha = 0.88f),
                       modifier = Modifier
@@ -1716,7 +1724,7 @@ fun TowerBattleScreen(
                             fontWeight = FontWeight.Bold,
                           )
                           if (droppedEquip != null) {
-                            Surface(
+                            FantasySurface(
                               shape = RoundedCornerShape(4.dp),
                               color = ArcaneViolet.copy(alpha = 0.35f),
                             ) {
@@ -1777,7 +1785,7 @@ fun TowerBattleScreen(
                     )
                   }
                   if (!isWin) {
-                    Surface(
+                    FantasySurface(
                       shape = RoundedCornerShape(10.dp),
                       color = ObsidianVoid.copy(alpha = 0.88f),
                       modifier = Modifier
@@ -1840,7 +1848,7 @@ fun TowerBattleScreen(
             }
 
             if (!isWin && onPrepareRetry != null) {
-              OutlinedButton(
+              FantasyChoiceButton(
                 onClick = onPrepareRetry,
                 enabled = !state.isBusyAction && settlement != null,
                 modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("prepare_rescue_retry_button"),
@@ -1886,7 +1894,7 @@ private fun SquadSkillHorizontalBar(
   ) {
     heroes.forEach { hero ->
       val ready = !hero.knockedOut && hero.skillCooldown <= 0.05f
-      Surface(
+      FantasySurface(
         shape = RoundedCornerShape(10.dp),
         color = FantasySkin.Panel.copy(alpha = if (hero.knockedOut) 0.55f else 0.90f),
         modifier = Modifier
@@ -1898,7 +1906,7 @@ private fun SquadSkillHorizontalBar(
             RoundedCornerShape(10.dp),
           )
           .testTag("skill_btn_${hero.id}")
-          .clickable(enabled = !hero.knockedOut) { onTriggerSkill(hero.id) },
+          .clickable(role = Role.Button, enabled = !hero.knockedOut) { onTriggerSkill(hero.id) },
       ) {
         Row(
           modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp),

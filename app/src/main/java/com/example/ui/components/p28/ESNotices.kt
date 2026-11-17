@@ -1,5 +1,6 @@
 package com.example.ui.components.p28
 
+import com.example.ui.components.FantasyIconButton
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -154,7 +154,7 @@ fun ESNoticeSurface(
         )
       }
       if (notice.dismissible) {
-        IconButton(
+        FantasyIconButton(
           onClick = { onDismiss(notice.stableId) },
           modifier = Modifier.size(32.dp).testTag("dismiss_notice_${notice.stableId}"),
         ) {

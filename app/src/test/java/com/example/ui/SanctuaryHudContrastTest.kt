@@ -8,6 +8,7 @@ import com.example.ui.theme.ArcaneViolet
 import com.example.ui.theme.RuneSilver
 import com.example.ui.theme.SummonerGold
 import com.example.ui.theme.SanctuaryUi
+import com.example.ui.theme.ESDesignTokens
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -90,24 +91,34 @@ class SanctuaryHudContrastTest {
     assertTrue("panel gold on glass is $ratio, below 4.5", ratio >= 4.5)
   }
 
-  /**
-   * Login screen (CP6). Its scrim is what makes the whole screen readable: the title is
-   * SummonerGold, the tagline PortalCyan, the subtitle ParchmentLight, and those measure
-   * 1.37 / 1.34 / 1.3:1 on a light backdrop - so the scrim, not the text colour, carries
-   * it. At the old 0.42 alpha the title sat at 4.45:1 and the tagline at 3.69:1 over the
-   * brightest world. This pins the current values so a restyle cannot quietly undo it.
-   */
   @Test
-  fun authGateScrimKeepsItsTextReadableOverTheBrightestWorld() {
-    val scrim = Color(0xFF0A0812).copy(alpha = 0.76f).compositeOver(worstBackdrop)
+  fun canvasPlaqueTokensStayReadableOverTheBrightestWorldPixel() {
+    val plaque = ESDesignTokens.panelInset.copy(alpha = 0.94f).compositeOver(worstBackdrop)
+    val textCases = listOf(
+      "gold" to ESDesignTokens.gold,
+      "primary" to ESDesignTokens.textPrimary,
+      "cyan" to ESDesignTokens.cyan,
+      "success" to ESDesignTokens.success,
+      "danger" to ESDesignTokens.danger,
+    )
+    for ((name, color) in textCases) {
+      val ratio = SanctuaryUi.contrastRatio(color, plaque)
+      assertTrue("Canvas $name label is $ratio on its plaque, below 4.5", ratio >= 4.5)
+    }
+  }
+
+  /** Landscape auth branding and the sign-in card use the shared translucent dark panel. */
+  @Test
+  fun authGateBrandTextStaysReadableOverTheBrightestWorldPixel() {
+    val panel = ESDesignTokens.panel.compositeOver(worstBackdrop)
     val cases = listOf(
-      "title (SummonerGold)" to SummonerGold,
-      "tagline (PortalCyan)" to Color(0xFF38BDF8),
-      "subtitle (ParchmentLight)" to Color(0xFFF5F1E7),
+      "brand gold" to ESDesignTokens.gold,
+      "portal cyan" to ESDesignTokens.cyan,
+      "primary subtitle" to ESDesignTokens.textPrimary,
     )
     for ((name, color) in cases) {
-      val ratio = SanctuaryUi.contrastRatio(color, scrim)
-      assertTrue("$name on the auth scrim is $ratio, below 4.5", ratio >= 4.5)
+      val ratio = SanctuaryUi.contrastRatio(color, panel)
+      assertTrue("$name on the auth panel is $ratio, below 4.5", ratio >= 4.5)
     }
   }
 

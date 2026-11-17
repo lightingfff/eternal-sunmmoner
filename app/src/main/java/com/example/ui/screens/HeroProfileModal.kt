@@ -1,10 +1,13 @@
 package com.example.ui.screens
 
+import com.example.ui.components.FantasyTextButton
+import com.example.ui.components.FantasyIconButton
+import com.example.ui.components.FantasySurface
+import com.example.ui.components.FantasyChoiceButton
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,11 +49,8 @@ import com.example.ui.components.FantasyButton as Button
 import com.example.ui.components.FantasySkin
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -128,7 +128,7 @@ fun ContextualFacilityPromptCard(
   val accent = facilityAccentColor(facility)
   val isEnterable = facility in SanctuaryLobbyEngine.ENTERABLE_FACILITIES && onEnterInterior != null
 
-  Surface(
+  FantasySurface(
     shape = RoundedCornerShape(16.dp),
     color = Color(0xC4132238),
     border = BorderStroke(1.5.dp, accent.copy(alpha = 0.88f)),
@@ -163,7 +163,7 @@ fun ContextualFacilityPromptCard(
             overflow = TextOverflow.Ellipsis,
           )
         }
-        IconButton(
+        FantasyIconButton(
           onClick = onDismiss,
           modifier = Modifier.size(36.dp).testTag("dismiss_facility_prompt_button"),
         ) {
@@ -198,7 +198,7 @@ fun ContextualFacilityPromptCard(
         }
 
         if (isEnterable) {
-          OutlinedButton(
+          FantasyChoiceButton(
             onClick = onOpenManagement,
             modifier = Modifier
               .heightIn(min = 44.dp)
@@ -247,7 +247,7 @@ fun SelectedHeroCompactCard(
   val hpTotal = hero.totalMaxHp(equipment)
   val atkTotal = hero.totalAttack(equipment)
 
-  Surface(
+  FantasySurface(
     shape = RoundedCornerShape(16.dp),
     color = Color(0xC4132238),
     border = BorderStroke(1.5.dp, classAccent.copy(alpha = 0.88f)),
@@ -294,7 +294,7 @@ fun SelectedHeroCompactCard(
             )
           }
         }
-        IconButton(
+        FantasyIconButton(
           onClick = onDismiss,
           modifier = Modifier.size(32.dp).testTag("dismiss_hero_card_button"),
         ) {
@@ -321,7 +321,7 @@ fun SelectedHeroCompactCard(
         }
 
         if (!isInsideInterior && !injured) {
-          OutlinedButton(
+          FantasyChoiceButton(
             onClick = onCommandHold,
             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
             modifier = Modifier.heightIn(min = 36.dp),
@@ -329,7 +329,7 @@ fun SelectedHeroCompactCard(
           ) {
             Text("Giữ Vị Trí", style = MaterialTheme.typography.labelSmall, color = AmberWarning)
           }
-          OutlinedButton(
+          FantasyChoiceButton(
             onClick = { onCommandTask(HeroTaskType.TRAIN) },
             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
             modifier = Modifier.heightIn(min = 36.dp),
@@ -337,7 +337,7 @@ fun SelectedHeroCompactCard(
           ) {
             Text("Sân Tập", style = MaterialTheme.typography.labelSmall, color = PortalCyan)
           }
-          OutlinedButton(
+          FantasyChoiceButton(
             onClick = { onCommandTask(HeroTaskType.DINING) },
             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
             modifier = Modifier.heightIn(min = 36.dp),
@@ -403,7 +403,7 @@ fun HeroFullProfileModal(
   ) {
     val isShort = maxHeight < 460.dp
 
-    Surface(
+    FantasySurface(
       shape = RoundedCornerShape(20.dp),
       color = Color(0xD4132238),
       tonalElevation = 10.dp,
@@ -448,7 +448,7 @@ fun HeroFullProfileModal(
               )
             }
           }
-          IconButton(
+          FantasyIconButton(
             onClick = onClose,
             modifier = Modifier.size(48.dp).testTag("close_hero_profile_button"),
           ) {
@@ -467,27 +467,23 @@ fun HeroFullProfileModal(
         ) {
           tabs.forEachIndexed { idx, (tag, label) ->
             val active = selectedTab == idx
-            Surface(
+            FantasyTextButton(
+              onClick = { selectedTab = idx },
+              modifier = Modifier.heightIn(min = 42.dp).testTag(tag),
               shape = RoundedCornerShape(10.dp),
-              color = if (active) classAccent.copy(alpha = 0.28f) else Color(0x98162842),
-              border = BorderStroke(if (active) 1.5.dp else 1.dp, if (active) classAccent else PortalCyan.copy(alpha = 0.42f)),
-              modifier = Modifier
-                .heightIn(min = 42.dp)
-                .testTag(tag)
-                .clickable { selectedTab = idx },
+              selected = active,
+              contentPadding = PaddingValues(horizontal = 14.dp, vertical = 7.dp),
+              colors = ButtonDefaults.textButtonColors(
+                contentColor = if (active) classAccent else ParchmentLight,
+              ),
             ) {
-              Box(
-                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
-                contentAlignment = Alignment.Center,
-              ) {
-                Text(
-                  text = label,
-                  style = MaterialTheme.typography.labelLarge,
-                  color = if (active) classAccent else ParchmentLight,
-                  fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
-                  maxLines = 1,
-                )
-              }
+              Text(
+                text = label,
+                style = MaterialTheme.typography.labelLarge,
+                color = if (active) classAccent else ParchmentLight,
+                fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
+                maxLines = 1,
+              )
             }
           }
         }
@@ -558,7 +554,7 @@ private fun HeroOverviewTab(
       .verticalScroll(rememberScrollState()),
     verticalArrangement = Arrangement.spacedBy(10.dp),
   ) {
-    Surface(
+    FantasySurface(
       shape = RoundedCornerShape(12.dp),
       color = AstralSlate,
       border = BorderStroke(1.dp, BorderRune),
@@ -608,7 +604,7 @@ private fun HeroOverviewTab(
       }
     }
 
-    Surface(
+    FantasySurface(
       shape = RoundedCornerShape(12.dp),
       color = Color(0x98162842),
       border = BorderStroke(1.dp, PortalCyan.copy(alpha = 0.42f)),
@@ -695,7 +691,7 @@ private fun HeroStatsTab(
       .verticalScroll(rememberScrollState()),
     verticalArrangement = Arrangement.spacedBy(10.dp),
   ) {
-    Surface(
+    FantasySurface(
       shape = RoundedCornerShape(12.dp),
       color = AstralSlate,
       border = BorderStroke(1.dp, SummonerGold.copy(alpha = 0.5f)),
@@ -720,19 +716,17 @@ private fun HeroStatsTab(
     ) {
       TrainingFocus.entries.filter { !it.isSkillUpgrade }.forEach { focus ->
         val active = selectedFocus == focus
-        Surface(
+        FantasyChoiceButton(
+          onClick = { onSelectFocus(focus) },
+          selected = active,
+          modifier = Modifier.heightIn(min = 40.dp),
           shape = RoundedCornerShape(9.dp),
-          color = if (active) SummonerGold.copy(alpha = 0.26f) else Color(0x98162842),
-          border = BorderStroke(1.dp, if (active) SummonerGold else PortalCyan.copy(alpha = 0.42f)),
-          modifier = Modifier
-            .heightIn(min = 40.dp)
-            .clickable { onSelectFocus(focus) },
+          contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
         ) {
           Text(
             text = focus.shortVi,
             style = MaterialTheme.typography.labelMedium,
             color = if (active) SummonerGold else ParchmentLight,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
           )
         }
       }
@@ -843,7 +837,7 @@ private fun HeroEquipmentTab(
       val holder = allHeroes.firstOrNull { it.id == item.equippedByHeroId }
       val alreadyEquippedHere = item.equippedByHeroId == hero.id
 
-      Surface(
+      FantasySurface(
         shape = RoundedCornerShape(12.dp),
         color = AstralSlate,
         border = BorderStroke(1.dp, if (alreadyEquippedHere) SummonerGold else BorderRune),
@@ -920,7 +914,7 @@ private fun EquippedSlotBox(
   onUnequip: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
-  Surface(
+  FantasySurface(
     shape = RoundedCornerShape(12.dp),
     color = Color(0x98162842),
     border = BorderStroke(1.dp, if (item != null) SummonerGold.copy(alpha = 0.65f) else PortalCyan.copy(alpha = 0.42f)),
@@ -939,7 +933,7 @@ private fun EquippedSlotBox(
         overflow = TextOverflow.Ellipsis,
       )
       if (item != null) {
-        OutlinedButton(
+        FantasyChoiceButton(
           onClick = onUnequip,
           enabled = !isBusy,
           modifier = Modifier
@@ -973,7 +967,7 @@ private fun HeroSkillsTab(
       .verticalScroll(rememberScrollState()),
     verticalArrangement = Arrangement.spacedBy(10.dp),
   ) {
-    Surface(
+    FantasySurface(
       shape = RoundedCornerShape(14.dp),
       color = AstralSlate,
       border = BorderStroke(1.dp, ArcaneViolet.copy(alpha = 0.75f)),
@@ -1046,7 +1040,7 @@ private fun HeroActivityRecoveryTab(
       .verticalScroll(rememberScrollState()),
     verticalArrangement = Arrangement.spacedBy(10.dp),
   ) {
-    Surface(
+    FantasySurface(
       shape = RoundedCornerShape(12.dp),
       color = AstralSlate,
       border = BorderStroke(1.dp, if (needsRecovery) AmberWarning else EmeraldVitality.copy(alpha = 0.65f)),
@@ -1142,23 +1136,20 @@ private fun RoutineChoiceButton(
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
-  Surface(
+  FantasyChoiceButton(
+    onClick = onClick,
+    enabled = enabled,
+    selected = selected,
+    modifier = modifier.heightIn(min = 48.dp).testTag(tag),
     shape = RoundedCornerShape(10.dp),
-    color = if (selected) EmeraldVitality.copy(alpha = 0.28f) else Color(0x98162842),
-    border = BorderStroke(1.dp, if (selected) EmeraldVitality else PortalCyan.copy(alpha = 0.42f)),
-    modifier = modifier
-      .heightIn(min = 48.dp)
-      .testTag(tag)
-      .clickable(enabled = enabled, onClick = onClick),
+    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
   ) {
-    Box(modifier = Modifier.padding(8.dp), contentAlignment = Alignment.Center) {
-      Text(
-        text = label,
-        style = MaterialTheme.typography.labelSmall,
-        color = if (selected) EmeraldVitality else ParchmentLight,
-        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-      )
-    }
+    Text(
+      text = label,
+      style = MaterialTheme.typography.labelSmall,
+      color = if (selected) EmeraldVitality else ParchmentLight,
+      fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+    )
   }
 }
 
@@ -1181,7 +1172,7 @@ fun IslandExpansionModal(
       .testTag("island_expansion_modal"),
     contentAlignment = Alignment.Center,
   ) {
-    Surface(
+    FantasySurface(
       shape = RoundedCornerShape(20.dp),
       color = Color(0xD4132238),
       tonalElevation = 10.dp,
@@ -1218,7 +1209,7 @@ fun IslandExpansionModal(
               maxLines = 2,
             )
           }
-          IconButton(
+          FantasyIconButton(
             onClick = onClose,
             modifier = Modifier.size(48.dp).testTag("close_expansion_modal_button"),
           ) {
@@ -1248,7 +1239,7 @@ fun IslandExpansionModal(
             val meetsReqs = SanctuaryProgressionHelper.canMeetRequirements(profile, milestone)
             val canAfford = SanctuaryProgressionHelper.canAffordExpansion(profile, milestone)
 
-            Surface(
+            FantasySurface(
               shape = RoundedCornerShape(14.dp),
               color = AstralSlate,
               border = BorderStroke(
@@ -1305,7 +1296,7 @@ fun IslandExpansionModal(
                   modifier = Modifier.fillMaxWidth(),
                   horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                  OutlinedButton(
+                  FantasyChoiceButton(
                     onClick = { onFocusExpansionOnMap(milestone) },
                     modifier = Modifier.heightIn(min = 46.dp),
                   ) {
