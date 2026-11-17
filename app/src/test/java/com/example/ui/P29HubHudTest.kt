@@ -1,5 +1,9 @@
 package com.example.ui
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -7,16 +11,21 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTouchInput
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.view.View
 import androidx.compose.ui.platform.LocalView
 import java.io.File
+import com.example.data.GameSettings
+import com.example.data.SessionAccountMode
 import com.example.data.model.HeroClassType
 import com.example.data.model.HeroRecord
+import com.example.data.model.HeroStatusType
 import com.example.data.model.MasterProfile
 import com.example.data.model.PersonalityType
 import com.example.ui.components.SanctuaryManagementNav
+import com.example.ui.components.SettingsAndAccountModal
 import com.example.ui.theme.EternalSummonerTheme
 import com.example.ui.screens.MasterHubScreen
 import com.example.ui.screens.SanctuaryLobbyScreen
@@ -90,13 +99,21 @@ class P29HubHudTest {
     assertEquals("summon", navigated)
   }
 
-  @Test fun masterHubScreenBindsRealProfileAndShortcutsFire() {
+  @Test
+  @Config(sdk = [36], qualifiers = "w800dp-h900dp")
+  fun masterHubScreenBindsRealProfileAndShortcutsFire() {
     var navigated: String? = null
     var settingsOpened = false
     var closed = false
+    val hubState = sampleState().copy(
+      heroes = listOf(
+        HeroRecord(id = "ready", name = "Ready", status = HeroStatusType.READY.name),
+        HeroRecord(id = "resting", name = "Resting", status = HeroStatusType.RESTING.name),
+      ),
+    )
     rule.setContent {
       MasterHubScreen(
-        state = sampleState(),
+        state = hubState,
         onNavigate = { navigated = it },
         onOpenSettings = { settingsOpened = true },
         onClose = { closed = true },
@@ -106,6 +123,9 @@ class P29HubHudTest {
     rule.onNodeWithText("Thống Lĩnh Lokir", substring = true).assertExists()
     rule.onNodeWithText("Cấp 12", substring = true).assertExists()
     rule.onNodeWithText("14850", substring = true).assertExists() // real gold from profile
+    rule.onNodeWithText("0 trong đội • 1 sẵn sàng").assertExists() // resting heroes aren't deploy-ready
+    rule.onNodeWithTag("master_hub_surface").performTouchInput { click() }
+    assertFalse("Tapping non-action content inside the card must not dismiss the hub", closed)
     rule.onNodeWithTag("master_hub_nav_tower").performClick()
     assertEquals("tower", navigated)
     rule.onNodeWithTag("master_hub_nav_settings").performScrollTo().performClick()
@@ -114,6 +134,28 @@ class P29HubHudTest {
     assertTrue(closed)
   }
 
+
+  @Test fun settingsModalBlocksWorldTapsAndItsOwnCloseActionStillWorks() {
+    var worldClicked = false
+    var closed = false
+    rule.setContent {
+      Box(Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize().clickable { worldClicked = true })
+        SettingsAndAccountModal(
+          accountMode = SessionAccountMode.GUEST_LOCAL,
+          accountSummary = "Guest • Floor 1",
+          settings = GameSettings(),
+          onUpdateSettings = {},
+          onClose = { closed = true },
+        )
+      }
+    }
+    rule.onNodeWithTag("settings_account_modal_surface").performTouchInput { click() }
+    assertFalse("Blank modal content must block taps from reaching the game", worldClicked)
+    assertFalse("A tap inside the account panel must not close the modal", closed)
+    rule.onNodeWithTag("close_settings_modal_button").performClick()
+    assertTrue(closed)
+  }
 
   @Test
   fun masterModalDismissedByAndroidBack() {

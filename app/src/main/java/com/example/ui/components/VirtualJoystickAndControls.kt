@@ -17,7 +17,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,13 +29,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -46,11 +46,8 @@ import com.example.data.model.HeroClassType
 import com.example.game.pixel.FantasyHd128CharacterAtlas
 import com.example.game.pixel.FantasyHd128Structures
 import com.example.game.pixel.PremiumPortraits
-import com.example.ui.theme.ArcaneViolet
-import com.example.ui.theme.BorderRune
-import com.example.ui.theme.ObsidianVoid
+import com.example.ui.theme.ESDesignTokens
 import com.example.ui.theme.PortalCyan
-import com.example.ui.theme.SanctuaryStone
 import com.example.ui.theme.SummonerGold
 import kotlin.math.hypot
 
@@ -66,6 +63,7 @@ fun VirtualTouchJoystick(
     modifier = modifier
       .size(diameter)
       .testTag("virtual_joystick")
+      .semantics { contentDescription = "Cần điều khiển ảo: kéo để di chuyển Master" }
       .pointerInput(Unit) {
         val maxRadius = size.width / 2f * 0.68f
         detectDragGestures(
@@ -109,7 +107,7 @@ fun VirtualTouchJoystick(
       val outerR = size.minDimension / 2f - 4f
       drawCircle(
         brush = Brush.radialGradient(
-          colors = listOf(Color(0x55223656), Color(0x88101C30)),
+          colors = listOf(ESDesignTokens.panelHighlight.copy(alpha = 0.52f), ESDesignTokens.panelInset.copy(alpha = 0.94f)),
           center = center,
           radius = outerR,
         ),
@@ -118,13 +116,13 @@ fun VirtualTouchJoystick(
       )
       // Double gilded RPG ring with astral cyan inner compass
       drawCircle(
-        color = SummonerGold.copy(alpha = 0.72f),
+        color = ESDesignTokens.gold.copy(alpha = 0.78f),
         radius = outerR,
         center = center,
         style = Stroke(width = 2.6f),
       )
       drawCircle(
-        color = PortalCyan.copy(alpha = 0.45f),
+        color = ESDesignTokens.cyan.copy(alpha = 0.58f),
         radius = outerR * 0.66f,
         center = center,
         style = Stroke(width = 1.6f),
@@ -133,7 +131,7 @@ fun VirtualTouchJoystick(
       val knobCenter = center + knobOffset
       drawCircle(
         brush = Brush.radialGradient(
-          colors = listOf(Color(0xFFFFF3C4), SummonerGold, Color(0xFFB47818)),
+          colors = listOf(ESDesignTokens.textPrimary, ESDesignTokens.gold, ESDesignTokens.goldMuted),
           center = knobCenter,
           radius = outerR * 0.36f,
         ),
@@ -161,23 +159,29 @@ fun CameraZoomControls(
     .clip(RoundedCornerShape(12.dp))
     .background(
       Brush.verticalGradient(
-        listOf(Color(0xA61A2B44), Color(0xBF0F1A2C))
+        listOf(ESDesignTokens.panelRaised.copy(alpha = 0.96f), ESDesignTokens.panelInset.copy(alpha = 0.98f))
       )
     )
-    .border(1.2.dp, SummonerGold.copy(alpha = 0.62f), RoundedCornerShape(12.dp))
+    .border(1.2.dp, ESDesignTokens.gold.copy(alpha = 0.68f), RoundedCornerShape(12.dp))
 
   if (horizontal) {
     Row(
       modifier = containerMod,
       verticalAlignment = Alignment.CenterVertically,
     ) {
-      IconButton(
+      FantasyIconButton(
         onClick = { onZoomChange((zoom - 0.15f).coerceAtLeast(0.65f)) },
         modifier = Modifier.size(48.dp).testTag("zoom_out_button"),
       ) {
-        Icon(Icons.Default.Remove, contentDescription = "Thu nhỏ camera", tint = PortalCyan)
+        Icon(Icons.Default.Remove, contentDescription = "Thu nhỏ camera", tint = ESDesignTokens.cyan)
       }
-      IconButton(
+      Text(
+        text = "${(zoom * 100).toInt()}%",
+        modifier = Modifier.padding(horizontal = 3.dp).testTag("camera_zoom_readout"),
+        color = ESDesignTokens.textPrimary,
+        style = MaterialTheme.typography.labelSmall,
+      )
+      FantasyIconButton(
         onClick = { onZoomChange((zoom + 0.15f).coerceAtMost(1.65f)) },
         modifier = Modifier.size(48.dp).testTag("zoom_in_button"),
       ) {
@@ -189,13 +193,19 @@ fun CameraZoomControls(
       modifier = containerMod,
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-      IconButton(
+      Text(
+        text = "ZOOM ${(zoom * 100).toInt()}%",
+        modifier = Modifier.padding(vertical = 4.dp).testTag("camera_zoom_readout"),
+        color = ESDesignTokens.textSecondary,
+        style = MaterialTheme.typography.labelSmall,
+      )
+      FantasyIconButton(
         onClick = { onZoomChange((zoom + 0.15f).coerceAtMost(1.65f)) },
         modifier = Modifier.size(48.dp).testTag("zoom_in_button"),
       ) {
         Icon(Icons.Default.Add, contentDescription = "Phóng to camera", tint = SummonerGold)
       }
-      IconButton(
+      FantasyIconButton(
         onClick = { onZoomChange((zoom - 0.15f).coerceAtLeast(0.65f)) },
         modifier = Modifier.size(48.dp).testTag("zoom_out_button"),
       ) {
@@ -260,7 +270,7 @@ fun PixelHeroPortraitAvatar(
 }
 
 /** Violet for text/marks on dark glass; Color.kt ArcaneViolet is a fill colour. */
-private val arcaneVioletOnDark = Color(0xFFB79BFF)
+private val arcaneVioletOnDark = ESDesignTokens.violet
 
 @Composable
 fun ResourcePillBadge(
@@ -277,7 +287,7 @@ fun ResourcePillBadge(
         if (lightOnIvory) {
           Brush.verticalGradient(listOf(Color(0xFFF3EFE6), Color(0xFFE5DEC9)))
         } else {
-          Brush.verticalGradient(listOf(Color(0xAD1B2C46), Color(0xC4101B2E)))
+          Brush.verticalGradient(listOf(ESDesignTokens.panelRaised.copy(alpha = 0.82f), ESDesignTokens.panelInset.copy(alpha = 0.96f)))
         }
       )
       .border(
@@ -303,7 +313,7 @@ fun ResourcePillBadge(
     Text(
       text = "$label $amount",
       style = MaterialTheme.typography.labelSmall,
-      color = if (lightOnIvory) Color(0xFF283B4B) else MaterialTheme.colorScheme.onSurface,
+      color = if (lightOnIvory) Color(0xFF283B4B) else ESDesignTokens.textPrimary,
       maxLines = 1,
       softWrap = false,
       overflow = TextOverflow.Ellipsis,

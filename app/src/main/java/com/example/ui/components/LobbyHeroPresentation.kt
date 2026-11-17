@@ -2,13 +2,13 @@ package com.example.ui.components
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.withTransform
 import com.example.game.lobby.LobbyHeroActor
 import com.example.game.lobby.LobbyLocomotion
 import com.example.game.map.ObliqueCamera
 import com.example.game.pixel.PixelSpriteRenderer.drawCharacterSprite
+import com.example.ui.theme.ESDesignTokens
 import kotlin.math.hypot
 import kotlin.math.sin
 
@@ -33,7 +33,11 @@ fun DrawScope.drawLobbyHero(actor: LobbyHeroActor, camX: Float, camY: Float, zoo
       isMaster = false, heroClass = actor.heroClass, facingRight = if (held) sin(time * 12f) > 0f else actor.facingRight,
       isMoving = held || actor.isMoving, attackAnimProgress = if (held) 0f else actor.attackPracticeAnim,
       hurtFlash = 0f, hpFraction = actor.lobbyData?.let { it.currentHP.toFloat() / it.maxHP } ?: if (actor.isInjured) .35f else 1f,
-      shieldOrAuraColor = when { held || selected -> Color(0xFFE8C36C); actor.isSanctuaryKeeperNpc -> Color(0x7738BDF8); else -> null },
+      shieldOrAuraColor = when {
+        held || selected -> ESDesignTokens.gold
+        actor.isSanctuaryKeeperNpc -> ESDesignTokens.cyan.copy(alpha = 0.47f)
+        else -> null
+      },
       isInjuredResting = actor.isInjured || actor.isSeatedDining, timeSec = time,
       facingNorth = !held && actor.facingNorth, heroName = actor.name,
       emotion = if (held || frightened || limp) "fear" else if (selected) "alert" else "calm")

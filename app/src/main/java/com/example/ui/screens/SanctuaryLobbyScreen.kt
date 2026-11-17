@@ -1,6 +1,10 @@
 package com.example.ui.screens
 
+import com.example.ui.components.FantasyTextButton
+import com.example.ui.components.FantasyIconButton
+import com.example.ui.components.FantasySurface
 import com.example.ui.theme.SanctuaryUi
+import com.example.ui.theme.ESDesignTokens
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -9,15 +13,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -42,13 +43,10 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.Backpack
 import androidx.compose.material.icons.filled.Castle
 import androidx.compose.material.icons.filled.CenterFocusStrong
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Map
-import androidx.compose.material.icons.filled.MeetingRoom
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.Remove
@@ -58,14 +56,9 @@ import androidx.compose.material.icons.filled.Settings
 import com.example.ui.components.FantasyButton as Button
 import com.example.ui.components.FantasySkin
 import com.example.ui.components.p28.ESBannerNotice
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import com.example.game.lobby.HeroTaskType
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -101,10 +94,10 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -135,7 +128,6 @@ import com.example.game.lobby.SanctuaryLobbyEngine
 import com.example.game.map.ObliqueCamera
 import com.example.game.map.SanctuaryIslandGeometry
 import com.example.game.map.WorldObstacle
-import com.example.game.pixel.PixelSpriteRenderer.drawCharacterSprite
 import com.example.game.pixel.PixelSpriteRenderer.drawForegroundAtmosphere
 import com.example.game.pixel.PixelSpriteRenderer.drawProp
 import com.example.game.pixel.PixelSpriteRenderer.drawSanctuaryZoneFloorRing
@@ -733,7 +725,7 @@ fun SanctuaryLobbyScreen(
           val top = ObliqueCamera.worldToScreenY(r.top, camY, zoom, halfH)
           val right = ObliqueCamera.worldToScreenX(r.right, camX, zoom, halfW)
           val bottom = ObliqueCamera.worldToScreenY(r.bottom, camY, zoom, halfH)
-          drawRect(PortalCyan.copy(alpha = .55f), Offset(left, top), Size(right - left, bottom - top), style = Stroke(2f))
+          drawRect(ESDesignTokens.cyan.copy(alpha = .60f), Offset(left, top), Size(right - left, bottom - top), style = Stroke(2f))
         }
       }
       val topHudSafePx = (if (isWideScreen) 64.dp else 112.dp).toPx()
@@ -751,7 +743,7 @@ fun SanctuaryLobbyScreen(
         val measured = textMeasurer.measure(
           text = labelText,
           style = TextStyle(
-            color = Color(0xFFFEF08A),
+            color = ESDesignTokens.gold,
             fontSize = fontSp,
             fontWeight = FontWeight.Bold,
           ),
@@ -764,13 +756,13 @@ fun SanctuaryLobbyScreen(
         placedTagRects += rect
 
         drawRoundRect(
-          color = Color(0x9E12223A),
+          color = ESDesignTokens.panelInset.copy(alpha = 0.94f),
           topLeft = topLeft,
           size = Size(boxW, boxH),
           cornerRadius = CornerRadius(9f, 9f),
         )
         drawRoundRect(
-          color = Color(0x387DD3FC),
+          color = ESDesignTokens.cyan.copy(alpha = 0.20f),
           topLeft = Offset(topLeft.x + 1.5f, topLeft.y + 1.5f),
           size = Size((boxW - 3f).coerceAtLeast(2f), (boxH * 0.45f).coerceAtLeast(2f)),
           cornerRadius = CornerRadius(7f, 7f),
@@ -861,7 +853,7 @@ fun SanctuaryLobbyScreen(
           val nameLayout = textMeasurer.measure(
             text = tag,
             style = TextStyle(
-              color = if (actor.isSanctuaryKeeperNpc) PortalCyan else ParchmentLight,
+              color = if (actor.isSanctuaryKeeperNpc) ESDesignTokens.cyan else ESDesignTokens.textPrimary,
               fontSize = if (zoom < 0.62f) 8.5.sp else 9.5.sp,
               fontWeight = FontWeight.Bold,
             ),
@@ -873,13 +865,13 @@ fun SanctuaryLobbyScreen(
           if (placedTagRects.none { it.overlaps(candidateRect) }) {
             placedTagRects += candidateRect
             drawRoundRect(
-              color = Color(0x94102038),
+              color = ESDesignTokens.panelInset.copy(alpha = 0.92f),
               topLeft = pillTopLeft,
               size = Size(pillW, pillH),
               cornerRadius = CornerRadius(7f, 7f),
             )
             drawRoundRect(
-              color = (if (actor.isSanctuaryKeeperNpc) PortalCyan else SummonerGold).copy(alpha = 0.72f),
+              color = (if (actor.isSanctuaryKeeperNpc) ESDesignTokens.cyan else ESDesignTokens.gold).copy(alpha = 0.78f),
               topLeft = pillTopLeft,
               size = Size(pillW, pillH),
               cornerRadius = CornerRadius(7f, 7f),
@@ -913,7 +905,7 @@ fun SanctuaryLobbyScreen(
           val bLayout = textMeasurer.measure(
             text = bubble,
             style = TextStyle(
-              color = SummonerGold.copy(alpha = fadeAlpha),
+              color = ESDesignTokens.gold.copy(alpha = fadeAlpha),
               fontSize = if (zoom < 0.56f) 9.sp else 10.sp,
               fontWeight = FontWeight.Medium,
             ),
@@ -927,13 +919,13 @@ fun SanctuaryLobbyScreen(
           if (isHeld || placedTagRects.none { it.overlaps(bubbleRect) }) {
             placedTagRects += bubbleRect
             drawRoundRect(
-              color = Color(0xD8102038).copy(alpha = 0.88f * fadeAlpha),
+              color = ESDesignTokens.panelInset.copy(alpha = 0.92f * fadeAlpha),
               topLeft = Offset(bx - 8f, by - 5f),
               size = Size(bLayout.size.width + 16f, bLayout.size.height + 10f),
               cornerRadius = CornerRadius(9f, 9f),
             )
             drawRoundRect(
-              color = (if (isHeld) PortalCyan else SummonerGold).copy(alpha = 0.85f * fadeAlpha),
+              color = (if (isHeld) ESDesignTokens.cyan else ESDesignTokens.gold).copy(alpha = 0.85f * fadeAlpha),
               topLeft = Offset(bx - 8f, by - 5f),
               size = Size(bLayout.size.width + 16f, bLayout.size.height + 10f),
               cornerRadius = CornerRadius(9f, 9f),
@@ -977,22 +969,37 @@ fun SanctuaryLobbyScreen(
       // P29: the permanent top bar is now a COMPACT CHIP ROW on translucent HudGlass —
       // it no longer spans the full width as a black rectangle. Tap the master chip to
       // open the dedicated MasterHubScreen (user-opened modal, allowed to use a scrim).
-      Surface(
+      FantasySurface(
         shape = RoundedCornerShape(12.dp),
         color = FantasySkin.HudGlass,
         border = BorderStroke(1.dp, SummonerGold.copy(alpha = 0.45f)),
         modifier = Modifier.align(Alignment.Start).testTag("top_hud_chip_row"),
       ) {
         Row(Modifier.padding(horizontal=8.dp,vertical=2.dp).horizontalScroll(rememberScrollState()),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(6.dp)) {
-          Surface(
+          FantasySurface(
             shape = RoundedCornerShape(10.dp),
-            color = FantasySkin.HudGlass.copy(alpha=0.9f),
-            border = BorderStroke(1.dp, SummonerGold.copy(alpha=.5f)),
-            modifier = Modifier.testTag("master_chip").clickable { showMasterHub = true },
+            color = FantasySkin.HudGlass.copy(alpha = 0.9f),
+            border = BorderStroke(1.dp, SummonerGold.copy(alpha = 0.5f)),
+            modifier = Modifier
+              .testTag("master_chip")
+              .clickable(role = Role.Button) { showMasterHub = true },
+            frameAssetId = FantasySkin.ChoiceButtonFrameId,
+            frameCornerInset = 8.dp,
+            compactFrame = true,
           ) {
-            Row(Modifier.padding(horizontal=6.dp,vertical=2.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(4.dp)) {
-              PixelHeroPortraitAvatar(heroClass=HeroClassType.MAGE,sizeDp=22.dp)
-              Text("Lv.${profile?.masterLevel ?: 1} • ${profile?.masterName ?: "Master"}",color=SummonerGold,maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.labelSmall)
+            Row(
+              modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+              PixelHeroPortraitAvatar(heroClass = HeroClassType.MAGE, sizeDp = 22.dp)
+              Text(
+                "Lv.${profile?.masterLevel ?: 1} • ${profile?.masterName ?: "Master"}",
+                color = SummonerGold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.labelSmall,
+              )
             }
           }
           // P29: on narrow screens resource pills live in MasterHubScreen instead,
@@ -1001,39 +1008,32 @@ fun SanctuaryLobbyScreen(
             ResourcePillBadge("Vàng",profile?.gold ?: 0L,SummonerGold)
             ResourcePillBadge("Hồn",profile?.soulShards ?: 0L,SanctuaryUi.violetOnDark)
           }
-          IconButton({showChronicleModal=true},Modifier.size(40.dp).testTag("quick_notifications_button")) {Icon(Icons.Default.Notifications,"Nhật ký",tint=RuneSilver)}
-          IconButton(onOpenSettings,Modifier.size(40.dp).testTag("open_settings_button")) {Icon(Icons.Default.Settings,"Cài đặt",tint=RuneSilver)}
-          IconButton({showPauseMapModal=true},Modifier.size(40.dp).testTag("pause_game_button")) {Icon(Icons.Default.Pause,"Bản đồ",tint=SummonerGold)}
+          FantasyIconButton({showChronicleModal=true},Modifier.size(40.dp).testTag("quick_notifications_button")) {Icon(Icons.Default.Notifications,"Nhật ký",tint=RuneSilver)}
+          FantasyIconButton(onOpenSettings,Modifier.size(40.dp).testTag("open_settings_button")) {Icon(Icons.Default.Settings,"Cài đặt",tint=RuneSilver)}
+          FantasyIconButton({showPauseMapModal=true},Modifier.size(40.dp).testTag("pause_game_button")) {Icon(Icons.Default.Pause,"Bản đồ",tint=SummonerGold)}
         }
       }
 
       if (insideInterior) {
-        Surface(
+        Button(
+          onClick = {
+            lobbyEngine.exitFacilityInterior()
+            activeInteriorState = lobbyEngine.activeInterior
+            zoom = lobbyEngine.zoom
+          },
+          modifier = Modifier.align(Alignment.Start).testTag("exit_interior_button"),
           shape = RoundedCornerShape(10.dp),
-          color = AmberWarning,
-          modifier = Modifier
-            .align(Alignment.Start)
-            .testTag("exit_interior_button")
-            .clickable {
-              lobbyEngine.exitFacilityInterior()
-              activeInteriorState = lobbyEngine.activeInterior
-              zoom = lobbyEngine.zoom
-            },
+          colors = FantasySkin.buttonColors(containerColor = AmberWarning, contentColor = ObsidianVoid),
+          contentPadding = PaddingValues(horizontal = 10.dp, vertical = 5.dp),
         ) {
-          Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-          ) {
-            Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null, tint = ObsidianVoid, modifier = Modifier.size(14.dp))
-            Text(
-              text = "← Ra Thánh Địa ($locationTag)",
-              style = MaterialTheme.typography.labelSmall,
-              color = ObsidianVoid,
-              fontWeight = FontWeight.Bold,
-              maxLines = 1,
-            )
-          }
+          Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null, modifier = Modifier.size(14.dp))
+          Spacer(Modifier.width(4.dp))
+          Text(
+            text = "← Ra Thánh Địa ($locationTag)",
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+          )
         }
       }
 
@@ -1058,7 +1058,7 @@ fun SanctuaryLobbyScreen(
       val maxPanelWidth = if (isNarrowScreen) 185.dp else 490.dp
 
       // Bottom-Left: Free Camera Quick Control Suite
-      Surface(
+      FantasySurface(
         shape = RoundedCornerShape(14.dp),
         color = FantasySkin.HudGlass,
         border = BorderStroke(1.dp, SummonerGold.copy(alpha = 0.60f)),
@@ -1070,7 +1070,7 @@ fun SanctuaryLobbyScreen(
         // P29: camera tools are COLLAPSED by default — one toggle button keeps the idle
         // viewport clear; expanding reveals all five tools (tags preserved).
         if (!cameraExpanded) {
-          IconButton(
+          FantasyIconButton(
             onClick = { cameraExpanded = true },
             modifier = Modifier.size(cameraIconSize).testTag("camera_controls_toggle"),
           ) {
@@ -1082,7 +1082,7 @@ fun SanctuaryLobbyScreen(
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(if (isNarrowScreen) 2.dp else 4.dp),
         ) {
-          IconButton(
+          FantasyIconButton(
             onClick = {
               lobbyEngine.zoomCamera(0.12f)
               zoom = lobbyEngine.zoom
@@ -1091,7 +1091,7 @@ fun SanctuaryLobbyScreen(
           ) {
             Icon(Icons.Default.Add, contentDescription = "Phóng To", tint = SummonerGold, modifier = Modifier.size(cameraIconInner))
           }
-          IconButton(
+          FantasyIconButton(
             onClick = {
               lobbyEngine.zoomCamera(-0.12f)
               zoom = lobbyEngine.zoom
@@ -1100,7 +1100,7 @@ fun SanctuaryLobbyScreen(
           ) {
             Icon(Icons.Default.Remove, contentDescription = "Thu Nhỏ", tint = SummonerGold, modifier = Modifier.size(cameraIconInner))
           }
-          IconButton(
+          FantasyIconButton(
             onClick = {
               if (!insideInterior && zoom > fitOverviewZoom + 0.08f) {
                 // Frame Full Floating Sanctuary Island Overview!
@@ -1117,7 +1117,7 @@ fun SanctuaryLobbyScreen(
           ) {
             Icon(Icons.Default.RestartAlt, contentDescription = "Toàn Cảnh / Căn Giữa Bản Đồ", tint = PortalCyan, modifier = Modifier.size(cameraIconInner))
           }
-          IconButton(
+          FantasyIconButton(
             onClick = {
               val selId = lobbyEngine.selectedHeroId
               if (selId != null) {
@@ -1130,7 +1130,7 @@ fun SanctuaryLobbyScreen(
           ) {
             Icon(Icons.Default.CenterFocusStrong, contentDescription = "Theo Vết Anh Hùng", tint = ArcaneViolet, modifier = Modifier.size(cameraIconInner))
           }
-          IconButton(
+          FantasyIconButton(
             onClick = {
               lobbyEngine.focusCameraOnFacility(FacilityType.TOWER_GATE)
             },
@@ -1188,7 +1188,7 @@ fun SanctuaryLobbyScreen(
           )
         }
 
-        TextButton(onClick={showQuickCommands=!showQuickCommands},modifier=Modifier.testTag("quick_commands_toggle")) {
+        FantasyTextButton(onClick={showQuickCommands=!showQuickCommands},modifier=Modifier.testTag("quick_commands_toggle")) {
           Text(if(showQuickCommands) "Thu gọn lệnh ▴" else "Lệnh & công trình ▾",color=RuneSilver,style=MaterialTheme.typography.labelSmall)
         }
         // Secondary commands stay accessible without permanently covering the world.
@@ -1274,22 +1274,19 @@ fun SanctuaryLobbyScreen(
 
           state.heroes.take(5).forEach { hero ->
             val isSel = hero.id == lobbyEngine.selectedHeroId
-            Surface(
+            FantasyChoiceButton(
+              onClick = {
+                promptedFacility = null
+                lobbyEngine.selectedHeroId = hero.id
+                hudSelectedHeroId = hero.id
+                lobbyEngine.focusCameraOnHero(hero.id)
+              },
+              selected = isSel,
               shape = RoundedCornerShape(10.dp),
-              color = if (isSel) SummonerGold else SanctuaryStone.copy(alpha = 0.90f),
-              border = BorderStroke(1.dp, if (isSel) Color.White else BorderRune),
-              modifier = Modifier
-                .testTag("hero_chip_${hero.id}")
-                .clickable {
-                  promptedFacility = null
-                  lobbyEngine.selectedHeroId = hero.id
-                  hudSelectedHeroId = hero.id
-                  lobbyEngine.focusCameraOnHero(hero.id)
-                }
-                .padding(2.dp),
+              contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
+              modifier = Modifier.testTag("hero_chip_${hero.id}").padding(2.dp),
             ) {
               Row(
-                modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
               ) {
@@ -1297,7 +1294,7 @@ fun SanctuaryLobbyScreen(
                 Text(
                   text = hero.name.substringBefore(" "),
                   style = MaterialTheme.typography.labelSmall,
-                  color = if (isSel) ObsidianVoid else ParchmentLight,
+                  color = if (isSel) SummonerGold else ParchmentLight,
                   maxLines = 1,
                 )
               }
@@ -1617,7 +1614,7 @@ private fun SanctuaryOverviewMapOverlay(
       .padding(16.dp),
     contentAlignment = Alignment.Center,
   ) {
-    Surface(
+    FantasySurface(
       shape = RoundedCornerShape(20.dp),
       color = Color(0xD6132238),
       modifier = Modifier
@@ -1639,7 +1636,7 @@ private fun SanctuaryOverviewMapOverlay(
             Text("TẠM DỪNG • BẢN ĐỒ ĐẢO NỔI THÁNH ĐỊA", style = MaterialTheme.typography.titleMedium, color = SummonerGold)
             Text("3200 × 2760px Pháo Đài Đảo Nổi • Chạm địa điểm để Dịch Chuyển Camera", style = MaterialTheme.typography.bodySmall, color = PortalCyan)
           }
-          IconButton(onClick = onClose, modifier = Modifier.testTag("close_pause_map_button")) {
+          FantasyIconButton(onClick = onClose, modifier = Modifier.testTag("close_pause_map_button")) {
             Icon(Icons.Default.Close, contentDescription = "Đóng", tint = ParchmentLight)
           }
         }
@@ -1795,18 +1792,21 @@ private fun FastTravelChip(
   targetY: Float,
   onFastTravel: (Float, Float) -> Unit,
 ) {
-  Surface(
+  FantasySurface(
     shape = RoundedCornerShape(8.dp),
     color = FantasySkin.Panel.copy(alpha = 0.90f),
-    modifier = Modifier
-      .border(1.dp, PortalCyan.copy(alpha = 0.65f), RoundedCornerShape(8.dp))
-      .clickable { onFastTravel(targetX, targetY) },
+    border = BorderStroke(1.dp, PortalCyan.copy(alpha = 0.65f)),
+    modifier = Modifier.clickable(role = Role.Button) { onFastTravel(targetX, targetY) },
+    frameAssetId = FantasySkin.ChoiceButtonFrameId,
+    frameCornerInset = 8.dp,
+    compactFrame = true,
   ) {
     Text(
       text = label,
       style = MaterialTheme.typography.labelSmall,
       color = ParchmentLight,
       modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+      maxLines = 1,
     )
   }
 }
@@ -1826,7 +1826,7 @@ private fun SanctuaryChronicleOverlay(
       .padding(16.dp),
     contentAlignment = Alignment.Center,
   ) {
-    Surface(
+    FantasySurface(
       shape = RoundedCornerShape(20.dp),
       color = Color(0xD4132238),
       modifier = Modifier
@@ -1848,7 +1848,7 @@ private fun SanctuaryChronicleOverlay(
             Icon(Icons.Default.Notifications, contentDescription = null, tint = PortalCyan)
             Text("NHẬT KÝ & THÔNG BÁO THÁNH ĐỊA", style = MaterialTheme.typography.titleMedium, color = SummonerGold)
           }
-          IconButton(onClick = onClose, modifier = Modifier.testTag("close_chronicle_button")) {
+          FantasyIconButton(onClick = onClose, modifier = Modifier.testTag("close_chronicle_button")) {
             Icon(Icons.Default.Close, contentDescription = "Đóng", tint = ParchmentLight)
           }
         }
@@ -1880,7 +1880,7 @@ private fun SanctuaryChronicleOverlay(
 
 @Composable
 private fun ChronicleTile(title: String, desc: String, accentCol: Color) {
-  Surface(
+  FantasySurface(
     shape = RoundedCornerShape(12.dp),
     color = Color(0x9E192B46),
     modifier = Modifier.fillMaxWidth().border(1.dp, accentCol.copy(alpha = 0.58f), RoundedCornerShape(12.dp)),
@@ -1902,13 +1902,13 @@ private fun PrologueDialogueCard(
   onNext: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
-  Surface(
+  FantasySurface(
     shape = RoundedCornerShape(18.dp),
     color = Color(0xDC08172E),
     modifier = modifier.border(1.5.dp, PortalCyan.copy(alpha = 0.85f), RoundedCornerShape(18.dp)),
   ) {
     Column(modifier = Modifier.padding(16.dp)) {
-      Surface(
+      FantasySurface(
         shape = RoundedCornerShape(6.dp),
         color = Color(0xA4102646),
         modifier = Modifier.border(1.dp, SummonerGold.copy(alpha = 0.65f), RoundedCornerShape(6.dp)),

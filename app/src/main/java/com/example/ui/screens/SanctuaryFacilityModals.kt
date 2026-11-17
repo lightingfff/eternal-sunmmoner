@@ -1,6 +1,11 @@
 package com.example.ui.screens
 
+import com.example.ui.components.FantasyTextButton
+import com.example.ui.components.FantasyIconButton
+import com.example.ui.components.FantasySurface
+import com.example.ui.components.FantasyChoiceButton
 import com.example.data.LostCourierProgression
+import com.example.data.model.ContextAwareDialogueDatabase
 import com.example.ui.theme.SanctuaryUi
 
 import androidx.activity.compose.BackHandler
@@ -45,7 +50,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.Shield
@@ -54,10 +58,7 @@ import com.example.ui.components.FantasySkin
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -78,7 +79,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.progressBarRangeInfo
-import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -97,7 +97,6 @@ import com.example.data.model.HeroAssignment
 import com.example.data.model.HeroData
 import com.example.data.model.HeroSanityState
 import com.example.data.model.LobbyPersonality
-import com.example.data.model.ContextAwareDialogueDatabase
 import com.example.data.model.HeroStatusType
 import com.example.data.model.IslandExpansionMilestone
 import com.example.data.model.MasterProfile
@@ -110,14 +109,12 @@ import com.example.ui.components.ResourcePillBadge
 import com.example.ui.theme.AmberWarning
 import com.example.ui.theme.ArcaneViolet
 import com.example.ui.theme.AstralSlate
-import com.example.ui.theme.BorderRune
 import com.example.ui.theme.CrimsonBlood
 import com.example.ui.theme.EmeraldVitality
 import com.example.ui.theme.ObsidianVoid
 import com.example.ui.theme.ParchmentLight
 import com.example.ui.theme.PortalCyan
 import com.example.ui.theme.RuneSilver
-import com.example.ui.theme.SanctuaryStone
 import com.example.ui.theme.SummonerGold
 import kotlinx.coroutines.delay
 
@@ -181,7 +178,7 @@ fun SanctuaryFacilityModalOverlay(
   ) {
     val isShort = maxHeight < 460.dp
 
-    Surface(
+    FantasySurface(
       modifier = Modifier
         .fillMaxWidth(0.94f)
         .fillMaxSize(if (isShort) 0.94f else 0.88f)
@@ -223,7 +220,7 @@ fun SanctuaryFacilityModalOverlay(
           }
 
           if (enterInteriorCallback != null && facility != FacilityType.RESTAURANT) {
-            OutlinedButton(
+            FantasyChoiceButton(
               onClick = enterInteriorCallback,
               modifier = Modifier
                 .heightIn(min = 42.dp)
@@ -238,7 +235,7 @@ fun SanctuaryFacilityModalOverlay(
             }
           }
 
-          IconButton(
+          FantasyIconButton(
             onClick = onClose,
             modifier = Modifier.size(48.dp).testTag("close_facility_modal_button"),
           ) {
@@ -355,20 +352,19 @@ private fun SummoningHallContent(
   if(confirmSummon) {
     androidx.compose.material3.AlertDialog(
       onDismissRequest={confirmSummon=false},
-      containerColor=SanctuaryUi.surface,
-      // The app theme may still supply a light content colour; state it explicitly so
-      // the message never becomes ivory-on-ivory in either light or dark app themes.
-      textContentColor=SanctuaryUi.inkSecondary,
-      titleContentColor=SanctuaryUi.ink,
-      title={Text("Xác nhận triệu hồi",color=SanctuaryUi.ink)},
-      text={Text("Tiêu hao 20 Mảnh Linh Hồn và 40 Mana. Anh hùng nhận được sẽ được lưu vào đội ngũ của bạn.",color=SanctuaryUi.inkSecondary)},
+      containerColor=FantasySkin.Panel,
+      shape=RoundedCornerShape(16.dp),
+      textContentColor=ParchmentLight,
+      titleContentColor=SummonerGold,
+      title={Text("Xác nhận triệu hồi",color=SummonerGold)},
+      text={Text("Tiêu hao 20 Mảnh Linh Hồn và 40 Mana. Anh hùng nhận được sẽ được lưu vào đội ngũ của bạn.",color=ParchmentLight)},
       confirmButton={Button(onClick={confirmSummon=false;onSummonHero()},
         enabled=!isBusy && profile.soulShards>=20 && profile.manaCrystals>=40,
         modifier=Modifier.testTag("confirm_summon_spend"),
-        colors=ButtonDefaults.buttonColors(containerColor=SanctuaryUi.accent,contentColor=Color.White)) {
+        colors=FantasySkin.buttonColors(containerColor=SummonerGold,contentColor=Color.White)) {
         Text("Triệu hồi • 20 Hồn / 40 Mana")
       }},
-      dismissButton={androidx.compose.material3.TextButton(onClick={confirmSummon=false},modifier=Modifier.testTag("cancel_summon_spend")) {Text("Hủy",color=SanctuaryUi.inkSecondary)}})
+      dismissButton={FantasyTextButton(onClick={confirmSummon=false},modifier=Modifier.testTag("cancel_summon_spend")) {Text("Hủy",color=ParchmentLight)}})
   }
   val infinite = rememberInfiniteTransition(label = "summonRune")
   val angle by infinite.animateFloat(
@@ -443,9 +439,11 @@ private fun SummoningHallContent(
           onClick = { confirmSummon=true },
           enabled = !isBusy && canSummon,
           modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("summon_ritual_button"),
-          colors = ButtonDefaults.buttonColors(
-            containerColor = SanctuaryUi.accent, contentColor = Color.White,
-            disabledContainerColor = Color(0xFFD5D9D9), disabledContentColor = SanctuaryUi.inkSecondary,
+          colors = FantasySkin.buttonColors(
+            containerColor = SanctuaryUi.accent,
+            contentColor = Color.White,
+            disabledContainerColor = Color(0xFFD5D9D9),
+            disabledContentColor = SanctuaryUi.inkSecondary,
           ),
         ) {
           Icon(Icons.Default.AutoFixHigh, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -556,9 +554,10 @@ private fun SummoningHallContent(
             overflow = TextOverflow.Ellipsis,
           )
         }
-        OutlinedButton(
+        FantasyChoiceButton(
           onClick = { onToggleSquad(hero) },
           enabled = !injured,
+          selected = hero.inActiveSquad,
           modifier = Modifier.heightIn(min = 48.dp),
         ) {
           Text(
@@ -611,21 +610,20 @@ private fun TrainingGroundContent(
         ) {
           TrainingFocus.entries.filter { !it.isSkillUpgrade }.forEach { focus ->
             val active = selectedFocus == focus
-            Surface(
-              shape = RoundedCornerShape(9.dp),
-              color = if (active) AmberWarning.copy(alpha = 0.28f) else Color(0x9E192D48),
-              border = BorderStroke(1.dp, if (active) AmberWarning else PortalCyan.copy(alpha = 0.42f)),
+            FantasyChoiceButton(
+              onClick = { selectedFocus = focus },
+              selected = active,
               modifier = Modifier
                 .heightIn(min = 40.dp)
-                .testTag("focus_chip_${focus.name.lowercase()}")
-                .clickable { selectedFocus = focus },
+                .testTag("focus_chip_${focus.name.lowercase()}"),
+              shape = RoundedCornerShape(9.dp),
+              contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
             ) {
               Text(
                 text = focus.shortVi,
                 style = MaterialTheme.typography.labelMedium,
                 color = if (active) SummonerGold else ParchmentLight,
                 fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
               )
             }
           }
@@ -687,7 +685,7 @@ private fun TrainingGroundContent(
               maxLines = 1,
             )
           }
-          OutlinedButton(
+          FantasyChoiceButton(
             onClick = { onTrainHeroWithFocus(hero, TrainingFocus.ARCANE_SKILL) },
             enabled = !isBusy && !injured && profile.manaCrystals >= skillManaCost && profile.arcaneEssence >= 1L,
             modifier = Modifier.heightIn(min = 48.dp).testTag("train_skill_${hero.id}"),
@@ -699,7 +697,7 @@ private fun TrainingGroundContent(
               maxLines = 1,
             )
           }
-          OutlinedButton(
+          FantasyChoiceButton(
             onClick = {
               onAssignHeroActivity(
                 hero,
@@ -763,17 +761,19 @@ private fun ArmoryContent(
     ) {
       heroes.forEach { h ->
         val active = h.id == selectedHero?.id
-        Box(
-          modifier = Modifier
-            .heightIn(min = 44.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(if (active) PortalCyan.copy(alpha = 0.28f) else Color(0x96162842))
-            .border(1.dp, if (active) SummonerGold else PortalCyan.copy(alpha = 0.42f), RoundedCornerShape(10.dp))
-            .clickable { selectedHeroId = h.id }
-            .padding(horizontal = 12.dp),
-          contentAlignment = Alignment.Center,
+        FantasyChoiceButton(
+          onClick = { selectedHeroId = h.id },
+          selected = active,
+          modifier = Modifier.heightIn(min = 44.dp),
+          shape = RoundedCornerShape(10.dp),
+          contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
         ) {
-          Text(h.name, style = MaterialTheme.typography.labelLarge, color = if (active) SummonerGold else ParchmentLight, maxLines = 1)
+          Text(
+            h.name,
+            style = MaterialTheme.typography.labelLarge,
+            color = if (active) SummonerGold else ParchmentLight,
+            maxLines = 1,
+          )
         }
       }
     }
@@ -902,7 +902,7 @@ private fun ArmoryEquippedSlotPill(
   onUnequip: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
-  Surface(
+  FantasySurface(
     shape = RoundedCornerShape(10.dp),
     color = Color(0x98162842),
     border = BorderStroke(1.dp, if (item != null) SummonerGold.copy(alpha = 0.68f) else PortalCyan.copy(alpha = 0.42f)),
@@ -924,7 +924,7 @@ private fun ArmoryEquippedSlotPill(
         )
       }
       if (item != null) {
-        OutlinedButton(
+        FantasyChoiceButton(
           onClick = onUnequip,
           enabled = !isBusy,
           modifier = Modifier.heightIn(min = 38.dp).testTag(tag),
@@ -1033,7 +1033,7 @@ private fun SynthesisLabContent(
           Text("${item.name} (+${item.level})", style = MaterialTheme.typography.titleSmall, color = ParchmentLight, maxLines = 1, overflow = TextOverflow.Ellipsis)
           Text("+${item.bonusHp} HP • +${item.bonusAttack} ATK • +${item.bonusDefense} DEF", style = MaterialTheme.typography.labelSmall, color = RuneSilver)
         }
-        OutlinedButton(
+        FantasyChoiceButton(
           onClick = { onEnhanceGear(item) },
           enabled = !isBusy && profile.gold >= enhanceGold && profile.ironOre >= 1L,
           modifier = Modifier.heightIn(min = 48.dp),
@@ -1114,9 +1114,10 @@ private fun HeroQuartersContent(
   Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
       tabs.forEachIndexed { index, (label, tag, accent) ->
-        OutlinedButton(
+        FantasyChoiceButton(
           onClick = { activeTab = index },
-          modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag(tag).semantics { selected = activeTab == index },
+          selected = activeTab == index,
+          modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag(tag),
           colors = ButtonDefaults.outlinedButtonColors(
             containerColor = if (activeTab == index) accent.copy(alpha = 0.24f) else Color(0x88132238),
           ),
@@ -1180,7 +1181,7 @@ private fun HeroQuartersContent(
                 )
               }
               if (onOpenHeroProfile != null) {
-                IconButton(
+                FantasyIconButton(
                   onClick = { onOpenHeroProfile(hero) }, enabled = !isBusy,
                   modifier = Modifier.size(48.dp).testTag("quarters_profile_${hero.id}"),
                 ) { Icon(Icons.Default.Person, contentDescription = "Mở hồ sơ ${hero.name}", tint = SummonerGold) }
@@ -1191,13 +1192,13 @@ private fun HeroQuartersContent(
               HouseStatBar(data.morale / 100f, "quarters_morale_${hero.id}", PortalCyan, Modifier.weight(1f))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-              OutlinedButton(
+              FantasyChoiceButton(
                 onClick = { selectedInfirmaryHeroId = hero.id; activeTab = 1 },
                 enabled = !isBusy,
                 modifier = Modifier.heightIn(min = 48.dp).testTag("quarters_treat_${hero.id}"),
               ) { Text("Điều trị / Bữa ăn", color = SummonerGold, maxLines = 1) }
               if (!injured) {
-                OutlinedButton(
+                FantasyChoiceButton(
                   onClick = { onAssignHeroActivity(hero, if (resting) HeroStatusType.READY else HeroStatusType.RESTING) },
                   enabled = !isBusy,
                   modifier = Modifier.heightIn(min = 48.dp).testTag("quarters_rest_${hero.id}"),
@@ -1285,14 +1286,15 @@ private fun HeroQuartersContent(
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
               activeHeroes.forEach { hero ->
                 val isTarget = hero.id == targetHero?.id
-                OutlinedButton(
+                FantasyChoiceButton(
                   onClick = {
                     synthesisTargetId = hero.id
                     synthesisMaterialIds = synthesisMaterialIds.filterNot { it == hero.id }
                     synthesisConfirmation = null
                   },
                   enabled = !isBusy,
-                  modifier = Modifier.heightIn(min = 48.dp).testTag("synthesis_target_${hero.id}").semantics { selected = isTarget },
+                  selected = isTarget,
+                  modifier = Modifier.heightIn(min = 48.dp).testTag("synthesis_target_${hero.id}"),
                   border = BorderStroke(1.dp, if (isTarget) SummonerGold else PortalCyan.copy(alpha = 0.45f)),
                 ) { Text(hero.name, color = if (isTarget) SummonerGold else ParchmentLight, maxLines = 1) }
               }
@@ -1365,7 +1367,8 @@ private fun HeroQuartersContent(
     AlertDialog(
       onDismissRequest = { if (!isBusy) synthesisConfirmation = null },
       modifier = Modifier.testTag("cruel_synthesis_confirmation"),
-      containerColor = ObsidianVoid,
+      shape = RoundedCornerShape(16.dp),
+      containerColor = FantasySkin.Panel,
       title = { Text("Xác nhận hiến tế vĩnh viễn", color = SummonerGold) },
       text = {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1391,7 +1394,7 @@ private fun HeroQuartersContent(
         ) { Text("Hiến tế vĩnh viễn") }
       },
       dismissButton = {
-        OutlinedButton(
+        FantasyChoiceButton(
           onClick = { synthesisConfirmation = null }, enabled = !isBusy,
           modifier = Modifier.heightIn(min = 48.dp).testTag("cancel_cruel_synthesis_button"),
         ) { Text("Hủy", color = ParchmentLight) }
@@ -1408,12 +1411,18 @@ private fun HouseSectionCard(
   accent: Color,
   content: @Composable ColumnScope.() -> Unit,
 ) {
-  Column(
-    modifier = modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Color(0xE5182B46))
-      .border(1.dp, accent.copy(alpha = 0.65f), RoundedCornerShape(12.dp)).padding(10.dp),
-    verticalArrangement = Arrangement.spacedBy(6.dp),
-    content = content,
-  )
+  FantasySurface(
+    modifier = modifier.fillMaxWidth(),
+    shape = RoundedCornerShape(12.dp),
+    color = Color(0xE5182B46),
+    border = BorderStroke(1.dp, accent.copy(alpha = 0.65f)),
+  ) {
+    Column(
+      modifier = Modifier.padding(10.dp),
+      verticalArrangement = Arrangement.spacedBy(6.dp),
+      content = content,
+    )
+  }
 }
 
 @Composable
@@ -1470,7 +1479,7 @@ private fun RestaurantContent(
 
         if (activeMealPair != null) {
           val (activeRecipe, remFeastSec) = activeMealPair
-          Surface(
+          FantasySurface(
             shape = RoundedCornerShape(8.dp),
             color = Color(0xFF14332B),
             modifier = Modifier.border(1.dp, EmeraldVitality, RoundedCornerShape(8.dp)),
@@ -1486,16 +1495,14 @@ private fun RestaurantContent(
 
         SanctuaryMealRecipe.entries.forEach { recipe ->
           val isSel = selectedRecipe == recipe
-          Surface(
+          FantasyChoiceButton(
+            onClick = { selectedRecipe = recipe },
+            selected = isSel,
+            modifier = Modifier.fillMaxWidth().testTag("meal_recipe_${recipe.code.lowercase()}"),
             shape = RoundedCornerShape(10.dp),
-            color = if (isSel) SummonerGold.copy(alpha = 0.22f) else Color(0x9815263E),
-            border = BorderStroke(1.dp, if (isSel) SummonerGold else PortalCyan.copy(alpha = 0.42f)),
-            modifier = Modifier
-              .fillMaxWidth()
-              .testTag("meal_recipe_${recipe.code.lowercase()}")
-              .clickable { selectedRecipe = recipe },
+            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 7.dp),
           ) {
-            Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
               Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(recipe.titleVi, style = MaterialTheme.typography.labelLarge, color = if (isSel) SummonerGold else ParchmentLight)
                 Text("${recipe.rationCost} Khẩu Phần • ${recipe.goldCost} Vàng", style = MaterialTheme.typography.labelSmall, color = PortalCyan)
@@ -1527,7 +1534,7 @@ private fun RestaurantContent(
         }
 
         if (onEnterRestaurantInterior != null) {
-          OutlinedButton(
+          FantasyChoiceButton(
             onClick = onEnterRestaurantInterior,
             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("modal_enter_restaurant_interior_button"),
           ) {
