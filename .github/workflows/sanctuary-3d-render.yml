@@ -1,0 +1,69 @@
+name: Sanctuary 3D render smoke
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/src/main/java/com/example/game/diorama/**'
+      - 'app/src/main/java/com/example/ui/screens/SanctuaryCourtyardScreen.kt'
+      - 'app/src/test/java/com/example/game/diorama/**'
+      - 'app/src/androidTest/java/com/example/CourtyardGlInstrumentedTest.kt'
+      - '.github/workflows/sanctuary-3d-render.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sanctuary-3d-render-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  open-gl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.3.1'
+      - name: Build app and Android test packages
+        run: |
+          sdkmanager --install 'platforms;android-36.1' 'build-tools;36.0.0'
+          keytool -genkeypair -keystore debug.keystore -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 365 -dname 'CN=Android Debug,O=Android,C=US'
+          gradle :app:testDebugUnitTest --tests 'com.example.game.diorama.*' :app:assembleDebug :app:assembleDebugAndroidTest --console=plain
+      - name: Enable KVM
+        run: |
+          test -c /dev/kvm
+          sudo chmod a+rw /dev/kvm
+      - name: Render through the production OpenGL ES pipeline
+        uses: ReactiveCircus/android-emulator-runner@4c44018e59b437e86cdfc41da381398f93ed8808
+        with:
+          api-level: 35
+          target: aosp_atd
+          arch: x86_64
+          ram-size: 2048M
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: |
+            mkdir -p app/build/courtyard-evidence
+            adb install --no-streaming app/build/outputs/apk/debug/app-debug.apk
+            adb install -t --no-streaming app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+            adb shell am instrument -w -r -e class com.example.CourtyardGlInstrumentedTest com.aistudio.eternalsummoner.kvrpzm.test/androidx.test.runner.AndroidJUnitRunner | tee app/build/courtyard-evidence/instrumentation.log
+            adb logcat -d -s SanctuaryCourtyard3D AndroidRuntime > app/build/courtyard-evidence/opengl.log
+            grep -Eq '^OK \(1 test\)' app/build/courtyard-evidence/instrumentation.log
+            adb exec-out run-as com.aistudio.eternalsummoner.kvrpzm cat files/sanctuary-3d-egl.png > app/build/courtyard-evidence/sanctuary-3d-egl.png
+            python3 -c 'from pathlib import Path; p = Path("app/build/courtyard-evidence/sanctuary-3d-egl.png").read_bytes(); assert len(p) > 20000 and p.startswith(bytes.fromhex("89504e470d0a1a0a"))'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sanctuary-3d-opengl-evidence
+          path: app/build/courtyard-evidence/
+          if-no-files-found: warn
+          retention-days: 7

@@ -195,6 +195,34 @@ class P29HubHudTest {
   }
 
   @Test
+  @Config(qualifiers = "w800dp-h360dp-land-mdpi")
+  fun cameraMenuOpensCourtyardAndExitReturnsToSanctuary() {
+    rule.mainClock.autoAdvance = false
+    rule.setContent {
+      EternalSummonerTheme {
+        SanctuaryLobbyScreen(
+          state = sampleState(), sceneActive = false,
+          onOpenFacility = {}, onCloseFacility = {}, onSummonHero = {},
+          onTrainHero = { _, _ -> }, onEquipItem = { _, _ -> }, onSynthesizeGear = {},
+          onEnhanceGear = {}, onRecoverHero = { _, _ -> }, onHostMeal = {},
+          onToggleSquad = {}, onCompletePrologue = {}, onSignOut = {},
+        )
+      }
+    }
+    rule.mainClock.advanceTimeBy(120L)
+    rule.onNodeWithTag("camera_controls_toggle").performClick()
+    rule.mainClock.advanceTimeBy(120L)
+    rule.onNodeWithTag("sanctuary_3d_enter").performClick()
+    rule.mainClock.advanceTimeBy(120L)
+    rule.onNodeWithTag("sanctuary_3d_courtyard").assertExists()
+    rule.onNodeWithTag("sanctuary_canvas").assertDoesNotExist()
+    rule.onNodeWithTag("sanctuary_3d_exit").performClick()
+    rule.mainClock.advanceTimeBy(120L)
+    rule.onNodeWithTag("sanctuary_3d_courtyard").assertDoesNotExist()
+    rule.onNodeWithTag("sanctuary_canvas").assertExists()
+  }
+
+  @Test
   fun collapsedNavHasAccessibleDestinationNames() {
     rule.mainClock.autoAdvance = false
     rule.setContent {

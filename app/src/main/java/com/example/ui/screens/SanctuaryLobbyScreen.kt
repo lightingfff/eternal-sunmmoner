@@ -290,6 +290,7 @@ fun SanctuaryLobbyScreen(
   var showQuickCommands by remember { mutableStateOf(false) }
   var showMasterHub by remember { mutableStateOf(false) }
   var cameraExpanded by remember { mutableStateOf(false) }
+  var courtyardOpen by remember { mutableStateOf(false) }
   var managementMode by remember { mutableStateOf<String?>(null) }
   var promptedFacility by remember { mutableStateOf<FacilityType?>(null) }
   var inspectingHeroId by remember { mutableStateOf<String?>(null) }
@@ -341,7 +342,7 @@ fun SanctuaryLobbyScreen(
 
   LaunchedEffect(Unit) { focusRequester.requestFocus() }
   SceneFrameLoop(
-    active = sceneActive && !showMasterHub && state.activeFacilityModal == null && managementMode == null &&
+    active = sceneActive && !courtyardOpen && !showMasterHub && state.activeFacilityModal == null && managementMode == null &&
       !showPauseMapModal && !showChronicleModal && !showExpansionModal && inspectingHeroId == null && !showPrologue,
     targetFps = settings.performanceMode.targetFps,
   ) { elapsed, nanos ->
@@ -394,6 +395,7 @@ fun SanctuaryLobbyScreen(
       .focusRequester(focusRequester)
       .focusable()
       .onKeyEvent { event ->
+        if (courtyardOpen) return@onKeyEvent false
         val down = event.type == KeyEventType.KeyDown
         when (event.key) {
           Key.W, Key.DirectionUp -> { keyUp = down; true }
@@ -422,6 +424,10 @@ fun SanctuaryLobbyScreen(
         }
       },
   ) {
+    if (courtyardOpen) {
+      SanctuaryCourtyardScreen(onExit = { courtyardOpen = false })
+      return@BoxWithConstraints
+    }
     val isWideScreen = maxWidth >= 600.dp
     val isShortHeight = maxHeight < 460.dp
     val isNarrowScreen = maxWidth < 480.dp
@@ -1080,7 +1086,7 @@ fun SanctuaryLobbyScreen(
           .testTag("camera_controls_bar"),
       ) {
         // P29: camera tools are COLLAPSED by default — one toggle button keeps the idle
-        // viewport clear; expanding reveals all five tools (tags preserved).
+        // viewport clear until the player opens the camera tools.
         if (!cameraExpanded) {
           FantasyIconButton(
             onClick = { cameraExpanded = true },
@@ -1149,6 +1155,19 @@ fun SanctuaryLobbyScreen(
             modifier = Modifier.size(cameraIconSize).testTag("camera_gate_button"),
           ) {
             Icon(Icons.Default.Castle, contentDescription = "Đến Cổng Tháp", tint = EmeraldVitality, modifier = Modifier.size(cameraIconInner))
+          }
+          if (!insideInterior) {
+            FantasyTextButton(
+              onClick = {
+                courtyardOpen = true
+                cameraExpanded = false
+              },
+              modifier = Modifier.testTag("sanctuary_3d_enter"),
+              enabled = !pendingDrop && lobbyEngine.pickedHeroId == null,
+              contentPadding = PaddingValues(horizontal = 8.dp),
+            ) {
+              Text("Sân 3D", style = MaterialTheme.typography.labelSmall, maxLines = 1)
+            }
           }
         }
         }
