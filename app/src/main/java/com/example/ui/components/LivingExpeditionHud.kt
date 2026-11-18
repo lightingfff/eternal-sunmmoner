@@ -45,7 +45,7 @@ fun LivingExpeditionHud(
   ) {
     if (compact && decision == null) {
       Row(
-        Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+        Modifier.padding(horizontal = 8.dp, vertical = 1.dp),
         horizontalArrangement = Arrangement.spacedBy(5.dp),
         verticalAlignment = Alignment.CenterVertically,
       ) {
@@ -72,7 +72,7 @@ fun LivingExpeditionHud(
       }
     } else {
       Column(
-        Modifier.padding(horizontal = 9.dp, vertical = 7.dp),
+        Modifier.padding(horizontal = 9.dp, vertical = 5.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
       ) {
         if (decision != null) {
@@ -127,7 +127,7 @@ fun LivingExpeditionHud(
               overflow = TextOverflow.Ellipsis,
             )
             Text(
-              if (automationEnabled) "TỰ ĐỘNG" else "CHỜ LỆNH",
+              if (automationEnabled) "Đội tự thám hiểm" else "Đang chờ lệnh",
               style = MaterialTheme.typography.labelSmall,
               color = ESDesignTokens.success,
               fontWeight = FontWeight.Bold,

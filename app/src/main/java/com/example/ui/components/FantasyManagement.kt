@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -103,7 +104,7 @@ fun SanctuaryManagementNav(onNavigate: (String) -> Unit, modifier: Modifier = Mo
     compactFrame = true,
   ) {
     Row(
-      modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp),
+      modifier = Modifier.padding(horizontal = 5.dp),
       horizontalArrangement = Arrangement.SpaceEvenly,
       verticalAlignment = Alignment.CenterVertically,
     ) {

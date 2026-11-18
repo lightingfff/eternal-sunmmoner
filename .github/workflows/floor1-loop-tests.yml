@@ -175,6 +175,30 @@ jobs:
           if [ "${{ steps.world_compatibility_tests.outcome }}" = "failure" ]; then
             python3 tools/annotate_junit_failures.py app/build/floor1-test-results/world --title "Floor 1 world test failure"
           fi
+      - name: Shared loading and Lobby HUD regression guards
+        id: shared_ui_tests
+        run: >-
+          gradle :app:testDebugUnitTest
+          --tests com.example.ui.P28ComponentsTest
+          --tests com.example.ui.P28UiEvidenceTest
+          --tests com.example.ui.P29HubHudTest
+          --console=plain
+      - name: Retain shared UI results
+        if: always()
+        run: |
+          if [ "${{ steps.shared_ui_tests.outcome }}" = "skipped" ]; then
+            echo 'Shared UI results not retained because that test group was skipped.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          mkdir -p app/build/floor1-test-results/shared-ui
+          if compgen -G 'app/build/test-results/testDebugUnitTest/*.xml' > /dev/null; then
+            cp app/build/test-results/testDebugUnitTest/*.xml app/build/floor1-test-results/shared-ui/
+          else
+            echo 'No JUnit XML was generated before the shared UI step failed.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ "${{ steps.shared_ui_tests.outcome }}" = "failure" ]; then
+            python3 tools/annotate_junit_failures.py app/build/floor1-test-results/shared-ui --title "Loading / Lobby HUD test failure"
+          fi
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -199,6 +223,8 @@ jobs:
             app/build/visual_screenshots/living-expedition/
             app/build/visual_screenshots/tower-reforge/
             app/build/visual_screenshots/p05/
+            app/build/visual_screenshots/p28/ui/
+            app/build/visual_screenshots/p29/hub/
             app/build/test-results/testDebugUnitTest/
             app/build/floor1-test-results/
           if-no-files-found: warn
