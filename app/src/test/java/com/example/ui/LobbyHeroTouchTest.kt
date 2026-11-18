@@ -10,6 +10,7 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.example.data.*
 import com.example.data.model.*
+import com.example.game.map.GroundView
 import com.example.game.map.ObliqueCamera
 import com.example.game.tower.TowerFloorCatalog
 import com.example.ui.screens.SanctuaryLobbyScreen
@@ -52,8 +53,9 @@ class LobbyHeroTouchTest {
     val rect=rule.onNodeWithTag("sanctuary_canvas").fetchSemanticsNode().boundsInRoot
     val layout=TowerFloorCatalog.buildSanctuaryMap()
     val cx=ObliqueCamera.clampCamX(1660f,layout.width,layout.wallMargin,.36f,rect.width/2f)
-    val cy=ObliqueCamera.clampCamY(1260f,layout.height,layout.wallMargin,.36f,rect.height/2f,northHeadroomWorld=220f)
-    return Offset(ObliqueCamera.worldToScreenX(wx,cx,.36f,rect.width/2f),ObliqueCamera.worldToScreenY(wy,cy,.36f,rect.height/2f))
+    val view = GroundView.SANCTUARY_DIORAMA
+    val cy=view.clampCameraY(1260f,layout.height,layout.wallMargin,.36f,rect.height/2f,northHeadroom=220f)
+    return Offset(ObliqueCamera.worldToScreenX(wx,cx,.36f,rect.width/2f),view.projectY(wy,cy,.36f,rect.height/2f))
   }
   private fun hold() {
     val start=screen(1785f,1185f)-Offset(0f,12f)

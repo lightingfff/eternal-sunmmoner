@@ -11,10 +11,12 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.example.data.model.IslandExpansionMilestone
+import com.example.game.map.GroundView
 import com.example.game.map.ObliqueCamera
 import com.example.game.map.PathSegment
 import com.example.game.map.SanctuaryIslandGeometry
@@ -41,7 +43,7 @@ object SanctuaryWorldRenderer {
     val mask = surfaceRectangle.apply { reset(); addRect(rect) }
     with(ArchitectureSurfaceArt) {
       drawSurface(name, mask, origin, Offset(.7f * zoom, 0f),
-        Offset(0f, .7f * zoom * if (ground) ObliqueCamera.OBLIQUE_Y_SCALE else 1f), tone = tone)
+        Offset(0f, .7f * zoom * if (ground) groundView.groundY else 1f), tone = tone)
     }
   }
 
@@ -124,7 +126,7 @@ object SanctuaryWorldRenderer {
     val halfW = size.width / 2f
     val halfH = size.height / 2f
     fun sx(wx: Float) = ObliqueCamera.worldToScreenX(wx, camX, zoom, halfW)
-    fun sy(wy: Float, z: Float = 0f) = ObliqueCamera.worldToScreenY(wy, camY, zoom, halfH, z)
+    fun sy(wy: Float, z: Float = 0f) = groundView.projectY(wy, camY, zoom, halfH, z)
 
     // 1. Time-of-day sky gradient, celestial discs, clouds and horizon haze.
     // P26: the sky is the mood carrier. Morning / noon / evening / night each read
@@ -156,12 +158,12 @@ object SanctuaryWorldRenderer {
     clipPath(islandGroundPath) {
       val worldTileSize = 64f
       val tileScreenW = (worldTileSize * zoom).roundToInt().coerceAtLeast(2)
-      val tileScreenH = (worldTileSize * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt().coerceAtLeast(2)
+      val tileScreenH = (worldTileSize * groundView.groundY * zoom).roundToInt().coerceAtLeast(2)
 
       val minWx = ObliqueCamera.screenToWorldX(0f, camX, zoom, halfW).coerceAtLeast(240f)
       val maxWx = ObliqueCamera.screenToWorldX(size.width, camX, zoom, halfW).coerceAtMost(2960f)
-      val minWy = ObliqueCamera.screenToWorldY(0f, camY, zoom, halfH).coerceAtLeast(280f)
-      val maxWy = ObliqueCamera.screenToWorldY(size.height, camY, zoom, halfH).coerceAtMost(2420f)
+      val minWy = groundView.unprojectY(0f, camY, zoom, halfH).coerceAtLeast(280f)
+      val maxWy = groundView.unprojectY(size.height, camY, zoom, halfH).coerceAtMost(2420f)
 
       val startTx = ((minWx / worldTileSize).toInt() - 1).coerceAtLeast(3)
       val endTx = ((maxWx / worldTileSize).toInt() + 1).coerceAtMost(47)
@@ -280,7 +282,7 @@ object SanctuaryWorldRenderer {
     val halfW = size.width / 2f
     val halfH = size.height / 2f
     fun sx(wx: Float) = ObliqueCamera.worldToScreenX(wx, camX, zoom, halfW)
-    fun sy(wy: Float, z: Float = 0f) = ObliqueCamera.worldToScreenY(wy, camY, zoom, halfH, z)
+    fun sy(wy: Float, z: Float = 0f) = groundView.projectY(wy, camY, zoom, halfH, z)
 
     val verts = SanctuaryIslandGeometry.POLYGON_VERTICES
     val wBot = verts[6]     // (300, 1780)
@@ -375,7 +377,7 @@ object SanctuaryWorldRenderer {
       // The road verge ring is a clip ring: tiles fully outside the road cannot contribute.
       if (roadPaths != null && !SanctuaryRoadCoverage.mayContainRoad(roadPaths, tx, ty, roadExtraWorld)) continue
       drawImage(ArtDepthAssets.tile(tiles, tx, ty), dstOffset=IntOffset(sx(tx*64f).roundToInt(),sy(ty*64f,0f).roundToInt()),
-        dstSize=IntSize((64*zoom).roundToInt().coerceAtLeast(1)+1,(64*zoom*ObliqueCamera.OBLIQUE_Y_SCALE).roundToInt().coerceAtLeast(1)+1),filterQuality=FilterQuality.None)
+        dstSize=IntSize((64*zoom).roundToInt().coerceAtLeast(1)+1,(64*zoom*groundView.groundY).roundToInt().coerceAtLeast(1)+1),filterQuality=FilterQuality.None)
     }
   }
 
@@ -418,7 +420,7 @@ object SanctuaryWorldRenderer {
         close()
 
         val capRx = halfW * zoom
-        val capRy = halfW * ObliqueCamera.OBLIQUE_Y_SCALE * zoom
+        val capRy = halfW * groundView.groundY * zoom
         addClockwiseCap(sx(seg.startX), sy(seg.startY, 0f), capRx, capRy)
         addClockwiseCap(sx(seg.endX), sy(seg.endY, 0f), capRx, capRy)
       }
@@ -804,6 +806,7 @@ object SanctuaryWorldRenderer {
     sy: (Float, Float) -> Float,
     zoom: Float,
   ) {
+    val diorama = groundView == GroundView.SANCTUARY_DIORAMA
     // 1. Warm Ochre Garden Soil Paths in the Residential Hedge Courtyard (x: 935..1255, y: 985..1285)
     val dirtColor = Color(0xFF3A352E)
     val dirtBorder = Color(0xFF2A2620)
@@ -814,11 +817,40 @@ object SanctuaryWorldRenderer {
     drawRect(dirtBorder, Offset(p1Left, p1Top), Size(p1W, p1H), style = Stroke(width = 3f * zoom))
     drawRect(dirtColor.copy(alpha = 0.88f), Offset(p1Left, p1Top), Size(p1W, p1H))
 
+    if (diorama && p1Left < size.width && p1Left + p1W > 0f && p1Top < size.height && p1Top + p1H > 0f) {
+      val soil = ArtDepthAssets.family("soil")
+      if (soil != null) clipRect(p1Left, p1Top, p1Left + p1W, p1Top + p1H) {
+        for (y in 15..20) for (x in 14..19) {
+          val left = sx(64f * x).roundToInt()
+          val top = sy(64f * y, 0f).roundToInt()
+          val right = sx(64f * (x + 1)).roundToInt()
+          val bottom = sy(64f * (y + 1), 0f).roundToInt()
+          if (left >= size.width || right <= 0 || top >= size.height || bottom <= 0) continue
+          drawImage(
+            ArtDepthAssets.tile(soil, x, y),
+            dstOffset = IntOffset(left, top),
+            dstSize = IntSize((right - left + 1).coerceAtLeast(1), (bottom - top + 1).coerceAtLeast(1)),
+            filterQuality = FilterQuality.None,
+          )
+        }
+      }
+    }
+
     // Green inner lawn beds inside courtyard
     fun drawLawnBed(x0: Float, y0: Float, x1: Float, y1: Float) {
       val l = sx(x0)
       val t = sy(y0, 0f)
-      drawRect(Color(0xFF2F3D33), Offset(l, t), Size(sx(x1) - l, sy(y1, 0f) - t))
+      val r = sx(x1)
+      val b = sy(y1, 0f)
+      if (l >= size.width || r <= 0f || t >= size.height || b <= 0f) return
+      if (diorama) clipRect(l, t, r, b) {
+        val grassDrawn = with(ArtDepthAssets) {
+          drawGrassMacros((x0 / 64f).toInt(), (x1 / 64f).toInt(), (y0 / 64f).toInt(),
+            (y1 / 64f).toInt(), sx, { sy(it, 0f) }, zoom)
+        }
+        if (!grassDrawn) drawRect(Color(0xFF2F3D33), Offset(l, t), Size(r - l, b - t))
+        drawRect(Color(0x22211A13), Offset(l, t), Size(r - l, b - t))
+      } else drawRect(Color(0xFF2F3D33), Offset(l, t), Size(r - l, b - t))
     }
     drawLawnBed(955f, 995f, 1085f, 1115f)
     drawLawnBed(1115f, 1135f, 1245f, 1270f)
@@ -832,6 +864,22 @@ object SanctuaryWorldRenderer {
       val b = sy(y1, 0f)
       val w = (r - l).coerceAtLeast(4f * zoom)
       val h = (b - t).coerceAtLeast(6f * zoom)
+      if (l >= size.width || r <= 0f || t >= size.height || b <= 0f) return
+      if (diorama) {
+        val faceTop = b - 9f * zoom
+        drawRect(Color(0x34302418), Offset(l + 3f * zoom, b), Size(w, 4f * zoom))
+        drawRect(Color(0xFF1E3625), Offset(l, faceTop), Size(w, b - faceTop))
+        clipRect(l, t, r, b) {
+          with(ArtDepthAssets) {
+            drawGrassMacros((x0 / 64f).toInt(), (x1 / 64f).toInt(), (y0 / 64f).toInt(),
+              ((y1 + 20f) / 64f).toInt(), sx, { sy(it, 10f) }, zoom)
+          }
+          drawRect(Color(0x62324D36), Offset(l, t), Size(w, b - t))
+          drawRect(Color(0x6930231A), Offset(l, faceTop), Size(w, b - faceTop))
+        }
+        drawLine(Color(0x60809658), Offset(l, t), Offset(r, t), 1.5f * zoom)
+        return
+      }
       drawRect(Color(0xFF1A2520), Offset(l, t + h * 0.45f), Size(w, h * 0.55f))
       drawRect(Color(0xFF2F4A2E), Offset(l, t), Size(w, h * 0.65f))
       drawRect(Color(0xFF3D5A36), Offset(l + 2f * zoom, t + 1f * zoom), Size((w - 4f * zoom).coerceAtLeast(1f), h * 0.25f))
@@ -854,6 +902,11 @@ object SanctuaryWorldRenderer {
       val h = (b - t).coerceAtLeast(5f * zoom)
       drawRect(Color(0xFF3A3F4A), Offset(l, t + h * 0.45f), Size(w, h * 0.55f))
       drawRect(Color(0xFF4E525E), Offset(l, t), Size(w, h * 0.50f))
+      if (diorama) {
+        val faceTop = t + h * .44f
+        surfaceRect("limestone", Rect(l, t, l + w, faceTop), Offset(sx(0f), t), zoom, ground = true)
+        surfaceRect("limestone", Rect(l, faceTop, l + w, t + h), Offset(sx(0f), faceTop), zoom, ground = false, tone = 2)
+      }
       drawRect(Color(0xFF3A3530), Offset(l, t), Size(w, h), style = Stroke(width = (1.2f * zoom).coerceAtLeast(1f)))
     }
     drawLowGardenWall(675f, 1280f, 915f, 1292f)
@@ -871,7 +924,7 @@ object SanctuaryWorldRenderer {
     val pondCx = sx(2595f)
     val pondCy = sy(1320f, 0f)
     val rx = 185f * zoom
-    val ry = 132f * zoom * ObliqueCamera.OBLIQUE_Y_SCALE
+    val ry = 132f * zoom * groundView.groundY
     if (pondCx + rx < -40f || pondCx - rx > size.width + 40f || pondCy + ry < -40f || pondCy - ry > size.height + 40f) return
 
     // Carved white-marble reflection basin curb & gold inlay
@@ -938,7 +991,7 @@ object SanctuaryWorldRenderer {
     val fCx = sx(1960f)
     val fCy = sy(645f, 0f)
     val rx = 245f * zoom
-    val ry = 165f * zoom * ObliqueCamera.OBLIQUE_Y_SCALE
+    val ry = 165f * zoom * groundView.groundY
     if (fCx + rx < -40f || fCx - rx > size.width + 40f || fCy + ry < -40f || fCy - ry > size.height + 40f) return
 
     val pulse = 0.80f + 0.20f * sin(timeSec * 2.6f)
@@ -1134,7 +1187,7 @@ object SanctuaryWorldRenderer {
     val cx = sx(SanctuaryIslandGeometry.PLAZA_CENTER_X)
     val cy = sy(SanctuaryIslandGeometry.PLAZA_CENTER_Y, 0f)
     val rx = SanctuaryIslandGeometry.PLAZA_RADIUS * zoom
-    val ry = rx * ObliqueCamera.OBLIQUE_Y_SCALE
+    val ry = rx * groundView.groundY
 
     if (cx + rx < -60f || cx - rx > size.width + 60f || cy + ry < -60f || cy - ry > size.height + 60f) return
 
@@ -1158,7 +1211,7 @@ object SanctuaryWorldRenderer {
     clipPath(plazaClip) {
       val tiles = FantasyHd128Atlas.hdSanctuaryStoneTiles
       val tw = (64 * zoom).roundToInt() + 1
-      val th = (64 * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt() + 1
+      val th = (64 * groundView.groundY * zoom).roundToInt() + 1
       for (ty in 10..28) for (tx in 21..39) {
         val hash = ((tx * 73856093 xor ty * 19349663) and 0x7fffffff)
         drawImage(
@@ -1256,7 +1309,7 @@ object SanctuaryWorldRenderer {
     for (rippleIndex in 0..2) {
       val ripplePhase = (timeSec * 0.38f + rippleIndex / 3f) % 1f
       val rippleX = 0.16f + ripplePhase * 0.22f
-      val rippleY = rippleX * ObliqueCamera.OBLIQUE_Y_SCALE
+      val rippleY = rippleX * groundView.groundY
       drawOval(
         color = Color(0xFFBAE6FD).copy(alpha = (1f - ripplePhase) * 0.42f),
         topLeft = Offset(cx - rx * rippleX, cy - ry * rippleY),
@@ -1377,7 +1430,7 @@ object SanctuaryWorldRenderer {
     drawPath(runner, Color(0xFF881337))
     with(ArchitectureSurfaceArt) {
       drawSurface("carpet", runner, Offset(sx(0f), sy(0f, 0f)),
-        Offset(.55f * zoom, 0f), Offset(0f, .55f * zoom * ObliqueCamera.OBLIQUE_Y_SCALE))
+        Offset(.55f * zoom, 0f), Offset(0f, .55f * zoom * groundView.groundY))
     }
     drawPath(runner, Color(0xFFF5B841), style = Stroke(width = 2f * zoom))
   }
@@ -1429,7 +1482,7 @@ object SanctuaryWorldRenderer {
     drawPath(leftWingStairs, Color(0xFFB5B0A6))
     with(ArchitectureSurfaceArt) {
       drawSurface("limestone", leftWingStairs, Offset(sx(0f), sy(0f, 0f)),
-        Offset(.7f * zoom, 0f), Offset(0f, .7f * zoom * ObliqueCamera.OBLIQUE_Y_SCALE))
+        Offset(.7f * zoom, 0f), Offset(0f, .7f * zoom * groundView.groundY))
     }
     drawPath(leftWingStairs, Color(0xFF3E3B36), style = Stroke(width = 1.5f * zoom))
 
@@ -1443,7 +1496,7 @@ object SanctuaryWorldRenderer {
     drawPath(rightWingStairs, Color(0xFFB5B0A6))
     with(ArchitectureSurfaceArt) {
       drawSurface("limestone", rightWingStairs, Offset(sx(0f), sy(0f, 0f)),
-        Offset(.7f * zoom, 0f), Offset(0f, .7f * zoom * ObliqueCamera.OBLIQUE_Y_SCALE))
+        Offset(.7f * zoom, 0f), Offset(0f, .7f * zoom * groundView.groundY))
     }
     drawPath(rightWingStairs, Color(0xFF3E3B36), style = Stroke(width = 1.5f * zoom))
 
@@ -1822,7 +1875,7 @@ object SanctuaryWorldRenderer {
       val pCx = sx(SanctuaryIslandGeometry.PLAZA_CENTER_X)
       val pCy = sy(SanctuaryIslandGeometry.PLAZA_CENTER_Y, 0f)
       val rx = SanctuaryIslandGeometry.PLAZA_RADIUS * zoom
-      val ry = rx * ObliqueCamera.OBLIQUE_Y_SCALE
+      val ry = rx * groundView.groundY
       drawOval(
         color = Color(0xFF060A14).copy(alpha = 0.32f),
         topLeft = Offset(pCx - rx*1.03f, pCy - ry*1.03f),
@@ -1855,14 +1908,14 @@ object SanctuaryWorldRenderer {
       val px = sx(SanctuaryIslandGeometry.PLAZA_CENTER_X)
       val py = sy(SanctuaryIslandGeometry.PLAZA_CENTER_Y, 0f)
       drawHdrStamp(
-        Offset(px, py), 120f*zoom, 120f*zoom*ObliqueCamera.OBLIQUE_Y_SCALE,
+        Offset(px, py), 120f*zoom, 120f*zoom*groundView.groundY,
         HdrLightResponse.Tint.MOON, (.160f*exposure).coerceAtMost(.30f),
       )
       // Tower Gate is the strongest cold source; its pool reaches the monolith stairs.
       // The emissive core/rift halo itself is drawn by drawProp AFTER the monument sprite.
       val gx = sx(1960f); val gy = sy(585f, 0f)
       drawHdrStamp(
-        Offset(gx, gy + 12f*zoom), 118f*zoom, 118f*zoom*ObliqueCamera.OBLIQUE_Y_SCALE,
+        Offset(gx, gy + 12f*zoom), 118f*zoom, 118f*zoom*groundView.groundY,
         HdrLightResponse.Tint.AETHER, (.13f*exposure*flicker).coerceAtMost(.22f),
       )
       if (DepthPresentation.quality == DepthPresentation.Quality.BALANCED) {
@@ -1870,7 +1923,7 @@ object SanctuaryWorldRenderer {
         for (i in 0..1) {
           val wx = if (i == 0) 1490f else 1730f
           drawHdrStamp(
-            Offset(sx(wx), sy(2155f, 0f)), 62f*zoom, 62f*zoom*ObliqueCamera.OBLIQUE_Y_SCALE,
+            Offset(sx(wx), sy(2155f, 0f)), 62f*zoom, 62f*zoom*groundView.groundY,
             HdrLightResponse.Tint.AMBER, (.10f*exposure*flicker).coerceAtMost(.22f),
           )
         }

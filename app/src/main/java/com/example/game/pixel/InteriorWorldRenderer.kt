@@ -301,7 +301,7 @@ object InteriorWorldRenderer {
     val halfW = size.width / 2f
     val halfH = size.height / 2f
     fun sx(wx: Float) = ObliqueCamera.worldToScreenX(wx, camX, zoom, halfW)
-    fun sy(wy: Float, z: Float = 0f) = ObliqueCamera.worldToScreenY(wy, camY, zoom, halfH, z)
+    fun sy(wy: Float, z: Float = 0f) = groundView.projectY(wy, camY, zoom, halfH, z)
 
     val pulse = 0.65f + 0.35f * sin(timeSec * 2.8f)
 
@@ -373,7 +373,7 @@ object InteriorWorldRenderer {
         drawPath(terraceOval, Color(0xFF69BD4F))
         val grassTiles = PixelTileAtlas.sanctuaryGrassTiles
         val tsW = (64f * zoom).roundToInt().coerceAtLeast(2)
-        val tsH = (64f * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt().coerceAtLeast(2)
+        val tsH = (64f * groundView.groundY * zoom).roundToInt().coerceAtLeast(2)
         clipPath(terraceOval) {
           for (ty in 16..23) {
             val dstY = sy(ty * 64f, 0f).roundToInt()
@@ -413,7 +413,7 @@ object InteriorWorldRenderer {
 
         // Central Celestial Healing Spring Fountain on the new island!
         val fRx = 56f * zoom
-        val fRy = fRx * ObliqueCamera.OBLIQUE_Y_SCALE
+        val fRy = fRx * groundView.groundY
         drawOval(Color(0xFF8C867B), Offset(eastCx - fRx * 1.08f, eastCy - fRy * 1.05f + 5f * zoom), Size(fRx * 2.16f, fRy * 2.10f))
         drawOval(Color(0xFFEDE9E0), Offset(eastCx - fRx, eastCy - fRy), Size(fRx * 2f, fRy * 2f))
         drawOval(Color(0xFF38BDF8), Offset(eastCx - fRx * 0.78f, eastCy - fRy * 0.78f), Size(fRx * 1.56f, fRy * 1.56f))
@@ -431,7 +431,7 @@ object InteriorWorldRenderer {
         // Mini Sakura trees & flower clusters gracing the unlocked Celestial Garden
         listOf(-105f to -95f, 95f to -90f, 102f to 88f, -96f to 92f).forEachIndexed { idx, (ox, oy) ->
           val tx = eastCx + ox * zoom
-          val ty = eastCy + oy * ObliqueCamera.OBLIQUE_Y_SCALE * zoom
+          val ty = eastCy + oy * groundView.groundY * zoom
           drawOval(Color(0x55000000), Offset(tx - 24f * zoom, ty - 6f * zoom), Size(48f * zoom, 13f * zoom))
           drawRect(Color(0xFF5C3A24), Offset(tx - 4f * zoom, ty - 26f * zoom), Size(8f * zoom, 26f * zoom))
           drawCircle(Color(0xFFF472B6), radius = 20f * zoom, center = Offset(tx, ty - 34f * zoom))

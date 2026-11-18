@@ -274,7 +274,7 @@ object HdrLightResponse {
     val rx = spec.groundRadius * s
     drawHdrStamp(
       Offset(cx, cy + 4f * s),
-      rx, rx * ObliqueCamera.OBLIQUE_Y_SCALE,
+      rx, rx * groundView.groundY,
       spec.tint,
       boundedAlpha(spec.groundAlpha * exposure * pulse, MAX_STAMP_ALPHA),
     )
@@ -282,7 +282,7 @@ object HdrLightResponse {
     if (balanced() && wet > 0.01f) {
       drawHdrStamp(
         Offset(cx, cy + 2f * s),
-        rx * 0.60f, rx * ObliqueCamera.OBLIQUE_Y_SCALE * 0.32f,
+        rx * 0.60f, rx * groundView.groundY * 0.32f,
         Tint.MOON,
         boundedAlpha(spec.groundAlpha * exposure * wet * 0.85f, .11f),
       )
@@ -313,7 +313,7 @@ object HdrLightResponse {
     if (isBuilding(obs.propKind) && balanced()) {
       drawHdrStamp(
         Offset(cx + 12f * s, cy + 8f * s),
-        124f * s, 124f * s * ObliqueCamera.OBLIQUE_Y_SCALE * .26f,
+        124f * s, 124f * s * groundView.groundY * .26f,
         Tint.SHADE, .17f,
       )
     }

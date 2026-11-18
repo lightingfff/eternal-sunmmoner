@@ -21,6 +21,7 @@ import com.example.data.model.HeroClassType
 import com.example.data.model.IslandExpansionMilestone
 import com.example.game.map.BiomeTheme
 import com.example.game.map.EnemyArchetype
+import com.example.game.map.GroundView
 import com.example.game.map.ObliqueCamera
 import com.example.game.map.PathSegment
 import com.example.game.map.PropKind
@@ -62,7 +63,7 @@ object PixelSpriteRenderer {
     radiusX: Float,
     innerColor: Color,
     midColor: Color? = null,
-    ellipseRatio: Float = ObliqueCamera.GROUND_ELLIPSE_RATIO,
+    ellipseRatio: Float = groundView.ellipseRatio,
   ) {
     if (radiusX <= 2f || cx+radiusX < 0f || cx-radiusX > size.width) return
     val ry=radiusX*ellipseRatio
@@ -221,7 +222,7 @@ object PixelSpriteRenderer {
     val halfW = size.width / 2f
     val halfH = size.height / 2f
     fun sx(wx: Float) = ObliqueCamera.worldToScreenX(wx, camX, zoom, halfW)
-    fun sy(wy: Float, z: Float = 0f) = ObliqueCamera.worldToScreenY(wy, camY, zoom, halfH, z)
+    fun sy(wy: Float, z: Float = 0f) = groundView.projectY(wy, camY, zoom, halfH, z)
 
     val voidBg = when (biome) {
       BiomeTheme.RESTAURANT_INTERIOR, BiomeTheme.DORMITORY_INTERIOR -> Color(0xFF120B08)
@@ -373,12 +374,12 @@ object PixelSpriteRenderer {
     // 3. True Oblique 3/4 Foreshortened Pixel-Art Terrain Tilemap (64w x 46h screen ratio!)
     val worldTileSize = 64f
     val tileScreenW = (worldTileSize * zoom).roundToInt().coerceAtLeast(2)
-    val tileScreenH = (worldTileSize * ObliqueCamera.OBLIQUE_Y_SCALE * zoom).roundToInt().coerceAtLeast(2)
+    val tileScreenH = (worldTileSize * groundView.groundY * zoom).roundToInt().coerceAtLeast(2)
 
     val minWorldX = ObliqueCamera.screenToWorldX(0f, camX, zoom, halfW)
     val maxWorldX = ObliqueCamera.screenToWorldX(size.width, camX, zoom, halfW)
-    val minWorldY = ObliqueCamera.screenToWorldY(0f, camY, zoom, halfH)
-    val maxWorldY = ObliqueCamera.screenToWorldY(size.height, camY, zoom, halfH)
+    val minWorldY = groundView.unprojectY(0f, camY, zoom, halfH)
+    val maxWorldY = groundView.unprojectY(size.height, camY, zoom, halfH)
 
     val minTxBound = if (biome == BiomeTheme.SANCTUARY_ASTRAL || biome.isInteriorBiome) {
       (wallMargin / worldTileSize).toInt()
@@ -583,9 +584,9 @@ object PixelSpriteRenderer {
     timeSec: Float,
   ) {
     val cx = ObliqueCamera.worldToScreenX(zone.centerX, camX, zoom, size.width / 2f)
-    val cy = ObliqueCamera.worldToScreenY(zone.centerY, camY, zoom, size.height / 2f)
+    val cy = groundView.projectY(zone.centerY, camY, zoom, size.height / 2f)
     val rx = zone.interactRadius * 0.56f * zoom
-    val ry = rx * ObliqueCamera.GROUND_ELLIPSE_RATIO
+    val ry = rx * groundView.ellipseRatio
     if (cx + rx < 0f || cx - rx > size.width || cy + ry < 0f || cy - ry > size.height) return
 
     // P27B review: the ivory summoning ground is delivered by the hall sprite itself, which
@@ -624,11 +625,17 @@ object PixelSpriteRenderer {
     alpha: Float = 1f,
     hdProfile: FantasyHd128Structures.MaterialProfile = FantasyHd128Structures.MaterialProfile.ARCHITECTURE,
     swayDegrees: Float = 0f,
+    decorativeSoftFocus: Boolean = false,
   ) {
     val dstW = (bmp.width * pixelScale).roundToInt().coerceAtLeast(2)
     val dstH = (bmp.height * pixelScale).roundToInt().coerceAtLeast(2)
     val hdBmp = if (CompletionPropAtlas.isAuthored(bmp) || CompletionInteriorAtlas.isAuthored(bmp)) bmp else FantasyHd128Structures.hdFor(bmp, hdProfile)
     val topLeft = IntOffset((cx - dstW / 2f).roundToInt(), (footY - dstH).roundToInt())
+    val sampling = if (decorativeSoftFocus && groundView == GroundView.SANCTUARY_DIORAMA &&
+      DepthPresentation.quality == DepthPresentation.Quality.BALANCED &&
+      DepthPresentation.selectiveFocusEnabled &&
+      (footY < size.height * .20f || footY > size.height * .80f)
+    ) FilterQuality.Low else FilterQuality.None
     if (abs(swayDegrees) > 0.01f) {
       // Pivot at the contact point so foliage sways while roots, shadow and hit geometry stay put.
       withTransform({ rotate(swayDegrees, pivot = Offset(cx, footY)) }) {
@@ -637,7 +644,7 @@ object PixelSpriteRenderer {
           dstOffset = topLeft,
           dstSize = IntSize(dstW, dstH),
           alpha = alpha.coerceIn(0f, 1f),
-          filterQuality = FilterQuality.None,
+          filterQuality = sampling,
         )
       }
     } else {
@@ -646,7 +653,7 @@ object PixelSpriteRenderer {
         dstOffset = topLeft,
         dstSize = IntSize(dstW, dstH),
         alpha = alpha.coerceIn(0f, 1f),
-        filterQuality = FilterQuality.None,
+        filterQuality = sampling,
       )
     }
   }
@@ -738,7 +745,7 @@ object PixelSpriteRenderer {
     if (baseAlpha < 0.02f) return
     val (offWx, offWy) = SanctuaryLight.shadowWorldOffset(caster.heightPx)
     val offX = offWx * zoom
-    val offY = offWy * zoom * ObliqueCamera.OBLIQUE_Y_SCALE
+    val offY = offWy * zoom * groundView.groundY
     // Contact AO — always pinned at foot, footprint-matched, never offset
     val contactRX = caster.footprintRX * zoom * 0.96f
     val contactRY = caster.footprintRY * zoom * 0.66f
@@ -757,7 +764,7 @@ object PixelSpriteRenderer {
   }
   private fun DrawScope.drawRectCastShadow(cx: Float, footY: Float, caster: ShadowCaster, zoom: Float, offX: Float, offY: Float, baseAlpha: Float) {
     val hw = caster.footprintRX * zoom
-    val hd = caster.footprintRY * zoom / ObliqueCamera.GROUND_ELLIPSE_RATIO * ObliqueCamera.OBLIQUE_Y_SCALE
+    val hd = caster.footprintRY * zoom / ObliqueCamera.GROUND_ELLIPSE_RATIO * groundView.groundY
     val expand = caster.softnessPx * zoom * 0.34f
     val left = cx - hw - expand; val right = cx + hw + expand
     val top = footY - hd * 2f - expand; val bottom = footY + expand * 0.45f
@@ -788,7 +795,7 @@ object PixelSpriteRenderer {
   }
   private fun DrawScope.drawGateCastShadow(cx: Float, footY: Float, caster: ShadowCaster, zoom: Float, offX: Float, offY: Float, baseAlpha: Float) {
     val hw = caster.footprintRX * zoom * 0.92f
-    val hd = caster.footprintRY * zoom / ObliqueCamera.GROUND_ELLIPSE_RATIO * ObliqueCamera.OBLIQUE_Y_SCALE
+    val hd = caster.footprintRY * zoom / ObliqueCamera.GROUND_ELLIPSE_RATIO * groundView.groundY
     val gap = hw * 0.42f
     val pillarW = hw * 0.38f
     fun pillarPath(centerOffset: Float): Path {
@@ -825,7 +832,7 @@ object PixelSpriteRenderer {
     renderShadow: Boolean? = true,
   ) {
     val cx = ObliqueCamera.worldToScreenX(obs.x, camX, zoom, size.width / 2f)
-    val cy = ObliqueCamera.worldToScreenY(obs.y, camY, zoom, size.height / 2f, obs.elevationZ)
+    val cy = groundView.projectY(obs.y, camY, zoom, size.height / 2f, obs.elevationZ)
     val s = zoom * obs.scale
     if (cx < -380f || cx > size.width + 380f || cy < -400f || cy > size.height + 380f) return
 
@@ -1076,6 +1083,7 @@ object PixelSpriteRenderer {
           cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.cypressConiferSprite) * s,
           2.0f * s,
           swayDegrees = swayDegrees,
+          decorativeSoftFocus = true,
         )
       }
 
@@ -1384,7 +1392,7 @@ object PixelSpriteRenderer {
     // Doorway ground indicator for enterable houses (subtle amber threshold bloom at arch)
     SanctuaryHouseEntrances.findByObstacleId(obs.id)?.let { entrance ->
       val doorCx = ObliqueCamera.worldToScreenX(entrance.doorWorldX, camX, zoom, size.width / 2f)
-      val doorCy = ObliqueCamera.worldToScreenY(entrance.doorWorldY, camY, zoom, size.height / 2f)
+      val doorCy = groundView.projectY(entrance.doorWorldY, camY, zoom, size.height / 2f)
       if (doorCx > -60f && doorCx < size.width + 60f && doorCy > -60f && doorCy < size.height + 60f) {
         val doorGlowAlpha = 0.14f + 0.06f * sin(timeSec * 2.0f + obs.x * 0.01f)
         drawForeshortenedGlow(doorCx, doorCy + 4f * s, 22f * s * zoom.coerceIn(0.6f, 1f), Color(0xFFF5B841).copy(alpha = doorGlowAlpha))
@@ -1413,7 +1421,7 @@ object PixelSpriteRenderer {
     for (obs in obstacles) {
       if (!obs.occludesUpperCanopy) continue
       val cx = ObliqueCamera.worldToScreenX(obs.x, camX, zoom, size.width / 2f)
-      val cy = ObliqueCamera.worldToScreenY(obs.y, camY, zoom, size.height / 2f, obs.elevationZ)
+      val cy = groundView.projectY(obs.y, camY, zoom, size.height / 2f, obs.elevationZ)
       val s = zoom * obs.scale
       if (cx < -320f || cx > size.width + 320f || cy < -340f || cy > size.height + 320f) continue
 
@@ -1452,7 +1460,7 @@ object PixelSpriteRenderer {
     camX: Float, camY: Float, zoom: Float, timeSec: Float,
   ) {
     val ax = ObliqueCamera.worldToScreenX(actorWorldX,camX,zoom,size.width/2f)
-    val ay = ObliqueCamera.worldToScreenY(actorWorldY,camY,zoom,size.height/2f)
+    val ay = groundView.projectY(actorWorldY,camY,zoom,size.height/2f)
     if (ax < -100f || ax > size.width+100f || ay < -20f || ay > size.height+150f) return
     for (obs in obstacles) {
       if (!obs.occludesUpperCanopy || !ObliqueSpriteGeometry.isTree(obs.propKind)) continue
@@ -1462,7 +1470,7 @@ object PixelSpriteRenderer {
       val scale = ObliqueSpriteGeometry.pixelScale(obs.propKind)*obs.scale
       if (actorWorldY > obs.y+bmp.width*scale*.18f || abs(actorWorldX-obs.x)>bmp.width*scale*.5f+24f) continue
       val cx = ObliqueCamera.worldToScreenX(obs.x,camX,zoom,size.width/2f)
-      val cy = ObliqueCamera.worldToScreenY(obs.y,camY,zoom,size.height/2f,obs.elevationZ)
+      val cy = groundView.projectY(obs.y,camY,zoom,size.height/2f,obs.elevationZ)
       clipRect(ax-45f*zoom,ay-110f*zoom,ax+45f*zoom,ay+8f*zoom) {
         drawCrispUpperCanopyPortion(bmp,cx,
           cy+ObliqueSpriteGeometry.drawFootOffset(obs.propKind,bmp)*obs.scale*zoom,
@@ -1510,7 +1518,7 @@ object PixelSpriteRenderer {
     emotion: String = "calm",
   ) {
     val cx = ObliqueCamera.worldToScreenX(worldX, camX, zoom, size.width / 2f)
-    val cy = ObliqueCamera.worldToScreenY(worldY, camY, zoom, size.height / 2f)
+    val cy = groundView.projectY(worldY, camY, zoom, size.height / 2f)
     if (cx < -120f || cx > size.width + 120f || cy < -150f || cy > size.height + 120f) return
 
     val pixelScale = 0.96f * zoom
@@ -1650,7 +1658,7 @@ object PixelSpriteRenderer {
     deathAnimProgress: Float = 0f,
   ) {
     val cx = ObliqueCamera.worldToScreenX(worldX, camX, zoom, size.width / 2f)
-    val cy = ObliqueCamera.worldToScreenY(worldY, camY, zoom, size.height / 2f)
+    val cy = groundView.projectY(worldY, camY, zoom, size.height / 2f)
     if (cx < -150f || cx > size.width + 150f || cy < -180f || cy > size.height + 150f) return
 
     val p = (if (archetype.isBoss) 1.04f else 0.95f) * zoom
@@ -1679,7 +1687,7 @@ object PixelSpriteRenderer {
     if (isTargetMarked) {
       val pulse = 0.85f + 0.15f * sin(timeSec * 8f)
       val rx = (if (archetype.isBoss) 42f else 30f) * zoom * pulse
-      val ry = rx * ObliqueCamera.GROUND_ELLIPSE_RATIO
+      val ry = rx * groundView.ellipseRatio
       drawOval(
         color = Color(0xFFEF4444),
         topLeft = Offset(cx - rx, cy - ry),

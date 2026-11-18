@@ -14,6 +14,7 @@ import com.example.data.model.HeroStatusType
 import com.example.data.model.IslandExpansionMilestone
 import com.example.data.model.PersonalityType
 import com.example.game.map.CollisionPhysics
+import com.example.game.map.GroundView
 import com.example.game.map.SanctuaryHouseEntrances
 import com.example.game.map.SanctuaryIslandGeometry
 import com.example.game.tower.GeneratedMapLayout
@@ -245,8 +246,14 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
     }
 
   // Free Camera State for External Master Commander (frames Circular Plaza + Residential + Obsidian Gate!)
-  var camX: Float = 1660f
-  var camY: Float = 1260f
+  internal fun resetExteriorCamera() {
+    setCameraPosition(exteriorCameraX, exteriorCameraY)
+  }
+
+  private val exteriorCameraX = 1510f
+  private val exteriorCameraY = 1010f
+  var camX: Float = exteriorCameraX
+  var camY: Float = exteriorCameraY
   var zoom: Float = 0.88f
 
   // Backward compatibility getters for legacy references
@@ -259,8 +266,8 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
   var selectedHeroId: String? by mutableStateOf(null)
   var selectedFacility: FacilityType? by mutableStateOf(null)
 
-  private var savedExteriorX: Float = 1660f
-  private var savedExteriorY: Float = 1260f
+  private var savedExteriorX: Float = exteriorCameraX
+  private var savedExteriorY: Float = exteriorCameraY
   private var savedExteriorZoom: Float = 0.88f
   private var savedSelectedHeroId: String? = null
   private var savedSelectedFacility: FacilityType? = null
@@ -333,7 +340,7 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
     val worldW = if (!isInsideInterior && IslandExpansionMilestone.EAST_CELESTIAL_GARDEN in unlockedExpansions)
       SanctuaryIslandGeometry.EXPANDED_WORLD_WIDTH else mapLayout.width
     return com.example.game.map.ObliqueCamera.clampCamX(camX, worldW, mapLayout.wallMargin, renderZoom, width / 2f) to
-      com.example.game.map.ObliqueCamera.clampCamY(camY, mapLayout.height, mapLayout.wallMargin, renderZoom, height / 2f, northHeadroomWorld = 220f)
+      GroundView.forSanctuary(isInsideInterior).clampCameraY(camY, mapLayout.height, mapLayout.wallMargin, renderZoom, height / 2f, northHeadroom = 220f)
   }
 
   fun dragAtViewportEdge(pointerX: Float, pointerY: Float, width: Float, height: Float, offsetX: Float, offsetY: Float, dt: Float) {
@@ -347,7 +354,7 @@ class SanctuaryLobbyEngine(private val random: Random = Random.Default) {
     panCameraWorld(direction(pointerX,width)*360f*dt, direction(pointerY,height)*360f*dt)
     val (cx,cy) = renderedCamera(width,height)
     dragPickedHeroTo(com.example.game.map.ObliqueCamera.screenToWorldX(pointerX,cx,zoom,width/2f)+offsetX,
-      com.example.game.map.ObliqueCamera.screenToWorldY(pointerY,cy,zoom,height/2f)+offsetY)
+      GroundView.forSanctuary(isInsideInterior).unprojectY(pointerY,cy,zoom,height/2f)+offsetY)
   }
 
   fun beginHeroPickUp(heroId: String): Boolean {

@@ -85,7 +85,7 @@ internal object DepthPresentation {
       val isle = islands[i]
       val bob = sin(timeSec * .9f + i * 1.3f) * 8f
       val x = ObliqueCamera.worldToScreenX(isle.x, camX, zoom, size.width / 2f)
-      val y = ObliqueCamera.worldToScreenY(isle.y, camY, zoom, size.height / 2f, bob)
+      val y = groundView.projectY(isle.y, camY, zoom, size.height / 2f, bob)
       // Raster (64,31) is the top-plane/base anchor. Upright pines keep full height.
       val pixelX = isle.radiusX * zoom / 56f
       val pixelY = isle.radiusY * zoom / 24f

@@ -7,7 +7,7 @@
     1254
   ],
   "native_generated_dimensions_claimed": false,
-  "normalization": "Per quadrant nearest256, symmetric12px wrap,128colour palette; original source retained",
+  "normalization": "Per quadrant nearest256, northwest-lit cliff/limestone relief, symmetric12px wrap, 128-colour palette",
   "retained_rgba_bytes": 1048576,
   "materials": [
     {
@@ -15,14 +15,14 @@
       "file": "cliff.png",
       "width": 256,
       "height": 256,
-      "sha256": "99ffa4904583ac81f567aa5c0669277c159ce921bbba2be95a2272f665372b5e"
+      "sha256": "218f875965c439434ea3b58bbe11b6134b55d38b206703cf3e470755d54e2ff5"
     },
     {
       "id": "limestone",
       "file": "limestone.png",
       "width": 256,
       "height": 256,
-      "sha256": "4ce56d4bb96a89848b2bdd85034578ac9e21edb0374895770184c1e0b2bb4406"
+      "sha256": "f4ff4b2f8b2698a4b1f135d52ebd8132cddb9afdf3eed6cc57b9df840ee7d8ce"
     },
     {
       "id": "carpet",

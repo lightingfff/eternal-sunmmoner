@@ -23,10 +23,29 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def periodic_panel(panel: Image.Image) -> Image.Image:
+def directional_relief(pixels: np.ndarray, material: str) -> np.ndarray:
+    """Shade original brushwork as lit edges and shaded recesses, with a periodic slope."""
+    luma = pixels @ np.array([.299, .587, .114], dtype=np.float32)
+    northwest = np.roll(luma, (1, 1), axis=(0, 1))
+    southeast = np.roll(luma, (-1, -1), axis=(0, 1))
+    edge = np.clip((luma - northwest) * .48 + (luma - southeast) * .20, -18, 18)
+    if material == 'sanctuary_grass':
+        # Warm tips on raised blades; cooler, less saturated soil between clumps.
+        raised = np.maximum(edge, 0)[..., None] * np.array([1.35, 1.04, .53])
+        recessed = np.minimum(edge, 0)[..., None] * np.array([.86, 1.10, .62])
+        return pixels * np.array([.97, 1.02, .94]) + raised + recessed
+    raised = np.maximum(edge, 0)[..., None] * np.array([1.25, 1.12, .86])
+    recessed = np.minimum(edge, 0)[..., None] * np.array([1.22, 1.16, .84])
+    base = np.array([.88, .90, .87]) if material == 'cliff' else np.array([.93, .92, .88])
+    return pixels * base + raised + recessed
+
+
+def periodic_panel(panel: Image.Image, material: str = '') -> Image.Image:
     # One common resample for the material, then a narrow symmetric wrap correction.
     # Internal 64px cuts retain the original continuous texture; never shuffle cells.
     pixels = np.array(panel.convert('RGB').resize((256, 256), Image.Resampling.NEAREST), dtype=np.float32)
+    if material in {'sanctuary_grass', 'cliff', 'limestone'}:
+        pixels = directional_relief(pixels, material)
     for axis in (1, 0):
         for inset in range(12):
             weight = (12 - inset) / 24
@@ -42,7 +61,7 @@ def periodic_panel(panel: Image.Image) -> Image.Image:
                           dither=Image.Dither.NONE).convert('RGBA')
 
 
-def build(source: Path, destination: Path) -> dict:
+def build(source: Path, destination: Path, write_contact: bool = True) -> dict:
     source = source.resolve()
     destination.mkdir(parents=True, exist_ok=True)
     with Image.open(source) as opened:
@@ -54,7 +73,7 @@ def build(source: Path, destination: Path) -> dict:
         row, col = divmod(index, 4)
         panel = original.crop((round(col * original.width / 4), round(row * original.height / 4),
                                round((col + 1) * original.width / 4), round((row + 1) * original.height / 4)))
-        output = periodic_panel(panel)
+        output = periodic_panel(panel, name if name == 'sanctuary_grass' else '')
         data = np.array(output)
         assert np.array_equal(data[0], data[-1]) and np.array_equal(data[:, 0], data[:, -1])
         path = destination / f'{name}.png'
@@ -69,11 +88,13 @@ def build(source: Path, destination: Path) -> dict:
                 'source_sha256': digest(source), 'source_dimensions': list(original.size),
                 'world_tile_units': 64, 'camera_ground_y': 0.72, 'families': families,
                 'sampling': '64px cells preserve 4x4 spatial order; periodic macro sheet, nearest-neighbor',
+                'sanctuary_grass_relief': 'Northwest-lit blade edges derived from the original panel before periodic wrapping',
                 'decoded_family_cells_bytes': len(families) * 256 * 256 * 4}
     (destination / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
-    evidence = ROOT / 'docs/art/art-depth-reforge'
-    evidence.mkdir(parents=True, exist_ok=True)
-    contact.save(evidence / 'material-contact.png')
+    if write_contact:
+        evidence = ROOT / 'docs/art/art-depth-reforge'
+        evidence.mkdir(parents=True, exist_ok=True)
+        contact.save(evidence / 'material-contact.png')
     print(json.dumps({'families': len(families), 'source_dimensions': list(original.size),
                       'retained_cell_bytes': manifest['decoded_family_cells_bytes'],
                       'periodic_edges': 'PASS'}))

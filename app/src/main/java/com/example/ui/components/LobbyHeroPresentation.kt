@@ -6,21 +6,22 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.withTransform
 import com.example.game.lobby.LobbyHeroActor
 import com.example.game.lobby.LobbyLocomotion
+import com.example.game.map.GroundView
 import com.example.game.map.ObliqueCamera
 import com.example.game.pixel.PixelSpriteRenderer.drawCharacterSprite
 import com.example.ui.theme.ESDesignTokens
 import kotlin.math.hypot
 import kotlin.math.sin
 
-fun pickupHeroAtScreen(actors: List<LobbyHeroActor>, point: Offset, camX: Float, camY: Float, zoom: Float, size: Size, minimumTargetPx: Float = 48f): LobbyHeroActor? =
+internal fun pickupHeroAtScreen(actors: List<LobbyHeroActor>, point: Offset, camX: Float, camY: Float, zoom: Float, size: Size, minimumTargetPx: Float = 48f, view: GroundView = GroundView.STANDARD): LobbyHeroActor? =
   actors.filter { !it.isSanctuaryKeeperNpc }.filter { actor ->
     val x = ObliqueCamera.worldToScreenX(actor.x, camX, zoom, size.width / 2f)
-    val y = ObliqueCamera.worldToScreenY(actor.y, camY, zoom, size.height / 2f)
+    val y = view.projectY(actor.y, camY, zoom, size.height / 2f)
     point.x in x - maxOf(minimumTargetPx / 2f, 30f * zoom)..x + maxOf(minimumTargetPx / 2f, 30f * zoom) &&
       point.y in y - maxOf(minimumTargetPx * .75f, 90f * zoom)..y + maxOf(minimumTargetPx * .25f, 12f * zoom)
   }.minByOrNull { actor ->
     hypot(point.x - ObliqueCamera.worldToScreenX(actor.x, camX, zoom, size.width / 2f),
-      point.y - (ObliqueCamera.worldToScreenY(actor.y, camY, zoom, size.height / 2f) - 36f * zoom))
+      point.y - (view.projectY(actor.y, camY, zoom, size.height / 2f) - 36f * zoom))
   }
 
 fun DrawScope.drawLobbyHero(actor: LobbyHeroActor, camX: Float, camY: Float, zoom: Float, time: Float, selected: Boolean, held: Boolean = false) {
