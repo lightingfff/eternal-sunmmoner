@@ -1,6 +1,7 @@
 package com.example.ui.screens
 
 import com.example.ui.components.FantasyTextButton
+import com.example.ui.components.FantasyChoiceButton
 import com.example.ui.components.FantasyIconButton
 import com.example.ui.components.FantasySurface
 import com.example.ui.theme.SanctuaryUi
