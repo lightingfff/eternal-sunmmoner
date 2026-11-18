@@ -108,13 +108,13 @@
   },
   "loading_bg": {
    "id": "loading_bg",
-   "path": "ui_p28/loading/loading_bg_fantasy.png",
+   "path": "ui_p28/loading/loading_bg_fantasy.jpg",
    "use": "cinematic loading backdrop, opaque, no text/logo",
    "width": 1280,
    "height": 720,
    "transparency": false,
-   "sha256": "33e7864d011bf40d85fc842e8f92109545a6048b45eeb1c24281df4b40d9798e",
-   "method": "ai-generated original (post-processed alpha/resize)"
+   "sha256": "674ef6e43c17f778c80499ab1e140c7d23f07bda770f98d3aeea4a9333b899d6",
+   "method": "AI-generated original (JPEG optimized for mobile APK; downsampled from 1672x941 master)"
   },
   "loading_sigil": {
    "id": "loading_sigil",

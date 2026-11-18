@@ -2229,19 +2229,30 @@
         176
       ],
       "world_scale_multiplier": "2 * worldObstacle.scale * zoom (unchanged)",
-      "source_type": "original Arena image generation edited from game-owned P21 sprite",
-      "source_path": "art/p27b_sources/summoning_hall_source.png",
-      "source_sha256": "97a30dd4eb0b6ef067f5a9460ace545855372492da10759d14f7e995b961a513",
+      "source_type": "original AI-generated green-screen Sanctuary environment art",
+      "source_path": "art/p27b_sources_next/ai_summoning_hall.png",
+      "source_sha256": "25eec93fed6962afc308265f6cc655003e407066d7d1de3bb5b8e0da19ffcbbb",
       "preview_sha256": "23b83a6e9461970ffcf65cdb10122e76df6adda3cf7bff3c1f4eec7f29e01013",
-      "sha256": "5a5caf366377650f25574dbe6b7093a174c127fa1b06393ccba60a69104fcce6",
+      "sha256": "a83ec7913a9a7e177ea6987511799a6530338037c6419ca2474f986cfcb6b763",
       "alpha_bbox": [
-        9,
-        23,
-        261,
+        5,
+        8,
+        263,
         206
       ],
       "qa_status": "GAME_CANDIDATE",
-      "visual_qa": "contact cutout checked; pending renderer pivot/light review"
+      "visual_qa": "keyed and fitted to inherited canvas; engine-side lighting/pivot render review pending",
+      "source_dimensions": [
+        1431,
+        1099
+      ],
+      "source_bbox": [
+        6,
+        4,
+        1426,
+        1094
+      ],
+      "normalized_scale": 0.1853211009174312
     },
     {
       "id": "tower_gate",
@@ -2262,19 +2273,30 @@
         120
       ],
       "world_scale_multiplier": "2 * worldObstacle.scale * zoom (unchanged)",
-      "source_type": "original Arena image generation edited from game-owned P21 sprite",
-      "source_path": "art/p27b_sources/tower_gate_rework.png",
-      "source_sha256": "4b097cdb49cce7252c5f8827baee54567cf955e48b0ca3328121d1ba13ae2dae",
+      "source_type": "original AI-generated green-screen Sanctuary environment art",
+      "source_path": "art/p27b_sources_next/ai_tower_gate.png",
+      "source_sha256": "a6c05bfc77bd64ce9b64b9a758aba6ee48b15bda06936238a787482989c9c439",
       "preview_sha256": "1dbe12bf83b15efa6e4939d451b84b08d9e7cf9eab3b46512ae4976bd41aedaa",
-      "sha256": "c28e93fffd518c9a808752c68224a78931add6f729520897de017139a1640fb2",
+      "sha256": "f142d9811c228934a97aedbb1cad6320944741fa2e8be0443ce9f1398ea9ce47",
       "alpha_bbox": [
-        20,
-        5,
-        252,
+        4,
+        16,
+        255,
         224
       ],
       "qa_status": "GAME_CANDIDATE",
-      "visual_qa": "contact cutout checked; pending renderer pivot/light review"
+      "visual_qa": "keyed and fitted to inherited canvas; engine-side lighting/pivot render review pending",
+      "source_dimensions": [
+        1352,
+        1163
+      ],
+      "source_bbox": [
+        2,
+        22,
+        1349,
+        1144
+      ],
+      "normalized_scale": 0.1900519673348181
     }
   ]
 }

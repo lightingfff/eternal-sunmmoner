@@ -27,7 +27,18 @@ fun DrawScope.drawLobbyHero(actor: LobbyHeroActor, camX: Float, camY: Float, zoo
   val frightened = actor.locomotion == LobbyLocomotion.COWERING
   val limp = actor.lobbyData?.isLimping == true
   val sway = when { held -> sin(time * 20f) * 6f; frightened -> sin(time * 32f) * 2f; else -> 0f }
-  val lift = if (held) -32f else if (limp && actor.isMoving) sin(time * 7f) * 2f else 0f
+  val idleBreath = if (
+    !held && !frightened && !actor.isMoving && !actor.isInjured && !actor.isSeatedDining
+  ) {
+    sin(time * 2.1f + actor.x * 0.013f + actor.y * 0.011f) * 1.8f
+  } else {
+    0f
+  }
+  val lift = when {
+    held -> -32f
+    limp && actor.isMoving -> sin(time * 7f) * 2f
+    else -> idleBreath
+  }
   withTransform({ translate(sway * zoom, lift * zoom) }) {
     drawCharacterSprite(worldX = actor.x, worldY = actor.y, camX = camX, camY = camY, zoom = zoom,
       isMaster = false, heroClass = actor.heroClass, facingRight = if (held) sin(time * 12f) > 0f else actor.facingRight,

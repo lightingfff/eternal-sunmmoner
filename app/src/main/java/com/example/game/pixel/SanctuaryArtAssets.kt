@@ -141,11 +141,14 @@ object SanctuaryArtAssets {
   }
 
   internal fun preferredLandmark(name: String, width: Int, height: Int): ImageBitmap? {
-    AuthoredStructureAtlas.landmark(name, width, height)?.let { return it }
+    // In the P27B review profile, choose the current landmark art first; the authored
+    // P21/P26 atlas remains an exact-size fallback. This keeps both runtime draw and its
+    // cached shadow silhouette on the same current sprite without changing world anchors.
     if (visualProfile == SanctuaryVisualProfile.P27B) {
       assetSafe("sanctuary_p27b/structures/$name.png")
         ?.takeIf { it.width == width && it.height == height }?.let { return it }
     }
+    AuthoredStructureAtlas.landmark(name, width, height)?.let { return it }
     return assetSafe("premium_slice/$name.png")
   }
 

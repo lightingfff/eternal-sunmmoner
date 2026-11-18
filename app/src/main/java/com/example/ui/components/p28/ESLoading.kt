@@ -1,5 +1,11 @@
 package com.example.ui.components.p28
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
@@ -78,9 +85,9 @@ internal object ESLoadingTips {
 }
 
 /**
- * Cinematic loading overlay with the shipped backdrop and sigil, a high-contrast
- * pixel-fantasy tip frame, and a progress fill only for a measured fraction. Static
- * artwork/scrim keeps the wait screen inexpensive; no animation or timer controls work.
+ * Cinematic loading overlay with the AI-painted Sanctuary lobby backdrop and sigil,
+ * a high-contrast tip frame, and progress only for a measured fraction. A very slow,
+ * reversible camera drift gives the artwork a living key-art feel without affecting work.
  */
 @Composable
 fun ESLoadingOverlay(
@@ -91,6 +98,15 @@ fun ESLoadingOverlay(
 
   val bg = ESP28Assets.image("loading_bg")
   val sigil = ESP28Assets.image("loading_sigil")
+  val cameraDrift by rememberInfiniteTransition(label = "loadingLobbyCamera").animateFloat(
+    initialValue = 0f,
+    targetValue = 1f,
+    animationSpec = infiniteRepeatable(
+      animation = tween(durationMillis = 18_000, easing = LinearEasing),
+      repeatMode = RepeatMode.Reverse,
+    ),
+    label = "loadingLobbyCameraDrift",
+  )
   val track = ESP28Assets.image("progress_track")
   val fill = ESP28Assets.image("progress_fill")
   val fontScale = LocalDensity.current.fontScale
@@ -126,7 +142,18 @@ fun ESLoadingOverlay(
       Image(
         bg,
         contentDescription = null,
-        modifier = Modifier.matchParentSize(),
+        modifier = Modifier
+          .matchParentSize()
+          // Gentle Ken Burns drift: keep all landmarks inside the frame while the
+          // high-resolution lobby illustration feels subtly alive during bootstrap.
+          .graphicsLayer {
+            val zoom = 1.025f + cameraDrift * 0.018f
+            scaleX = zoom
+            scaleY = zoom
+            translationX = (cameraDrift - 0.5f) * -12.dp.toPx()
+            translationY = (cameraDrift - 0.5f) * 5.dp.toPx()
+          }
+          .testTag("es_loading_lobby_backdrop"),
         contentScale = ContentScale.Crop,
       )
     }
