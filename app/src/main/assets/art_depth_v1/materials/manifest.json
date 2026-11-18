@@ -22,7 +22,7 @@
         4,
         4
       ],
-      "sha256": "467e3c6a56bad05e050b27aa052a4e4b7ad6daf689f199fd8f0cf799547e7a3c",
+      "sha256": "1450b63cb969495d530ae48c2eb516262f2f05d3ad87fb6334f5b96b11ebad27",
       "rgba_bytes": 262144,
       "opaque": true,
       "source_panel": [
@@ -363,5 +363,6 @@
     }
   ],
   "sampling": "64px cells preserve 4x4 spatial order; periodic macro sheet, nearest-neighbor",
+  "sanctuary_grass_relief": "Northwest-lit blade edges derived from the original panel before periodic wrapping",
   "decoded_family_cells_bytes": 4194304
 }

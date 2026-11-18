@@ -23,13 +23,13 @@ object ObliqueCamera {
     zoom: Float,
     viewportHalfH: Float,
     elevationZ: Float = 0f,
-  ): Float = ((wy - camY) * OBLIQUE_Y_SCALE - elevationZ) * zoom + viewportHalfH
+  ): Float = GroundView.STANDARD.projectY(wy, camY, zoom, viewportHalfH, elevationZ)
 
   fun screenToWorldX(sx: Float, camX: Float, zoom: Float, viewportHalfW: Float): Float =
     (sx - viewportHalfW) / zoom + camX
 
   fun screenToWorldY(sy: Float, camY: Float, zoom: Float, viewportHalfH: Float): Float =
-    (sy - viewportHalfH) / (zoom * OBLIQUE_Y_SCALE) + camY
+    GroundView.STANDARD.unprojectY(sy, camY, zoom, viewportHalfH)
 
   fun clampCamX(
     desiredCamX: Float,
@@ -51,12 +51,7 @@ object ObliqueCamera {
     zoom: Float,
     viewportHalfH: Float,
     northHeadroomWorld: Float = 160f,
-  ): Float {
-    val halfVisibleWorldY = viewportHalfH / (zoom.coerceAtLeast(0.26f) * OBLIQUE_Y_SCALE)
-    val minY = (wallMargin - northHeadroomWorld) + halfVisibleWorldY
-    val maxY = (worldHeight - wallMargin + 95f) - halfVisibleWorldY
-    return if (minY <= maxY) desiredCamY.coerceIn(minY, maxY) else worldHeight * 0.48f
-  }
+  ): Float = GroundView.STANDARD.clampCameraY(desiredCamY, worldHeight, wallMargin, zoom, viewportHalfH, northHeadroomWorld)
 }
 
 enum class BiomeTheme {

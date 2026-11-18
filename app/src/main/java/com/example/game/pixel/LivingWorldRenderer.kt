@@ -27,7 +27,9 @@ object LivingWorldRenderer {
   fun DrawScope.drawWorldGrade() {
     val light=WorldEnvironment.lighting
     // Preserve texture values: daytime gently lifts existing twilight art, night stays readable.
-    if(light.ambientIntensity>.9f) drawRect(Color(0xffffefd5).copy(alpha=(light.ambientIntensity-.9f)*.65f))
+    if (groundView == GroundView.STANDARD && light.ambientIntensity > .9f) {
+      drawRect(Color(0xffffefd5).copy(alpha = (light.ambientIntensity - .9f) * .65f))
+    }
     drawRect(light.ambient.copy(alpha=(1-light.ambientIntensity)*.55f))
     drawRect(Color(0xff101d33).copy(alpha=(1-light.ambientIntensity)*.42f))
     drawRect(light.skyTint.copy(alpha=.04f))
@@ -44,7 +46,7 @@ object LivingWorldRenderer {
       for(i in 0 until count) {
         // World-anchored repeating volume: camera motion changes parallax; time is not frame-integrated.
         val x=((i*127.13f+layer*43-camX*zoom*(.65f+layer*.35f)-time*(28+layer*12))%size.width+size.width)%size.width
-        val y=((i*83.71f-camY*zoom*.72f+time*(230+layer*100))%size.height+size.height)%size.height
+        val y=((i*83.71f-camY*zoom*groundView.groundY+time*(230+layer*100))%size.height+size.height)%size.height
         if(i.toFloat()/count > weather.rain) continue
         drawLine(Color(0xffb4d0dc).copy(alpha=weather.rain*(if(foreground) .26f else .13f)),Offset(x,y),Offset(x-4f,y+10f+layer*6),strokeWidth=if(foreground) 1.2f else 1f)
       }
@@ -76,7 +78,7 @@ object LivingWorldRenderer {
     for (obs in obstacles) {
       val tint = wetTint(obs.propKind) ?: continue
       val x = ObliqueCamera.worldToScreenX(obs.x,camX,zoom,size.width/2)
-      val y = ObliqueCamera.worldToScreenY(obs.y,camY,zoom,size.height/2,obs.elevationZ)
+      val y = groundView.projectY(obs.y,camY,zoom,size.height/2,obs.elevationZ)
       if (x < -40f || x > size.width + 40f || y < -40f || y > size.height + 40f) continue
       val scale = zoom*obs.scale
       drawLine(

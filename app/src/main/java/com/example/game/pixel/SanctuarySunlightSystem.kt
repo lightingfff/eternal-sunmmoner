@@ -9,7 +9,9 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import com.example.game.map.BiomeTheme
+import com.example.game.map.GroundView
 import com.example.game.map.ObliqueCamera
+import com.example.game.pixel.SanctuaryDioramaLight.drawSoftShaft
 import com.example.game.map.SanctuaryIslandGeometry
 import com.example.game.map.SanctuaryLight
 import com.example.game.world.WorldEnvironment
@@ -23,7 +25,7 @@ import kotlin.math.sin
  * Specular Micro-Reflections, Shadow-Occluded Ground Light Pools, and Atmospheric Depth Grade.
  *
  * Replaces static screen-locked overlays with world-anchored (`camX`, `camY`, `zoom`) 2.5D lighting
- * aligned with `SanctuaryLight` (`AZ=142°`, `EL=48°`) and `ObliqueCamera.OBLIQUE_Y_SCALE = 0.72f`.
+ * aligned with `SanctuaryLight` (`AZ=142°`, `EL=48°`) and `the current ground projection`.
  */
 object SanctuarySunlightSystem {
 
@@ -106,9 +108,9 @@ object SanctuarySunlightSystem {
       val worldBandX = ((band * 820f + timeSec * 22f) % 3400f) - 100f
       val worldBandY = 500f + band * 560f + sin(timeSec * 0.18f + band) * 90f
       val sx = ObliqueCamera.worldToScreenX(worldBandX, camX, zoom, halfW)
-      val sy = ObliqueCamera.worldToScreenY(worldBandY, camY, zoom, halfH)
+      val sy = groundView.projectY(worldBandY, camY, zoom, halfH)
       val rx = 480f * zoom
-      val ry = rx * ObliqueCamera.OBLIQUE_Y_SCALE
+      val ry = rx * groundView.groundY
       if (sx + rx >= 0f && sx - rx <= size.width && sy + ry >= 0f && sy - ry <= size.height) {
         drawOval(
           brush = Brush.radialGradient(
@@ -129,9 +131,9 @@ object SanctuarySunlightSystem {
     // 1B. Animated Dappled Tree-Canopy Gobo Shadows & Sunlit Leaf-Gap Caustics on the Ground
     canopyGoboClusters.forEachIndexed { idx, (gxWorld, gyWorld, radiusWorld) ->
       val cx = ObliqueCamera.worldToScreenX(gxWorld + 18f, camX, zoom, halfW)
-      val cy = ObliqueCamera.worldToScreenY(gyWorld + 12f, camY, zoom, halfH)
+      val cy = groundView.projectY(gyWorld + 12f, camY, zoom, halfH)
       val rx = radiusWorld * zoom
-      val ry = rx * ObliqueCamera.OBLIQUE_Y_SCALE
+      val ry = rx * groundView.groundY
       if (cx + rx < -30f || cx - rx > size.width + 30f || cy + ry < -30f || cy - ry > size.height + 30f) {
         return@forEachIndexed
       }
@@ -142,7 +144,7 @@ object SanctuarySunlightSystem {
         val lx = cx + cos(ang) * rx * 0.38f + breeze * (if (lobe % 2 == 0) 1f else -0.7f)
         val ly = cy + sin(ang) * ry * 0.38f
         val lrx = rx * (0.42f + (lobe % 2) * 0.12f)
-        val lry = lrx * ObliqueCamera.OBLIQUE_Y_SCALE
+        val lry = lrx * groundView.groundY
         drawOval(
           color = Color(0x40050A16),
           topLeft = Offset(lx - lrx, ly - lry),
@@ -155,7 +157,7 @@ object SanctuarySunlightSystem {
         val fx = cx + cos(fAng) * rx * 0.28f - breeze * 0.5f
         val fy = cy + sin(fAng) * ry * 0.28f
         val frx = (11f + fleck * 3f) * zoom
-        val fry = frx * ObliqueCamera.OBLIQUE_Y_SCALE
+        val fry = frx * groundView.groundY
         drawOval(
           color = Color(0x38FFF3C4),
           topLeft = Offset(fx - frx, fy - fry),
@@ -172,10 +174,10 @@ object SanctuarySunlightSystem {
 
     sanctuarySunAnchors.forEach { anchor ->
       val sx = ObliqueCamera.worldToScreenX(anchor.worldX, camX, zoom, halfW)
-      val sy = ObliqueCamera.worldToScreenY(anchor.worldY, camY, zoom, halfH)
+      val sy = groundView.projectY(anchor.worldY, camY, zoom, halfH)
       val pulse = 0.94f + 0.06f * sin(timeSec * 0.9f + anchor.phaseOffset)
       val rx = anchor.radiusWorld * zoom * pulse
-      val ry = rx * ObliqueCamera.OBLIQUE_Y_SCALE
+      val ry = rx * groundView.groundY
       if (sx + rx < -40f || sx - rx > size.width + 40f || sy + ry < -40f || sy - ry > size.height + 40f) {
         return@forEach
       }
@@ -204,7 +206,7 @@ object SanctuarySunlightSystem {
     val plazaX = SanctuaryIslandGeometry.PLAZA_CENTER_X
     val plazaY = SanctuaryIslandGeometry.PLAZA_CENTER_Y
     val centerSx = ObliqueCamera.worldToScreenX(plazaX, camX, zoom, halfW)
-    val centerSy = ObliqueCamera.worldToScreenY(plazaY, camY, zoom, halfH)
+    val centerSy = groundView.projectY(plazaY, camY, zoom, halfH)
     val medallionRx = 236f * zoom
     val medallionRy = 162f * zoom
     if (
@@ -236,7 +238,7 @@ object SanctuarySunlightSystem {
         val shimmer = sin(timeSec * 2.9f + i * 1.37f)
         if (shimmer > 0.20f) {
           val gsx = ObliqueCamera.worldToScreenX(gxWorld, camX, zoom, halfW)
-          val gsy = ObliqueCamera.worldToScreenY(gyWorld, camY, zoom, halfH)
+          val gsy = groundView.projectY(gyWorld, camY, zoom, halfH)
           val glintAlpha = ((shimmer - 0.20f) / 0.80f) * 0.54f * daylightStrength
           val glintR = (3.6f + (i % 3) * 1.5f) * zoom
           drawCircle(
@@ -270,7 +272,7 @@ object SanctuarySunlightSystem {
 
     sanctuarySunAnchors.forEachIndexed { idx, anchor ->
       val targetSx = ObliqueCamera.worldToScreenX(anchor.worldX, camX, zoom, halfW)
-      val targetSy = ObliqueCamera.worldToScreenY(anchor.worldY, camY, zoom, halfH)
+      val targetSy = groundView.projectY(anchor.worldY, camY, zoom, halfH)
       val beamHalfW = (anchor.radiusWorld * 0.50f) * zoom
       val beamLen = 540f * zoom
 
@@ -286,6 +288,19 @@ object SanctuarySunlightSystem {
       val sway = sin(timeSec * 0.55f + anchor.phaseOffset) * 14f * zoom
       val breath = 0.86f + 0.14f * sin(timeSec * 0.85f + idx * 0.9f)
       val shaftAlpha = (0.125f * anchor.intensity * breath).coerceIn(0.03f, 0.17f)
+
+      if (groundView == GroundView.SANCTUARY_DIORAMA) {
+        val daylight = ((envLight.ambientIntensity - .78f) / .22f).coerceIn(0f, 1f)
+        if (daylight > .01f && DepthPresentation.quality == DepthPresentation.Quality.BALANCED) {
+          drawSoftShaft(
+            Offset(originX + sway, originY),
+            Offset(targetSx, targetSy),
+            beamHalfW * .48f,
+            shaftAlpha * daylight * 1.6f,
+          )
+        }
+        return@forEachIndexed
+      }
 
       // Outer wide atmospheric sun shaft
       val outerPath = Path().apply {
@@ -342,7 +357,7 @@ object SanctuarySunlightSystem {
         val elevZ = 18f + ((i * 19f + timeSec * 14f) % 95f)
 
         val sx = ObliqueCamera.worldToScreenX(wx, camX, zoom, halfW)
-        val sy = ObliqueCamera.worldToScreenY(wy, camY, zoom, halfH, elevationZ = elevZ)
+        val sy = groundView.projectY(wy, camY, zoom, halfH, elevation = elevZ)
         if (sx in 0f..size.width && sy in 0f..size.height) {
           val twinkle = 0.45f + 0.55f * abs(sin(timeSec * 2.2f + i * 0.77f))
           val r = (1.7f + (i % 3) * 0.9f) * zoom
@@ -436,9 +451,9 @@ object SanctuarySunlightSystem {
     val windowXs = listOf(roomWidth * 0.26f, roomWidth * 0.50f, roomWidth * 0.74f)
     windowXs.forEachIndexed { idx, winX ->
       val winTopX = ObliqueCamera.worldToScreenX(winX, camX, zoom, halfW)
-      val winTopY = ObliqueCamera.worldToScreenY(88f, camY, zoom, halfH, elevationZ = 68f)
+      val winTopY = groundView.projectY(88f, camY, zoom, halfH, elevation = 68f)
       val floorPoolX = ObliqueCamera.worldToScreenX(winX + 56f, camX, zoom, halfW)
-      val floorPoolY = ObliqueCamera.worldToScreenY(240f, camY, zoom, halfH)
+      val floorPoolY = groundView.projectY(240f, camY, zoom, halfH)
       val beamW = 54f * zoom
 
       drawOval(
@@ -527,9 +542,9 @@ object SanctuarySunlightSystem {
       val wx = worldWidth * (0.18f + i * 0.16f)
       val wy = worldHeight * (0.32f + ((i * 37) % 3) * 0.18f)
       val sx = ObliqueCamera.worldToScreenX(wx, camX, zoom, halfW)
-      val sy = ObliqueCamera.worldToScreenY(wy, camY, zoom, halfH)
+      val sy = groundView.projectY(wy, camY, zoom, halfH)
       val rx = 175f * zoom
-      val ry = rx * ObliqueCamera.OBLIQUE_Y_SCALE
+      val ry = rx * groundView.groundY
 
       if (sx + rx >= -80f && sx - rx <= size.width + 80f && sy + ry >= -80f && sy - ry <= size.height + 80f) {
         val pulse = 0.85f + 0.15f * sin(timeSec * 1.4f + i * 1.3f)
