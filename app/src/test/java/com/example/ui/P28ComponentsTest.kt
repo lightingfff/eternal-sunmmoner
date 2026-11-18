@@ -71,6 +71,14 @@ class P28ComponentsTest {
     val assets = org.json.JSONObject(manifest!!).getJSONObject("assets")
     val keys = assets.keys().asSequence().toList()
     assertEquals(24, keys.size)
+    val lobbyBackdrop = assets.getJSONObject("loading_bg")
+    assertEquals(
+      "loading backdrop points to the generated lobby illustration",
+      "ui_p28/loading/loading_bg_fantasy.jpg",
+      lobbyBackdrop.getString("path"),
+    )
+    assertEquals("loading lobby backdrop width", 1280, lobbyBackdrop.getInt("width"))
+    assertEquals("loading lobby backdrop height", 720, lobbyBackdrop.getInt("height"))
     for (key in keys) {
       val meta = assets.getJSONObject(key)
       val entry = ESP28Assets.entry(key)

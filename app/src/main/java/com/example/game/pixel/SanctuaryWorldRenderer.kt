@@ -1228,6 +1228,20 @@ object SanctuaryWorldRenderer {
       topLeft = Offset(cx - rx * 0.15f, cy - ry * 0.15f),
       size = Size(rx * 0.30f, ry * 0.30f),
     )
+    val fountainPulse = 0.82f + 0.18f * sin(timeSec * 1.7f)
+    drawOval(
+      brush = Brush.radialGradient(
+        colors = listOf(
+          Color(0xFFBDEBFF).copy(alpha = 0.34f * fountainPulse),
+          Color(0xFF38BDF8).copy(alpha = 0.20f * fountainPulse),
+          Color.Transparent,
+        ),
+        center = Offset(cx, cy),
+        radius = (rx * 0.34f).coerceAtLeast(8f),
+      ),
+      topLeft = Offset(cx - rx * 0.34f, cy - ry * 0.32f),
+      size = Size(rx * 0.68f, ry * 0.64f),
+    )
     drawOval(
       brush = Brush.radialGradient(
         colors = listOf(Color(0xFF7DD3FC), Color(0xFF0284C7), Color(0xFF1E3A8A)),
@@ -1237,6 +1251,19 @@ object SanctuaryWorldRenderer {
       topLeft = Offset(cx - rx * 0.13f, cy - ry * 0.13f),
       size = Size(rx * 0.26f, ry * 0.26f),
     )
+    // Soft expanding water rings make the central summoning pool visibly breathe.
+    // They are purely decorative; the fountain's world footprint remains unchanged.
+    for (rippleIndex in 0..2) {
+      val ripplePhase = (timeSec * 0.38f + rippleIndex / 3f) % 1f
+      val rippleX = 0.16f + ripplePhase * 0.22f
+      val rippleY = rippleX * ObliqueCamera.OBLIQUE_Y_SCALE
+      drawOval(
+        color = Color(0xFFBAE6FD).copy(alpha = (1f - ripplePhase) * 0.42f),
+        topLeft = Offset(cx - rx * rippleX, cy - ry * rippleY),
+        size = Size(rx * rippleX * 2f, ry * rippleY * 2f),
+        style = Stroke(width = (1.5f * zoom).coerceAtLeast(0.7f)),
+      )
+    }
     drawOval(
       color = Color(0xFFF5B841),
       topLeft = Offset(cx - rx * 0.15f, cy - ry * 0.15f),

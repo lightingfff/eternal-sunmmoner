@@ -147,6 +147,9 @@ class HdrLightingRenderTest {
     assertEquals(null, HdrLightResponse.specFor(PropKind.TALL_GRASS_CLUMP))
     assertEquals(null, HdrLightResponse.specFor(PropKind.WOODEN_BENCH_34))
     assertTrue(HdrLightResponse.specFor(PropKind.STREET_LANTERN) != null)
+    val trainingLight = requireNotNull(HdrLightResponse.specFor(PropKind.FACILITY_TRAINING_GROUND))
+    assertEquals(HdrLightResponse.Tint.AETHER, trainingLight.tint)
+    assertEquals(292f, trainingLight.emitterHeight, 0.001f)
     assertTrue(HdrLightResponse.isBuilding(PropKind.FACILITY_ARMORY))
   }
 }

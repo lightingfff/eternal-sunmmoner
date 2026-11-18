@@ -167,6 +167,7 @@ class P28UiEvidenceTest {
       .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
     rule.onNodeWithText("Đang triệu hồi", substring = true).assertIsDisplayed()
     rule.onNodeWithText(tip).assertIsDisplayed()
+    rule.onNodeWithTag("es_loading_lobby_backdrop").assertExists()
     rule.onNodeWithTag("es_loading_progress_track").assertExists()
     rule.onNodeWithTag("es_loading_progress_fill").assertExists()
     assertWithinViewport("Portrait loading stage", stageBounds, viewport)
@@ -187,6 +188,7 @@ class P28UiEvidenceTest {
       .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
     rule.onNodeWithText("đồng bộ", substring = true).assertIsDisplayed()
     rule.onNodeWithText(tip).assertIsDisplayed()
+    rule.onNodeWithTag("es_loading_lobby_backdrop").assertExists()
     rule.onNodeWithTag("es_loading_progress_track").assertDoesNotExist()
     assertWithinViewport("Landscape loading stage", stageBounds, viewport)
     assertWithinViewport("Landscape gameplay tip", tipBounds, viewport)

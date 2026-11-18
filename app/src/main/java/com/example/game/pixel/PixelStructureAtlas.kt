@@ -31,7 +31,10 @@ object PixelStructureAtlas {
     SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/hero_registry.png")
       ?: SanctuaryArtAssets.assetSafe("premium_slice/hero_registry.png") ?: heroRegistryFallback
   private val heroRegistryFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildHeroRegistryHall() }
-  val trainingGroundStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildTrainingGround() }
+  val trainingGroundStructure: ImageBitmap get() =
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/training_ground.png")
+      ?: trainingGroundFallback
+  private val trainingGroundFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildTrainingGround() }
   val armoryStructure: ImageBitmap get() = SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/armory.png")
       ?: SanctuaryArtAssets.assetSafe("premium_slice/armory.png") ?: armoryFallback
   private val armoryFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildArmory() }
@@ -47,7 +50,10 @@ object PixelStructureAtlas {
     SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/restaurant.png")
       ?: SanctuaryArtAssets.assetSafe("premium_slice/restaurant.png") ?: restaurantFallback
   private val restaurantFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildRestaurantExterior() }
-  val floorVistaArchStructure: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildFloorVistaArch() }
+  val floorVistaArchStructure: ImageBitmap get() =
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/floor_vista_arch.png")
+      ?: floorVistaArchFallback
+  private val floorVistaArchFallback: ImageBitmap by lazy { PixelSanctuaryLandmarks.buildFloorVistaArch() }
 
   // 2.5D Oblique 3/4 Medieval Townhouses, Cottages, Terraces, Stairs, Balustrades & Street Props
   // P23: the Sanctuary background houses and perimeter towers were the last procedural
@@ -93,7 +99,9 @@ object PixelStructureAtlas {
   val sakuraTreeSpriteA: ImageBitmap get() = SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/canopy_a.png")
       ?: SanctuaryArtAssets.image("canopy_a") ?: sakuraTreeSpriteAFallback
   private val sakuraTreeSpriteAFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(0, 114, 132) }
-  val sakuraTreeSpriteB: ImageBitmap get() = SanctuaryArtAssets.image("canopy_b") ?: sakuraTreeSpriteBFallback
+  val sakuraTreeSpriteB: ImageBitmap get() =
+    SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/canopy_b.png")
+      ?: SanctuaryArtAssets.image("canopy_b") ?: sakuraTreeSpriteBFallback
   private val sakuraTreeSpriteBFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(1, 96, 114) }
   val cypressConiferSprite: ImageBitmap get() = SanctuaryArtAssets.image("cypress") ?: cypressConiferSpriteFallback
   private val cypressConiferSpriteFallback: ImageBitmap by lazy { SanctuaryVegetation.tree(2, 48, 88) }

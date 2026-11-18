@@ -231,7 +231,7 @@ fun EternalSummonerRootApp() {
   }
 
   if (uiState.isBootstrapping) {
-    // P28: cinematic loading overlay with the original backdrop/sigil/progress assets.
+    // P28: cinematic loading overlay with AI-generated Sanctuary-lobby key art and progress assets.
     // Stage text is real bootstrap copy; guest/offline mode never claims a server connection.
     val stage = "Đang triệu hồi Thánh Địa (The Sanctuary)..." + " • " + if (cloudUser != null) {
       "Đồng bộ khế ước Google Cloud & đội hình Anh hùng"

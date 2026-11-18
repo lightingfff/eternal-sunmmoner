@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.clipPath
@@ -71,6 +72,122 @@ object PixelSpriteRenderer {
       else DepthPresentation.LightTint.COOL_AETHER
     with(DepthPresentation) {
       drawLightStamp(Offset(cx,cy),radiusX,ry,tint,(innerColor.alpha*intensity*.65f).coerceAtMost(.20f))
+    }
+  }
+
+  /** Small, building-anchored emissive animations. These sit on authored emitters; they
+   * never change the sprite, contact point, hit geometry or world-space building pose.
+   */
+  private fun DrawScope.drawBuildingMagicVfx(
+    kind: PropKind,
+    cx: Float,
+    cy: Float,
+    s: Float,
+    timeSec: Float,
+    worldX: Float,
+    worldY: Float,
+  ) {
+    if (DepthPresentation.quality == DepthPresentation.Quality.OFF || s < 0.24f) return
+    val phase = worldX * 0.0017f + worldY * 0.0021f
+    val pulse = 0.5f + 0.5f * sin(timeSec * 2.2f + phase)
+    val twinkle = 0.5f + 0.5f * sin(timeSec * 4.1f + phase * 0.73f)
+    val full = DepthPresentation.quality == DepthPresentation.Quality.BALANCED
+
+    fun aura(point: Offset, radius: Float, tint: HdrLightResponse.Tint, strength: Float) {
+      with(HdrLightResponse) {
+        drawHdrStamp(point, radius * s, radius * s,
+          tint, (0.055f + 0.075f * pulse) * strength)
+      }
+    }
+    fun glint(point: Offset, tint: Color, sizePx: Float, phase: Float) {
+      val shimmer = (0.34f + 0.66f * kotlin.math.abs(sin(timeSec * 3.7f + phase))).coerceIn(0f, 1f)
+      val r = sizePx * s
+      drawCircle(tint.copy(alpha = 0.50f + shimmer * 0.42f), r * 0.62f, point)
+      drawLine(tint.copy(alpha = shimmer * 0.82f), Offset(point.x - r * 1.65f, point.y),
+        Offset(point.x + r * 1.65f, point.y), (0.9f * s).coerceAtLeast(0.7f))
+      drawLine(tint.copy(alpha = shimmer * 0.72f), Offset(point.x, point.y - r * 1.8f),
+        Offset(point.x, point.y + r * 1.8f), (0.8f * s).coerceAtLeast(0.65f))
+    }
+    fun orbit(center: Offset, rx: Float, ry: Float, tint: Color, count: Int) {
+      repeat(count) { i ->
+        val angle = timeSec * 0.78f + i * (2f * Math.PI.toFloat() / count)
+        val p = Offset(center.x + cos(angle) * rx * s, center.y + sin(angle) * ry * s)
+        val beadAlpha = 0.36f + 0.50f * (0.5f + 0.5f * sin(timeSec * 2.8f + i * 1.7f))
+        drawCircle(tint.copy(alpha = beadAlpha), (1.6f + (i % 2) * 0.7f) * s, p)
+        if (full && i % 2 == 0) glint(p, Color.White, 1.6f, i * 1.4f)
+      }
+    }
+
+    when (kind) {
+      PropKind.FACILITY_SUMMONING_HALL -> {
+        // The AI sprite's blue ritual seal is on the front apron, near y=170/206.
+        val altar = Offset(cx - 4f * s, cy - 62f * s)
+        aura(altar, 54f, HdrLightResponse.Tint.AETHER, 1f)
+        drawOval(Color(0xFF8BE8FF).copy(alpha = 0.20f + pulse * 0.14f),
+          Offset(altar.x - 46f * s, altar.y - 14f * s), Size(92f * s, 28f * s),
+          style = Stroke(width = 1.25f * s))
+        withTransform({ rotate(timeSec * 18f, pivot = altar) }) {
+          drawOval(Color(0xFFFFD88A).copy(alpha = 0.12f + pulse * 0.12f),
+            Offset(altar.x - 34f * s, altar.y - 9f * s), Size(68f * s, 18f * s),
+            style = Stroke(width = 0.95f * s))
+        }
+        orbit(altar, 42f, 12f, Color(0xFFB9F4FF), if (full) 5 else 3)
+      }
+      PropKind.FACILITY_HERO_REGISTRY -> {
+        val crest = Offset(cx, cy - 310f * s)
+        aura(crest, 34f, HdrLightResponse.Tint.AETHER, 0.95f)
+        glint(Offset(crest.x - 3f * s, crest.y + 2f * s), Color(0xFFDDF8FF), 2.8f, 0.4f)
+        aura(Offset(cx - 52f * s, cy - 112f * s), 20f, HdrLightResponse.Tint.GOLD, 0.62f)
+        aura(Offset(cx + 48f * s, cy - 96f * s), 18f, HdrLightResponse.Tint.GOLD, 0.62f)
+        if (full && twinkle > 0.78f) glint(Offset(crest.x + 22f * s, crest.y + 15f * s), Color.White, 1.8f, 1.3f)
+      }
+      PropKind.FACILITY_SYNTHESIS_LAB -> {
+        // Two animated alchemy lamps on the side counters, plus a slower violet breath.
+        val leftVial = Offset(cx - 62f * s, cy - 86f * s)
+        val rightVial = Offset(cx + 58f * s, cy - 76f * s)
+        aura(leftVial, 28f, HdrLightResponse.Tint.VIOLET, 0.78f)
+        aura(rightVial, 24f, HdrLightResponse.Tint.AETHER, 0.9f)
+        glint(leftVial, Color(0xFFE9D5FF), 2.1f, 0.6f)
+        glint(rightVial, Color(0xFFB9F4FF), 2.4f, 2.1f)
+        drawOval(Color(0xFF9A7BFF).copy(alpha = 0.12f + pulse * 0.12f),
+          Offset(cx - 39f * s, cy - 47f * s), Size(78f * s, 22f * s),
+          style = Stroke(width = 1f * s))
+      }
+      PropKind.FACILITY_TRAINING_GROUND -> {
+        val roofGem = Offset(cx, cy - 292f * s)
+        aura(roofGem, 33f, HdrLightResponse.Tint.AETHER, 0.84f)
+        glint(roofGem, Color(0xFFDDF8FF), 2.6f, 0.9f)
+        orbit(Offset(cx, cy - 74f * s), 58f, 13f, Color(0xFF91DFFF), if (full) 3 else 2)
+      }
+      PropKind.FLOOR_VISTA_ARCH -> {
+        val keystone = Offset(cx, cy - 224f * s)
+        aura(keystone, 27f, HdrLightResponse.Tint.AETHER, 0.72f)
+        glint(keystone, Color(0xFFE3F7FF), 2.2f, 1.5f)
+      }
+      PropKind.FACILITY_ARMORY -> {
+        val ember = Offset(cx - 35f * s, cy - 76f * s)
+        val flicker = 0.75f + 0.25f * sin(timeSec * 8.5f + worldX * 0.013f)
+        aura(ember, 30f + pulse * 6f, HdrLightResponse.Tint.EMBER, flicker)
+        drawCircle(Color(0xFFFFC47A).copy(alpha = 0.20f + flicker * 0.22f), 2.1f * s, ember)
+      }
+      PropKind.FACILITY_HERO_QUARTERS, PropKind.FACILITY_RESTAURANT,
+      PropKind.MEDIEVAL_TOWNHOUSE_A, PropKind.MEDIEVAL_TOWNHOUSE_B,
+      PropKind.SANCTUARY_COTTAGE_BROWN, PropKind.SANCTUARY_COTTAGE_SLATE -> {
+        val cozy = kind == PropKind.FACILITY_RESTAURANT || kind == PropKind.SANCTUARY_COTTAGE_BROWN
+        val warm = if (cozy) HdrLightResponse.Tint.EMBER else HdrLightResponse.Tint.GOLD
+        val smallHouse = kind == PropKind.MEDIEVAL_TOWNHOUSE_A || kind == PropKind.MEDIEVAL_TOWNHOUSE_B ||
+          kind == PropKind.SANCTUARY_COTTAGE_BROWN || kind == PropKind.SANCTUARY_COTTAGE_SLATE
+        val windowPulse = 0.78f + 0.22f * sin(timeSec * 2.7f + worldX * 0.009f)
+        val spacing = if (smallHouse) 32f else 48f
+        val y = if (smallHouse) 70f else 82f
+        val radius = if (smallHouse) 15f else 22f
+        aura(Offset(cx - spacing * s, cy - y * s), radius, warm, windowPulse)
+        aura(Offset(cx + spacing * s, cy - (y - 4f) * s), radius * 0.92f, warm, 1.15f - windowPulse * 0.25f)
+        if (full && twinkle > 0.88f) {
+          glint(Offset(cx + spacing * s, cy - (y - 4f) * s), Color(0xFFFFE6B0), 1.5f, 2f)
+        }
+      }
+      else -> Unit
     }
   }
 
@@ -506,17 +623,32 @@ object PixelSpriteRenderer {
     pixelScale: Float,
     alpha: Float = 1f,
     hdProfile: FantasyHd128Structures.MaterialProfile = FantasyHd128Structures.MaterialProfile.ARCHITECTURE,
+    swayDegrees: Float = 0f,
   ) {
     val dstW = (bmp.width * pixelScale).roundToInt().coerceAtLeast(2)
     val dstH = (bmp.height * pixelScale).roundToInt().coerceAtLeast(2)
     val hdBmp = if (CompletionPropAtlas.isAuthored(bmp) || CompletionInteriorAtlas.isAuthored(bmp)) bmp else FantasyHd128Structures.hdFor(bmp, hdProfile)
-    drawImage(
-      image = hdBmp,
-      dstOffset = IntOffset((cx - dstW / 2f).roundToInt(), (footY - dstH).roundToInt()),
-      dstSize = IntSize(dstW, dstH),
-      alpha = alpha.coerceIn(0f, 1f),
-      filterQuality = FilterQuality.None,
-    )
+    val topLeft = IntOffset((cx - dstW / 2f).roundToInt(), (footY - dstH).roundToInt())
+    if (abs(swayDegrees) > 0.01f) {
+      // Pivot at the contact point so foliage sways while roots, shadow and hit geometry stay put.
+      withTransform({ rotate(swayDegrees, pivot = Offset(cx, footY)) }) {
+        drawImage(
+          image = hdBmp,
+          dstOffset = topLeft,
+          dstSize = IntSize(dstW, dstH),
+          alpha = alpha.coerceIn(0f, 1f),
+          filterQuality = FilterQuality.None,
+        )
+      }
+    } else {
+      drawImage(
+        image = hdBmp,
+        dstOffset = topLeft,
+        dstSize = IntSize(dstW, dstH),
+        alpha = alpha.coerceIn(0f, 1f),
+        filterQuality = FilterQuality.None,
+      )
+    }
   }
 
   /** P28D building kinds that need a real stone foundation (móng nhà / chân tường / bậc thềm). */
@@ -750,6 +882,37 @@ object PixelSpriteRenderer {
           size = Size(64f * s, 108f * s),
           style = Stroke(width = 2.4f * s),
         )
+        // Animated broken-rune bands orbit the aperture. They hug its rim and never
+        // cover the dark center, keeping the gate readable as a portal rather than a lamp.
+        val riftSpin = timeSec * 38f + obs.x * 0.03f
+        drawArc(
+          color = Color(0xFF70E7FF).copy(alpha = 0.24f + 0.18f * pulse * nightBoost),
+          startAngle = riftSpin,
+          sweepAngle = 132f,
+          useCenter = false,
+          topLeft = Offset(riftCenter.x - 38f * s, riftCenter.y - 63f * s),
+          size = Size(76f * s, 126f * s),
+          style = Stroke(width = 1.7f * s),
+        )
+        drawArc(
+          color = Color(0xFFC5A7FF).copy(alpha = 0.16f + 0.14f * pulse * nightBoost),
+          startAngle = -riftSpin * 0.72f + 176f,
+          sweepAngle = 92f,
+          useCenter = false,
+          topLeft = Offset(riftCenter.x - 44f * s, riftCenter.y - 71f * s),
+          size = Size(88f * s, 142f * s),
+          style = Stroke(width = 1.2f * s),
+        )
+        for (rune in 0 until 5) {
+          val angle = timeSec * 1.16f + rune * (2f * Math.PI.toFloat() / 5f)
+          val mote = Offset(
+            riftCenter.x + cos(angle) * 36f * s,
+            riftCenter.y + sin(angle) * 59f * s,
+          )
+          val sparkle = 0.42f + 0.58f * kotlin.math.abs(sin(timeSec * 3.2f + rune * 1.8f))
+          drawCircle(Color(0xFF8BE9FF).copy(alpha = sparkle * 0.82f), 2.2f * s, mote)
+          drawCircle(Color.White.copy(alpha = sparkle * 0.64f), 0.9f * s, mote)
+        }
         // P26: a bounded energy aura hugs the portal at night — localized to the gate,
         // never a screen-wide glow. BALANCED-only so the cheap tiers stay cheap.
         if (com.example.game.pixel.DepthPresentation.quality == com.example.game.pixel.DepthPresentation.Quality.BALANCED &&
@@ -888,20 +1051,32 @@ object PixelSpriteRenderer {
       }
 
       PropKind.SAKURA_BLOSSOM_TREE -> {
-        val sway = sin(timeSec * 1.7f + obs.x * 0.015f) * 1.8f * s
+        val swayDegrees = sin(timeSec * 1.15f + obs.x * 0.015f) * 1.15f
         if (legacyShadow) drawDirectionalShadow34(cx + 10f * s, cy, 70f * s, 18f * s, alpha = 0.32f)
         val bmp = if ((obs.id.hashCode() and 1) == 0) {
           PixelStructureAtlas.sakuraTreeSpriteA
         } else {
           PixelStructureAtlas.sakuraTreeSpriteB
         }
-        drawCrispSprite(bmp, cx, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, bmp) * s, 2.0f * s)
+        drawCrispSprite(
+          bmp,
+          cx,
+          cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, bmp) * s,
+          2.0f * s,
+          swayDegrees = swayDegrees,
+        )
       }
 
       PropKind.CYPRESS_CONIFER_TREE -> {
-        val sway = sin(timeSec * 1.9f + obs.x * 0.02f) * 1.2f * s
+        val swayDegrees = sin(timeSec * 1.35f + obs.x * 0.02f) * 0.72f
         if (legacyShadow) drawDirectionalShadow34(cx + 6f * s, cy, 34f * s, 11f * s, alpha = 0.34f)
-        drawCrispSprite(PixelStructureAtlas.cypressConiferSprite, cx, cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.cypressConiferSprite) * s, 2.0f * s)
+        drawCrispSprite(
+          PixelStructureAtlas.cypressConiferSprite,
+          cx,
+          cy + ObliqueSpriteGeometry.drawFootOffset(obs.propKind, PixelStructureAtlas.cypressConiferSprite) * s,
+          2.0f * s,
+          swayDegrees = swayDegrees,
+        )
       }
 
       PropKind.GARDEN_HEDGE_BUSH -> {
@@ -1219,6 +1394,9 @@ object PixelSpriteRenderer {
     // drawn AFTER the sprite, so the light belongs to the architecture. No fullscreen
     // pass; every stamp is cached and culled, and OFF/REDUCED shed the expensive parts.
     with(HdrLightResponse) { drawHdrEmissive(obs, cx, cy, s, timeSec) }
+    // Finish with small, building-anchored VFX so night absorption does not dim the
+    // animated crystal/seal/window emitters. The actual sprite and world anchor stay fixed.
+    drawBuildingMagicVfx(obs.propKind, cx, cy, s, timeSec, obs.x, obs.y)
   }
 
   /**
@@ -1565,23 +1743,40 @@ object PixelSpriteRenderer {
         drawHd2dAtmosphericDepthGrade(timeSec)
       }
       if (!particlesEnabled) return
-      // Dark Fantasy HD-2D: golden sunlit dust motes, sakura petals & astral spores
-      val petalCount = 18
+      // Cinematic Sanctuary breeze: layered drifting sakura petals, a few luminous
+      // motes, and varied rotations make the still world read as a living place.
+      // All particles are presentation-only; world coordinates and hit targets are untouched.
+      val petalCount = 34
+      val spanW = size.width.coerceAtLeast(1f)
+      val spanH = size.height.coerceAtLeast(1f)
       for (i in 0 until petalCount) {
         val seed = i * 43.3f
-        val px = ((seed * 31.7f + timeSec * (14f + (i % 3) * 4f)) % size.width.coerceAtLeast(1f))
-        val py = ((seed * 19.3f + timeSec * (9f + (i % 3) * 3f) + sin(timeSec * 1.2f + i) * 10f) % size.height.coerceAtLeast(1f))
-        val alpha = (0.24f + 0.22f * abs(sin(timeSec * 1.4f + i))).coerceIn(0.10f, 0.48f)
-        val col = when (i % 3) {
-          0 -> Color(0xFFFBCFE8) // sakura rose petal
-          1 -> Color(0xFFBAE6FD) // astral sky mote
-          else -> Color(0xFFFDE68A) // golden sun mote
+        val speedX = 14f + (i % 4) * 5f
+        val speedY = 20f + (i % 5) * 4f
+        val sway = sin(timeSec * (0.85f + (i % 3) * 0.16f) + i * 1.7f) * (12f + i % 4 * 4f)
+        val px = ((seed * 31.7f + timeSec * speedX + sway) % spanW + spanW) % spanW
+        val py = ((seed * 19.3f + timeSec * speedY) % spanH + spanH) % spanH
+        val alpha = (0.28f + 0.38f * abs(sin(timeSec * 1.25f + i * 0.63f))).coerceIn(0.16f, 0.68f)
+        val col = when (i % 5) {
+          0, 1, 2 -> Color(0xFFFFD6E8) // sakura rose
+          3 -> Color(0xFFFFF1F5) // sunlit blossom
+          else -> Color(0xFFBAE6FD) // astral mote
         }
-        drawOval(
-          color = col.copy(alpha = alpha),
-          topLeft = Offset(px, py),
-          size = Size(5.5f, 3.5f),
-        )
+        val center = Offset(px, py)
+        if (i % 7 == 0) {
+          drawCircle(
+            color = col.copy(alpha = alpha * 0.18f),
+            radius = 5.5f + (i % 3),
+            center = center,
+          )
+        }
+        withTransform({ rotate((timeSec * (42f + i % 4 * 13f) + i * 37f) % 360f, center) }) {
+          drawOval(
+            color = col.copy(alpha = alpha),
+            topLeft = Offset(px, py),
+            size = Size(5.5f + (i % 4) * 1.35f, 2.8f + (i % 3) * 0.75f),
+          )
+        }
       }
       return
     }

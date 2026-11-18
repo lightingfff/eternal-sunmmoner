@@ -5,6 +5,7 @@ import com.example.game.pixel.PixelStructureAtlas
 import java.nio.file.Paths
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,6 +40,7 @@ class P27BStructureContractTest {
     "flower_planter" to (64 to 36),
     "training_dummy" to (40 to 58),
     "canopy_a" to (114 to 132),
+    "canopy_b" to (96 to 114),
     "pine" to (96 to 128),
     "oak" to (112 to 136),
     // Facilities keep their premium_slice canvas sizes.
@@ -48,6 +50,8 @@ class P27BStructureContractTest {
     "restaurant" to (206 to 172),
     // Debt A remainder: towers + hero registry. Still the P03 / premium canvas sizes.
     "hero_registry" to (188 to 166),
+    "training_ground" to (192 to 160),
+    "floor_vista_arch" to (156 to 168),
     "fortress_tower" to (80 to 118),
     "gate_tower" to (96 to 136),
     // Repeating tile, not a sprite: still the shipped 88x48.
@@ -91,7 +95,7 @@ class P27BStructureContractTest {
     // only became wrong once the inherited foot padding was restored.
     // Ship-measured transparent foot bands: the canopy/pine/oak trees (their band is the
     // draw offset) and the barrel cluster (rests 3 px above the line).
-    val footBands = mapOf("barrels" to 3, "canopy_a" to 5, "pine" to 5, "oak" to 1)
+    val footBands = mapOf("barrels" to 3, "canopy_a" to 5, "canopy_b" to 5, "pine" to 5, "oak" to 1)
     for ((name, size) in contracts) {
       val bytes = assetBytes("sanctuary_p27b_2/structures/$name.png")
       val png = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)!!
@@ -178,6 +182,7 @@ class P27BStructureContractTest {
     val replaced = mapOf(
       "townhouse_a" to 51.4, "townhouse_b" to 58.9, "cottage_brown" to 50.6,
       "cottage_slate" to 58.6, "oak" to 51.3, "pine" to 50.4, "canopy_a" to 57.1,
+      "canopy_b" to 52.5,
       "hero_quarters" to 50.0, "armory" to 51.1, "synthesis_lab" to 54.5,
       "restaurant" to 58.5, "training_dummy" to 62.2, "wooden_bench" to 45.9,
       "flower_planter" to 77.9,
@@ -238,12 +243,33 @@ class P27BStructureContractTest {
     assertEquals(32, PixelStructureAtlas.streetLanternFrames.first().width)
     assertEquals(200, PixelStructureAtlas.heroQuartersStructure.width)
     assertEquals(190, PixelStructureAtlas.armoryStructure.width)
+    assertEquals("alternate sakura tree must use the AI P27B sprite canvas", 96, PixelStructureAtlas.sakuraTreeSpriteB.width)
+    assertEquals(114, PixelStructureAtlas.sakuraTreeSpriteB.height)
     // Debt A remainder. These two towers used to resolve straight to sanctuary_p03, so the
     // wall line changed tone mid-run: ivory gate next to dark blue-grey P03 towers.
     assertEquals("corner tower must resolve to the P27B-V5 canvas", 80, PixelStructureAtlas.fortressCornerTowerSprite.width)
     assertEquals(118, PixelStructureAtlas.fortressCornerTowerSprite.height)
     assertEquals(96, PixelStructureAtlas.southernGateTowerSprite.width)
     assertEquals(188, PixelStructureAtlas.heroRegistryStructure.width)
+    assertEquals(188, PixelStructureAtlas.synthesisLabStructure.width)
+    assertEquals(192, PixelStructureAtlas.trainingGroundStructure.width)
+    assertEquals(156, PixelStructureAtlas.floorVistaArchStructure.width)
+    assertSame(
+      com.example.game.pixel.SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/floor_vista_arch.png"),
+      PixelStructureAtlas.floorVistaArchStructure,
+    )
+    assertSame(
+      com.example.game.pixel.SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/training_ground.png"),
+      PixelStructureAtlas.trainingGroundStructure,
+    )
+    assertSame(
+      com.example.game.pixel.SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/hero_registry.png"),
+      PixelStructureAtlas.heroRegistryStructure,
+    )
+    assertSame(
+      com.example.game.pixel.SanctuaryArtAssets.assetSafe("sanctuary_p27b_2/structures/synthesis_lab.png"),
+      PixelStructureAtlas.synthesisLabStructure,
+    )
     assertEquals(88, PixelStructureAtlas.stoneRetainingWallSprite.width)
   }
 

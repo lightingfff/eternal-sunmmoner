@@ -199,6 +199,11 @@ object HdrLightResponse {
     PropKind.FACILITY_SUMMONING_HALL -> LightSpec(
       Tint.AETHER, Material.STONE, 100f, .135f, 0f, .00f, 34f, .13f, 70f, false,
     )
+    // The training dojo's authored roof crystal is its cool emitter; the tuned height
+    // aligns the halo to that crystal and carries a small cyan response onto the paving.
+    PropKind.FACILITY_TRAINING_GROUND -> LightSpec(
+      Tint.AETHER, Material.CRYSTAL, 76f, .105f, 0f, .00f, 28f, .10f, 292f, false,
+    )
     PropKind.FACILITY_ARMORY -> LightSpec(
       Tint.EMBER, Material.METAL, 78f, .130f, 0f, .00f, 24f, .12f, 78f, false,
     )

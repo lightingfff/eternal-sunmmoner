@@ -1,7 +1,7 @@
 {
   "schema": "eternal-summoner.p27b2.structures.v1",
   "status": "GAME_CANDIDATE",
-  "note": "Houses re-cut into the inherited P03 canvas/pivot contracts. Canvas size, pivot and collider are unchanged; only the art is new.",
+  "note": "AI-generated cinematic Sanctuary facility and blossom sprites fitted to the inherited P27B canvas/pivot contracts. Canvas size, ground anchor, collider and hit geometry remain unchanged. Runtime render QA is pending.",
   "assets": [
     {
       "id": "house_timber_crest",
@@ -16,13 +16,24 @@
         156
       ],
       "alpha": "binary RGBA",
-      "source_path": "art/p27b_sources_next/house_timber_crest.png",
-      "source_sha256": "68b3712c1cda938e6a71749c9b2abf85a1ed41a8c12ef69a4c2f63b7b31e28ad",
-      "sha256": "99ff1041f7236806c22d89ebef809941dfd4b9bc76abc20ccb2afa16ef10b325",
-      "mean_luma": 86.1,
+      "source_path": "art/p27b_sources_next/ai_townhouse_a.png",
+      "source_sha256": "3b14b47c6f4700de958d712ae1f03c482f4f1d2bd72b9d95589a1f8d95e27b47",
+      "sha256": "638688e255d0ae88cf8e65c4abce531cc4de90514d40ade06c56d21df15047df",
+      "mean_luma": 90.9,
       "old_mean_luma": null,
       "qa_status": "GAME_CANDIDATE",
-      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+      "visual_qa": "keyed and fitted to inherited canvas; engine-side lighting/pivot render review pending",
+      "source_dimensions": [
+        1239,
+        1270
+      ],
+      "source_bbox": [
+        171,
+        8,
+        1052,
+        1250
+      ],
+      "normalized_scale": 0.12238325281803543
     },
     {
       "id": "house_thatched",
@@ -37,13 +48,24 @@
         144
       ],
       "alpha": "binary RGBA",
-      "source_path": "art/p27b_sources_next/house_thatched.png",
-      "source_sha256": "5281f7653f7efbb87e830e03805621cb190b0f9d33494c86944e5617199e256b",
-      "sha256": "494c8dbd958cec018ea5f1bd89c99c579e54d2cd09f55760e7795bbd81cc2431",
-      "mean_luma": 148.4,
+      "source_path": "art/p27b_sources_next/ai_cottage_brown.png",
+      "source_sha256": "0964b3c6e103c4c6fba8a06fd559259f5bda2b6157b0b7882784882fb2f6ae8a",
+      "sha256": "1e9a851546b9b211a9506f9163e8feefe36ad28ecd4ea4014cbf0bf10a80ea97",
+      "mean_luma": 119.4,
       "old_mean_luma": null,
       "qa_status": "GAME_CANDIDATE",
-      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+      "visual_qa": "keyed and fitted to inherited canvas; engine-side lighting/pivot render review pending",
+      "source_dimensions": [
+        1201,
+        1309
+      ],
+      "source_bbox": [
+        42,
+        37,
+        1162,
+        1249
+      ],
+      "normalized_scale": 0.11428571428571428
     },
     {
       "id": "house_stone_guild",
@@ -58,13 +80,24 @@
         160
       ],
       "alpha": "binary RGBA",
-      "source_path": "art/p27b_sources_next/house_stone_guild.png",
-      "source_sha256": "99b66a318407b96c0315a5ad0876ac9482c0a834ce4d5f32ee656bcf1d1130b2",
-      "sha256": "f0822fa9efc0239d88ae02a3cbac497c10c7e7f4707bea60ebdad40589974872",
-      "mean_luma": 117.9,
+      "source_path": "art/p27b_sources_next/ai_townhouse_b.png",
+      "source_sha256": "3f76037ee2b5b1c5000c66d3a6baa1af335039f50173e60277398088329d2653",
+      "sha256": "c0008d03e91ee29173d96d749ff0c48ba0408b2bbae0431e26fdbc3a1332e1b3",
+      "mean_luma": 104.4,
       "old_mean_luma": null,
       "qa_status": "GAME_CANDIDATE",
-      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+      "visual_qa": "keyed and fitted to inherited canvas; engine-side lighting/pivot render review pending",
+      "source_dimensions": [
+        1190,
+        1322
+      ],
+      "source_bbox": [
+        172,
+        37,
+        999,
+        1277
+      ],
+      "normalized_scale": 0.12580645161290321
     },
     {
       "id": "house_slate_wing",
@@ -79,13 +112,24 @@
         144
       ],
       "alpha": "binary RGBA",
-      "source_path": "art/p27b_sources_next/house_slate_wing.png",
-      "source_sha256": "ab5b05d042cd9484ae246041e7d745dd99d1358b185a1c2ece7f89d6bacf1d47",
-      "sha256": "dfb35e98c81bbe40165faa981201b9864db7c3ab07a43766ecd63996227dd0b4",
-      "mean_luma": 93.9,
+      "source_path": "art/p27b_sources_next/ai_cottage_slate.png",
+      "source_sha256": "821f513f93b20020909f0f5d56b74848d0b91c6d3869221f0e81e1b1214724f6",
+      "sha256": "7138eaf4a9e9c37a84bc84088e2cf4e57e03a406818544674b71e7cb0eb799f2",
+      "mean_luma": 107.1,
       "old_mean_luma": null,
       "qa_status": "GAME_CANDIDATE",
-      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+      "visual_qa": "keyed and fitted to inherited canvas; engine-side lighting/pivot render review pending",
+      "source_dimensions": [
+        1201,
+        1310
+      ],
+      "source_bbox": [
+        56,
+        39,
+        1130,
+        1270
+      ],
+      "normalized_scale": 0.11372867587327376
     },
     {
       "id": "street_lantern",
@@ -205,13 +249,13 @@
         168
       ],
       "alpha": "binary RGBA",
-      "source_path": "art/p27b_sources_next/facility_hero_quarters.png",
-      "source_sha256": "ebeed615302392c0163e4526335b7224ec3a550beeac0c866543c985b295a277",
-      "sha256": "0eb2770dc220108e93c1a5575bc03b09ae4127b2391bcbb2a921c22bc802a844",
-      "mean_luma": 83.4,
+      "source_path": "AI-generated original (cinematic Sanctuary environment art; chroma-keyed and fitted to inherited canvas)",
+      "source_sha256": "804da28ebb899534b7ab5a7b31f56381f1d10b77291292cf4b6b6058c05efc26",
+      "sha256": "36dc7f9c76e3b0894cff7f341213c9009c4dfe59be1fbdff3e20bb2cc43c752b",
+      "mean_luma": 91.7,
       "old_mean_luma": 50.0,
       "qa_status": "GAME_CANDIDATE",
-      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+      "visual_qa": "AI-generated painterly sprite; inherited canvas, pivot and collider contract retained; render QA pending"
     },
     {
       "id": "facility_armory",
@@ -226,13 +270,13 @@
         166
       ],
       "alpha": "binary RGBA",
-      "source_path": "art/p27b_sources_next/facility_armory.png",
-      "source_sha256": "7f553aa5694782a1b84255d0894690eba1b13254aaa7245ca35c46fda18a3b26",
-      "sha256": "8d39899734e8c20f1eca6a13b30c86822e3c2070d08058fbe62e67ba642bbfec",
-      "mean_luma": 84.4,
+      "source_path": "AI-generated original (cinematic Sanctuary environment art; chroma-keyed and fitted to inherited canvas)",
+      "source_sha256": "e0cde9d45c1465cb7e137833046a5b29dfbc8d1475f0f0fa344b67e41ed51cc8",
+      "sha256": "7aa2db7885c2c275713fb8d276343d0ea54107f40124c0034d0d8f261b9f9b43",
+      "mean_luma": 72.4,
       "old_mean_luma": 51.1,
       "qa_status": "GAME_CANDIDATE",
-      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+      "visual_qa": "AI-generated painterly sprite; inherited canvas, pivot and collider contract retained; render QA pending"
     },
     {
       "id": "facility_synthesis_lab",
@@ -247,13 +291,24 @@
         168
       ],
       "alpha": "binary RGBA",
-      "source_path": "art/p27b_sources_next/facility_synthesis_lab.png",
-      "source_sha256": "1409bf500165c0b95aa64ec537e9d46af3aefffbc3ff5a053a291398d3b580e1",
-      "sha256": "ec1727d79b30831409372ab4cfcce787bcc9a41d2bd5ba3c4eaceeef752f53a7",
-      "mean_luma": 90.0,
+      "source_path": "art/p27b_sources_next/ai_synthesis_lab.png",
+      "source_sha256": "d4f3e3e9bc8c99b9176f25f02b8b7fa458a18797f8391e22a0d5285674374b96",
+      "sha256": "5259be0e6cd997bfb94775950e8ac14c444fe81ee130ecd98b7acdd1e1d4ed2e",
+      "mean_luma": 95.3,
       "old_mean_luma": 54.5,
       "qa_status": "GAME_CANDIDATE",
-      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+      "visual_qa": "keyed and fitted to inherited canvas; engine-side lighting/pivot render review pending",
+      "source_dimensions": [
+        1327,
+        1186
+      ],
+      "source_bbox": [
+        13,
+        11,
+        1312,
+        1142
+      ],
+      "normalized_scale": 0.14164742109314857
     },
     {
       "id": "facility_restaurant",
@@ -268,13 +323,13 @@
         172
       ],
       "alpha": "binary RGBA",
-      "source_path": "art/p27b_sources_next/facility_restaurant.png",
-      "source_sha256": "544e8eea81c598b0c57494eb97f0c9de377f2dd18bbe2371f61585994f13df91",
-      "sha256": "8b9938ba131a593acb8717e4ca6ad39a4b81b22e19430029fc535d4bf902d1ab",
-      "mean_luma": 75.7,
+      "source_path": "AI-generated original (cinematic Sanctuary environment art; chroma-keyed and fitted to inherited canvas)",
+      "source_sha256": "92414abc41fbd32e9af598e56810ae898d06bccf7253b0458462ef86952efcbc",
+      "sha256": "c601e61a4b42e1c9b26523f2a6ab0d46e4cbea0cea66846e0ce665fc9c80b32e",
+      "mean_luma": 95.0,
       "old_mean_luma": 58.5,
       "qa_status": "GAME_CANDIDATE",
-      "visual_qa": "needs engine-side review at z0.88 and z1.48"
+      "visual_qa": "AI-generated painterly sprite; inherited canvas, pivot and collider contract retained; render QA pending"
     },
     {
       "id": "facility_hero_registry",
@@ -289,13 +344,24 @@
         166
       ],
       "alpha": "binary RGBA",
-      "source_path": "art/p27b_sources_next/facility_hero_registry.png",
-      "source_sha256": "037a39ab9bf7d0e1cac9e3611d483c5ee5df6e1e0e21684ba585c4a9144b2975",
-      "sha256": "171e80d2d899cabaf6c6dc6a37c9a90539b7f05e22117b74dad489081c9c70f0",
-      "mean_luma": 152.6,
+      "source_path": "art/p27b_sources_next/ai_hero_registry.png",
+      "source_sha256": "507bd47a070b17c2166d0befa1aeb49b4c039254a31e5e9486fb018a8a6dc203",
+      "sha256": "91bcf73c2da084433f2457c1b5c91698088c179bb59b77eb3d41bc58860c90d2",
+      "mean_luma": 119.1,
       "old_mean_luma": 54.7,
       "qa_status": "GAME_CANDIDATE",
-      "visual_qa": "needs engine-side review; corner tower repeats around the wall"
+      "visual_qa": "keyed and fitted to inherited canvas; engine-side lighting/pivot render review pending",
+      "source_dimensions": [
+        1334,
+        1179
+      ],
+      "source_bbox": [
+        51,
+        24,
+        1286,
+        1134
+      ],
+      "normalized_scale": 0.14594594594594595
     },
     {
       "id": "tower_corner",
@@ -377,13 +443,13 @@
         132
       ],
       "alpha": "binary RGBA",
-      "source_path": "art/p27b_sources_next/tree_set_01.png",
-      "source_sha256": "966dcc648fe1a2c443d16213a35e3d8e18e87210c3f8fc5dd4532e3c588b6142",
-      "sha256": "4978efe6cead82226938ea0482b81b08c9ea39f0b8b78478f5f388a6f0903ff5",
-      "mean_luma": 129.8,
+      "source_path": "AI-generated original (cinematic Sanctuary environment art; chroma-keyed and fitted to inherited canvas)",
+      "source_sha256": "6c924881dc089396195c7f9d9de8b58083a0dbd9b2d649a6b565d3fb55cbc8f3",
+      "sha256": "29c5393c59b9bb721d8866d326da38dbf60d6fbe2bcc54cca7772921e3213567",
+      "mean_luma": 137.7,
       "old_mean_luma": 57.1,
       "qa_status": "GAME_CANDIDATE",
-      "visual_qa": "needs engine-side review for canopy occlusion"
+      "visual_qa": "AI-generated painterly sprite; inherited canvas, pivot and collider contract retained; render QA pending"
     },
     {
       "id": "pine",
@@ -426,6 +492,91 @@
       "old_mean_luma": 51.3,
       "qa_status": "GAME_CANDIDATE",
       "visual_qa": "needs engine-side review for canopy occlusion"
+    },
+    {
+      "id": "sakura_b",
+      "file": "structures/canopy_b.png",
+      "size": [
+        96,
+        114
+      ],
+      "replaces": "sanctuary_p03/canopy_b",
+      "pivot": [
+        48,
+        114
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "AI-generated original (alternate sakura canopy for cinematic Sanctuary; chroma-keyed and fitted to inherited canvas)",
+      "source_sha256": "9832a6f2bdbc26fa7a7112d2f2f477df5a88aa5d75039803ecc6e06a74f27168",
+      "sha256": "d73d446d762d7a01680f1a864be0ec65dc3a52868e179550a02612f9ac803759",
+      "mean_luma": 153.9,
+      "old_mean_luma": null,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "AI-generated alternate blossom sprite; inherited 5px foot padding retained; native render QA pending"
+    },
+    {
+      "id": "facility_training_ground",
+      "file": "structures/training_ground.png",
+      "size": [
+        192,
+        160
+      ],
+      "replaces": "procedural PixelSanctuaryLandmarks.buildTrainingGround",
+      "pivot": [
+        96,
+        160
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/ai_training_ground.png",
+      "source_sha256": "cdfac1cc33133d396948bf4da97cc8a807a8b4b74c7f9e18839397a0195443f4",
+      "sha256": "16a22cecd5b9a7a9ca8f6f2e22942ba05b50292df918ef6e3cfaa7c2340c3bc0",
+      "mean_luma": 115.1,
+      "old_mean_luma": null,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "keyed and fitted to inherited canvas; engine-side lighting/pivot render review pending",
+      "source_dimensions": [
+        1373,
+        1146
+      ],
+      "source_bbox": [
+        70,
+        17,
+        1305,
+        1118
+      ],
+      "normalized_scale": 0.14168937329700274
+    },
+    {
+      "id": "floor_vista_arch",
+      "file": "structures/floor_vista_arch.png",
+      "size": [
+        156,
+        168
+      ],
+      "replaces": "procedural PixelSanctuaryLandmarks builder",
+      "pivot": [
+        78,
+        168
+      ],
+      "alpha": "binary RGBA",
+      "source_path": "art/p27b_sources_next/ai_floor_vista_arch.png",
+      "source_sha256": "718e9beac250b275b31321d08cf47ebdd6501536853f98f727a3eadf20bb7deb",
+      "sha256": "37c1180e9cdcf3c60e16ee98149a72bd40e8396882e36451dea2932875b4842b",
+      "mean_luma": 125.4,
+      "old_mean_luma": null,
+      "qa_status": "GAME_CANDIDATE",
+      "visual_qa": "keyed and fitted to inherited canvas; engine-side lighting/pivot render review pending",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "source_bbox": [
+        29,
+        127,
+        1223,
+        1109
+      ],
+      "normalized_scale": 0.1273031825795645
     }
   ]
 }

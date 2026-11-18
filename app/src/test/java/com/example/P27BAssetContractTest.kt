@@ -76,6 +76,10 @@ class P27BAssetContractTest {
       SanctuaryArtAssets.preferredLandmark("summoning_hall",268,206))
     assertSame(SanctuaryArtAssets.assetSafe("sanctuary_p27b/structures/tower_gate.png"),
       SanctuaryArtAssets.preferredLandmark("tower_gate",260,224))
+    assertSame(SanctuaryArtAssets.assetSafe("sanctuary_p27b/structures/summoning_hall.png"),
+      PixelStructureAtlas.summoningHallStructure)
+    assertSame(SanctuaryArtAssets.assetSafe("sanctuary_p27b/structures/tower_gate.png"),
+      PixelStructureAtlas.towerGateMonument)
     // Candidate absent -> premium_slice still loads; negative family is cached, not reopened per frame.
     assertSame(SanctuaryArtAssets.assetSafe("premium_slice/armory.png"),
       SanctuaryArtAssets.preferredLandmark("armory",190,166))
