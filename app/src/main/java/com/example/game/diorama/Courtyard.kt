@@ -60,6 +60,11 @@ internal object Courtyard {
     GroundPoint(-8.6f, -5.05f), GroundPoint(8.65f, .3f),
   )
 
+  val lowerRailings = listOf(
+    Footprint(-11.7f, 3.9f, -11.37f, 8.8f),
+    Footprint(11.40f, 4.65f, 11.72f, 8.84f),
+  )
+
   fun inBridge(x: Float, z: Float): Boolean =
     x in BRIDGE_LEFT..BRIDGE_RIGHT && z in (SOUTH - .12f)..BRIDGE_END
 
@@ -85,6 +90,7 @@ internal object Courtyard {
       z in (SOUTH - .64f)..(BRIDGE_END - .42f)
     if (!inCourt && !onBridge) return false
     if (houses.any { it.bounds.contains(x, z, .33f) }) return false
+    if (lowerRailings.any { it.contains(x, z, .18f) }) return false
     if (trees.any { abs(it.x - x) < .44f && abs(it.z - z) < .44f }) return false
     if (bollards.any { abs(it.x - x) < .33f && abs(it.z - z) < .33f }) return false
     return stairs.none { stair ->

@@ -401,8 +401,9 @@ internal class CourtyardMesh {
           stair.edge + .04f, Material3d.WALL, 0xc6bca5)
       }
     }
-    railing(-11.7f, -11.37f, 3.9f, 8.8f, 0f)
-    railing(11.40f, 11.72f, 4.65f, 8.84f, 0f)
+    for ((left, north, right, south) in Courtyard.lowerRailings) {
+      railing(left, right, north, south, 0f)
+    }
   }
 
   fun build() {

@@ -34,6 +34,10 @@ class CourtyardNavigatorTest {
     assertFalse(Courtyard.canStand(house.centerX, house.south - .5f))
     assertTrue(navigator.route(Courtyard.start, GroundPoint(house.centerX, house.south - .5f)).isEmpty())
     assertTrue(navigator.route(Courtyard.start, GroundPoint(Courtyard.RIGHT + .1f, 5f)).isEmpty())
+    for (rail in Courtyard.lowerRailings) {
+      val point = GroundPoint(rail.centerX, (rail.north + rail.south) * .5f)
+      assertTrue(navigator.route(Courtyard.start, point).isEmpty())
+    }
     val around = navigator.route(Courtyard.start, GroundPoint(-10.75f, -2.6f))
     assertTrue(around.isNotEmpty())
     assertTrue(around.none { house.contains(it.x, it.z, .33f) })

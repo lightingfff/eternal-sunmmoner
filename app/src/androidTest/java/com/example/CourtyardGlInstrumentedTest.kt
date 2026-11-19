@@ -56,13 +56,10 @@ class CourtyardGlInstrumentedTest {
       val camera = CourtyardCamera()
       camera.frame(Courtyard.start, width, height, 1f)
       val landing = GroundPoint(3.75f, 4.30f)
-      val clip = FloatArray(4)
-      Matrix.multiplyMV(clip, 0, camera.viewProjection, 0,
-        floatArrayOf(landing.x, Courtyard.height(landing.x, landing.z), landing.z, 1f), 0)
-      val x = (clip[0] / clip[3] + 1f) * width * .5f
-      val y = (1f - clip[1] / clip[3]) * height * .5f
-      val picked = requireNotNull(camera.groundAt(x, y))
-      assertTrue("Screen tap must resolve to the upper surface it projects", picked.distance(landing) < .20f)
+      assertGroundPick(camera, landing, width, height)
+      val bridge = GroundPoint(-5.9f, 11.5f)
+      camera.frame(bridge, width, height, .82f)
+      assertGroundPick(camera, bridge, width, height)
 
       val fullColor = capture(width, height)
       assertTrue("Visible geometry and lighting must cover the frame", fullColor.toSet().size > 512)
@@ -85,6 +82,16 @@ class CourtyardGlInstrumentedTest {
       EGL14.eglDestroyContext(display, session)
       EGL14.eglTerminate(display)
     }
+  }
+
+  private fun assertGroundPick(camera: CourtyardCamera, target: GroundPoint, width: Int, height: Int) {
+    val clip = FloatArray(4)
+    Matrix.multiplyMV(clip, 0, camera.viewProjection, 0,
+      floatArrayOf(target.x, Courtyard.height(target.x, target.z), target.z, 1f), 0)
+    val x = (clip[0] / clip[3] + 1f) * width * .5f
+    val y = (1f - clip[1] / clip[3]) * height * .5f
+    val picked = requireNotNull(camera.groundAt(x, y)) { "No walkable surface projected at $target" }
+    assertTrue("Screen tap must resolve to $target, but hit $picked", picked.distance(target) < .20f)
   }
 
   private fun capture(width: Int, height: Int): IntArray {
