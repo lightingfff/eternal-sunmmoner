@@ -54,6 +54,10 @@ internal object CourtyardShaders {
     $radiance
     uniform sampler2D material;
     uniform sampler2D sunDepth;
+    uniform sampler2D heroAtlas;
+    uniform vec4 heroFrame;
+    uniform vec3 heroSide;
+    uniform vec2 heroHeight;
     uniform vec3 camera;
     uniform vec3 actor;
     uniform vec3 sunDirection;
@@ -70,14 +74,35 @@ internal object CourtyardShaders {
     float visibility(float cosine) {
       vec3 uvz = sunPosition.xyz / sunPosition.w * 0.5 + 0.5;
       if (any(lessThan(uvz, vec3(0.0))) || any(greaterThan(uvz, vec3(1.0)))) return 1.0;
-      float bias = mix(.0021, .00077, cosine);
+      float bias = mix(.00192, .00067, cosine);
       vec2 texel = 1.0 / vec2(textureSize(sunDepth, 0));
       float visible = 0.0;
-      for (int i = 0; i < 4; ++i) {
-        vec2 offset = (vec2(float(i % 2), float(i / 2)) - .5) * 1.8 * texel;
-        visible += step(uvz.z - bias, texture(sunDepth, uvz.xy + offset).r);
+      for (int y = -1; y <= 1; ++y) {
+        for (int x = -1; x <= 1; ++x) {
+          vec2 offset = vec2(float(x), float(y)) * 1.12 * texel;
+          float weight = (x == 0 ? 2.0 : 1.0) * (y == 0 ? 2.0 : 1.0);
+          visible += weight * step(uvz.z - bias, texture(sunDepth, uvz.xy + offset).r);
+        }
       }
-      return visible * .25;
+      return visible / 16.0;
+    }
+
+    float actorShadow(vec2 delta) {
+      if (dot(delta, delta) > 13.0) return 0.0;
+      vec2 side = heroSide.xy;
+      vec2 forward = vec2(-side.y, side.x);
+      float approach = dot(sunDirection.xz, forward);
+      if (abs(approach) < .08) return 0.0;
+      float ray = -dot(delta, forward) / approach;
+      if (ray <= 0.0) return 0.0;
+      vec2 k = vec2(dot(delta + sunDirection.xz * ray, side) / (2.0 * heroSide.z) + .5,
+        (position.y + ray * sunDirection.y - heroHeight.x) / (heroHeight.y - heroHeight.x));
+      if (any(lessThan(k, vec2(0.0))) || any(greaterThan(k, vec2(1.0)))) return 0.0;
+      vec2 uv = mix(heroFrame.xy, heroFrame.zw, k);
+      vec2 blur = vec2(.00135, .0) * mix(.68, 1.30, k.y);
+      float mask = texture(heroAtlas, uv).a * .50
+        + texture(heroAtlas, uv - blur).a * .25 + texture(heroAtlas, uv + blur).a * .25;
+      return smoothstep(.08, .91, mask);
     }
 
     vec3 lamplight(vec3 n) {
@@ -99,13 +124,14 @@ internal object CourtyardShaders {
       vec3 n = normalize(surfaceNormal);
       float lambert = max(dot(n, sunDirection), 0.0);
       float shadow = visibility(lambert);
-      vec3 ambient = mix(vec3(.30, .28, .27), vec3(.53, .65, .78), .5 + .5 * n.y);
-      vec3 sunlight = vec3(2.91, 2.27, 1.52) * lambert * shadow;
+      vec3 ambient = mix(vec3(.22, .21, .22), vec3(.32, .43, .57), .5 + .5 * n.y);
+      vec3 sunlight = vec3(4.04, 3.12, 2.15) * lambert * shadow;
       if (kind == 1) {
         vec2 dx = (position.xz - actor.xz) / vec2(.38, .28);
         float contact = exp(-dot(dx, dx) * 1.7) * (1.0 - smoothstep(.035, .26, abs(position.y - actor.y)));
-        ambient *= 1.0 - .59 * contact;
-        sunlight *= 1.0 - .93 * contact;
+        ambient *= 1.0 - .50 * contact;
+        float silhouette = actorShadow(position.xz - actor.xz);
+        sunlight *= 1.0 - max(.88 * contact, .93 * silhouette);
       } else if (kind == 2) {
         float t = timer * .46;
         float a = position.z * 5.1 + sin(position.x * 1.64) + t;
@@ -114,18 +140,18 @@ internal object CourtyardShaders {
         vec3 viewDirection = normalize(camera - position);
         float fresnel = pow(1.0 - max(0.0, dot(n, viewDirection)), 3.0);
         float glint = pow(max(dot(n, normalize(sunDirection + viewDirection)), 0.0), 21.0);
-        base = mix(base, vec3(.15, .28, .34), fresnel * .43);
+        base = mix(base, vec3(.10, .25, .28), fresnel * .43);
         sunlight = vec3(.82, .87, .82) + vec3(1.32, 1.09, .66) * glint * shadow;
       } else if (kind == 3) {
-        ambient = vec3(.88, .97, 1.10);
-        sunlight = vec3(1.06, .83, .54) * shadow;
+        ambient = vec3(.95, .96, 1.04);
+        sunlight = vec3(1.48, 1.13, .73) * shadow;
       }
       vec3 lit = base * (ambient + sunlight + lamplight(n));
       if (kind == 4) lit = base * 4.8;
       float distanceToEye = distance(camera, position);
-      float haze = smoothstep(16.0, 53.0, distanceToEye) * .62;
+      float haze = smoothstep(16.0, 48.0, distanceToEye) * .46;
       float coolGroundFog = (1.0 - smoothstep(-.8, 2.0, position.y)) * smoothstep(19.0, 44.0, distanceToEye);
-      vec3 air = mix(vec3(.21, .30, .36), vec3(.38, .34, .25), shadow * .46);
+      vec3 air = mix(vec3(.19, .30, .38), vec3(.41, .40, .31), shadow * .46);
       pixel = vec4(storeLight(mix(lit, air, haze + (1.0 - haze) * coolGroundFog * .32)), 1.0);
     }
   """.trimIndent()
@@ -189,21 +215,25 @@ internal object CourtyardShaders {
     in vec2 uv;
     out vec4 pixel;
 
-    float distanceAt(vec2 p) {
-      float d = texture(depth, p).r;
+    const vec2 blurRing[8] = vec2[8](
+      vec2(1.0, 0.0), vec2(.707, .707), vec2(0.0, 1.0), vec2(-.707, .707),
+      vec2(-1.0, 0.0), vec2(-.707, -.707), vec2(0.0, -1.0), vec2(.707, -.707)
+    );
+
+    float distanceAt(float d) {
       return (planes.x * planes.y) / mix(planes.y, planes.x, d);
     }
 
-    vec3 colorAt(vec2 p) {
-      if (texture(depth, p).r < .99999) return readLight(rendered, p);
+    vec3 colorAt(vec2 p, float d) {
+      if (d < .99999) return readLight(rendered, p);
       vec3 sky = mix(vec3(.52, .49, .38), vec3(.21, .32, .42), smoothstep(.22, 1.0, p.y));
       vec2 ray = (p - vec2(.07, 1.03)) * vec2(2.2, 3.4);
       return sky + vec3(.27, .20, .10) * exp(-dot(ray, ray));
     }
 
-    vec3 sunHaze() {
+    vec3 sunHaze(float sceneDepth) {
       vec2 ndc = uv * 2.0 - 1.0;
-      vec4 clip = inverseViewProjection * vec4(ndc, texture(depth, uv).r * 2.0 - 1.0, 1.0);
+      vec4 clip = inverseViewProjection * vec4(ndc, sceneDepth * 2.0 - 1.0, 1.0);
       vec3 segment = clip.xyz / clip.w - camera;
       float rayLength = length(segment);
       vec3 ray = segment / max(rayLength, .001);
@@ -212,36 +242,37 @@ internal object CourtyardShaders {
       for (int i = 0; i < 4; ++i) {
         vec3 p = camera + ray * end * (float(i) + .5) * .25;
         // Limit scattering to the stream and the gap between roofs.
-        vec2 axis = (p.xz + p.y * vec2(1.5, -.94) - vec2(-2.0, -3.1)) * vec2(.42, .17);
+        vec2 axis = (p.xz + p.y * vec2(1.5, -.94) - vec2(3.0, -2.5)) * vec2(.31, .161);
         float density = exp(-dot(axis, axis)) * (1.0 - smoothstep(1.6, 8.0, p.y));
         vec4 light = sunMatrix * vec4(p, 1.0);
         vec3 lightUv = light.xyz / light.w * .5 + .5;
         float lit = step(lightUv.z - .0012, texture(fogSunDepth, lightUv.xy).r);
         scatter += density * lit;
       }
-      return vec3(.76, .52, .26) * scatter * end * .0019;
+      return vec3(.91, .66, .34) * scatter * end * .0027;
     }
 
     void main() {
-      float center = distanceAt(uv);
-      float defocus = center < focus ? focus - center : (center - focus) * .81;
-      float radius = smoothstep(2.25, 10.0, defocus) * 6.0;
-      vec3 color = colorAt(uv);
+      float centerDepth = texture(depth, uv).r;
+      float center = distanceAt(centerDepth);
+      float defocus = center < focus ? focus - center : (center - focus) * .75;
+      float radius = smoothstep(2.20, 11.5, defocus) * 6.6;
+      vec3 color = colorAt(uv, centerDepth);
       if (radius > .35) {
         vec3 sum = color * 2.0;
         float weight = 2.0;
         for (int i = 0; i < 8; ++i) {
-          float angle = float(i) * .785398;
-          vec2 q = uv + vec2(cos(angle), sin(angle)) * pixelStep * radius;
-          float other = distanceAt(q);
+          vec2 q = uv + blurRing[i] * pixelStep * radius;
+          float qDepth = texture(depth, q).r;
+          float other = distanceAt(qDepth);
           // Weight similar depths so blurred roofs and railings do not leak onto the player.
           float w = 1.0 - smoothstep(.85, 3.0, abs(other - center));
-          sum += colorAt(q) * w;
+          sum += colorAt(q, qDepth) * w;
           weight += w;
         }
         color = sum / weight;
       }
-      color += readLight(glow, uv) * .22 + sunHaze();
+      color += readLight(glow, uv) * .28 + sunHaze(centerDepth);
       float edge = smoothstep(.31, .74, length((uv - vec2(.48, .48)) * vec2(1.0, .89)));
       color *= 1.0 - .24 * edge;
       // Tone mapping compresses highlights before conversion from linear light to display color.

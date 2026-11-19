@@ -5,6 +5,7 @@ import android.opengl.EGL14
 import android.opengl.EGLConfig
 import android.opengl.GLES30
 import android.opengl.Matrix
+import android.os.SystemClock
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.game.diorama.Courtyard
@@ -65,6 +66,25 @@ class CourtyardGlInstrumentedTest {
       assertTrue("Visible geometry and lighting must cover the frame", fullColor.toSet().size > 512)
       saveCapture(File(context.filesDir, "sanctuary-3d-egl.png"), fullColor, width, height)
 
+      renderer.zoomBy(.25f)
+      drawAtGameCadence(renderer, 14)
+      saveCapture(File(context.filesDir, "sanctuary-kingdom-wide.png"), capture(width, height), width, height)
+      renderer.zoomBy(-.43f)
+      drawAtGameCadence(renderer, 18)
+      saveCapture(File(context.filesDir, "sanctuary-kingdom-close.png"), capture(width, height), width, height)
+      val frameTimes = DoubleArray(24) {
+        val start = System.nanoTime()
+        renderer.onDrawFrame(null)
+        GLES30.glFinish()
+        (System.nanoTime() - start) / 1_000_000.0
+      }.sorted()
+      val device = GLES30.glGetString(GLES30.GL_RENDERER)
+      File(context.filesDir, "sanctuary-kingdom-timing.txt").writeText(
+        "pbuffer ${width}x${height}, 24 warmed draws, no swap or UI; renderer=$device\n" +
+          "median_ms=${(frameTimes[11] + frameTimes[12]) / 2} p95_ms=${frameTimes[22]}\n",
+      )
+      assertFalse("Repeated drawing and zooming must keep the production renderer active", failed)
+
       val backup = CourtyardRenderer(context, onReady = {}, onFailure = { failed = true }, preferHalfFloat = false)
       backup.onSurfaceCreated(null, null)
       backup.onSurfaceChanged(null, width, height)
@@ -81,6 +101,14 @@ class CourtyardGlInstrumentedTest {
       EGL14.eglDestroySurface(display, buffer)
       EGL14.eglDestroyContext(display, session)
       EGL14.eglTerminate(display)
+    }
+  }
+
+  private fun drawAtGameCadence(renderer: CourtyardRenderer, frames: Int) {
+    repeat(frames) {
+      SystemClock.sleep(42)
+      renderer.onDrawFrame(null)
+      GLES30.glFinish()
     }
   }
 

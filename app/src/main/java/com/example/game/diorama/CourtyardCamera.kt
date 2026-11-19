@@ -22,15 +22,15 @@ internal class CourtyardCamera {
     this.width = width.coerceAtLeast(1)
     this.height = height.coerceAtLeast(1)
     val aspect = this.width / this.height.toFloat()
-    val aimX = (actor.x * .66f + 2.85f).coerceIn(-5f, 6f)
-    val aimZ = (actor.z - 4.3f).coerceIn(-8f, 5.5f)
-    val aimY = Courtyard.height(actor.x, actor.z) * .48f + .95f
+    val aimX = (actor.x * .72f + 2.55f).coerceIn(-5f, 6f)
+    val aimZ = (actor.z - 3.8f).coerceIn(-8f, 5.5f)
+    val aimY = Courtyard.height(actor.x, actor.z) * .52f + 2.12f
     val distance = zoom * if (aspect < 1f) 1.12f else 1f
-    eye[0] = aimX + 4.5f * distance
-    eye[1] = aimY + 7.9f * distance
-    eye[2] = aimZ + 15.6f * distance
+    eye[0] = aimX + 2.50f * distance
+    eye[1] = aimY + 6.05f * distance
+    eye[2] = aimZ + 14.8f * distance
     Matrix.setLookAtM(view, 0, eye[0], eye[1], eye[2], aimX, aimY, aimZ, 0f, 1f, 0f)
-    Matrix.perspectiveM(projection, 0, if (aspect < 1f) 50f else 44f, aspect, NEAR, FAR)
+    Matrix.perspectiveM(projection, 0, if (aspect < 1f) 50f else 45f, aspect, NEAR, FAR)
     Matrix.multiplyMM(viewProjection, 0, projection, 0, view, 0)
     valid = Matrix.invertM(inverse, 0, viewProjection, 0)
   }

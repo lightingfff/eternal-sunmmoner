@@ -48,6 +48,7 @@ internal class CourtyardRenderer(
     private fun location(name: String) = locations.getOrPut(name) { glGetUniformLocation(id, name) }
     fun matrix(name: String, data: FloatArray) = glUniformMatrix4fv(location(name), 1, false, data, 0)
     fun vector(name: String, x: Float, y: Float, z: Float) = glUniform3f(location(name), x, y, z)
+    fun vector(name: String, x: Float, y: Float, z: Float, w: Float) = glUniform4f(location(name), x, y, z, w)
     fun vector(name: String, x: Float, y: Float) = glUniform2f(location(name), x, y)
     fun uniform(name: String, value: Int) = glUniform1i(location(name), value)
     fun uniform(name: String, value: Float) = glUniform1f(location(name), value)
@@ -272,7 +273,10 @@ internal class CourtyardRenderer(
     for ((i, lamp) in lamps.withIndex()) world.vector("lamps[$i]", lamp[0], lamp[1], lamp[2])
     world.uniform("material", 0)
     world.uniform("sunDepth", 1)
+    world.uniform("heroAtlas", 2)
     bindTexture(1, shadowTargets.depth)
+    bindTexture(2, textures[Material3d.HERO.ordinal])
+    updateHeroVertices()
     for (mesh in meshes) {
       world.uniform("kind", when (mesh.material) {
         Material3d.GRASS, Material3d.STONE -> 1
@@ -286,11 +290,15 @@ internal class CourtyardRenderer(
       worldAttributes()
       glDrawArrays(GL_TRIANGLES, 0, mesh.count)
     }
-    drawHero()
+    glBindBuffer(GL_ARRAY_BUFFER, spriteBuffer)
+    worldAttributes()
+    bindTexture(0, textures[Material3d.HERO.ordinal])
+    world.uniform("kind", 3)
+    glDrawArrays(GL_TRIANGLES, 0, 6)
     for (i in 0..3) glDisableVertexAttribArray(i)
   }
 
-  private fun drawHero() {
+  private fun updateHeroVertices() {
     val cell = if (waypoint < route.size) 2 + (movingTime * 9f).toInt() % 4 else (elapsed * 1.5f).toInt() % 2
     val row = if (facingAway) 1 else 0
     val u0 = (cell * 128f + .5f) / 1536f
@@ -298,13 +306,16 @@ internal class CourtyardRenderer(
     val v0 = (row * 112f + .5f) / 224f
     val v1 = (row * 112f + 111.5f) / 224f
     val foot = Courtyard.height(hero.x, hero.z) + .022f
-    val low = foot - .12f
-    val high = foot + 1.55f
-    val halfWidth = .93f
+    val low = foot - .13f
+    val high = foot + 1.70f
+    val halfWidth = 1.02f
     val rx = camera.view[0] * halfWidth
     val rz = camera.view[8] * halfWidth
     val left = if (facingRight) u0 else u1
     val right = if (facingRight) u1 else u0
+    world.vector("heroSide", camera.view[0], camera.view[8], halfWidth)
+    world.vector("heroHeight", low, high)
+    world.vector("heroFrame", left, v1, right, v0)
     sprite.clear()
     writeSprite(-rx, low, -rz, left, v1)
     writeSprite(rx, low, rz, right, v1)
@@ -315,10 +326,6 @@ internal class CourtyardRenderer(
     sprite.flip()
     glBindBuffer(GL_ARRAY_BUFFER, spriteBuffer)
     glBufferSubData(GL_ARRAY_BUFFER, 0, 6 * STRIDE * FLOAT_BYTES, sprite)
-    worldAttributes()
-    bindTexture(0, textures[Material3d.HERO.ordinal])
-    world.uniform("kind", 3)
-    glDrawArrays(GL_TRIANGLES, 0, 6)
   }
 
   private fun writeSprite(dx: Float, y: Float, dz: Float, u: Float, v: Float) {

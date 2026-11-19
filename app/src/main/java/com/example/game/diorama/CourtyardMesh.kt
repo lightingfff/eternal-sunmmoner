@@ -9,8 +9,8 @@ internal data class Point3(val x: Float, val y: Float, val z: Float)
 
 internal enum class Material3d(val asset: String? = null) {
   GRASS("art_depth_v1/materials/sanctuary_grass.png"),
-  STONE("art_depth_v1/materials/cobble.png"),
-  WALL("art_completion_v1/surfaces/limestone.png"),
+  STONE("diorama/cobblestone.png"),
+  WALL("diorama/masonry.png"),
   TIMBER("art_depth_v1/materials/oak.png"),
   SLATE("diorama/slate.png"),
   PLASTER("diorama/plaster.png"),
@@ -93,7 +93,7 @@ internal class CourtyardMesh {
     val ridge = eave + house.roof
     val mid = (l + r) / 2
     val wallTint = if (house.style == 1) 0xe5d5b6 else 0xf0e1c8
-    val roofTint = when (house.style) { 0 -> 0x7e97b5; 1 -> 0xa78876; else -> 0x8596a4 }
+    val roofTint = when (house.style) { 0 -> 0x76979e; 1 -> 0xa89684; else -> 0x868eac }
     box(l - .1f, y, n - .1f, r + .1f, y + .33f, s + .12f, Material3d.WALL, 0xa19b85)
     box(l, y + .33f, n, r, y + .74f, s, Material3d.WALL, 0xc4b79c, .7f)
     box(l, y + .74f, n, r, eave, s, Material3d.PLASTER, wallTint, .9f)
@@ -111,7 +111,7 @@ internal class CourtyardMesh {
     frontBeam(mid, ridge, r + .34f, eave - .12f, s + .34f, .15f, .16f)
     box(mid - .07f, ridge - .035f, n - .24f, mid + .07f, ridge + .13f, s + .26f, Material3d.TIMBER, 0x554742)
 
-    val beamTint = 0xa57d59
+    val beamTint = 0x9c6f4f
     for (x in listOf(l + .12f, r - .12f, mid)) {
       val bottom = if (x == mid) y + 1.98f else y + .28f
       box(x - .07f, bottom, s, x + .07f, eave, s + .09f, Material3d.TIMBER, beamTint)
@@ -131,9 +131,18 @@ internal class CourtyardMesh {
       frontBeam(r - .14f, y + 1.95f, r - .84f, eave - .12f, s + .035f, .11f, .12f)
     } else if (house.style == 1) {
       val shadeY = y + 2.13f
-      quad(Material3d.TIMBER, Point3(l - .04f, shadeY - .26f, s + .62f),
-        Point3(r + .04f, shadeY - .26f, s + .62f), Point3(r + .04f, shadeY, s),
-        Point3(l - .04f, shadeY, s), 0xa36d4f, 3.0f, .9f)
+      val count = 9
+      for (panel in 0 until count) {
+        val left = l + (r - l) * panel / count
+        val right = l + (r - l) * (panel + 1) / count
+        val tint = if (panel % 2 == 0) 0x9b6656 else 0xc5a888
+        quad(Material3d.PLASTER, Point3(left, shadeY - .28f, s + .66f),
+          Point3(right, shadeY - .28f, s + .66f), Point3(right, shadeY, s),
+          Point3(left, shadeY, s), tint)
+        quad(Material3d.PLASTER, Point3(left, shadeY - .43f, s + .657f),
+          Point3(right, shadeY - .43f, s + .657f), Point3(right, shadeY - .28f, s + .66f),
+          Point3(left, shadeY - .28f, s + .66f), tint)
+      }
       for (x in listOf(l + .08f, r - .08f))
         box(x - .064f, y, s + .12f, x + .064f, shadeY - .14f, s + .28f, Material3d.TIMBER, 0x77513d)
       lantern(mid, y + 1.76f, s + .47f, .62f)
@@ -142,7 +151,13 @@ internal class CourtyardMesh {
       window(x, y + .92f, s + .015f)
       if (house.style != 2) windowBox(x, y + .71f, s + .105f)
     }
-    window(mid, eave + .33f, s + .015f, .67f)
+    for (side in floatArrayOf(-1f, 1f)) {
+      val inner = mid + side * .40f
+      val outer = mid + side * (r - l) * .32f
+      frontBeam(outer, eave + .01f, inner, eave + house.roof * .65f, s + .002f, .10f, .092f)
+      frontBeam(inner, y + 1.98f, outer, y + 1.25f, s + .002f, .095f, .087f)
+    }
+    window(mid, eave + .28f, s + .015f, .65f)
     val chimneyX = if (house.style == 0) mid - .68f else mid + .7f
     box(chimneyX - .21f, eave + .35f, n + .6f, chimneyX + .21f, ridge + .46f, n + 1.04f, Material3d.WALL, 0x998678)
     box(chimneyX - .28f, ridge + .41f, n + .53f, chimneyX + .28f, ridge + .54f, n + 1.11f, Material3d.STONE)
@@ -249,6 +264,13 @@ internal class CourtyardMesh {
     box(x - .36f * scale, y - .065f, z, x + .36f * scale, y + .8f * scale, z + .065f, Material3d.TIMBER, 0x534946)
     box(x - .26f * scale, y, z + .066f, x + .26f * scale, y + .68f * scale, z + .083f, Material3d.EMISSIVE, 0xac784a)
     box(x - .033f, y, z + .084f, x + .033f, y + .69f * scale, z + .112f, Material3d.SOLID, 0x4a463d)
+    for (sign in intArrayOf(-1, 1)) {
+      val sx = x + sign * .34f * scale
+      box(sx - .065f * scale, y - .007f, z + .011f, sx + .065f * scale, y + .69f * scale, z + .12f,
+        Material3d.TIMBER, 0x64825f)
+    }
+    box(x - .26f * scale, y + .31f * scale, z + .084f, x + .26f * scale, y + .36f * scale, z + .112f,
+      Material3d.TIMBER, 0x695343)
     box(x - .42f * scale, y - .11f, z, x + .42f * scale, y - .032f, z + .18f, Material3d.STONE)
   }
 
@@ -289,18 +311,113 @@ internal class CourtyardMesh {
   }
 
   private fun promenade() {
-    // Joined slabs carry the eye from the bridge, across the square, to the stairs.
-    val edges = listOf(
-      Triple(-5.92f, 9.03f, 1.40f), Triple(-4.92f, 7.38f, 2.35f),
-      Triple(-2.45f, 5.31f, 3.24f), Triple(.68f, 4.26f, 3.47f),
-      Triple(3.75f, 4.02f, 1.55f), Triple(3.75f, 1.5f, 1.55f),
+    // One continuous plaza, with cut corners reserved for planted beds.
+    val landings = listOf(
+      Triple(-5.92f, 9.03f, 1.40f), Triple(-2.4f, 7.52f, 5.75f),
+      Triple(-.35f, 4.75f, 7.70f), Triple(.40f, 3.66f, 8.00f),
+      Triple(1.01f, 2.43f, 7.50f), Triple(3.75f, 1.5f, 1.55f),
     )
-    for ((a, b) in edges.zipWithNext()) {
+    for ((a, b) in landings.zipWithNext()) {
       quad(Material3d.STONE,
         Point3(a.first - a.third, .020f, a.second), Point3(a.first + a.third, .020f, a.second),
-        Point3(b.first + b.third, .020f, b.second), Point3(b.first - b.third, .020f, b.second), 0xd8c8af)
+        Point3(b.first + b.third, .020f, b.second), Point3(b.first - b.third, .020f, b.second), 0xdecdb4)
     }
+    val centerX = -.82f
+    val centerZ = 4.88f
+    val size = 1.86f
+    val y = .024f
+    val colors = intArrayOf(0xb5a184, 0x977c65)
+    // An inlaid compass marks the center without adding collision or height.
+    for (i in 0 until 24) {
+      val a = i * PI / 12
+      val b = (i + 1) * PI / 12
+      fun ring(angle: Double, r: Float) =
+        Point3(centerX + sin(angle).toFloat() * r, y, centerZ + cos(angle).toFloat() * r)
+      quad(Material3d.STONE, ring(a, size), ring(b, size), ring(b, size - .13f), ring(a, size - .13f), colors[i % 2])
+    }
+    for (i in 0 until 8) {
+      val a = i * PI / 4
+      fun ray(along: Float, across: Float) = Point3(centerX + (sin(a) * along + cos(a) * across).toFloat(), y,
+        centerZ + (cos(a) * along - sin(a) * across).toFloat())
+      quad(Material3d.STONE, ray(.11f, 0f), ray(.39f, -.13f),
+        ray(if (i % 2 == 0) 1.43f else .86f, 0f), ray(.39f, .13f), 0x957b69)
+    }
+  }
 
+  private fun citadel() {
+    val base = Courtyard.RISE * 2
+    val front = Courtyard.NORTH - .62f
+    // The connected upper bank and its gate lie beyond the playable parapet.
+    box(-17f, -1.08f, front - 11f, 17f, base, front, Material3d.ROCK, 0x868879, .54f)
+    plane(-17f, 17f, front - 11f, front, base + .005f, Material3d.GRASS, 0x8b9167)
+    box(-15f, base, front - 1.75f, 15f, base + 2.98f, front, Material3d.WALL, 0xcac1a9, .73f)
+    box(-15.14f, base + 2.84f, front - 1.90f, 15.14f, base + 3.08f, front + .14f, Material3d.WALL, 0xd6c8a9)
+    for (i in 0..28) {
+      val x = -14.84f + i * 1.04f
+      box(x, base + 3.04f, front - .59f, x + .48f, base + 3.64f, front + .12f, Material3d.WALL, 0xc7b99d)
+      box(x - .045f, base + 3.60f, front - .68f, x + .525f, base + 3.72f, front + .20f, Material3d.WALL, 0xd9c9a7)
+    }
+    val gate = -1.25f
+    box(gate - 2.12f, base, front - 2.21f, gate + 2.12f, base + 3.96f, front + .21f, Material3d.WALL, 0xcabc9d, .69f)
+    doorway(gate, base, front + .222f, 1.04f, 1.68f)
+    crest(gate, base + 3.40f, front + .25f, .57f)
+    for (side in intArrayOf(-1, 1)) {
+      val x = gate + side * 2.37f
+      royalTower(x, base, front - .22f, 1.02f, 4.36f)
+      pennant(x, base + 3.63f, front + .825f, .56f, 1.14f)
+    }
+    royalTower(-12.3f, base, front - .63f, 1.27f, 3.70f)
+    royalTower(10.4f, base, front - .73f, 1.24f, 3.91f)
+    royalTower(1.7f, base, front - 5.88f, 1.39f, 6.23f)
+    royalTower(-5.4f, base, front - 6.7f, 1.22f, 5.55f)
+    for (x in floatArrayOf(-9.1f, 6.9f)) {
+      val rear = front - 6.2f
+      val top = base + 5.5f
+      val eave = top - 1.1f
+      val frontZ = rear + 1.60f
+      val backZ = rear - 2f
+      box(x - 2.45f, base, backZ, x + 2.45f, eave, frontZ, Material3d.WALL, 0xafada0, .70f)
+      triangle(Material3d.WALL, Point3(x - 2.45f, eave, frontZ), Point3(x + 2.45f, eave, frontZ),
+        Point3(x, top, frontZ), 0xafada0)
+      triangle(Material3d.WALL, Point3(x + 2.45f, eave, backZ), Point3(x - 2.45f, eave, backZ),
+        Point3(x, top, backZ), 0xafada0)
+      roofPlane(x - 2.58f, x, rear - 2.25f, rear + 1.78f, top - 1.1f, top, 0x667f92)
+      roofPlane(x, x + 2.58f, rear - 2.25f, rear + 1.78f, top, top - 1.1f, 0x667f92)
+    }
+  }
+
+  private fun crest(x: Float, y: Float, z: Float, r: Float) {
+    quad(Material3d.SOLID, Point3(x - r, y, z), Point3(x, y - r, z),
+      Point3(x + r, y, z), Point3(x, y + r, z), 0x495975)
+    val h = r * .71f
+    quad(Material3d.SOLID, Point3(x - h, y, z + .011f), Point3(x, y - h, z + .011f),
+      Point3(x + h, y, z + .011f), Point3(x, y + h, z + .011f), 0xd4ae68)
+    val core = h * .56f
+    quad(Material3d.SOLID, Point3(x - core, y, z + .017f), Point3(x, y - core, z + .017f),
+      Point3(x + core, y, z + .017f), Point3(x, y + core, z + .017f), 0x66798e)
+  }
+
+  private fun royalTower(x: Float, y: Float, z: Float, radius: Float, body: Float) {
+    val top = y + body
+    val count = 12
+    val roofColor = 0x75959f
+    fun point(angle: Double, r: Float, height: Float) =
+      Point3(x + sin(angle).toFloat() * r, height, z + cos(angle).toFloat() * r)
+    for (i in 0 until count) {
+      val a = (i - .5) * 2 * PI / count
+      val b = (i + .5) * 2 * PI / count
+      quad(Material3d.WALL, point(a, radius, y), point(b, radius, y), point(b, radius, top), point(a, radius, top),
+        0xcac2ae, .65f, body * .69f)
+      quad(Material3d.WALL, point(a, radius * 1.10f, top - .23f), point(b, radius * 1.10f, top - .23f),
+        point(b, radius * 1.10f, top + .035f), point(a, radius * 1.10f, top + .035f), 0xd3c7ad, .8f, .24f)
+      quad(Material3d.SLATE, point(a, radius * 1.22f, top), point(b, radius * 1.22f, top),
+        point(b, radius * .59f, top + 1.04f), point(a, radius * .59f, top + 1.04f), roofColor, .53f, .60f)
+      triangle(Material3d.SLATE, point(a, radius * .59f, top + 1.04f),
+        point(b, radius * .59f, top + 1.04f), Point3(x, top + 2.13f, z), roofColor)
+    }
+    window(x, top - 1.45f, z + radius * .972f, .59f)
+    box(x - .035f, top + 2.02f, z - .035f, x + .035f, top + 2.54f, z + .035f, Material3d.SOLID, 0xd6ae63)
+    crown(x, top + 2.14f, z, .11f, .14f, .11f, 0xe7be75)
   }
 
   private fun railing(left: Float, right: Float, z0: Float, z1: Float, bottom: Float) {
@@ -378,6 +495,24 @@ internal class CourtyardMesh {
     }
   }
 
+  private fun promenadeParapet() {
+    val z = Courtyard.SOUTH - .045f
+    val lengths = listOf(Courtyard.LEFT + .15f to Courtyard.BRIDGE_LEFT - .19f,
+      Courtyard.BRIDGE_RIGHT + .18f to Courtyard.RIGHT - .20f)
+    for ((left, right) in lengths) {
+      box(left, -.04f, z - .13f, right, .13f, z + .29f, Material3d.WALL, 0xafa289)
+      box(left, .65f, z - .16f, right, .78f, z + .34f, Material3d.WALL, 0xcabd9e)
+      val segments = ((right - left) / .46f).toInt()
+      for (i in 0..segments) {
+        val x = left + .14f + (right - left - .28f) * i / segments
+        val pier = i == 0 || i == segments || i % 6 == 0
+        val half = if (pier) .13f else .055f
+        box(x - half, .12f, z - .055f, x + half, .67f, z + .24f, Material3d.WALL, 0xb7ab92)
+        if (pier) box(x - .17f, .77f, z - .17f, x + .17f, .87f, z + .35f, Material3d.WALL, 0xd2c1a2)
+      }
+    }
+  }
+
   private fun terrain() {
     plane(-60f, 60f, -65f, 56f, -1.08f, Material3d.WATER, 0x284f58)
     box(Courtyard.LEFT, -.98f, Courtyard.NORTH, Courtyard.RIGHT, 0f, Courtyard.SOUTH, Material3d.WALL, 0x998e78, .7f)
@@ -389,11 +524,15 @@ internal class CourtyardMesh {
     plane(-4.1f, .7f, Courtyard.NORTH, Courtyard.UPPER_EDGE, Courtyard.RISE * 2 + .017f, Material3d.STONE, 0xbdb79f)
     promenade()
     bridge()
+    promenadeParapet()
+    citadel()
     for (stair in Courtyard.stairs) {
       for (i in 0 until Courtyard.STEP_COUNT) {
         val z = stair.edge + Courtyard.STEP_DEPTH * i
         val y = stair.base + (Courtyard.STEP_COUNT - i) * Courtyard.STEP_HEIGHT
-        box(stair.left, stair.base - .03f, z, stair.right, y + .018f, z + Courtyard.STEP_DEPTH, Material3d.WALL, 0xbfb299)
+        val face = z + Courtyard.STEP_DEPTH
+        box(stair.left, stair.base - .03f, z, stair.right, y + .018f, face, Material3d.WALL, 0xa69d88)
+        box(stair.left, y - .035f, face - .065f, stair.right, y + .020f, face + .027f, Material3d.WALL, 0xb8ac96)
         plane(stair.left, stair.right, z, z + Courtyard.STEP_DEPTH, y + .022f, Material3d.STONE, 0xd8cab0)
       }
       for ((a, b) in listOf(Courtyard.LEFT to stair.left - .07f, stair.right + .07f to Courtyard.RIGHT)) {
@@ -415,11 +554,25 @@ internal class CourtyardMesh {
       val y = Courtyard.height(x, z)
       box(x - .19f, y, z - .18f, x + .18f, y + 2.66f, z + .19f, Material3d.TIMBER, 0x897457)
       val palette = if (index % 3 == 0) intArrayOf(0xc9c47a, 0xb8bc76, 0xe4d386) else intArrayOf(0x98b079, 0xb0bf81, 0xd2d692)
-      repeat(19) { i ->
-        val offsetX = (random.nextFloat() - .5f) * 2.5f
-        val offsetZ = (random.nextFloat() - .5f) * 2.2f
-        val rx = .46f + random.nextFloat() * 1f
-        crown(x + offsetX, y + 2.5f + random.nextFloat() * 1.32f, z + offsetZ, rx, rx * .68f, rx * .88f, palette[i % 3], Material3d.FOLIAGE)
+      repeat(13) { i ->
+        val angle = i * 2.39996f
+        val t = i / 12f
+        val spread = .38f + t * 1.06f
+        val px = x + cos(angle) * spread
+        val pz = z + sin(angle) * spread
+        val py = y + 2.57f + (1f - t) * 1.38f + random.nextFloat() * .38f
+        val radius = .72f + random.nextFloat() * .25f
+        crown(px, py, pz, radius, radius * .68f, radius * .85f, palette[i % 3], Material3d.FOLIAGE)
+        for (j in 0 until 14) {
+          val leafAngle = j * 2.39996f
+          val ox = cos(leafAngle) * radius * (.75f + random.nextFloat() * .37f)
+          val oz = sin(leafAngle) * radius
+          val h = py + (random.nextFloat() - .5f) * .92f
+          val leaf = .075f + random.nextFloat() * .12f
+          triangle(Material3d.FOLIAGE, Point3(px + ox - leaf, h, pz + oz),
+            Point3(px + ox + leaf, h - .08f, pz + oz - leaf * .58f),
+            Point3(px + ox + leaf * .34f, h + leaf, pz + oz + .062f), palette[(i + j) % 3])
+        }
       }
     }
     Courtyard.stairs.forEach { wallDetail(it, random) }
@@ -451,7 +604,7 @@ internal class CourtyardMesh {
       lantern(x, y + 1.02f, z)
     }
     // Small grouped plants break the repeating tile pattern at the stair and cliff edges.
-    for ((x, z) in listOf(-7.6f to 2.1f, 7.4f to 2.15f, -9.2f to 7.8f, 4.8f to 7.6f, 7.5f to 6.9f)) {
+    for ((x, z) in listOf(-9.3f to 2.15f, 9.1f to 2.40f, -9.2f to 7.8f, 5.7f to 7.9f, 9.3f to 6.87f)) {
       repeat(5) { i ->
         val spread = i * .19f
         crown(x + spread, .23f + random.nextFloat() * .16f, z + .18f * sin(i.toFloat()),
@@ -461,7 +614,7 @@ internal class CourtyardMesh {
     repeat(520) { i ->
       val x = -11.7f + random.nextFloat() * 23.4f
       val z = 3.3f + random.nextFloat() * 5.55f
-      if (x in -7.4f..4.2f && z > 4.2f || x in 1.9f..5.6f && z < 4.3f) return@repeat
+      if ((x in -8.45f..8.45f && z < 7.5f) || x in -8.45f..3.4f) return@repeat
       val stem = .068f + random.nextFloat() * .27f
       val color = intArrayOf(0x6d794c, 0x5d7045, 0x858450)[i % 3]
       triangle(Material3d.SOLID, Point3(x - .045f, .012f, z), Point3(x + .043f, .012f, z),
