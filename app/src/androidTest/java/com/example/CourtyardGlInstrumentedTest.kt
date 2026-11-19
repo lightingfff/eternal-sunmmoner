@@ -101,6 +101,7 @@ class CourtyardGlInstrumentedTest {
         walkAndCapture(renderer, target, File(context.filesDir, name), width, height)
         camera.frame(target, width, height, 1f)
         assertGroundPick(camera, target, width, height)
+        if (index == 1) recordAfternoonWalk(renderer, context.filesDir, width, height)
       }
       walkAndCapture(renderer, GroundPoint(11.30f, 19.35f),
         File(context.filesDir, "sanctuary-orchard-canopy.png"), width, height)
@@ -125,6 +126,36 @@ class CourtyardGlInstrumentedTest {
       EGL14.eglDestroyContext(display, session)
       EGL14.eglTerminate(display)
     }
+  }
+
+  private fun recordAfternoonWalk(renderer: CourtyardRenderer, directory: File, width: Int, height: Int) {
+    val frames = File(directory, "afternoon-walk").apply { mkdirs() }
+    val shade = GroundPoint(-6.36f, 15.58f)
+    val awning = GroundPoint(4.60f, 18.60f)
+    renderer.walkTo(shade)
+    repeat(360) { renderer.advance(1f / 24f) }
+    assertTrue("The market walk must start by the tree", renderer.actorPosition.distance(shade) < .36f)
+    renderer.walkTo(GroundPoint(-4.65f, 25.45f))
+    for (index in 1..30) {
+      if (index == 11) renderer.walkTo(awning)
+      if (index == 27) renderer.zoomBy(.22f)
+      if (index == 29) renderer.zoomBy(-.40f)
+      repeat(12) { renderer.advance(1f / 24f) }
+      renderer.onDrawFrame(null)
+      GLES30.glFinish()
+      val image = Bitmap.createBitmap(capture(width, height), width, height, Bitmap.Config.ARGB_8888)
+      val reduced = Bitmap.createScaledBitmap(image, 480, 270, false)
+      try {
+        File(frames, "frame-${index.toString().padStart(2, '0')}.jpg").outputStream().use {
+          assertTrue(reduced.compress(Bitmap.CompressFormat.JPEG, 89, it))
+        }
+      } finally {
+        reduced.recycle()
+        image.recycle()
+      }
+    }
+    assertTrue("The market walk must reach the awning", renderer.actorPosition.distance(awning) < .36f)
+    renderer.zoomBy(.18f)
   }
 
   private fun walkAndCapture(

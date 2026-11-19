@@ -80,6 +80,7 @@ internal class CourtyardRenderer(
     floatArrayOf(p.x, y, p.z)
   }
   private var spriteBuffer = 0
+  private var marketContactTexture = 0
   private val textures = IntArray(Material3d.entries.size)
   private val sun = FloatArray(16)
   private val camera = CourtyardCamera()
@@ -150,13 +151,18 @@ internal class CourtyardRenderer(
       glBufferData(GL_ARRAY_BUFFER, data.size * FLOAT_BYTES, vertices, GL_STATIC_DRAW)
       Batch(buffer, data.size / STRIDE, material)
     }
+    marketContactTexture = texture(GL_LINEAR, GL_LINEAR)
+    val contactSize = CourtyardDaylight.contactSize
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, contactSize, contactSize, 0, GL_RED, GL_UNSIGNED_BYTE,
+      CourtyardDaylight.contactPixels())
     spriteBuffer = buffer()
     glBindBuffer(GL_ARRAY_BUFFER, spriteBuffer)
     glBufferData(GL_ARRAY_BUFFER, 6 * STRIDE * FLOAT_BYTES, null, GL_DYNAMIC_DRAW)
 
     val light = FloatArray(16)
     val orthographic = FloatArray(16)
-    Matrix.setLookAtM(light, 0, -24f, 16f, 23f, 0f, 0f, 8f, 0f, 1f, 0f)
+    val eye = CourtyardDaylight.sunAnchor
+    Matrix.setLookAtM(light, 0, eye.x, eye.y, eye.z, 0f, 0f, 8f, 0f, 1f, 0f)
     Matrix.orthoM(orthographic, 0, -35f, 35f, -26f, 26f, 1f, 88f)
     Matrix.multiplyMM(sun, 0, orthographic, 0, light, 0)
     shadowTargets = checkNotNull(targets(1536, 1536, colorFormat = null))
@@ -194,7 +200,6 @@ internal class CourtyardRenderer(
     val now = SystemClock.uptimeMillis()
     val dt = if (lastFrame == 0L) 0f else ((now - lastFrame) * .001f).coerceIn(0f, .05f)
     lastFrame = now
-    elapsed = (elapsed + dt) % 600f
     advance(dt)
     camera.frame(tracked, viewportWidth, viewportHeight, zoom)
     val highlights = glow ?: return@guard
@@ -221,6 +226,7 @@ internal class CourtyardRenderer(
   }
 
   internal fun advance(dt: Float) {
+    elapsed = (elapsed + dt) % 600f
     var left = dt * 3.25f
     if (waypoint < route.size) movingTime += dt else movingTime = 0f
     while (left > .0001f && waypoint < route.size) {
@@ -253,8 +259,10 @@ internal class CourtyardRenderer(
     glClear(GL_DEPTH_BUFFER_BIT)
     shadow.use()
     shadow.matrix("sunMatrix", sun)
+    marketBounds(shadow)
     for (mesh in meshes) {
       if (mesh.material == Material3d.WATER) continue
+      shadow.uniform("dappled", if (mesh.material == Material3d.FOLIAGE || mesh.material == Material3d.BLOSSOM) 1 else 0)
       glBindBuffer(GL_ARRAY_BUFFER, mesh.buffer)
       attribute(0, 3, 0)
       glDrawArrays(GL_TRIANGLES, 0, mesh.count)
@@ -274,7 +282,13 @@ internal class CourtyardRenderer(
     world.matrix("viewProjection", camera.viewProjection)
     world.matrix("sunMatrix", sun)
     world.vector("camera", camera.eye[0], camera.eye[1], camera.eye[2])
-    world.vector("sunDirection", -.738f, .492f, .461f)
+    val direction = CourtyardDaylight.sun
+    world.vector("sunDirection", direction.x, direction.y, direction.z)
+    marketBounds(world)
+    world.uniform("marketView", CourtyardDaylight.marketView(hero))
+    world.vector("fountain", Courtyard.fountain.x, Courtyard.fountain.z, Courtyard.FOUNTAIN_RADIUS)
+    world.uniform("marketContact", 3)
+    bindTexture(3, marketContactTexture)
     world.vector("actor", hero.x, Courtyard.height(hero.x, hero.z), hero.z)
     world.uniform("timer", elapsed)
     world.uniform("packedRadiance", packedRadiance)
@@ -294,6 +308,13 @@ internal class CourtyardRenderer(
         else -> 0
       })
       world.uniform("uvScale", mesh.material.uvScale)
+      world.uniform("surfaceSheen", when (mesh.material) {
+        Material3d.STONE -> .080f
+        Material3d.WALL -> .062f
+        Material3d.SLATE -> .112f
+        Material3d.TIMBER, Material3d.PLANKS -> .038f
+        else -> 0f
+      })
       val texture = textures[mesh.material.ordinal].takeIf { it != 0 } ?: textures[Material3d.SOLID.ordinal]
       bindTexture(0, texture)
       glBindBuffer(GL_ARRAY_BUFFER, mesh.buffer)
@@ -305,8 +326,14 @@ internal class CourtyardRenderer(
     bindTexture(0, textures[Material3d.HERO.ordinal])
     world.uniform("kind", 3)
     world.uniform("uvScale", Material3d.HERO.uvScale)
+    world.uniform("surfaceSheen", 0f)
     glDrawArrays(GL_TRIANGLES, 0, 6)
     for (i in 0..3) glDisableVertexAttribArray(i)
+  }
+
+  private fun marketBounds(program: Program) {
+    val bounds = CourtyardDaylight.bounds
+    program.vector("marketBounds", bounds.left, bounds.north, bounds.right, bounds.south)
   }
 
   private fun updateHeroVertices() {
@@ -388,6 +415,11 @@ internal class CourtyardRenderer(
     lens.vector("planes", CourtyardCamera.NEAR, CourtyardCamera.FAR)
     lens.vector("pixelStep", 1f / frame.width, 1f / frame.height)
     lens.uniform("focus", camera.depthAt(hero.x, Courtyard.height(hero.x, hero.z) + .7f, hero.z))
+    lens.uniform("fountainFocus", camera.depthAt(Courtyard.fountain.x, .45f, Courtyard.fountain.z))
+    lens.uniform("marketView", CourtyardDaylight.marketView(hero))
+    lens.uniform("shaftStrength", 1f)
+    val direction = CourtyardDaylight.sun
+    lens.vector("sunDirection", direction.x, direction.y, direction.z)
     glDrawArrays(GL_TRIANGLES, 0, 3)
   }
 
