@@ -68,11 +68,13 @@ internal class CourtyardRenderer(
   private lateinit var shadow: Program
   private lateinit var lens: Program
   private lateinit var bloom: Program
+  private lateinit var present: Program
   private lateinit var meshes: List<Batch>
   private lateinit var shadowTargets: Targets
   private var scene: Targets? = null
   private var glow: Targets? = null
   private var glowScratch: Targets? = null
+  private var resolved: Targets? = null
   private var halfFloatSupported = false
   private var packedRadiance = 1
   private val lamps = Courtyard.bollards.take(4).map { p ->
@@ -118,6 +120,7 @@ internal class CourtyardRenderer(
     scene = null
     glow = null
     glowScratch = null
+    resolved = null
     val extensions = glGetString(GL_EXTENSIONS).orEmpty().split(' ')
     halfFloatSupported = preferHalfFloat && (
       "GL_EXT_color_buffer_half_float" in extensions || "GL_EXT_color_buffer_float" in extensions
@@ -128,6 +131,7 @@ internal class CourtyardRenderer(
     shadow = Program(CourtyardShaders.shadowVertex, CourtyardShaders.shadowFragment)
     lens = Program(CourtyardShaders.lensVertex, CourtyardShaders.lensFragment)
     bloom = Program(CourtyardShaders.lensVertex, CourtyardShaders.bloomFragment)
+    present = Program(CourtyardShaders.lensVertex, CourtyardShaders.presentFragment)
     textures[Material3d.SOLID.ordinal] = whiteTexture()
     for (material in Material3d.entries) {
       val asset = material.asset ?: continue
@@ -135,7 +139,8 @@ internal class CourtyardRenderer(
     }
     textures[Material3d.HERO.ordinal] = imageTexture("character_upgrade_v1/kaelen/kaelen.png", atlas = true)
     val geometry = CourtyardMesh().apply { build() }
-    meshes = geometry.buffers().map { (material, data) ->
+    // Opaque terrain covers most of the water. Let depth rejection skip those pixels.
+    meshes = geometry.buffers().entries.sortedBy { it.key == Material3d.WATER }.map { (material, data) ->
       val buffer = buffer()
       glBindBuffer(GL_ARRAY_BUFFER, buffer)
       val vertices = floats(data.size)
@@ -165,6 +170,8 @@ internal class CourtyardRenderer(
     release(scene)
     release(glow)
     release(glowScratch)
+    release(resolved)
+    resolved = null
     scene = null
     glow = null
     glowScratch = null
@@ -177,7 +184,11 @@ internal class CourtyardRenderer(
       check(setupFrame(w, h, GL_RGBA8)) { "Unable to allocate courtyard color and depth buffers" }
       packedRadiance = 1
     }
-    Log.i(TAG, "Lighting storage " + if (packedRadiance == 0) "RGBA16F" else "companded RGBA8")
+    if (w != width || h != height) {
+      resolved = checkNotNull(targets(w, h, GL_RGBA8, depthNeeded = false))
+    }
+    val format = if (packedRadiance == 0) "RGBA16F" else "companded RGBA8"
+    Log.i(TAG, "Lighting storage $format · ${w}x${h} render → ${width}x${height} display")
     camera.frame(tracked, width, height, zoom)
   }
 
@@ -357,8 +368,9 @@ internal class CourtyardRenderer(
   }
 
   private fun renderLens(frame: Targets, highlights: Targets) {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0)
-    glViewport(0, 0, viewportWidth, viewportHeight)
+    val output = resolved
+    glBindFramebuffer(GL_FRAMEBUFFER, output?.framebuffer ?: 0)
+    glViewport(0, 0, frame.width, frame.height)
     glDisable(GL_DEPTH_TEST)
     glBindBuffer(GL_ARRAY_BUFFER, 0)
     lens.use()
@@ -378,6 +390,14 @@ internal class CourtyardRenderer(
     lens.vector("pixelStep", 1f / frame.width, 1f / frame.height)
     lens.uniform("focus", camera.depthAt(hero.x, Courtyard.height(hero.x, hero.z) + .7f, hero.z))
     glDrawArrays(GL_TRIANGLES, 0, 3)
+    if (output != null) {
+      glBindFramebuffer(GL_FRAMEBUFFER, 0)
+      glViewport(0, 0, viewportWidth, viewportHeight)
+      present.use()
+      bindTexture(0, output.color)
+      present.uniform("image", 0)
+      glDrawArrays(GL_TRIANGLES, 0, 3)
+    }
   }
 
   private fun worldAttributes() {

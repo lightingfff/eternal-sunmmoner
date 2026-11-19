@@ -76,15 +76,14 @@ internal object CourtyardShaders {
       if (any(lessThan(uvz, vec3(0.0))) || any(greaterThan(uvz, vec3(1.0)))) return 1.0;
       float bias = mix(.00192, .00067, cosine);
       vec2 texel = 1.0 / vec2(textureSize(sunDepth, 0));
-      float visible = 0.0;
-      for (int y = -1; y <= 1; ++y) {
-        for (int x = -1; x <= 1; ++x) {
-          vec2 offset = vec2(float(x), float(y)) * 1.12 * texel;
-          float weight = (x == 0 ? 2.0 : 1.0) * (y == 0 ? 2.0 : 1.0);
-          visible += weight * step(uvz.z - bias, texture(sunDepth, uvz.xy + offset).r);
-        }
-      }
-      return visible / 16.0;
+      float reference = uvz.z - bias;
+      vec2 spread = texel * 1.35;
+      float visible = 2.0 * step(reference, texture(sunDepth, uvz.xy).r);
+      visible += step(reference, texture(sunDepth, uvz.xy + spread).r);
+      visible += step(reference, texture(sunDepth, uvz.xy - spread).r);
+      visible += step(reference, texture(sunDepth, uvz.xy + vec2(-spread.x, spread.y)).r);
+      visible += step(reference, texture(sunDepth, uvz.xy + vec2(spread.x, -spread.y)).r);
+      return visible / 6.0;
     }
 
     float actorShadow(vec2 delta) {
@@ -110,6 +109,7 @@ internal object CourtyardShaders {
       for (int i = 0; i < 4; ++i) {
         vec3 ray = lamps[i] - position;
         float square = dot(ray, ray);
+        if (square >= 7.2) continue;
         float falloff = 1.0 - smoothstep(0.08, 7.2, square);
         spill += falloff * falloff * max(0.0, dot(n, ray) * inversesqrt(max(square, .04)));
       }
@@ -165,6 +165,18 @@ internal object CourtyardShaders {
     }
   """.trimIndent()
 
+  val presentFragment = """#version 300 es
+    precision highp float;
+    uniform sampler2D image;
+    in vec2 uv;
+    out vec4 pixel;
+    void main() {
+      ivec2 size = textureSize(image, 0);
+      ivec2 nearestPixel = clamp(ivec2(uv * vec2(size)), ivec2(0), size - 1);
+      pixel = texelFetch(image, nearestPixel, 0);
+    }
+  """.trimIndent()
+
   val bloomFragment = """#version 300 es
     precision highp float;
     precision highp sampler2D;
@@ -215,9 +227,9 @@ internal object CourtyardShaders {
     in vec2 uv;
     out vec4 pixel;
 
-    const vec2 blurRing[8] = vec2[8](
-      vec2(1.0, 0.0), vec2(.707, .707), vec2(0.0, 1.0), vec2(-.707, .707),
-      vec2(-1.0, 0.0), vec2(-.707, -.707), vec2(0.0, -1.0), vec2(.707, -.707)
+    const vec2 blurRing[6] = vec2[6](
+      vec2(1.0, 0.0), vec2(.5, .866), vec2(-.5, .866),
+      vec2(-1.0, 0.0), vec2(-.5, -.866), vec2(.5, -.866)
     );
 
     float distanceAt(float d) {
@@ -244,8 +256,8 @@ internal object CourtyardShaders {
         // Limit scattering to the stream and the gap between roofs.
         vec2 axis = (p.xz + p.y * vec2(1.5, -.94) - vec2(3.0, -2.5)) * vec2(.31, .161);
         float density = exp(-dot(axis, axis)) * (1.0 - smoothstep(1.6, 8.0, p.y));
-        vec4 light = sunMatrix * vec4(p, 1.0);
-        vec3 lightUv = light.xyz / light.w * .5 + .5;
+        if (density < .006) continue;
+        vec3 lightUv = (sunMatrix * vec4(p, 1.0)).xyz * .5 + .5;
         float lit = step(lightUv.z - .0012, texture(fogSunDepth, lightUv.xy).r);
         scatter += density * lit;
       }
@@ -261,7 +273,7 @@ internal object CourtyardShaders {
       if (radius > .35) {
         vec3 sum = color * 2.0;
         float weight = 2.0;
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < 6; ++i) {
           vec2 q = uv + blurRing[i] * pixelStep * radius;
           float qDepth = texture(depth, q).r;
           float other = distanceAt(qDepth);

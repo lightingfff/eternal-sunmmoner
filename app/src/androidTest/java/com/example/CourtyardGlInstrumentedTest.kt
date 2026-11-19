@@ -39,8 +39,8 @@ class CourtyardGlInstrumentedTest {
     assertTrue(EGL14.eglChooseConfig(display, wanted, 0, config, 0, 1, available, 0) && available[0] > 0)
     val session = EGL14.eglCreateContext(display, config[0], EGL14.EGL_NO_CONTEXT,
       intArrayOf(EGL14.EGL_CONTEXT_CLIENT_VERSION, 3, EGL14.EGL_NONE), 0)
-    val width = 960
-    val height = 540
+    val width = 1280
+    val height = 720
     val buffer = EGL14.eglCreatePbufferSurface(display, config[0],
       intArrayOf(EGL14.EGL_WIDTH, width, EGL14.EGL_HEIGHT, height, EGL14.EGL_NONE), 0)
     try {
@@ -72,15 +72,17 @@ class CourtyardGlInstrumentedTest {
       renderer.zoomBy(-.43f)
       drawAtGameCadence(renderer, 18)
       saveCapture(File(context.filesDir, "sanctuary-kingdom-close.png"), capture(width, height), width, height)
+      val sample = ByteBuffer.allocateDirect(4)
       val frameTimes = DoubleArray(24) {
         val start = System.nanoTime()
         renderer.onDrawFrame(null)
-        GLES30.glFinish()
+        // Read a pixel to wait for completion, including on virtualized GL drivers.
+        GLES30.glReadPixels(width / 2, height / 2, 1, 1, GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, sample)
         (System.nanoTime() - start) / 1_000_000.0
       }.sorted()
       val device = GLES30.glGetString(GLES30.GL_RENDERER)
       File(context.filesDir, "sanctuary-kingdom-timing.txt").writeText(
-        "pbuffer ${width}x${height}, 24 warmed draws, no swap or UI; renderer=$device\n" +
+        "pbuffer ${width}x${height}, 24 warmed draws with one-pixel readback, no swap or UI; renderer=$device\n" +
           "median_ms=${(frameTimes[11] + frameTimes[12]) / 2} p95_ms=${frameTimes[22]}\n",
       )
       assertFalse("Repeated drawing and zooming must keep the production renderer active", failed)

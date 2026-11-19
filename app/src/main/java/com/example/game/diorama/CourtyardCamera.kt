@@ -23,8 +23,9 @@ internal class CourtyardCamera {
     this.height = height.coerceAtLeast(1)
     val aspect = this.width / this.height.toFloat()
     val aimX = (actor.x * .72f + 2.55f).coerceIn(-5f, 6f)
-    val aimZ = (actor.z - 3.8f).coerceIn(-8f, 5.5f)
-    val aimY = Courtyard.height(actor.x, actor.z) * .52f + 2.12f
+    val aimZ = (actor.z - 3.8f).coerceIn(-8f, Courtyard.BRIDGE_END - 3.8f)
+    val bridgeApproach = ((actor.z - 6.9f) / 4.7f).coerceIn(0f, 1f)
+    val aimY = Courtyard.height(actor.x, actor.z) * .52f + 2.12f - bridgeApproach * .70f
     val distance = zoom * if (aspect < 1f) 1.12f else 1f
     eye[0] = aimX + 2.50f * distance
     eye[1] = aimY + 6.05f * distance
