@@ -169,8 +169,7 @@ internal object CourtyardShaders {
     float ringWave(vec2 point, vec2 strike, float time) {
       float radius = length(point - strike);
       float phase = radius * 19.0 - time * 2.5;
-      float filterWeight = 1.0 - smoothstep(.32, 1.42, fwidth(phase));
-      return (1.0 - smoothstep(.08, .61, radius)) * sin(phase) * filterWeight;
+      return (1.0 - smoothstep(.08, .61, radius)) * sin(phase);
     }
 
     vec3 fountainSurface(vec2 point, float shadow) {
@@ -179,9 +178,10 @@ internal object CourtyardShaders {
       float phaseZ = dot(point, vec2(-1.9, 6.0)) - timer * .53;
       float rim = smoothstep(.91, fountain.z * .84, radius);
       vec3 color = mix(vec3(.036, .174, .211), vec3(.077, .269, .244), rim);
-      float rings = ringWave(point, vec2(.535, .927), timer)
+      float filterWeight = 1.0 - smoothstep(.32, 1.42, 19.0 * length(fwidth(point)));
+      float rings = (ringWave(point, vec2(.535, .927), timer)
         + ringWave(point, vec2(.535, -.927), timer + .64)
-        + ringWave(point, vec2(-1.07, 0), timer + 1.25);
+        + ringWave(point, vec2(-1.07, 0), timer + 1.25)) * filterWeight;
       vec3 n = normalize(vec3(.068 * cos(phaseX) + .022 * rings,
         1.0, .080 * cos(phaseZ) - .026 * rings));
       vec3 eye = normalize(camera - position);
@@ -216,6 +216,9 @@ internal object CourtyardShaders {
       vec3 skylight = mix(vec3(.18, .225, .285), vec3(.31, .385, .485), .5 + .5 * n.y);
       ambient = mix(ambient, skylight, plaza);
       vec3 sunlight = mix(vec3(4.04, 3.12, 2.15), vec3(2.65, 2.31, 1.95), plaza) * lambert * shadow;
+      vec2 fountainOffset = position.xz - fountain.xy;
+      bool fountainBasin = kind == 2 && abs(position.y - .31) < .015
+        && dot(fountainOffset, fountainOffset) < fountain.z * fountain.z;
       if (kind == 1) {
         vec2 dx = (position.xz - actor.xz) / vec2(.38, .28);
         float contact = exp(-dot(dx, dx) * 1.7) * (1.0 - smoothstep(.035, .26, abs(position.y - actor.y)));
@@ -228,7 +231,7 @@ internal object CourtyardShaders {
         }
         float silhouette = actorShadow(position.xz - actor.xz);
         sunlight *= 1.0 - max(.88 * contact, .93 * silhouette);
-      } else if (kind == 2) {
+      } else if (kind == 2 && !fountainBasin) {
         float t = timer * .46;
         float a = position.z * 5.1 + sin(position.x * 1.64) + t;
         float b = position.x * 3.8 - position.z * 2.7 + t * .71;
@@ -242,16 +245,12 @@ internal object CourtyardShaders {
         ambient = mix(vec3(.95, .96, 1.04), vec3(.92, 1.02, 1.15), plaza);
         sunlight = mix(vec3(1.48, 1.13, .73), vec3(1.16, .99, .79), plaza) * shadow;
       }
-      vec3 lit = base * (ambient + sunlight + lamplight(n));
+      vec3 lit = fountainBasin ? fountainSurface(fountainOffset, shadow) : base * (ambient + sunlight + lamplight(n));
       if (kind == 4) lit = base * mix(4.8, 2.75, plaza);
       if (surfaceSheen > 0.0 && plaza > .01) {
         vec3 halfAngle = normalize(sunDirection + normalize(camera - position));
         float highlight = pow(max(dot(n, halfAngle), 0.0), 9.0);
         lit += vec3(1.0, .92, .79) * surfaceSheen * highlight * shadow * plaza;
-      }
-      if (kind == 2 && abs(position.y - .31) < .015) {
-        vec2 offset = position.xz - fountain.xy;
-        if (dot(offset, offset) < fountain.z * fountain.z) lit = fountainSurface(offset, shadow);
       }
       float distanceToEye = distance(camera, position);
       float haze = smoothstep(mix(16.0, 23.0, marketView), mix(48.0, 53.0, marketView), distanceToEye)

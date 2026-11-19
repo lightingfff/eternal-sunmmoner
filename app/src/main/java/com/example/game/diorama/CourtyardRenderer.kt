@@ -308,13 +308,7 @@ internal class CourtyardRenderer(
         else -> 0
       })
       world.uniform("uvScale", mesh.material.uvScale)
-      world.uniform("surfaceSheen", when (mesh.material) {
-        Material3d.STONE -> .080f
-        Material3d.WALL -> .062f
-        Material3d.SLATE -> .112f
-        Material3d.TIMBER, Material3d.PLANKS -> .038f
-        else -> 0f
-      })
+      world.uniform("surfaceSheen", if (mesh.material == Material3d.SLATE) .112f else 0f)
       val texture = textures[mesh.material.ordinal].takeIf { it != 0 } ?: textures[Material3d.SOLID.ordinal]
       bindTexture(0, texture)
       glBindBuffer(GL_ARRAY_BUFFER, mesh.buffer)
