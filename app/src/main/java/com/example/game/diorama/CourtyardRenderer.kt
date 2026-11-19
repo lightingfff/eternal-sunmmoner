@@ -68,13 +68,11 @@ internal class CourtyardRenderer(
   private lateinit var shadow: Program
   private lateinit var lens: Program
   private lateinit var bloom: Program
-  private lateinit var present: Program
   private lateinit var meshes: List<Batch>
   private lateinit var shadowTargets: Targets
   private var scene: Targets? = null
   private var glow: Targets? = null
   private var glowScratch: Targets? = null
-  private var resolved: Targets? = null
   private var halfFloatSupported = false
   private var packedRadiance = 1
   private val lamps = Courtyard.bollards.take(4).map { p ->
@@ -120,7 +118,6 @@ internal class CourtyardRenderer(
     scene = null
     glow = null
     glowScratch = null
-    resolved = null
     val extensions = glGetString(GL_EXTENSIONS).orEmpty().split(' ')
     halfFloatSupported = preferHalfFloat && (
       "GL_EXT_color_buffer_half_float" in extensions || "GL_EXT_color_buffer_float" in extensions
@@ -131,7 +128,6 @@ internal class CourtyardRenderer(
     shadow = Program(CourtyardShaders.shadowVertex, CourtyardShaders.shadowFragment)
     lens = Program(CourtyardShaders.lensVertex, CourtyardShaders.lensFragment)
     bloom = Program(CourtyardShaders.lensVertex, CourtyardShaders.bloomFragment)
-    present = Program(CourtyardShaders.lensVertex, CourtyardShaders.presentFragment)
     textures[Material3d.SOLID.ordinal] = whiteTexture()
     for (material in Material3d.entries) {
       val asset = material.asset ?: continue
@@ -170,8 +166,6 @@ internal class CourtyardRenderer(
     release(scene)
     release(glow)
     release(glowScratch)
-    release(resolved)
-    resolved = null
     scene = null
     glow = null
     glowScratch = null
@@ -183,9 +177,6 @@ internal class CourtyardRenderer(
     } else {
       check(setupFrame(w, h, GL_RGBA8)) { "Unable to allocate courtyard color and depth buffers" }
       packedRadiance = 1
-    }
-    if (w != width || h != height) {
-      resolved = checkNotNull(targets(w, h, GL_RGBA8, depthNeeded = false, colorFilter = GL_NEAREST))
     }
     val format = if (packedRadiance == 0) "RGBA16F" else "companded RGBA8"
     Log.i(TAG, "Lighting storage $format · ${w}x${h} render → ${width}x${height} display")
@@ -368,9 +359,8 @@ internal class CourtyardRenderer(
   }
 
   private fun renderLens(frame: Targets, highlights: Targets) {
-    val output = resolved
-    glBindFramebuffer(GL_FRAMEBUFFER, output?.framebuffer ?: 0)
-    glViewport(0, 0, frame.width, frame.height)
+    glBindFramebuffer(GL_FRAMEBUFFER, 0)
+    glViewport(0, 0, viewportWidth, viewportHeight)
     glDisable(GL_DEPTH_TEST)
     glBindBuffer(GL_ARRAY_BUFFER, 0)
     lens.use()
@@ -390,14 +380,6 @@ internal class CourtyardRenderer(
     lens.vector("pixelStep", 1f / frame.width, 1f / frame.height)
     lens.uniform("focus", camera.depthAt(hero.x, Courtyard.height(hero.x, hero.z) + .7f, hero.z))
     glDrawArrays(GL_TRIANGLES, 0, 3)
-    if (output != null) {
-      glBindFramebuffer(GL_FRAMEBUFFER, 0)
-      glViewport(0, 0, viewportWidth, viewportHeight)
-      present.use()
-      bindTexture(0, output.color)
-      present.uniform("displayColor", 0)
-      glDrawArrays(GL_TRIANGLES, 0, 3)
-    }
   }
 
   private fun worldAttributes() {
@@ -470,13 +452,7 @@ internal class CourtyardRenderer(
     return true
   }
 
-  private fun targets(
-    width: Int,
-    height: Int,
-    colorFormat: Int?,
-    depthNeeded: Boolean = true,
-    colorFilter: Int = if (depthNeeded) GL_NEAREST else GL_LINEAR,
-  ): Targets? {
+  private fun targets(width: Int, height: Int, colorFormat: Int?, depthNeeded: Boolean = true): Targets? {
     val id = IntArray(1)
     glGenFramebuffers(1, id, 0)
     glBindFramebuffer(GL_FRAMEBUFFER, id[0])
@@ -487,7 +463,8 @@ internal class CourtyardRenderer(
       image
     } else 0
     val color = if (colorFormat != null) {
-      val image = texture(colorFilter, colorFilter)
+      val filter = if (depthNeeded) GL_NEAREST else GL_LINEAR
+      val image = texture(filter, filter)
       glTexStorage2D(GL_TEXTURE_2D, 1, colorFormat, width, height)
       glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, image, 0)
       image

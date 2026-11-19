@@ -39,12 +39,15 @@ class CourtyardGlInstrumentedTest {
     assertTrue(EGL14.eglChooseConfig(display, wanted, 0, config, 0, 1, available, 0) && available[0] > 0)
     val session = EGL14.eglCreateContext(display, config[0], EGL14.EGL_NO_CONTEXT,
       intArrayOf(EGL14.EGL_CONTEXT_CLIENT_VERSION, 3, EGL14.EGL_NONE), 0)
-    val width = 1280
-    val height = 720
+    val width = 960
+    val height = 540
     val buffer = EGL14.eglCreatePbufferSurface(display, config[0],
       intArrayOf(EGL14.EGL_WIDTH, width, EGL14.EGL_HEIGHT, height, EGL14.EGL_NONE), 0)
     try {
       assertTrue(EGL14.eglMakeCurrent(display, buffer, buffer, session))
+      val actual = IntArray(1)
+      assertTrue(EGL14.eglQuerySurface(display, buffer, EGL14.EGL_WIDTH, actual, 0) && actual[0] == width)
+      assertTrue(EGL14.eglQuerySurface(display, buffer, EGL14.EGL_HEIGHT, actual, 0) && actual[0] == height)
       var ready = false
       var failed = false
       val renderer = CourtyardRenderer(context, onReady = { ready = true }, onFailure = { failed = true })

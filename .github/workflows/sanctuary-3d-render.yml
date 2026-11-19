@@ -66,8 +66,11 @@ jobs:
             adb shell am instrument -w -r -e class com.example.CourtyardGlInstrumentedTest com.aistudio.eternalsummoner.kvrpzm.test/androidx.test.runner.AndroidJUnitRunner | tee app/build/courtyard-evidence/instrumentation.log
             adb logcat -d -s SanctuaryCourtyard3D AndroidRuntime > app/build/courtyard-evidence/opengl.log
             for artifact in sanctuary-3d-egl.png sanctuary-3d-packed.png sanctuary-kingdom-wide.png sanctuary-kingdom-close.png sanctuary-kingdom-timing.txt; do
-              if adb shell run-as com.aistudio.eternalsummoner.kvrpzm test -s "files/$artifact"; then
-                adb exec-out run-as com.aistudio.eternalsummoner.kvrpzm cat "files/$artifact" > "app/build/courtyard-evidence/$artifact"
+              destination="app/build/courtyard-evidence/$artifact"
+              if adb exec-out run-as com.aistudio.eternalsummoner.kvrpzm cat "files/$artifact" > "$destination.tmp" && test -s "$destination.tmp"; then
+                mv "$destination.tmp" "$destination"
+              else
+                rm -f "$destination.tmp"
               fi
             done
             grep -Eq '^OK \(1 test\)' app/build/courtyard-evidence/instrumentation.log
