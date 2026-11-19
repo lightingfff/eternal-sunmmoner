@@ -215,25 +215,21 @@ internal object CourtyardShaders {
     in vec2 uv;
     out vec4 pixel;
 
-    const vec2 blurRing[6] = vec2[6](
-      vec2(1.0, 0.0), vec2(.5, .866), vec2(-.5, .866),
-      vec2(-1.0, 0.0), vec2(-.5, -.866), vec2(.5, -.866)
-    );
-
-    float distanceAt(float d) {
+    float distanceAt(vec2 p) {
+      float d = texture(depth, p).r;
       return (planes.x * planes.y) / mix(planes.y, planes.x, d);
     }
 
-    vec3 colorAt(vec2 p, float d) {
-      if (d < .99999) return readLight(rendered, p);
+    vec3 colorAt(vec2 p) {
+      if (texture(depth, p).r < .99999) return readLight(rendered, p);
       vec3 sky = mix(vec3(.52, .49, .38), vec3(.21, .32, .42), smoothstep(.22, 1.0, p.y));
       vec2 ray = (p - vec2(.07, 1.03)) * vec2(2.2, 3.4);
       return sky + vec3(.27, .20, .10) * exp(-dot(ray, ray));
     }
 
-    vec3 sunHaze(float sceneDepth) {
+    vec3 sunHaze() {
       vec2 ndc = uv * 2.0 - 1.0;
-      vec4 clip = inverseViewProjection * vec4(ndc, sceneDepth * 2.0 - 1.0, 1.0);
+      vec4 clip = inverseViewProjection * vec4(ndc, texture(depth, uv).r * 2.0 - 1.0, 1.0);
       vec3 segment = clip.xyz / clip.w - camera;
       float rayLength = length(segment);
       vec3 ray = segment / max(rayLength, .001);
@@ -242,37 +238,36 @@ internal object CourtyardShaders {
       for (int i = 0; i < 4; ++i) {
         vec3 p = camera + ray * end * (float(i) + .5) * .25;
         // Limit scattering to the stream and the gap between roofs.
-        vec2 axis = (p.xz + p.y * vec2(1.5, -.94) - vec2(3.0, -2.5)) * vec2(.31, .161);
+        vec2 axis = (p.xz + p.y * vec2(1.5, -.94) - vec2(-2.0, -3.1)) * vec2(.42, .17);
         float density = exp(-dot(axis, axis)) * (1.0 - smoothstep(1.6, 8.0, p.y));
-        if (density < .006) continue;
-        vec3 lightUv = (sunMatrix * vec4(p, 1.0)).xyz * .5 + .5;
+        vec4 light = sunMatrix * vec4(p, 1.0);
+        vec3 lightUv = light.xyz / light.w * .5 + .5;
         float lit = step(lightUv.z - .0012, texture(fogSunDepth, lightUv.xy).r);
         scatter += density * lit;
       }
-      return vec3(.91, .66, .34) * scatter * end * .0027;
+      return vec3(.76, .52, .26) * scatter * end * .0019;
     }
 
     void main() {
-      float centerDepth = texture(depth, uv).r;
-      float center = distanceAt(centerDepth);
-      float defocus = center < focus ? focus - center : (center - focus) * .75;
-      float radius = smoothstep(2.20, 11.5, defocus) * 6.6;
-      vec3 color = colorAt(uv, centerDepth);
+      float center = distanceAt(uv);
+      float defocus = center < focus ? focus - center : (center - focus) * .81;
+      float radius = smoothstep(2.25, 10.0, defocus) * 6.0;
+      vec3 color = colorAt(uv);
       if (radius > .35) {
         vec3 sum = color * 2.0;
         float weight = 2.0;
-        for (int i = 0; i < 6; ++i) {
-          vec2 q = uv + blurRing[i] * pixelStep * radius;
-          float qDepth = texture(depth, q).r;
-          float other = distanceAt(qDepth);
+        for (int i = 0; i < 8; ++i) {
+          float angle = float(i) * .785398;
+          vec2 q = uv + vec2(cos(angle), sin(angle)) * pixelStep * radius;
+          float other = distanceAt(q);
           // Weight similar depths so blurred roofs and railings do not leak onto the player.
           float w = 1.0 - smoothstep(.85, 3.0, abs(other - center));
-          sum += colorAt(q, qDepth) * w;
+          sum += colorAt(q) * w;
           weight += w;
         }
         color = sum / weight;
       }
-      color += readLight(glow, uv) * .28 + sunHaze(centerDepth);
+      color += readLight(glow, uv) * .22 + sunHaze();
       float edge = smoothstep(.31, .74, length((uv - vec2(.48, .48)) * vec2(1.0, .89)));
       color *= 1.0 - .24 * edge;
       // Tone mapping compresses highlights before conversion from linear light to display color.

@@ -53,7 +53,10 @@ class CourtyardGlInstrumentedTest {
       val renderer = CourtyardRenderer(context, onReady = { ready = true }, onFailure = { failed = true })
       renderer.onSurfaceCreated(null, null)
       renderer.onSurfaceChanged(null, width, height)
-      renderer.onDrawFrame(null)
+      repeat(2) {
+        renderer.onDrawFrame(null)
+        GLES30.glFinish()
+      }
       assertFalse("Production renderer must compile and draw on OpenGL ES 3", failed)
       assertTrue(ready)
 
@@ -68,7 +71,8 @@ class CourtyardGlInstrumentedTest {
       val fullColor = capture(width, height)
       saveCapture(File(context.filesDir, "sanctuary-3d-egl.png"), fullColor, width, height)
       val paletteSize = fullColor.toSet().size
-      assertTrue("Visible geometry and lighting must cover the frame ($paletteSize colors)", paletteSize > 512)
+      val firstColor = fullColor[0].toUInt().toString(16)
+      assertTrue("Visible geometry and lighting must cover the frame ($paletteSize colors, first $firstColor)", paletteSize > 512)
 
       renderer.zoomBy(.25f)
       drawAtGameCadence(renderer, 14)
@@ -94,7 +98,10 @@ class CourtyardGlInstrumentedTest {
       val backup = CourtyardRenderer(context, onReady = {}, onFailure = { failed = true }, preferHalfFloat = false)
       backup.onSurfaceCreated(null, null)
       backup.onSurfaceChanged(null, width, height)
-      backup.onDrawFrame(null)
+      repeat(2) {
+        backup.onDrawFrame(null)
+        GLES30.glFinish()
+      }
       assertFalse("RGBA8 fallback must compile and draw even without float targets", failed)
       val compactColor = capture(width, height)
       val red = fullColor.indices.sumOf { i ->
