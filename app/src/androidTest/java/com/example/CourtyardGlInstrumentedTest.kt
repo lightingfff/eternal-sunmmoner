@@ -95,6 +95,16 @@ class CourtyardGlInstrumentedTest {
       )
       assertFalse("Repeated drawing and zooming must keep the production renderer active", failed)
 
+      renderer.zoomBy(.18f)
+      for ((index, name) in listOf(1 to "sanctuary-harbor.png", 2 to "sanctuary-orchard.png")) {
+        val target = Courtyard.landmarks[index].destination
+        walkAndCapture(renderer, target, File(context.filesDir, name), width, height)
+        camera.frame(target, width, height, 1f)
+        assertGroundPick(camera, target, width, height)
+      }
+      walkAndCapture(renderer, GroundPoint(11.30f, 19.35f),
+        File(context.filesDir, "sanctuary-orchard-canopy.png"), width, height)
+
       val backup = CourtyardRenderer(context, onReady = {}, onFailure = { failed = true }, preferHalfFloat = false)
       backup.onSurfaceCreated(null, null)
       backup.onSurfaceChanged(null, width, height)
@@ -115,6 +125,25 @@ class CourtyardGlInstrumentedTest {
       EGL14.eglDestroyContext(display, session)
       EGL14.eglTerminate(display)
     }
+  }
+
+  private fun walkAndCapture(
+    renderer: CourtyardRenderer,
+    destination: GroundPoint,
+    output: File,
+    width: Int,
+    height: Int,
+  ) {
+    renderer.walkTo(destination)
+    repeat(600) { renderer.advance(1f / 24f) }
+    assertTrue("The renderer must walk the route to $destination", renderer.actorPosition.distance(destination) < .36f)
+    repeat(2) {
+      renderer.onDrawFrame(null)
+      GLES30.glFinish()
+    }
+    val image = capture(width, height)
+    assertTrue("Destination framebuffer must show the environment", image.toSet().size > 512)
+    saveCapture(output, image, width, height)
   }
 
   private fun drawAtGameCadence(renderer: CourtyardRenderer, frames: Int) {

@@ -14,6 +14,9 @@ internal enum class Material3d(val asset: String? = null, val uvScale: Float = 1
   TIMBER("art_depth_v1/materials/oak.png"),
   SLATE("diorama/slate.png", uvScale = .5f),
   PLASTER("diorama/plaster.png"),
+  PLANKS("diorama/quay_planks.png"),
+  CANVAS("diorama/market_canvas.png"),
+  BLOSSOM("diorama/blossom_canopy.png"),
   ROCK("art_depth_v1/materials/rock.png"),
   FOLIAGE("art_depth_v1/materials/forest_moss.png"),
   WATER, SOLID, HERO, EMISSIVE
@@ -458,10 +461,7 @@ internal class CourtyardMesh {
         }
       }
     }
-    box(l - .75f, -1.50f, end, r + .85f, .031f, end + 4.1f, Material3d.ROCK, 0x959572)
-    plane(l - .75f, r + .85f, end, end + 4.1f, .037f, Material3d.GRASS, 0xa0a776)
-    box(l, .031f, end - .13f, r, .54f, end + .04f, Material3d.TIMBER, 0x776052)
-    box(l - .04f, .54f, end - .16f, r + .04f, .65f, end + .07f, Material3d.WALL, 0xb1a58c)
+
   }
 
   private fun wallDetail(stair: Courtyard.Stair, random: Random) {
@@ -545,8 +545,229 @@ internal class CourtyardMesh {
     }
   }
 
+  private fun riverbank(bounds: Footprint, grass: Int) {
+    box(bounds.left, -1.16f, bounds.north, bounds.right, 0f, bounds.south, Material3d.ROCK, 0xaaa48e, .73f)
+    plane(bounds.left, bounds.right, bounds.north, bounds.south, .006f, Material3d.GRASS, grass)
+  }
+
+  private fun harborFloor() {
+    val market = Courtyard.market
+    val garden = Courtyard.orchard
+    val plank = Courtyard.dock
+    riverbank(market, 0xbaba89)
+    riverbank(garden, 0xa1a975)
+    plane(Courtyard.BRIDGE_LEFT, Courtyard.BRIDGE_RIGHT, market.north, 17.45f, .022f, Material3d.STONE, 0xd0c6ad)
+    plane(-11f, 5.60f, 17.45f, 26.40f, .021f, Material3d.STONE, 0xcdbfa2)
+    plane(5.60f, 10.4f, 21.4f, 24.3f, .020f, Material3d.STONE, 0xc8bb9d)
+    plane(-8.70f, 1.5f, 26.40f, 29.36f, .020f, Material3d.STONE, 0xbaa991)
+    plane(10.40f, 18.10f, 21.4f, 24.3f, .020f, Material3d.STONE, 0xc2b597)
+    plane(17.55f, 19.05f, 24.3f, 28.85f, .020f, Material3d.STONE, 0xbfb299)
+    plane(10.15f, 17.55f, 28.65f, 29.7f, .020f, Material3d.STONE, 0xb5a88c)
+    plane(10.15f, 11.55f, 24.30f, 28.65f, .020f, Material3d.STONE, 0xb5a88c)
+    plane(-13.65f, -7.45f, 14.96f, 17.45f, .020f, Material3d.STONE, 0xb9ad93)
+    box(plank.left, -.23f, plank.north, plank.right, .026f, plank.south, Material3d.TIMBER, 0xab8c6c, .68f)
+    plane(plank.left, plank.right, plank.north, plank.south, .030f, Material3d.PLANKS, 0xd7c3a0, .56f)
+    box(plank.left, .03f, plank.north - .006f, plank.right, .44f, plank.north + .12f, Material3d.TIMBER, 0x9a7e60)
+    for (x in floatArrayOf(plank.left + .19f, plank.right - .19f)) {
+      for (z in floatArrayOf(plank.north + .25f, plank.north + 1.66f, plank.south - .22f)) {
+        box(x - .11f, -1.3f, z - .11f, x + .11f, .49f, z + .11f, Material3d.TIMBER, 0x855f47)
+      }
+    }
+  }
+
+  private fun basin(x: Float, z: Float, sizeX: Float, sizeZ: Float, waterY: Float, steps: Int, stone: Int) {
+    val inner = .86f
+    val rim = waterY + .12f
+    val base = if (waterY > 1f) waterY - .09f else .017f
+    fun ring(index: Int, scale: Float, y: Float): Point3 {
+      val angle = index * 2 * PI / steps
+      return Point3(x + sin(angle).toFloat() * sizeX * scale, y, z + cos(angle).toFloat() * sizeZ * scale)
+    }
+    for (i in 0 until steps) {
+      val next = i + 1
+      quad(Material3d.WALL, ring(i, 1f, base), ring(next, 1f, base),
+        ring(next, 1f, rim), ring(i, 1f, rim), stone)
+      quad(Material3d.WALL, ring(i, 1f, rim), ring(next, 1f, rim),
+        ring(next, inner, rim), ring(i, inner, rim), 0xd0c5b1)
+      quad(Material3d.WALL, ring(next, inner, waterY), ring(i, inner, waterY),
+        ring(i, inner, rim), ring(next, inner, rim), 0x8b8e79)
+      triangle(Material3d.WATER, Point3(x, waterY, z), ring(i, inner, waterY), ring(next, inner, waterY), 0x45766b)
+    }
+  }
+
+  private fun harborLandmarks() {
+    val (x, z) = Courtyard.fountain
+    val radius = Courtyard.FOUNTAIN_RADIUS
+    basin(x, z, radius, radius, .31f, 20, 0xb1ab90)
+    box(x - .26f, .16f, z - .26f, x + .26f, 1.04f, z + .26f, Material3d.WALL, 0xbaaf99)
+    box(x - .45f, .90f, z - .40f, x + .45f, 1.065f, z + .40f, Material3d.STONE, 0xc5b99f)
+    basin(x, z, .46f, .40f, 1.10f, 12, 0xb0b4a2)
+    for (arm in 0 until 3) {
+      val angle = PI / 6 + arm * 2 * PI / 3.0
+      fun stream(t: Float, width: Float): Point3 {
+        val r = .17f + .90f * t
+        return Point3(x + sin(angle).toFloat() * r + cos(angle).toFloat() * width,
+          1.14f + .85f * t - 1.59f * t * t,
+          z + cos(angle).toFloat() * r - sin(angle).toFloat() * width)
+      }
+      for (i in 0..6) {
+        val a = i / 7f
+        val b = (i + 1) / 7f
+        quad(Material3d.WATER, stream(a, -.037f), stream(a, .037f),
+          stream(b, .061f), stream(b, -.061f), 0xc1d8bc)
+      }
+    }
+    val pond = Courtyard.gardenPond
+    basin(pond.centerX, (pond.north + pond.south) / 2f, (pond.right - pond.left) / 2f,
+      (pond.south - pond.north) / 2f, .13f, 24, 0x99a28b)
+  }
+
+  private fun marketStand(bounds: Footprint, main: Int, trim: Int, goods: Int) {
+    val (left, north, right, south) = bounds
+    val postY = 2.02f
+    val ridgeY = 2.45f
+    val nearEdge = south + .12f
+    val middleZ = (north + south) * .5f
+    for (x in floatArrayOf(left + .10f, right - .10f)) {
+      for (z in floatArrayOf(north + .10f, south - .11f)) {
+        box(x - .08f, .015f, z - .08f, x + .08f, postY + .035f, z + .08f, Material3d.TIMBER, 0x9d745a)
+      }
+    }
+    box(left + .16f, .035f, south - .71f, right - .16f, .72f, south - .12f, Material3d.PLANKS, 0xd1ad83)
+    box(left + .10f, .72f, south - .80f, right - .10f, .82f, south - .08f, Material3d.TIMBER, 0xb49772)
+    val strips = 9
+    for (i in 0 until strips) {
+      val x = left - .10f + (right - left + .20f) * i / strips
+      val next = left - .10f + (right - left + .20f) * (i + 1) / strips
+      val color = if (i % 2 == 0) main else trim
+      quad(Material3d.CANVAS, Point3(x, postY, nearEdge), Point3(next, postY, nearEdge),
+        Point3(next, ridgeY, middleZ), Point3(x, ridgeY, middleZ), color)
+      quad(Material3d.CANVAS, Point3(x, ridgeY, middleZ), Point3(next, ridgeY, middleZ),
+        Point3(next, postY, north - .12f), Point3(x, postY, north - .12f), color)
+      triangle(Material3d.CANVAS, Point3(x, postY, nearEdge), Point3((x + next) / 2, postY - .16f, nearEdge + .03f),
+        Point3(next, postY, nearEdge), color)
+    }
+    for (i in 0..3) {
+      val x = left + (right - left) * (.21f + .19f * i)
+      val z = south - .42f
+      box(x - .17f, .82f, z - .11f, x + .17f, .92f, z + .13f, Material3d.TIMBER, 0xb2916a)
+      crown(x - .07f, .96f, z, .10f, .085f, .13f, goods)
+      crown(x + .07f, .97f, z - .04f, .10f, .076f, .089f, if (i % 2 == 0) 0xe1b872 else goods)
+    }
+    lantern(right - .28f, 1.54f, south + .09f, .65f)
+  }
+
+  private fun orchardTree(point: GroundPoint, index: Int, random: Random) {
+    val (x, z) = point
+    val tall = 2.25f + random.nextFloat() * .40f
+    val lean = sin(index * 2.4f) * .37f
+    for (i in 0 until 7) {
+      val a = i * 2 * PI / 7
+      val b = (i + 1) * 2 * PI / 7
+      fun stem(angle: Double, r: Float, y: Float, dx: Float) =
+        Point3(x + sin(angle).toFloat() * r + dx, y, z + cos(angle).toFloat() * r)
+      quad(Material3d.TIMBER, stem(a, .24f, .01f, 0f), stem(b, .24f, .01f, 0f),
+        stem(b, .115f, tall, lean), stem(a, .115f, tall, lean), 0x9c7654, .58f, 1.6f)
+    }
+    val blossom = index == 0 || index == 3 || index == 5
+    val palette = if (blossom) intArrayOf(0xe7c4c0, 0xd9a6ae, 0xf1d7cb)
+      else intArrayOf(0xc4b97b, 0x97a45f, 0xa9b76a)
+    repeat(9) { i ->
+      val a = i * 2.39996f
+      val ring = .39f + .85f * i / 8f
+      val centerX = x + lean + sin(a) * ring
+      val centerZ = z + cos(a) * ring * .78f
+      val y = tall + 1.22f - i * .12f
+      val size = .63f + random.nextFloat() * .39f
+      val material = if (blossom) Material3d.BLOSSOM else Material3d.FOLIAGE
+      crown(centerX, y, centerZ, size, size * .61f, size * .79f, palette[i % 3], material)
+      for (leaf in 0..5) {
+        val leafAngle = a + leaf * 1.8f
+        val px = centerX + sin(leafAngle) * size
+        val pz = centerZ + cos(leafAngle) * size * .8f
+        val h = y + random.nextFloat() * .42f - .25f
+        triangle(material, Point3(px - .13f, h - .045f, pz),
+          Point3(px + .14f, h, pz - .08f), Point3(px + .045f, h + .14f, pz + .02f), palette[(i + leaf) % 3])
+      }
+    }
+  }
+
+  private fun orchardGate() {
+    val seam = Courtyard.orchard.left
+    val opening = Courtyard.orchardEntrance
+    for ((a, b) in listOf(Courtyard.orchard.north to opening.north, opening.south to Courtyard.orchard.south)) {
+      box(seam - .16f, .006f, a, seam + .16f, .55f, b, Material3d.WALL, 0xaba894)
+      box(seam - .21f, .52f, a, seam + .21f, .69f, b, Material3d.WALL, 0xc1b89e)
+    }
+    for (z in floatArrayOf(opening.north - .23f, opening.south + .23f)) {
+      box(seam - .28f, .01f, z - .19f, seam + .28f, 2.44f, z + .19f, Material3d.TIMBER, 0x987154)
+      box(seam - .35f, .01f, z - .24f, seam + .35f, .35f, z + .24f, Material3d.WALL, 0xb7a88e)
+    }
+    val center = (opening.north + opening.south) * .5f
+    roofPlane(seam - .80f, seam, opening.north - .48f, opening.south + .48f, 2.42f, 3.17f, 0x7e9e89)
+    roofPlane(seam, seam + .80f, opening.north - .48f, opening.south + .48f, 3.17f, 2.42f, 0x7e9e89)
+    lantern(seam + .02f, 2.08f, center, .85f)
+  }
+
+  private fun harborDetails() {
+    val palettes = listOf(
+      intArrayOf(0xae5353, 0xd0ae87, 0xc46755), intArrayOf(0x56807e, 0xcfbd90, 0xa7a65d),
+      intArrayOf(0x9f724b, 0xddc196, 0xbc8057), intArrayOf(0x585d83, 0xbdaac0, 0xa76d6d),
+    )
+    Courtyard.stalls.forEachIndexed { index, stall ->
+      val (main, trim, goods) = palettes[index]
+      marketStand(stall, main, trim, goods)
+    }
+    val random = Random(10053)
+    Courtyard.gardenTrees.forEachIndexed { index, point -> orchardTree(point, index, random) }
+    orchardGate()
+    val market = Courtyard.market
+    // Rocks and reeds soften the waterline while leaving the walkway clear.
+    repeat(32) { i ->
+      val x = market.left + (i + .5f) * (market.right - market.left) / 32f
+      if (x in (Courtyard.BRIDGE_LEFT - .5f)..(Courtyard.BRIDGE_RIGHT + .5f) ||
+        x in Courtyard.dock.left..Courtyard.dock.right) return@repeat
+      val z = market.north - .34f - random.nextFloat() * .36f
+      val scale = .22f + random.nextFloat() * .44f
+      crown(x, -.66f, z, scale * 1.17f, scale, scale * .9f, 0xa4a792, Material3d.ROCK)
+      if (i % 2 == 0) {
+        for (stem in 0..5) {
+          val px = x + (random.nextFloat() - .5f) * .42f
+          val high = .13f + random.nextFloat() * .52f
+          triangle(Material3d.SOLID, Point3(px - .028f, -.19f, z + .37f), Point3(px + .037f, -.19f, z + .37f),
+            Point3(px + .085f, high, z + .31f), if (stem % 2 == 0) 0xa6a072 else 0x7e8a59)
+        }
+      }
+    }
+    val garden = Courtyard.orchard
+    for (i in 0..22) {
+      val t = i / 22f
+      val x = garden.left + (garden.right - garden.left) * t
+      val z = garden.north + (garden.south - garden.north) * t
+      val r = .29f + random.nextFloat() * .34f
+      val shade = if (i % 3 == 0) 0xa39e82 else 0x8e927b
+      crown(x, -.65f, garden.south + .30f + random.nextFloat() * .22f,
+        r * 1.6f, r, r * .95f, shade, Material3d.ROCK)
+      crown(garden.right + .26f + random.nextFloat() * .24f, -.68f, z,
+        r * .92f, r * .88f, r * 1.5f, shade, Material3d.ROCK)
+    }
+    val pond = Courtyard.gardenPond
+    for (z in floatArrayOf(pond.north + .17f, pond.south - .17f)) {
+      for (x in floatArrayOf(pond.left + .22f, pond.right - .22f)) {
+        repeat(4) { i ->
+          crown(x + sin(i * 3.1f) * .22f, .11f, z + cos(i * 2f) * .22f, .23f, .22f, .19f, 0xb1ba79, Material3d.FOLIAGE)
+          crown(x + i * .065f - .12f, .34f + random.nextFloat() * .15f, z, .073f, .045f, .072f,
+            if (i % 2 == 0) 0xbd827d else 0xdfc792)
+        }
+      }
+    }
+  }
+
   fun build() {
     terrain()
+    harborFloor()
+    harborLandmarks()
+    harborDetails()
     Courtyard.houses.forEach(::house)
     val random = Random(1731)
     for ((index, tree) in Courtyard.trees.withIndex()) {

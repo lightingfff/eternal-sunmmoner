@@ -21,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -39,7 +40,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.game.diorama.Courtyard
 import com.example.game.diorama.CourtyardRenderer
+import com.example.game.diorama.GroundPoint
 import kotlinx.coroutines.delay
 import kotlin.math.abs
 
@@ -66,6 +69,10 @@ private class CourtyardView(
     renderMode = RENDERMODE_WHEN_DIRTY
     contentDescription = "Sân Bậc Đá, chạm đường đi để di chuyển Kaelen"
     isClickable = true
+  }
+
+  fun walkTo(destination: GroundPoint) {
+    queueEvent { courtyard.walkTo(destination) }
   }
 
   fun zoomBy(delta: Float) {
@@ -162,7 +169,17 @@ internal fun SanctuaryCourtyardScreen(onExit: () -> Unit) {
       verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
       Button(onClick = onExit, modifier = Modifier.testTag("sanctuary_3d_exit")) { Text("Về Thánh Địa") }
-      Text("Sân Bậc Đá", color = Color(0xFFFFEBCB), style = MaterialTheme.typography.titleMedium)
+      if (ready && !failed) {
+        Column(
+          Modifier.background(Color(0xDF141D22), MaterialTheme.shapes.small).padding(horizontal = 4.dp),
+        ) {
+          for (place in Courtyard.landmarks) {
+            TextButton(onClick = { view?.walkTo(place.destination) }) {
+              Text(place.label, color = Color(0xFFFFEBCB), style = MaterialTheme.typography.labelLarge)
+            }
+          }
+        }
+      }
     }
     if (ready && !failed) {
       Row(

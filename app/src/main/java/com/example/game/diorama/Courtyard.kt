@@ -31,6 +31,22 @@ internal object Courtyard {
   const val BRIDGE_LEFT = -7.3f
   const val BRIDGE_RIGHT = -4.55f
   val start = GroundPoint(-2.65f, 5.65f)
+  val market = Footprint(-17.8f, BRIDGE_END, 9f, 32f)
+  val orchard = Footprint(market.right, 18.6f, 20.8f, 30.8f)
+  val orchardEntrance = Footprint(8.35f, 21.0f, 9.65f, 24.6f)
+  val fountain = GroundPoint(-3.6f, 23.0f)
+  const val FOUNTAIN_RADIUS = 1.9f
+  val gardenPond = Footprint(12.0f, 25.3f, 16.8f, 28.25f)
+  val dock = Footprint(-15.7f, 11.0f, -11.2f, 15.0f)
+
+  data class Landmark(val label: String, val destination: GroundPoint)
+
+  val landmarks = listOf(
+    Landmark("Vương Thành", GroundPoint(-5.92f, 8.18f)),
+    Landmark("Bến Chợ", GroundPoint(-8.1f, 25.3f)),
+    Landmark("Vườn Ven Sông", GroundPoint(16.85f, 29.65f)),
+  )
+
 
   data class Stair(val center: Float, val edge: Float, val base: Float) {
     val left = center - STAIR_HALF
@@ -47,6 +63,19 @@ internal object Courtyard {
     House(Footprint(-8.7f, -11.7f, -4.8f, -8.15f), 2.6f, 1.38f, 2),
     House(Footprint(1.3f, -11.1f, 5.65f, -7.75f), 2.45f, 1.5f, 1),
     House(Footprint(7.75f, -11.7f, 10.9f, -8.3f), 2.8f, 1.72f, 2),
+    House(Footprint(-16.3f, 14.8f, -11.1f, 18.8f), 2.53f, 1.62f, 2),
+    House(Footprint(1.9f, 13.8f, 7.35f, 18.0f), 3.0f, 1.9f, 1),
+  )
+  val stalls = listOf(
+    Footprint(-14.45f, 22.2f, -11.05f, 24.40f),
+    Footprint(-14.0f, 26.5f, -10.15f, 28.80f),
+    Footprint(1.30f, 26.90f, 4.75f, 29.10f),
+    Footprint(2.6f, 20.10f, 5.97f, 22.30f),
+  )
+  val gardenTrees = listOf(
+    GroundPoint(11.25f, 21.1f), GroundPoint(17.65f, 20.75f), GroundPoint(19.3f, 25.65f),
+    GroundPoint(18.95f, 29.2f), GroundPoint(10.6f, 29.3f),
+    GroundPoint(-15.7f, 28.65f), GroundPoint(6.65f, 30.01f), GroundPoint(-9.14f, 17.5f),
   )
   val trees = listOf(
     GroundPoint(-10.5f, 6.1f), GroundPoint(10.45f, 7.9f),
@@ -58,6 +87,9 @@ internal object Courtyard {
     GroundPoint(-4.42f, -4.72f), GroundPoint(-.70f, -4.72f),
     GroundPoint(-7.65f, 8.37f), GroundPoint(-4.25f, 8.37f),
     GroundPoint(-8.6f, -5.05f), GroundPoint(8.65f, .3f),
+    GroundPoint(-7.9f, 13.6f), GroundPoint(-4.05f, 13.6f),
+    GroundPoint(-9.6f, 23.25f), GroundPoint(.5f, 24.50f), GroundPoint(8.05f, 24.85f),
+    GroundPoint(14f, 21.25f), GroundPoint(18.35f, 28.25f),
   )
 
   val lowerRailings = listOf(
@@ -69,7 +101,8 @@ internal object Courtyard {
     x in BRIDGE_LEFT..BRIDGE_RIGHT && z in (SOUTH - .12f)..BRIDGE_END
 
   fun isGround(x: Float, z: Float): Boolean =
-    (x in LEFT..RIGHT && z in NORTH..SOUTH) || inBridge(x, z)
+    (x in LEFT..RIGHT && z in NORTH..SOUTH) || inBridge(x, z) ||
+      market.contains(x, z) || orchard.contains(x, z) || dock.contains(x, z)
 
   fun height(x: Float, z: Float): Float {
     for (stair in stairs) {
@@ -87,11 +120,16 @@ internal object Courtyard {
   fun canStand(x: Float, z: Float): Boolean {
     val inCourt = x in (LEFT + .42f)..(RIGHT - .42f) && z in (NORTH + .46f)..(SOUTH - .42f)
     val onBridge = x in (BRIDGE_LEFT + .43f)..(BRIDGE_RIGHT - .43f) &&
-      z in (SOUTH - .64f)..(BRIDGE_END - .42f)
-    if (!inCourt && !onBridge) return false
+      z in (SOUTH - .64f)..(BRIDGE_END + .60f)
+    val inExpansion = market.contains(x, z, -.42f) || orchard.contains(x, z, -.42f) ||
+      orchardEntrance.contains(x, z) || dock.contains(x, z, -.42f)
+    if (!inCourt && !onBridge && !inExpansion) return false
+    if (gardenPond.contains(x, z, .22f) || fountain.distance(GroundPoint(x, z)) < FOUNTAIN_RADIUS + .22f) return false
+    if (stalls.any { it.contains(x, z, .21f) }) return false
     if (houses.any { it.bounds.contains(x, z, .33f) }) return false
     if (lowerRailings.any { it.contains(x, z, .18f) }) return false
     if (trees.any { abs(it.x - x) < .44f && abs(it.z - z) < .44f }) return false
+    if (gardenTrees.any { abs(it.x - x) < .38f && abs(it.z - z) < .38f }) return false
     if (bollards.any { abs(it.x - x) < .33f && abs(it.z - z) < .33f }) return false
     return stairs.none { stair ->
       abs(abs(x - stair.center) - STAIR_HALF) < .25f && z in stair.edge..stair.foot
@@ -102,9 +140,9 @@ internal object Courtyard {
 /** The preview has its own walkable graph. A route can change height only at its authored stairs. */
 internal class CourtyardNavigator {
   private val gridStep = .4f
-  private val width = ((Courtyard.RIGHT - Courtyard.LEFT) / gridStep).toInt() + 1
-  private val depth = ((Courtyard.BRIDGE_END - Courtyard.NORTH) / gridStep).toInt() + 1
-  private fun at(index: Int) = GroundPoint(Courtyard.LEFT + index % width * gridStep,
+  private val width = ((Courtyard.orchard.right - Courtyard.market.left) / gridStep).toInt() + 1
+  private val depth = ((Courtyard.market.south - Courtyard.NORTH) / gridStep).toInt() + 1
+  private fun at(index: Int) = GroundPoint(Courtyard.market.left + index % width * gridStep,
     Courtyard.NORTH + index / width * gridStep)
 
   private val nodes = Array(width * depth, ::at)
@@ -114,12 +152,17 @@ internal class CourtyardNavigator {
   private fun nearest(point: GroundPoint): Int {
     var result = -1
     var distance = .82f
-    for (i in nodes.indices) {
-      if (!walkable[i]) continue
-      val next = point.distance(nodes[i])
-      if (next < distance) {
-        distance = next
-        result = i
+    val col = ((point.x - Courtyard.market.left) / gridStep).toInt()
+    val row = ((point.z - Courtyard.NORTH) / gridStep).toInt()
+    for (z in maxOf(0, row - 3)..minOf(depth - 1, row + 3)) {
+      for (x in maxOf(0, col - 3)..minOf(width - 1, col + 3)) {
+        val index = z * width + x
+        if (!walkable[index]) continue
+        val next = point.distance(nodes[index])
+        if (next < distance) {
+          distance = next
+          result = index
+        }
       }
     }
     return result

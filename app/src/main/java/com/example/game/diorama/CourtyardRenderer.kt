@@ -90,6 +90,7 @@ internal class CourtyardRenderer(
   private var failed = false
   private var ready = false
   private var hero = Courtyard.start
+  val actorPosition: GroundPoint get() = hero
   private var facingRight = true
   private var facingAway = true
   private var route: List<GroundPoint> = emptyList()
@@ -104,6 +105,11 @@ internal class CourtyardRenderer(
   fun chooseDestination(screenX: Float, screenY: Float) {
     if (!ready || failed) return
     val destination = camera.groundAt(screenX, screenY) ?: return
+    walkTo(destination)
+  }
+
+  fun walkTo(destination: GroundPoint) {
+    if (!ready || failed) return
     val next = navigator.route(hero, destination)
     if (next.isEmpty()) return
     route = next
@@ -150,10 +156,10 @@ internal class CourtyardRenderer(
 
     val light = FloatArray(16)
     val orthographic = FloatArray(16)
-    Matrix.setLookAtM(light, 0, -24f, 16f, 12f, 0f, 0f, -3f, 0f, 1f, 0f)
-    Matrix.orthoM(orthographic, 0, -20f, 20f, -19f, 19f, 2f, 67f)
+    Matrix.setLookAtM(light, 0, -24f, 16f, 23f, 0f, 0f, 8f, 0f, 1f, 0f)
+    Matrix.orthoM(orthographic, 0, -35f, 35f, -26f, 26f, 1f, 88f)
     Matrix.multiplyMM(sun, 0, orthographic, 0, light, 0)
-    shadowTargets = checkNotNull(targets(1024, 1024, colorFormat = null))
+    shadowTargets = checkNotNull(targets(1536, 1536, colorFormat = null))
     renderShadowMap()
     Log.i(TAG, "OpenGL " + glGetString(GL_VERSION) + " · " + meshes.sumOf { it.count / 3 } + " scene triangles")
     checkGl("initialization")
@@ -214,7 +220,7 @@ internal class CourtyardRenderer(
     }
   }
 
-  private fun advance(dt: Float) {
+  internal fun advance(dt: Float) {
     var left = dt * 3.25f
     if (waypoint < route.size) movingTime += dt else movingTime = 0f
     while (left > .0001f && waypoint < route.size) {
@@ -283,6 +289,7 @@ internal class CourtyardRenderer(
       world.uniform("kind", when (mesh.material) {
         Material3d.GRASS, Material3d.STONE -> 1
         Material3d.EMISSIVE -> 4
+        Material3d.FOLIAGE, Material3d.BLOSSOM -> 5
         Material3d.WATER -> 2
         else -> 0
       })

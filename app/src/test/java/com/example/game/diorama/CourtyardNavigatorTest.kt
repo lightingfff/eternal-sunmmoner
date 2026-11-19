@@ -53,4 +53,31 @@ class CourtyardNavigatorTest {
     assertTrue(navigator.route(bridge, Courtyard.start).isNotEmpty())
     assertTrue(navigator.route(Courtyard.start, GroundPoint(-3.9f, 10.3f)).isEmpty())
   }
+
+  @Test
+  fun allDistrictsAreConnectedThroughTheBridgeAndGardenEntrance() {
+    val navigator = CourtyardNavigator()
+    val market = Courtyard.landmarks[1].destination
+    val garden = Courtyard.landmarks[2].destination
+    val first = navigator.route(Courtyard.start, market)
+    val second = navigator.route(market, garden)
+    val back = navigator.route(garden, Courtyard.start)
+    assertTrue(first.last().distance(market) < .3f && second.last().distance(garden) < .3f)
+    assertTrue(back.last().distance(Courtyard.start) < .3f)
+    assertTrue(first.count { it.z in Courtyard.SOUTH..Courtyard.BRIDGE_END && Courtyard.inBridge(it.x, it.z) } >= 8)
+    assertTrue(second.any { Courtyard.orchardEntrance.contains(it.x, it.z) })
+    assertTrue((first + second + back).all { Courtyard.canStand(it.x, it.z) })
+    assertFalse(Courtyard.canStand(Courtyard.fountain.x, Courtyard.fountain.z))
+    assertFalse(Courtyard.canStand(Courtyard.gardenPond.centerX, 26.5f))
+    assertFalse(Courtyard.canStand(9f, 28f))
+  }
+
+  @Test
+  fun theMarketDockIsReachedFromLand() {
+    val dock = GroundPoint(-13.5f, 11.7f)
+    val route = CourtyardNavigator().route(Courtyard.landmarks[1].destination, dock)
+    assertTrue(route.last().distance(dock) < .3f)
+    assertTrue(route.all { Courtyard.isGround(it.x, it.z) })
+    assertFalse(Courtyard.canStand(-10f, 11.7f))
+  }
 }

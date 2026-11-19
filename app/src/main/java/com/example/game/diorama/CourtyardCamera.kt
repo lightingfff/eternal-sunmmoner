@@ -22,9 +22,10 @@ internal class CourtyardCamera {
     this.width = width.coerceAtLeast(1)
     this.height = height.coerceAtLeast(1)
     val aspect = this.width / this.height.toFloat()
-    val aimX = (actor.x * .72f + 2.55f).coerceIn(-5f, 6f)
-    val aimZ = (actor.z - 3.8f).coerceIn(-8f, Courtyard.BRIDGE_END - 3.8f)
-    val bridgeApproach = ((actor.z - 6.9f) / 4.7f).coerceIn(0f, 1f)
+    val aimX = (actor.x * .72f + 2.55f).coerceIn(Courtyard.market.left + 2f, Courtyard.orchard.right - 2f)
+    val aimZ = (actor.z - 3.8f).coerceIn(-8f, Courtyard.market.south - 3.8f)
+    val bridgeApproach = minOf(((actor.z - 6.9f) / 4.7f).coerceIn(0f, 1f),
+      ((16.1f - actor.z) / 3.1f).coerceIn(0f, 1f))
     val aimY = Courtyard.height(actor.x, actor.z) * .52f + 2.12f - bridgeApproach * .70f
     val distance = zoom * if (aspect < 1f) 1.12f else 1f
     eye[0] = aimX + 2.50f * distance
@@ -60,10 +61,11 @@ internal class CourtyardCamera {
       val x = ax + dx * t
       val y = ay + dy * t
       val z = az + dz * t
-      if (y < -.05f) break
+      if (y < -.15f) break
       if (!Courtyard.isGround(x, z)) continue
       val roof = Courtyard.houses.firstOrNull { it.bounds.contains(x, z) }
       if (roof != null && y <= Courtyard.height(x, z) + roof.height + roof.roof) return null
+      if (y <= 2.55f && Courtyard.stalls.any { it.contains(x, z) }) return null
       if (y <= Courtyard.height(x, z)) return GroundPoint(x, z).takeIf { Courtyard.canStand(x, z) }
     }
     return null

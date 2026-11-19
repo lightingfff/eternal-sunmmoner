@@ -117,10 +117,25 @@ internal object CourtyardShaders {
       return vec3(1.1, .44, .12) * spill;
     }
 
+    float canopyReveal() {
+      vec3 center = actor + vec3(0.0, .78, 0.0);
+      vec3 ray = normalize(camera - center);
+      vec3 offset = position - center;
+      float along = dot(ray, offset);
+      if (along <= .18 || along >= 8.5) return 0.0;
+      vec3 side = offset - along * ray;
+      return .96 * (1.0 - smoothstep(.48, .96, length(side)));
+    }
+
     void main() {
       vec2 surfaceUv = kind == 1 ? position.xz * .62 : texCoord;
       vec4 source = texture(material, surfaceUv * uvScale);
       if (source.a < .45) discard;
+      if (kind == 5) {
+        // Keep alpha cutout in the same depth buffer while the actor passes behind foliage.
+        float screenDoor = fract(dot(floor(gl_FragCoord.xy), vec2(.75487766, .56984030)));
+        if (screenDoor < canopyReveal()) discard;
+      }
       vec3 base = pow(max(source.rgb * tint, vec3(.001)), vec3(2.2));
       vec3 n = normalize(surfaceNormal);
       float lambert = max(dot(n, sunDirection), 0.0);
