@@ -185,7 +185,7 @@ internal class CourtyardRenderer(
       packedRadiance = 1
     }
     if (w != width || h != height) {
-      resolved = checkNotNull(targets(w, h, GL_RGBA8, depthNeeded = false))
+      resolved = checkNotNull(targets(w, h, GL_RGBA8, depthNeeded = false, colorFilter = GL_NEAREST))
     }
     val format = if (packedRadiance == 0) "RGBA16F" else "companded RGBA8"
     Log.i(TAG, "Lighting storage $format · ${w}x${h} render → ${width}x${height} display")
@@ -395,7 +395,7 @@ internal class CourtyardRenderer(
       glViewport(0, 0, viewportWidth, viewportHeight)
       present.use()
       bindTexture(0, output.color)
-      present.uniform("image", 0)
+      present.uniform("displayColor", 0)
       glDrawArrays(GL_TRIANGLES, 0, 3)
     }
   }
@@ -470,7 +470,13 @@ internal class CourtyardRenderer(
     return true
   }
 
-  private fun targets(width: Int, height: Int, colorFormat: Int?, depthNeeded: Boolean = true): Targets? {
+  private fun targets(
+    width: Int,
+    height: Int,
+    colorFormat: Int?,
+    depthNeeded: Boolean = true,
+    colorFilter: Int = if (depthNeeded) GL_NEAREST else GL_LINEAR,
+  ): Targets? {
     val id = IntArray(1)
     glGenFramebuffers(1, id, 0)
     glBindFramebuffer(GL_FRAMEBUFFER, id[0])
@@ -481,8 +487,7 @@ internal class CourtyardRenderer(
       image
     } else 0
     val color = if (colorFormat != null) {
-      val filter = if (depthNeeded) GL_NEAREST else GL_LINEAR
-      val image = texture(filter, filter)
+      val image = texture(colorFilter, colorFilter)
       glTexStorage2D(GL_TEXTURE_2D, 1, colorFormat, width, height)
       glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, image, 0)
       image

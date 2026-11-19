@@ -167,14 +167,11 @@ internal object CourtyardShaders {
 
   val presentFragment = """#version 300 es
     precision highp float;
-    uniform sampler2D image;
+    precision highp sampler2D;
+    uniform sampler2D displayColor;
     in vec2 uv;
     out vec4 pixel;
-    void main() {
-      ivec2 size = textureSize(image, 0);
-      ivec2 nearestPixel = clamp(ivec2(uv * vec2(size)), ivec2(0), size - 1);
-      pixel = texelFetch(image, nearestPixel, 0);
-    }
+    void main() { pixel = texture(displayColor, uv); }
   """.trimIndent()
 
   val bloomFragment = """#version 300 es

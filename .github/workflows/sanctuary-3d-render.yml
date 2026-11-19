@@ -65,10 +65,12 @@ jobs:
             adb install -t --no-streaming app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
             adb shell am instrument -w -r -e class com.example.CourtyardGlInstrumentedTest com.aistudio.eternalsummoner.kvrpzm.test/androidx.test.runner.AndroidJUnitRunner | tee app/build/courtyard-evidence/instrumentation.log
             adb logcat -d -s SanctuaryCourtyard3D AndroidRuntime > app/build/courtyard-evidence/opengl.log
-            grep -Eq '^OK \(1 test\)' app/build/courtyard-evidence/instrumentation.log
             for artifact in sanctuary-3d-egl.png sanctuary-3d-packed.png sanctuary-kingdom-wide.png sanctuary-kingdom-close.png sanctuary-kingdom-timing.txt; do
-              adb exec-out run-as com.aistudio.eternalsummoner.kvrpzm cat "files/$artifact" > "app/build/courtyard-evidence/$artifact"
+              if adb shell run-as com.aistudio.eternalsummoner.kvrpzm test -s "files/$artifact"; then
+                adb exec-out run-as com.aistudio.eternalsummoner.kvrpzm cat "files/$artifact" > "app/build/courtyard-evidence/$artifact"
+              fi
             done
+            grep -Eq '^OK \(1 test\)' app/build/courtyard-evidence/instrumentation.log
             python3 -c 'from pathlib import Path; p = Path("app/build/courtyard-evidence"); images = list(p.glob("*.png")); assert len(images) == 4 and all(x.stat().st_size > 20000 and x.read_bytes().startswith(bytes.fromhex("89504e470d0a1a0a")) for x in images); assert (p / "sanctuary-kingdom-timing.txt").stat().st_size > 70'
       - uses: actions/upload-artifact@v4
         if: always()

@@ -63,8 +63,9 @@ class CourtyardGlInstrumentedTest {
       assertGroundPick(camera, bridge, width, height)
 
       val fullColor = capture(width, height)
-      assertTrue("Visible geometry and lighting must cover the frame", fullColor.toSet().size > 512)
       saveCapture(File(context.filesDir, "sanctuary-3d-egl.png"), fullColor, width, height)
+      val paletteSize = fullColor.toSet().size
+      assertTrue("Visible geometry and lighting must cover the frame ($paletteSize colors)", paletteSize > 512)
 
       renderer.zoomBy(.25f)
       drawAtGameCadence(renderer, 14)
