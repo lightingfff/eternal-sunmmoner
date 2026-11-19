@@ -22,15 +22,15 @@ internal class CourtyardCamera {
     this.width = width.coerceAtLeast(1)
     this.height = height.coerceAtLeast(1)
     val aspect = this.width / this.height.toFloat()
-    val aimX = (actor.x * .65f).coerceIn(-5f, 5f)
-    val aimZ = (actor.z - 3.8f).coerceIn(-8f, 1.3f)
-    val aimY = Courtyard.height(actor.x, actor.z) * .46f + .5f
+    val aimX = (actor.x * .66f + 2.85f).coerceIn(-5f, 6f)
+    val aimZ = (actor.z - 4.3f).coerceIn(-8f, 5.5f)
+    val aimY = Courtyard.height(actor.x, actor.z) * .48f + .95f
     val distance = zoom * if (aspect < 1f) 1.12f else 1f
-    eye[0] = aimX + 4.7f * distance
-    eye[1] = aimY + 9.6f * distance
-    eye[2] = aimZ + 17.2f * distance
+    eye[0] = aimX + 4.5f * distance
+    eye[1] = aimY + 7.9f * distance
+    eye[2] = aimZ + 15.6f * distance
     Matrix.setLookAtM(view, 0, eye[0], eye[1], eye[2], aimX, aimY, aimZ, 0f, 1f, 0f)
-    Matrix.perspectiveM(projection, 0, if (aspect < 1f) 49f else 41f, aspect, .65f, 80f)
+    Matrix.perspectiveM(projection, 0, if (aspect < 1f) 50f else 44f, aspect, NEAR, FAR)
     Matrix.multiplyMM(viewProjection, 0, projection, 0, view, 0)
     valid = Matrix.invertM(inverse, 0, viewProjection, 0)
   }
@@ -60,11 +60,16 @@ internal class CourtyardCamera {
       val y = ay + dy * t
       val z = az + dz * t
       if (y < -.05f) break
-      if (x !in Courtyard.LEFT..Courtyard.RIGHT || z !in Courtyard.NORTH..Courtyard.SOUTH) continue
+      if (!Courtyard.isGround(x, z)) continue
       val roof = Courtyard.houses.firstOrNull { it.bounds.contains(x, z) }
       if (roof != null && y <= Courtyard.height(x, z) + roof.height + roof.roof) return null
       if (y <= Courtyard.height(x, z)) return GroundPoint(x, z).takeIf { Courtyard.canStand(x, z) }
     }
     return null
+  }
+
+  companion object {
+    const val NEAR = .65f
+    const val FAR = 80f
   }
 }

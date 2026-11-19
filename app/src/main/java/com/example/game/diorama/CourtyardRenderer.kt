@@ -21,6 +21,7 @@ internal class CourtyardRenderer(
   private val context: Context,
   private val onReady: () -> Unit,
   private val onFailure: () -> Unit,
+  private val preferHalfFloat: Boolean = true,
 ) : GLSurfaceView.Renderer {
   private data class Batch(val buffer: Int, val count: Int, val material: Material3d)
   private data class Targets(val framebuffer: Int, val color: Int, val depth: Int, val width: Int, val height: Int)
@@ -65,9 +66,18 @@ internal class CourtyardRenderer(
   private lateinit var world: Program
   private lateinit var shadow: Program
   private lateinit var lens: Program
+  private lateinit var bloom: Program
   private lateinit var meshes: List<Batch>
   private lateinit var shadowTargets: Targets
   private var scene: Targets? = null
+  private var glow: Targets? = null
+  private var glowScratch: Targets? = null
+  private var halfFloatSupported = false
+  private var packedRadiance = 1
+  private val lamps = Courtyard.bollards.take(4).map { p ->
+    val y = Courtyard.height(p.x, p.z) + 1.16f
+    floatArrayOf(p.x, y, p.z)
+  }
   private var spriteBuffer = 0
   private val textures = IntArray(Material3d.entries.size)
   private val sun = FloatArray(16)
@@ -105,11 +115,18 @@ internal class CourtyardRenderer(
 
   override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) = guard {
     scene = null
+    glow = null
+    glowScratch = null
+    val extensions = glGetString(GL_EXTENSIONS).orEmpty().split(' ')
+    halfFloatSupported = preferHalfFloat && (
+      "GL_EXT_color_buffer_half_float" in extensions || "GL_EXT_color_buffer_float" in extensions
+    )
     ready = false
     lastFrame = 0L
     world = Program(CourtyardShaders.worldVertex, CourtyardShaders.worldFragment)
     shadow = Program(CourtyardShaders.shadowVertex, CourtyardShaders.shadowFragment)
     lens = Program(CourtyardShaders.lensVertex, CourtyardShaders.lensFragment)
+    bloom = Program(CourtyardShaders.lensVertex, CourtyardShaders.bloomFragment)
     textures[Material3d.SOLID.ordinal] = whiteTexture()
     for (material in Material3d.entries) {
       val asset = material.asset ?: continue
@@ -131,10 +148,10 @@ internal class CourtyardRenderer(
 
     val light = FloatArray(16)
     val orthographic = FloatArray(16)
-    Matrix.setLookAtM(light, 0, -17f, 25f, 11f, 0f, 0f, -3f, 0f, 1f, 0f)
+    Matrix.setLookAtM(light, 0, -24f, 16f, 12f, 0f, 0f, -3f, 0f, 1f, 0f)
     Matrix.orthoM(orthographic, 0, -20f, 20f, -19f, 19f, 2f, 67f)
     Matrix.multiplyMM(sun, 0, orthographic, 0, light, 0)
-    shadowTargets = targets(1024, 1024, colorNeeded = false)
+    shadowTargets = checkNotNull(targets(1024, 1024, colorFormat = null))
     renderShadowMap()
     Log.i(TAG, "OpenGL " + glGetString(GL_VERSION) + " · " + meshes.sumOf { it.count / 3 } + " scene triangles")
     checkGl("initialization")
@@ -145,8 +162,21 @@ internal class CourtyardRenderer(
     viewportHeight = height
     if (width <= 0 || height <= 0) return@guard
     release(scene)
-    val scale = min(1f, 900f / maxOf(width, height))
-    scene = targets((width * scale).toInt().coerceAtLeast(1), (height * scale).toInt().coerceAtLeast(1))
+    release(glow)
+    release(glowScratch)
+    scene = null
+    glow = null
+    glowScratch = null
+    val scale = min(1f, 960f / maxOf(width, height))
+    val w = (width * scale).toInt().coerceAtLeast(1)
+    val h = (height * scale).toInt().coerceAtLeast(1)
+    if (halfFloatSupported && setupFrame(w, h, GL_RGBA16F)) {
+      packedRadiance = 0
+    } else {
+      check(setupFrame(w, h, GL_RGBA8)) { "Unable to allocate courtyard color and depth buffers" }
+      packedRadiance = 1
+    }
+    Log.i(TAG, "Lighting storage " + if (packedRadiance == 0) "RGBA16F" else "companded RGBA8")
     camera.frame(tracked, width, height, zoom)
   }
 
@@ -158,8 +188,11 @@ internal class CourtyardRenderer(
     elapsed = (elapsed + dt) % 600f
     advance(dt)
     camera.frame(tracked, viewportWidth, viewportHeight, zoom)
+    val highlights = glow ?: return@guard
+    val scratch = glowScratch ?: return@guard
     renderWorld(frame)
-    renderLens(frame)
+    renderBloom(frame, highlights, scratch)
+    renderLens(frame, highlights)
     if (!ready) {
       checkGl("first frame")
       ready = true
@@ -226,22 +259,24 @@ internal class CourtyardRenderer(
     glViewport(0, 0, frame.width, frame.height)
     glEnable(GL_DEPTH_TEST)
     glDepthMask(true)
-    glClearColor(.34f, .42f, .43f, 1f)
+    glClearColor(0f, 0f, 0f, 1f)
     glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
     world.use()
     world.matrix("viewProjection", camera.viewProjection)
     world.matrix("sunMatrix", sun)
     world.vector("camera", camera.eye[0], camera.eye[1], camera.eye[2])
-    world.vector("sunDirection", -.510f, .750f, .420f)
+    world.vector("sunDirection", -.738f, .492f, .461f)
     world.vector("actor", hero.x, Courtyard.height(hero.x, hero.z), hero.z)
     world.uniform("timer", elapsed)
+    world.uniform("packedRadiance", packedRadiance)
+    for ((i, lamp) in lamps.withIndex()) world.vector("lamps[$i]", lamp[0], lamp[1], lamp[2])
     world.uniform("material", 0)
     world.uniform("sunDepth", 1)
     bindTexture(1, shadowTargets.depth)
     for (mesh in meshes) {
       world.uniform("kind", when (mesh.material) {
         Material3d.GRASS, Material3d.STONE -> 1
-        Material3d.SOIL -> 4
+        Material3d.EMISSIVE -> 4
         Material3d.WATER -> 2
         else -> 0
       })
@@ -293,7 +328,28 @@ internal class CourtyardRenderer(
     sprite.put(1f); sprite.put(1f); sprite.put(1f)
   }
 
-  private fun renderLens(frame: Targets) {
+  private fun renderBloom(frame: Targets, highlights: Targets, scratch: Targets) {
+    glDisable(GL_DEPTH_TEST)
+    glBindBuffer(GL_ARRAY_BUFFER, 0)
+    bloom.use()
+    bloom.uniform("rendered", 0)
+    bloom.uniform("packedRadiance", packedRadiance)
+    bloom.uniform("extract", 1)
+    bloomPass(frame, highlights, 1f / frame.width, 1f / frame.height)
+    bloom.uniform("extract", 0)
+    bloomPass(highlights, scratch, 1f / highlights.width, 0f)
+    bloomPass(scratch, highlights, 0f, 1f / scratch.height)
+  }
+
+  private fun bloomPass(from: Targets, to: Targets, x: Float, y: Float) {
+    glBindFramebuffer(GL_FRAMEBUFFER, to.framebuffer)
+    glViewport(0, 0, to.width, to.height)
+    bindTexture(0, from.color)
+    bloom.vector("sampleStep", x, y)
+    glDrawArrays(GL_TRIANGLES, 0, 3)
+  }
+
+  private fun renderLens(frame: Targets, highlights: Targets) {
     glBindFramebuffer(GL_FRAMEBUFFER, 0)
     glViewport(0, 0, viewportWidth, viewportHeight)
     glDisable(GL_DEPTH_TEST)
@@ -301,8 +357,17 @@ internal class CourtyardRenderer(
     lens.use()
     bindTexture(0, frame.color)
     bindTexture(1, frame.depth)
+    bindTexture(2, highlights.color)
+    bindTexture(3, shadowTargets.depth)
+    lens.uniform("fogSunDepth", 3)
+    lens.matrix("sunMatrix", sun)
+    lens.matrix("inverseViewProjection", camera.inverse)
+    lens.vector("camera", camera.eye[0], camera.eye[1], camera.eye[2])
     lens.uniform("rendered", 0)
     lens.uniform("depth", 1)
+    lens.uniform("glow", 2)
+    lens.uniform("packedRadiance", packedRadiance)
+    lens.vector("planes", CourtyardCamera.NEAR, CourtyardCamera.FAR)
     lens.vector("pixelStep", 1f / frame.width, 1f / frame.height)
     lens.uniform("focus", camera.depthAt(hero.x, Courtyard.height(hero.x, hero.z) + .7f, hero.z))
     glDrawArrays(GL_TRIANGLES, 0, 3)
@@ -360,16 +425,38 @@ internal class CourtyardRenderer(
 
   private fun buffer(): Int = IntArray(1).also { glGenBuffers(1, it, 0) }[0]
 
-  private fun targets(width: Int, height: Int, colorNeeded: Boolean = true): Targets {
+  private fun setupFrame(width: Int, height: Int, format: Int): Boolean {
+    val frame = targets(width, height, format) ?: return false
+    val w = (width / 4).coerceAtLeast(1)
+    val h = (height / 4).coerceAtLeast(1)
+    val highlights = targets(w, h, format, depthNeeded = false)
+    val scratch = targets(w, h, format, depthNeeded = false)
+    if (highlights == null || scratch == null) {
+      release(frame)
+      release(highlights)
+      release(scratch)
+      return false
+    }
+    scene = frame
+    glow = highlights
+    glowScratch = scratch
+    return true
+  }
+
+  private fun targets(width: Int, height: Int, colorFormat: Int?, depthNeeded: Boolean = true): Targets? {
     val id = IntArray(1)
     glGenFramebuffers(1, id, 0)
     glBindFramebuffer(GL_FRAMEBUFFER, id[0])
-    val depth = texture(GL_NEAREST, GL_NEAREST)
-    glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT24, width, height)
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth, 0)
-    val color = if (colorNeeded) {
+    val depth = if (depthNeeded) {
       val image = texture(GL_NEAREST, GL_NEAREST)
-      glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height)
+      glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT24, width, height)
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, image, 0)
+      image
+    } else 0
+    val color = if (colorFormat != null) {
+      val filter = if (depthNeeded) GL_NEAREST else GL_LINEAR
+      val image = texture(filter, filter)
+      glTexStorage2D(GL_TEXTURE_2D, 1, colorFormat, width, height)
       glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, image, 0)
       image
     } else {
@@ -378,9 +465,14 @@ internal class CourtyardRenderer(
       0
     }
     val status = glCheckFramebufferStatus(GL_FRAMEBUFFER)
-    check(status == GL_FRAMEBUFFER_COMPLETE) { "3D framebuffer status 0x${status.toString(16)}" }
     glBindFramebuffer(GL_FRAMEBUFFER, 0)
-    return Targets(id[0], color, depth, width, height)
+    val target = Targets(id[0], color, depth, width, height)
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+      release(target)
+      Log.w(TAG, "3D framebuffer status 0x${status.toString(16)} for format $colorFormat")
+      return null
+    }
+    return target
   }
 
   private fun release(target: Targets?) {

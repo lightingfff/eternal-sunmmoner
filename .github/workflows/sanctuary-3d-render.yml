@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'app/src/main/java/com/example/game/diorama/**'
+      - 'app/src/main/assets/diorama/**'
       - 'app/src/main/java/com/example/ui/screens/SanctuaryCourtyardScreen.kt'
       - 'app/src/test/java/com/example/game/diorama/**'
       - 'app/src/androidTest/java/com/example/CourtyardGlInstrumentedTest.kt'
@@ -66,6 +67,7 @@ jobs:
             adb logcat -d -s SanctuaryCourtyard3D AndroidRuntime > app/build/courtyard-evidence/opengl.log
             grep -Eq '^OK \(1 test\)' app/build/courtyard-evidence/instrumentation.log
             adb exec-out run-as com.aistudio.eternalsummoner.kvrpzm cat files/sanctuary-3d-egl.png > app/build/courtyard-evidence/sanctuary-3d-egl.png
+            adb exec-out run-as com.aistudio.eternalsummoner.kvrpzm cat files/sanctuary-3d-packed.png > app/build/courtyard-evidence/sanctuary-3d-packed.png
             python3 -c 'from pathlib import Path; p = Path("app/build/courtyard-evidence/sanctuary-3d-egl.png").read_bytes(); assert len(p) > 20000 and p.startswith(bytes.fromhex("89504e470d0a1a0a"))'
       - uses: actions/upload-artifact@v4
         if: always()

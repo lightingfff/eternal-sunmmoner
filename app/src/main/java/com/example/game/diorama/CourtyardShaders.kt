@@ -34,8 +34,24 @@ internal object CourtyardShaders {
     }
   """.trimIndent()
 
+  // The RGBA8 path compands linear radiance so values over 1 survive on ES 3.0
+  // devices where RGBA16F is not color-renderable. All math uses decoded light.
+  private val radiance = """
+    uniform int packedRadiance;
+    vec3 storeLight(vec3 light) {
+      return packedRadiance == 0 ? light : light / (1.0 + light);
+    }
+    vec3 readLight(sampler2D image, vec2 p) {
+      vec3 value = texture(image, p).rgb;
+      return packedRadiance == 0 ? value : value / max(1.0 - value, vec3(.004));
+    }
+    float luminance(vec3 light) { return dot(light, vec3(.2126, .7152, .0722)); }
+  """.trimIndent()
+
   val worldFragment = """#version 300 es
     precision highp float;
+    precision highp sampler2D;
+    $radiance
     uniform sampler2D material;
     uniform sampler2D sunDepth;
     uniform vec3 camera;
@@ -43,6 +59,7 @@ internal object CourtyardShaders {
     uniform vec3 sunDirection;
     uniform int kind;
     uniform float timer;
+    uniform vec3 lamps[4];
     in vec3 position;
     in vec3 surfaceNormal;
     in vec2 texCoord;
@@ -53,45 +70,63 @@ internal object CourtyardShaders {
     float visibility(float cosine) {
       vec3 uvz = sunPosition.xyz / sunPosition.w * 0.5 + 0.5;
       if (any(lessThan(uvz, vec3(0.0))) || any(greaterThan(uvz, vec3(1.0)))) return 1.0;
-      float bias = mix(.0034, .0014, cosine);
+      float bias = mix(.0021, .00077, cosine);
+      vec2 texel = 1.0 / vec2(textureSize(sunDepth, 0));
       float visible = 0.0;
       for (int i = 0; i < 4; ++i) {
-        vec2 offset = vec2(float(i % 2) - .5, float(i / 2) - .5) * .00165;
+        vec2 offset = (vec2(float(i % 2), float(i / 2)) - .5) * 1.8 * texel;
         visible += step(uvz.z - bias, texture(sunDepth, uvz.xy + offset).r);
       }
       return visible * .25;
     }
 
-    void main() {
-      vec4 source = texture(material, kind == 4 ? position.xz * .71 : texCoord);
-      if (kind == 4) {
-        float ragged = .08 + fract(sin(dot(floor(position.xz * 28.0), vec2(127.1, 311.7))) * 43758.5453) * .13;
-        if (min(texCoord.x, 1.0 - texCoord.x) < ragged) discard;
+    vec3 lamplight(vec3 n) {
+      float spill = 0.0;
+      for (int i = 0; i < 4; ++i) {
+        vec3 ray = lamps[i] - position;
+        float square = dot(ray, ray);
+        float falloff = 1.0 - smoothstep(0.08, 7.2, square);
+        spill += falloff * falloff * max(0.0, dot(n, ray) * inversesqrt(max(square, .04)));
       }
+      return vec3(1.1, .44, .12) * spill;
+    }
+
+    void main() {
+      vec2 surfaceUv = kind == 1 ? position.xz * .62 : texCoord;
+      vec4 source = texture(material, surfaceUv);
       if (source.a < .45) discard;
-      vec3 base = source.rgb * tint;
+      vec3 base = pow(max(source.rgb * tint, vec3(.001)), vec3(2.2));
       vec3 n = normalize(surfaceNormal);
       float lambert = max(dot(n, sunDirection), 0.0);
       float shadow = visibility(lambert);
-      vec3 ambient = vec3(.48, .54, .58) * mix(.78, 1.10, max(0.0, n.y));
-      vec3 sunlight = vec3(.78, .68, .52) * lambert * shadow;
-      if (kind == 1 || kind == 4) {
-        vec2 dx = (position.xz - actor.xz) / vec2(.38, .27);
-        float contact = exp(-dot(dx, dx) * 1.7) * (1.0 - smoothstep(.02, .28, abs(position.y - actor.y)));
-        ambient *= 1.0 - .37 * contact;
-        sunlight *= 1.0 - .78 * contact;
+      vec3 ambient = mix(vec3(.30, .28, .27), vec3(.53, .65, .78), .5 + .5 * n.y);
+      vec3 sunlight = vec3(2.91, 2.27, 1.52) * lambert * shadow;
+      if (kind == 1) {
+        vec2 dx = (position.xz - actor.xz) / vec2(.38, .28);
+        float contact = exp(-dot(dx, dx) * 1.7) * (1.0 - smoothstep(.035, .26, abs(position.y - actor.y)));
+        ambient *= 1.0 - .59 * contact;
+        sunlight *= 1.0 - .93 * contact;
       } else if (kind == 2) {
-        float wave = sin(position.z * 4.1 + sin(position.x * 1.3) + timer * .6);
-        float glint = pow(max(0.0, wave), 22.0);
-        base += vec3(.05, .095, .097) * glint;
+        float t = timer * .46;
+        float a = position.z * 5.1 + sin(position.x * 1.64) + t;
+        float b = position.x * 3.8 - position.z * 2.7 + t * .71;
+        n = normalize(vec3(.15 * cos(b), 1.0, .24 * cos(a)));
+        vec3 viewDirection = normalize(camera - position);
+        float fresnel = pow(1.0 - max(0.0, dot(n, viewDirection)), 3.0);
+        float glint = pow(max(dot(n, normalize(sunDirection + viewDirection)), 0.0), 21.0);
+        base = mix(base, vec3(.15, .28, .34), fresnel * .43);
+        sunlight = vec3(.82, .87, .82) + vec3(1.32, 1.09, .66) * glint * shadow;
       } else if (kind == 3) {
-        // Keep the sprite pixels and lighting readable as the billboard rotates with the camera.
-        ambient = vec3(.74, .75, .75);
-        sunlight = vec3(.34, .30, .23) * shadow;
+        ambient = vec3(.88, .97, 1.10);
+        sunlight = vec3(1.06, .83, .54) * shadow;
       }
-      vec3 lit = base * (ambient + sunlight);
-      float air = smoothstep(16.0, 47.0, distance(camera, position)) * .43;
-      pixel = vec4(mix(lit, vec3(.42, .50, .49), air), 1.0);
+      vec3 lit = base * (ambient + sunlight + lamplight(n));
+      if (kind == 4) lit = base * 4.8;
+      float distanceToEye = distance(camera, position);
+      float haze = smoothstep(16.0, 53.0, distanceToEye) * .62;
+      float coolGroundFog = (1.0 - smoothstep(-.8, 2.0, position.y)) * smoothstep(19.0, 44.0, distanceToEye);
+      vec3 air = mix(vec3(.21, .30, .36), vec3(.38, .34, .25), shadow * .46);
+      pixel = vec4(storeLight(mix(lit, air, haze + (1.0 - haze) * coolGroundFog * .32)), 1.0);
     }
   """.trimIndent()
 
@@ -104,49 +139,115 @@ internal object CourtyardShaders {
     }
   """.trimIndent()
 
+  val bloomFragment = """#version 300 es
+    precision highp float;
+    precision highp sampler2D;
+    $radiance
+    uniform sampler2D rendered;
+    uniform vec2 sampleStep;
+    uniform int extract;
+    in vec2 uv;
+    out vec4 pixel;
+
+    vec3 highlights(vec2 p) {
+      vec3 color = readLight(rendered, p);
+      float value = luminance(color);
+      return color * smoothstep(.83, 2.12, value);
+    }
+
+    void main() {
+      vec3 light;
+      if (extract == 1) {
+        vec2 d = sampleStep * 1.15;
+        light = (highlights(uv + d) + highlights(uv - d) +
+          highlights(uv + vec2(d.x, -d.y)) + highlights(uv + vec2(-d.x, d.y))) * .25;
+      } else {
+        light = readLight(rendered, uv) * .227027;
+        light += (readLight(rendered, uv + sampleStep * 1.384615) +
+          readLight(rendered, uv - sampleStep * 1.384615)) * .316216;
+        light += (readLight(rendered, uv + sampleStep * 3.230769) +
+          readLight(rendered, uv - sampleStep * 3.230769)) * .070270;
+      }
+      pixel = vec4(storeLight(light), 1.0);
+    }
+  """.trimIndent()
+
   val lensFragment = """#version 300 es
     precision highp float;
+    precision highp sampler2D;
+    $radiance
     uniform sampler2D rendered;
     uniform sampler2D depth;
+    uniform sampler2D glow;
+    uniform sampler2D fogSunDepth;
+    uniform mat4 inverseViewProjection;
+    uniform mat4 sunMatrix;
+    uniform vec3 camera;
     uniform vec2 pixelStep;
+    uniform vec2 planes;
     uniform float focus;
     in vec2 uv;
     out vec4 pixel;
 
     float distanceAt(vec2 p) {
       float d = texture(depth, p).r;
-      return (2.0 * .65 * 80.0) / (80.0 + .65 - (2.0 * d - 1.0) * (80.0 - .65));
+      return (planes.x * planes.y) / mix(planes.y, planes.x, d);
     }
 
     vec3 colorAt(vec2 p) {
-      return texture(depth, p).r >= .99999
-        ? mix(vec3(.63, .65, .51), vec3(.29, .43, .49), smoothstep(.2, 1.0, p.y))
-        : texture(rendered, p).rgb;
+      if (texture(depth, p).r < .99999) return readLight(rendered, p);
+      vec3 sky = mix(vec3(.52, .49, .38), vec3(.21, .32, .42), smoothstep(.22, 1.0, p.y));
+      vec2 ray = (p - vec2(.07, 1.03)) * vec2(2.2, 3.4);
+      return sky + vec3(.27, .20, .10) * exp(-dot(ray, ray));
+    }
+
+    vec3 sunHaze() {
+      vec2 ndc = uv * 2.0 - 1.0;
+      vec4 clip = inverseViewProjection * vec4(ndc, texture(depth, uv).r * 2.0 - 1.0, 1.0);
+      vec3 segment = clip.xyz / clip.w - camera;
+      float rayLength = length(segment);
+      vec3 ray = segment / max(rayLength, .001);
+      float end = min(rayLength, 38.0);
+      float scatter = 0.0;
+      for (int i = 0; i < 4; ++i) {
+        vec3 p = camera + ray * end * (float(i) + .5) * .25;
+        // Limit scattering to the stream and the gap between roofs.
+        vec2 axis = (p.xz + p.y * vec2(1.5, -.94) - vec2(-2.0, -3.1)) * vec2(.42, .17);
+        float density = exp(-dot(axis, axis)) * (1.0 - smoothstep(1.6, 8.0, p.y));
+        vec4 light = sunMatrix * vec4(p, 1.0);
+        vec3 lightUv = light.xyz / light.w * .5 + .5;
+        float lit = step(lightUv.z - .0012, texture(fogSunDepth, lightUv.xy).r);
+        scatter += density * lit;
+      }
+      return vec3(.76, .52, .26) * scatter * end * .0019;
     }
 
     void main() {
       float center = distanceAt(uv);
-      float radius = smoothstep(1.5, 10.0, abs(center - focus)) * 4.2;
+      float defocus = center < focus ? focus - center : (center - focus) * .81;
+      float radius = smoothstep(2.25, 10.0, defocus) * 6.0;
       vec3 color = colorAt(uv);
-      if (radius > .25) {
+      if (radius > .35) {
         vec3 sum = color * 2.0;
         float weight = 2.0;
         for (int i = 0; i < 8; ++i) {
           float angle = float(i) * .785398;
           vec2 q = uv + vec2(cos(angle), sin(angle)) * pixelStep * radius;
-          float delta = abs(distanceAt(q) - center);
-          // A far blurred wall may not smear into the playable foreground.
-          float w = mix(1.0, .055, smoothstep(.65, 3.2, delta));
+          float other = distanceAt(q);
+          // Weight similar depths so blurred roofs and railings do not leak onto the player.
+          float w = 1.0 - smoothstep(.85, 3.0, abs(other - center));
           sum += colorAt(q) * w;
           weight += w;
         }
         color = sum / weight;
       }
-      float edges = smoothstep(.29, .73, length((uv - vec2(.47, .49)) * vec2(1.0, .86)));
-      vec2 beam = uv - vec2(.18, .78);
-      float haze = exp(-dot(beam * vec2(2.5, 6.6), beam * vec2(2.5, 6.6))) * .12;
-      color = mix(color * (1.0 - .35 * edges), vec3(.93, .80, .53), haze);
-      pixel = vec4(color, 1.0);
+      color += readLight(glow, uv) * .22 + sunHaze();
+      float edge = smoothstep(.31, .74, length((uv - vec2(.48, .48)) * vec2(1.0, .89)));
+      color *= 1.0 - .24 * edge;
+      // Tone mapping compresses highlights before conversion from linear light to display color.
+      vec3 exposed = color * 1.04;
+      color = (exposed * (2.51 * exposed + .03)) / (exposed * (2.43 * exposed + .59) + .14);
+      pixel = vec4(pow(clamp(color, 0.0, 1.0), vec3(1.0 / 2.2)), 1.0);
     }
   """.trimIndent()
 }

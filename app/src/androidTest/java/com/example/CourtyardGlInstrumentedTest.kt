@@ -55,7 +55,7 @@ class CourtyardGlInstrumentedTest {
 
       val camera = CourtyardCamera()
       camera.frame(Courtyard.start, width, height, 1f)
-      val landing = GroundPoint(.35f, .68f)
+      val landing = GroundPoint(3.75f, 4.30f)
       val clip = FloatArray(4)
       Matrix.multiplyMV(clip, 0, camera.viewProjection, 0,
         floatArrayOf(landing.x, Courtyard.height(landing.x, landing.z), landing.z, 1f), 0)
@@ -64,29 +64,46 @@ class CourtyardGlInstrumentedTest {
       val picked = requireNotNull(camera.groundAt(x, y))
       assertTrue("Screen tap must resolve to the upper surface it projects", picked.distance(landing) < .20f)
 
-      val bytes = ByteBuffer.allocateDirect(width * height * 4)
-      GLES30.glReadPixels(0, 0, width, height, GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, bytes)
-      val pixels = IntArray(width * height)
-      for (y in 0 until height) for (x in 0 until width) {
-        val i = ((height - 1 - y) * width + x) * 4
-        pixels[y * width + x] = 0xff000000.toInt() or
-          ((bytes[i].toInt() and 255) shl 16) or ((bytes[i + 1].toInt() and 255) shl 8) or
-          (bytes[i + 2].toInt() and 255)
-      }
-      assertTrue("Visible geometry and lighting must cover the frame", pixels.toSet().size > 512)
-      val image = Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888)
-      try {
-        File(context.filesDir, "sanctuary-3d-egl.png").outputStream().use {
-          assertTrue(image.compress(Bitmap.CompressFormat.PNG, 100, it))
-        }
-      } finally {
-        image.recycle()
-      }
+      val fullColor = capture(width, height)
+      assertTrue("Visible geometry and lighting must cover the frame", fullColor.toSet().size > 512)
+      saveCapture(File(context.filesDir, "sanctuary-3d-egl.png"), fullColor, width, height)
+
+      val backup = CourtyardRenderer(context, onReady = {}, onFailure = { failed = true }, preferHalfFloat = false)
+      backup.onSurfaceCreated(null, null)
+      backup.onSurfaceChanged(null, width, height)
+      backup.onDrawFrame(null)
+      assertFalse("RGBA8 fallback must compile and draw even without float targets", failed)
+      val compactColor = capture(width, height)
+      val red = fullColor.indices.sumOf { i ->
+        kotlin.math.abs((fullColor[i] shr 16 and 255) - (compactColor[i] shr 16 and 255))
+      }.toDouble() / fullColor.size
+      assertTrue("The two radiance formats must preserve comparable exposure ($red)", red < 4.0)
+      saveCapture(File(context.filesDir, "sanctuary-3d-packed.png"), compactColor, width, height)
     } finally {
       EGL14.eglMakeCurrent(display, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_CONTEXT)
       EGL14.eglDestroySurface(display, buffer)
       EGL14.eglDestroyContext(display, session)
       EGL14.eglTerminate(display)
+    }
+  }
+
+  private fun capture(width: Int, height: Int): IntArray {
+    val bytes = ByteBuffer.allocateDirect(width * height * 4)
+    GLES30.glReadPixels(0, 0, width, height, GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, bytes)
+    assertTrue("Framebuffer readback", GLES30.glGetError() == GLES30.GL_NO_ERROR)
+    return IntArray(width * height) { index ->
+      val i = ((height - 1 - index / width) * width + index % width) * 4
+      0xff000000.toInt() or ((bytes[i].toInt() and 255) shl 16) or
+        ((bytes[i + 1].toInt() and 255) shl 8) or (bytes[i + 2].toInt() and 255)
+    }
+  }
+
+  private fun saveCapture(file: File, pixels: IntArray, width: Int, height: Int) {
+    val image = Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888)
+    try {
+      file.outputStream().use { assertTrue(image.compress(Bitmap.CompressFormat.PNG, 100, it)) }
+    } finally {
+      image.recycle()
     }
   }
 }

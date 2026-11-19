@@ -27,58 +27,77 @@ internal object Courtyard {
   const val STEP_DEPTH = STAIR_LENGTH / STEP_COUNT
   const val STEP_HEIGHT = RISE / STEP_COUNT
   const val STAIR_HALF = 1.55f
-  val start = GroundPoint(-.6f, 5.1f)
+  const val BRIDGE_END = 12.6f
+  const val BRIDGE_LEFT = -7.3f
+  const val BRIDGE_RIGHT = -4.55f
+  val start = GroundPoint(-2.65f, 5.65f)
+
+  data class Stair(val center: Float, val edge: Float, val base: Float) {
+    val left = center - STAIR_HALF
+    val right = center + STAIR_HALF
+    val foot = edge + STAIR_LENGTH
+  }
+
+  val stairs = listOf(Stair(3.75f, STONE_EDGE, 0f), Stair(-2.55f, UPPER_EDGE, RISE))
 
   data class House(val bounds: Footprint, val height: Float, val roof: Float, val style: Int)
   val houses = listOf(
-    House(Footprint(-8.4f, -3.7f, -3.7f, -.35f), 2.8f, 1.65f, 0),
-    House(Footprint(2.75f, -10.8f, 7.8f, -6.75f), 3.1f, 1.95f, 1),
-    House(Footprint(-8.1f, -11.35f, -4.65f, -8.65f), 2.25f, 1.25f, 2),
-    House(Footprint(5.4f, -3.85f, 9.1f, -1.1f), 2.6f, 1.5f, 2),
+    House(Footprint(-10.1f, -3.75f, -6.0f, -.65f), 2.15f, 1.22f, 1),
+    House(Footprint(5.75f, -4.25f, 10.85f, -.55f), 3.35f, 1.92f, 0),
+    House(Footprint(-8.7f, -11.7f, -4.8f, -8.15f), 2.6f, 1.38f, 2),
+    House(Footprint(1.3f, -11.1f, 5.65f, -7.75f), 2.45f, 1.5f, 1),
+    House(Footprint(7.75f, -11.7f, 10.9f, -8.3f), 2.8f, 1.72f, 2),
   )
   val trees = listOf(
-    GroundPoint(-10.1f, 5.1f), GroundPoint(9.75f, 5.7f), GroundPoint(10.4f, -.2f),
-    GroundPoint(-10.3f, -5.8f), GroundPoint(2.8f, -11.5f), GroundPoint(9.9f, -10.3f),
-    GroundPoint(-1.8f, -11.9f), GroundPoint(-9.5f, -10.8f),
+    GroundPoint(-10.5f, 6.1f), GroundPoint(10.45f, 7.9f),
+    GroundPoint(-10.6f, -6.95f), GroundPoint(-3.9f, -10.4f),
+    GroundPoint(6.65f, -9.0f), GroundPoint(11.1f, -6.25f), GroundPoint(-10.6f, -11.5f),
   )
   val bollards = listOf(
-    GroundPoint(-2.4f, 1.05f), GroundPoint(2.4f, 1.05f),
-    GroundPoint(-2.4f, -4.95f), GroundPoint(2.4f, -4.95f),
-    GroundPoint(-8.9f, -6.75f), GroundPoint(7.9f, -5.55f),
+    GroundPoint(1.85f, 1.24f), GroundPoint(5.63f, 1.2f),
+    GroundPoint(-4.42f, -4.72f), GroundPoint(-.70f, -4.72f),
+    GroundPoint(-7.65f, 8.37f), GroundPoint(-4.25f, 8.37f),
+    GroundPoint(-8.6f, -5.05f), GroundPoint(8.65f, .3f),
   )
 
+  fun inBridge(x: Float, z: Float): Boolean =
+    x in BRIDGE_LEFT..BRIDGE_RIGHT && z in (SOUTH - .12f)..BRIDGE_END
+
+  fun isGround(x: Float, z: Float): Boolean =
+    (x in LEFT..RIGHT && z in NORTH..SOUTH) || inBridge(x, z)
+
   fun height(x: Float, z: Float): Float {
-    val flat = when {
+    for (stair in stairs) {
+      if (x in stair.left..stair.right && z >= stair.edge && z < stair.foot) {
+        return stair.base + (STEP_COUNT - ((z - stair.edge) / STEP_DEPTH).toInt().coerceIn(0, STEP_COUNT - 1)) * STEP_HEIGHT
+      }
+    }
+    return when {
       z < UPPER_EDGE -> RISE * 2
       z < STONE_EDGE -> RISE
       else -> 0f
     }
-    if (abs(x) > STAIR_HALF) return flat
-    for ((edge, base) in listOf(STONE_EDGE to 0f, UPPER_EDGE to RISE)) {
-      if (z >= edge && z < edge + STAIR_LENGTH) {
-        return base + (STEP_COUNT - ((z - edge) / STEP_DEPTH).toInt().coerceIn(0, STEP_COUNT - 1)) * STEP_HEIGHT
-      }
-    }
-    return flat
   }
 
   fun canStand(x: Float, z: Float): Boolean {
-    if (x !in (LEFT + .42f)..(RIGHT - .42f) || z !in (NORTH + .46f)..(SOUTH - .42f)) return false
+    val inCourt = x in (LEFT + .42f)..(RIGHT - .42f) && z in (NORTH + .46f)..(SOUTH - .42f)
+    val onBridge = x in (BRIDGE_LEFT + .43f)..(BRIDGE_RIGHT - .43f) &&
+      z in (SOUTH - .64f)..(BRIDGE_END - .42f)
+    if (!inCourt && !onBridge) return false
     if (houses.any { it.bounds.contains(x, z, .33f) }) return false
     if (trees.any { abs(it.x - x) < .44f && abs(it.z - z) < .44f }) return false
-    if (bollards.any { abs(it.x - x) < .31f && abs(it.z - z) < .31f }) return false
-    // Preserve the stair rail clearance and prevent cuts across the side faces.
-    if (abs(abs(x) - STAIR_HALF) < .23f &&
-      ((z in STONE_EDGE..STONE_EDGE + STAIR_LENGTH) || (z in UPPER_EDGE..UPPER_EDGE + STAIR_LENGTH))) return false
-    return true
+    if (bollards.any { abs(it.x - x) < .33f && abs(it.z - z) < .33f }) return false
+    return stairs.none { stair ->
+      abs(abs(x - stair.center) - STAIR_HALF) < .25f && z in stair.edge..stair.foot
+    }
   }
 }
 
 /** The preview has its own walkable graph. A route can change height only at its authored stairs. */
 internal class CourtyardNavigator {
   private val gridStep = .4f
-  private val width = 61
-  private val depth = 56
+  private val width = ((Courtyard.RIGHT - Courtyard.LEFT) / gridStep).toInt() + 1
+  private val depth = ((Courtyard.BRIDGE_END - Courtyard.NORTH) / gridStep).toInt() + 1
   private fun at(index: Int) = GroundPoint(Courtyard.LEFT + index % width * gridStep,
     Courtyard.NORTH + index / width * gridStep)
 
