@@ -10,11 +10,12 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUT = ROOT / "app/src/main/assets/diorama"
 SIZE = 128
+EXTENDED_SIZE = 256
 
 
-def periodic_noise(x, y):
+def periodic_noise(x, y, size=SIZE):
     """A small hand-painted tonal variation which repeats at the tile edges."""
-    u, v = x * 2 * pi / SIZE, y * 2 * pi / SIZE
+    u, v = x * 2 * pi / size, y * 2 * pi / size
     return sin(3 * u + 5 * v) * 2.4 + cos(9 * u - 6 * v) * 1.5 + sin(17 * u + 11 * v) * 1.7
 
 
@@ -24,30 +25,43 @@ def paint(image, x, y, color, shift):
 
 def cobblestone():
     rng = Random(14119)
-    count = 8
-    interval = SIZE / count
-    samples = [
-        (i * interval + rng.uniform(-4, 4), j * interval + (6 if i % 2 else 0) + rng.uniform(-4, 4), rng.uniform(-20, 20))
-        for i in range(count) for j in range(count)
-    ]
-    image = Image.new("RGB", (SIZE, SIZE))
-    for y in range(SIZE):
-        for x in range(SIZE):
+    size = EXTENDED_SIZE
+    interval = 16
+    count = size // interval
+    samples = []
+    for col in range(count):
+        column = []
+        for row in range(count):
+            sx = col * interval + rng.uniform(-4.6, 4.6)
+            sy = row * interval + (6 if col % 2 else 0) + rng.uniform(-4.6, 4.6)
+            # Wear varies across several stones at once, with gentler variations per stone.
+            u, v = 2 * pi * sx / size, 2 * pi * sy / size
+            wear = 8 * sin(2 * u - v) + 5 * cos(u + 3 * v)
+            column.append((sx, sy, wear + rng.uniform(-14, 14)))
+        samples.append(column)
+
+    image = Image.new("RGB", (size, size))
+    for y in range(size):
+        for x in range(size):
             neighbor = []
-            for sx, sy, shade in samples:
-                dx = (x - sx + SIZE / 2) % SIZE - SIZE / 2
-                dy = (y - sy + SIZE / 2) % SIZE - SIZE / 2
-                neighbor.append((dx * dx + dy * dy, dx, dy, shade))
+            for col in range(x // interval - 2, x // interval + 3):
+                for row in range(y // interval - 2, y // interval + 3):
+                    sx, sy, shade = samples[col % count][row % count]
+                    dx = (x - sx + size / 2) % size - size / 2
+                    dy = (y - sy + size / 2) % size - size / 2
+                    neighbor.append((dx * dx + dy * dy, dx, dy, shade))
             first, second = sorted(neighbor)[:2]
             _, dx, dy, shade = first
             gap = (second[0] - first[0]) / max(1, 2 * sqrt((second[1] - dx)**2 + (second[2] - dy)**2))
-            noise = periodic_noise(x, y) + rng.uniform(-2.9, 2.9)
-            if gap < .84:
-                paint(image, x, y, (84, 76, 66), noise)
+            noise = periodic_noise(x, y, size) + rng.uniform(-3.5, 3.5)
+            mortar = .72 + .14 * sin(1.21 * dx + .37 * dy)
+            if gap < mortar:
+                paint(image, x, y, (95, 89, 77), noise + shade * .18)
             else:
-                height = min(1, (gap - .84) / 1.85)
-                bevel = max(-13, min(16, -dy * 1.8 - dx * .82)) * (1 - height)
-                paint(image, x, y, (150, 140, 121), shade + bevel + 18 * height + noise)
+                height = min(1, (gap - mortar) / 2.15)
+                bevel = max(-12, min(12, -dy * 1.45 - dx * .80)) * (1 - height)
+                pitting = -rng.uniform(7, 17) if rng.random() < .045 else 0
+                paint(image, x, y, (151, 145, 132), shade + bevel + 14 * height + noise + pitting)
     return image
 
 
@@ -76,17 +90,33 @@ def masonry():
 
 def slate():
     rng = Random(579)
-    image = Image.new("RGB", (SIZE, SIZE))
-    courses = [[rng.uniform(-14, 14) for _ in range(8)] for _ in range(8)]
-    for y in range(SIZE):
-        row, v = divmod(y, 16)
-        for x in range(SIZE):
-            col, u = divmod((x + 8 * (row % 2)) % SIZE, 16)
-            grain = periodic_noise(x, y) + rng.uniform(-2.9, 2.9)
-            # Rows overlap toward the eave; seams are staggered between rows.
-            lip = [-22, 16, 22, 16, 7, 2, 0, -1, 0, 0, -2, -2, -5, -9, -15, -26][v]
-            joint = -22 if u == 0 else 9 if u == 1 else -11 if u == 15 else 0
-            paint(image, x, y, (98, 130, 136), courses[row][col] + grain + lip + joint)
+    size = EXTENDED_SIZE
+    image = Image.new("RGB", (size, size))
+    nominal = 16
+    count = size // nominal
+    # Jitter cumulative edges to vary individual tile widths without breaking the repeat.
+    borders = [i * nominal + (rng.randint(-2, 2) if 0 < i < count else 0) for i in range(count + 1)]
+    for row, (top, bottom) in enumerate(zip(borders, borders[1:])):
+        offset = (8 * (row % 2) + rng.randint(-3, 3)) % size
+        tile_edges = [i * nominal + (rng.randint(-4, 4) if 0 < i < count else 0) for i in range(count + 1)]
+        for left, right in zip(tile_edges, tile_edges[1:]):
+            variation = rng.uniform(-13, 13) + 4 * cos(2 * pi * row / count)
+            chip_side = rng.choice((-1, 0, 1))
+            color = rng.choice(((89, 121, 129), (98, 127, 132), (97, 130, 136)))
+            for y in range(top, bottom):
+                v = (y - top) / (bottom - top)
+                for tx in range(left, right):
+                    x = (tx + offset) % size
+                    u = tx - left
+                    edge = min(u, right - tx - 1)
+                    grain = periodic_noise(x, y, size) + rng.uniform(-3.1, 3.1)
+                    brown = 3 * sin(x * 4 * pi / size + .35 * row)
+                    lap = -22 if v == 0 else max(0, 20 - 68 * v) - 18 * v**4
+                    joint = -17 if edge == 0 else 6 if edge == 1 else 0
+                    chipped = chip_side != 0 and v < .19 and (
+                        (chip_side < 0 and u < 2) or (chip_side > 0 and right - tx < 3)
+                    )
+                    paint(image, x, y, color, variation + grain + brown + lap + joint - (9 if chipped else 0))
     return image
 
 

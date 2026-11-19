@@ -286,6 +286,7 @@ internal class CourtyardRenderer(
         Material3d.WATER -> 2
         else -> 0
       })
+      world.uniform("uvScale", mesh.material.uvScale)
       val texture = textures[mesh.material.ordinal].takeIf { it != 0 } ?: textures[Material3d.SOLID.ordinal]
       bindTexture(0, texture)
       glBindBuffer(GL_ARRAY_BUFFER, mesh.buffer)
@@ -296,6 +297,7 @@ internal class CourtyardRenderer(
     worldAttributes()
     bindTexture(0, textures[Material3d.HERO.ordinal])
     world.uniform("kind", 3)
+    world.uniform("uvScale", Material3d.HERO.uvScale)
     glDrawArrays(GL_TRIANGLES, 0, 6)
     for (i in 0..3) glDisableVertexAttribArray(i)
   }

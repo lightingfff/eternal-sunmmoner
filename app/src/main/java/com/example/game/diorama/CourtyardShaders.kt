@@ -62,6 +62,7 @@ internal object CourtyardShaders {
     uniform vec3 actor;
     uniform vec3 sunDirection;
     uniform int kind;
+    uniform float uvScale;
     uniform float timer;
     uniform vec3 lamps[4];
     in vec3 position;
@@ -118,7 +119,7 @@ internal object CourtyardShaders {
 
     void main() {
       vec2 surfaceUv = kind == 1 ? position.xz * .62 : texCoord;
-      vec4 source = texture(material, surfaceUv);
+      vec4 source = texture(material, surfaceUv * uvScale);
       if (source.a < .45) discard;
       vec3 base = pow(max(source.rgb * tint, vec3(.001)), vec3(2.2));
       vec3 n = normalize(surfaceNormal);
