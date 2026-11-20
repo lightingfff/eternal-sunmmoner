@@ -217,9 +217,7 @@ internal object CourtyardShaders {
       float detail = 1.0 - smoothstep(18.0, 49.0, distanceToEye);
       float a = dot(xz, vec2(.83, 1.71)) + .65 * sin(xz.x * .52) + timer * .50;
       float b = dot(xz, vec2(1.40, -.99)) - timer * .34;
-      float c = dot(xz, vec2(-2.08, 2.95)) + timer * .71;
-      vec2 slope = (vec2(.031, .068) * cos(a) + vec2(.039, -.028) * cos(b)) * detail
-        + vec2(-.019, .032) * cos(c) * detail * detail;
+      vec2 slope = (vec2(.031, .068) * cos(a) + vec2(.039, -.028) * cos(b)) * detail;
       vec3 normal = normalize(vec3(slope.x, 1.0, slope.y));
       float grazing = 1.0 - clamp(dot(normal, viewDirection), 0.0, 1.0);
       float fresnel = .04 + .62 * grazing * grazing * grazing;
@@ -246,15 +244,6 @@ internal object CourtyardShaders {
       vec3 base = pow(max(source.rgb * tint, vec3(.001)), vec3(2.2));
       float plaza = plazaLight(position.xz);
       vec2 fountainOffset = position.xz - fountain.xy;
-      if (kind == 1 && plaza > .001) {
-        // Shade broad bands of weathering in world space so they do not repeat with each tile.
-        float wear = sin(dot(position.xz, vec2(.67, .35))) * .30
-          + cos(dot(position.xz, vec2(-.51, .82))) * .20 + .5;
-        vec3 variation = reliefStrength > 0.0
-          ? mix(vec3(.76, .85, .93), vec3(1.05, 1.00, .92), wear)
-          : mix(vec3(.75, .84, .76), vec3(1.04, .99, .72), wear);
-        base *= mix(vec3(1.0), variation, plaza);
-      }
       float shadow = visibility(max(dot(normal, sunDirection), 0.0), plaza);
       vec3 n = normal;
       float crevice = 1.0;
@@ -264,7 +253,9 @@ internal object CourtyardShaders {
         vec3 detail = textureGrad(reliefMap, surfaceUv, uvDx, uvDy).rgb;
         float influence = max(plaza, marketView * .40);
         vec2 slope = (detail.rg * 255.0 - 128.0) / 127.0 * reliefStrength * influence;
-        n = surfaceRelief(normal, slope, uvDx, uvDy);
+        // World-space UVs on the paving already align with the ground axes.
+        n = horizontalGround ? normalize(normal + vec3(slope.x, 0.0, slope.y))
+          : surfaceRelief(normal, slope, uvDx, uvDy);
         crevice = mix(1.0, smoothstep(.08, .79, detail.b), influence);
       }
       float lambert = max(dot(n, sunDirection), 0.0);
@@ -285,7 +276,12 @@ internal object CourtyardShaders {
         ambient *= 1.0 - .50 * contact;
         if (plaza > .001) {
           vec2 patchUv = (position.xz - marketBounds.xy) / (marketBounds.zw - marketBounds.xy);
-          float staticContact = texture(marketContact, patchUv).r * plaza;
+          vec2 ground = texture(marketContact, patchUv).rg;
+          float staticContact = ground.r * plaza;
+          vec3 wear = reliefStrength > 0.0
+            ? mix(vec3(.76, .85, .93), vec3(1.05, 1.00, .92), ground.g)
+            : mix(vec3(.75, .84, .76), vec3(1.04, .99, .72), ground.g);
+          base *= mix(vec3(1.0), wear, plaza);
           ambient *= 1.0 - .40 * staticContact;
           sunlight *= 1.0 - .18 * staticContact;
         }

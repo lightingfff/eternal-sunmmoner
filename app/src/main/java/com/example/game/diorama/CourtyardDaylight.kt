@@ -1,10 +1,12 @@
 package com.example.game.diorama
 
 import java.nio.ByteBuffer
+import kotlin.math.cos
 import kotlin.math.hypot
+import kotlin.math.sin
 import kotlin.math.sqrt
 
-/** Parameters for the world sun and the market's baked contact shading. */
+/** Parameters for the world sun and the market's baked ground shading. */
 internal object CourtyardDaylight {
   private const val SUN_X = -21f
   private const val SUN_Y = 20.5f
@@ -37,7 +39,7 @@ internal object CourtyardDaylight {
     val foundations = Courtyard.houses.map { it.bounds }.filter {
       it.right >= bounds.left && it.left <= bounds.right && it.south >= bounds.north && it.north <= bounds.south
     }
-    val pixels = ByteBuffer.allocateDirect(contactSize * contactSize)
+    val pixels = ByteBuffer.allocateDirect(contactSize * contactSize * 2)
     for (j in 0 until contactSize) {
       val z = bounds.north + (j + .5f) * (bounds.south - bounds.north) / contactSize
       for (i in 0 until contactSize) {
@@ -59,7 +61,9 @@ internal object CourtyardDaylight {
           val falloff = 1f - rim / .55f
           shade = maxOf(shade, .75f * falloff * falloff)
         }
+        val wear = .5f + .30f * sin(x * .67f + z * .35f) + .20f * cos(x * -.51f + z * .82f)
         pixels.put((shade * 255f).toInt().toByte())
+        pixels.put((wear.coerceIn(0f, 1f) * 255f).toInt().toByte())
       }
     }
     pixels.rewind()
