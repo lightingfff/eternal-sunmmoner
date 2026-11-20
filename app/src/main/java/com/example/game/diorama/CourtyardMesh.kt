@@ -7,12 +7,16 @@ import kotlin.random.Random
 
 internal data class Point3(val x: Float, val y: Float, val z: Float)
 
-internal enum class Material3d(val asset: String? = null, val uvScale: Float = 1f) {
+internal enum class Material3d(
+  val asset: String? = null,
+  val uvScale: Float = 1f,
+  val relief: Float = 0f,
+) {
   GRASS("art_depth_v1/materials/sanctuary_grass.png"),
-  STONE("diorama/cobblestone.png", uvScale = .5f),
-  WALL("diorama/masonry.png"),
+  STONE("diorama/cobblestone.png", uvScale = .5f, relief = .81f),
+  WALL("diorama/masonry.png", relief = .78f),
   TIMBER("art_depth_v1/materials/oak.png"),
-  SLATE("diorama/slate.png", uvScale = .5f),
+  SLATE("diorama/slate.png", uvScale = .5f, relief = 1.08f),
   PLASTER("diorama/plaster.png"),
   PLANKS("diorama/quay_planks.png"),
   CANVAS("diorama/market_canvas.png"),

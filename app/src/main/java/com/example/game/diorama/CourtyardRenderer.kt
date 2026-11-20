@@ -82,6 +82,7 @@ internal class CourtyardRenderer(
   private var spriteBuffer = 0
   private var marketContactTexture = 0
   private val textures = IntArray(Material3d.entries.size)
+  private val reliefTextures = IntArray(Material3d.entries.size)
   private val sun = FloatArray(16)
   private val camera = CourtyardCamera()
   private val navigator by lazy(LazyThreadSafetyMode.NONE) { CourtyardNavigator() }
@@ -139,6 +140,9 @@ internal class CourtyardRenderer(
     for (material in Material3d.entries) {
       val asset = material.asset ?: continue
       textures[material.ordinal] = imageTexture(asset, atlas = false)
+      if (material.relief > 0f) {
+        reliefTextures[material.ordinal] = imageTexture(asset.removeSuffix(".png") + "_relief.png", atlas = false)
+      }
     }
     textures[Material3d.HERO.ordinal] = imageTexture("character_upgrade_v1/kaelen/kaelen.png", atlas = true)
     val geometry = CourtyardMesh().apply { build() }
@@ -289,6 +293,8 @@ internal class CourtyardRenderer(
     world.vector("fountain", Courtyard.fountain.x, Courtyard.fountain.z, Courtyard.FOUNTAIN_RADIUS)
     world.uniform("marketContact", 3)
     bindTexture(3, marketContactTexture)
+    world.uniform("reliefMap", 4)
+    bindTexture(4, textures[Material3d.SOLID.ordinal])
     world.vector("actor", hero.x, Courtyard.height(hero.x, hero.z), hero.z)
     world.uniform("timer", elapsed)
     world.uniform("packedRadiance", packedRadiance)
@@ -309,6 +315,8 @@ internal class CourtyardRenderer(
       })
       world.uniform("uvScale", mesh.material.uvScale)
       world.uniform("surfaceSheen", if (mesh.material == Material3d.SLATE) .112f else 0f)
+      world.uniform("reliefStrength", mesh.material.relief)
+      if (mesh.material.relief > 0f) bindTexture(4, reliefTextures[mesh.material.ordinal])
       val texture = textures[mesh.material.ordinal].takeIf { it != 0 } ?: textures[Material3d.SOLID.ordinal]
       bindTexture(0, texture)
       glBindBuffer(GL_ARRAY_BUFFER, mesh.buffer)
@@ -321,6 +329,7 @@ internal class CourtyardRenderer(
     world.uniform("kind", 3)
     world.uniform("uvScale", Material3d.HERO.uvScale)
     world.uniform("surfaceSheen", 0f)
+    world.uniform("reliefStrength", 0f)
     glDrawArrays(GL_TRIANGLES, 0, 6)
     for (i in 0..3) glDisableVertexAttribArray(i)
   }

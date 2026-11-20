@@ -34,6 +34,9 @@ internal object CourtyardDaylight {
         }
       }
     }
+    val foundations = Courtyard.houses.map { it.bounds }.filter {
+      it.right >= bounds.left && it.left <= bounds.right && it.south >= bounds.north && it.north <= bounds.south
+    }
     val pixels = ByteBuffer.allocateDirect(contactSize * contactSize)
     for (j in 0 until contactSize) {
       val z = bounds.north + (j + .5f) * (bounds.south - bounds.north) / contactSize
@@ -45,6 +48,11 @@ internal object CourtyardDaylight {
           val dz = (z - contact.z) / contact.rz
           val falloff = (1f - dx * dx - dz * dz).coerceAtLeast(0f)
           shade = maxOf(shade, falloff * falloff)
+        }
+        for (wall in foundations) {
+          val distance = hypot(maxOf(wall.left - x, x - wall.right, 0f), maxOf(wall.north - z, z - wall.south, 0f))
+          val falloff = (1f - distance / .86f).coerceAtLeast(0f)
+          shade = maxOf(shade, .84f * falloff * falloff)
         }
         val rim = hypot(x - Courtyard.fountain.x, z - Courtyard.fountain.z) - Courtyard.FOUNTAIN_RADIUS
         if (rim in 0f..0.55f) {

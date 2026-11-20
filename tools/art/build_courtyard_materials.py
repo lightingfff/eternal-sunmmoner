@@ -23,8 +23,25 @@ def paint(image, x, y, color, shift):
     image.putpixel((x, y), tuple(round(max(0, min(255, c + shift))) for c in color))
 
 
+def relief_texture(height, strength):
+    """Pack two tangent-space slopes and a crevice mask into a repeatable RGB tile."""
+    size = height.width
+    source = height.load()
+    relief = Image.new("RGB", (size, size))
+    for y in range(size):
+        for x in range(size):
+            dx = (source[(x - 1) % size, y] - source[(x + 1) % size, y]) * strength
+            dy = (source[x, (y - 1) % size] - source[x, (y + 1) % size]) * strength
+            u, v = (round(128 + max(-108, min(108, slope))) for slope in (dx, dy))
+            relief.putpixel((x, y), (u, v, source[x, y]))
+    return relief
+
+
 def cobblestone():
     rng = Random(14119)
+    color_rng = Random(6103)
+    colors = ((151, 143, 127), (146, 142, 134), (137, 143, 139),
+              (155, 142, 132), (145, 135, 121), (152, 151, 144))
     size = EXTENDED_SIZE
     interval = 16
     count = size // interval
@@ -37,37 +54,41 @@ def cobblestone():
             # Wear varies across several stones at once, with gentler variations per stone.
             u, v = 2 * pi * sx / size, 2 * pi * sy / size
             wear = 8 * sin(2 * u - v) + 5 * cos(u + 3 * v)
-            column.append((sx, sy, wear + rng.uniform(-14, 14)))
+            column.append((sx, sy, wear + rng.uniform(-14, 14), color_rng.choice(colors)))
         samples.append(column)
 
     image = Image.new("RGB", (size, size))
+    heights = Image.new("L", (size, size))
     for y in range(size):
         for x in range(size):
             neighbor = []
             for col in range(x // interval - 2, x // interval + 3):
                 for row in range(y // interval - 2, y // interval + 3):
-                    sx, sy, shade = samples[col % count][row % count]
+                    sx, sy, shade, color = samples[col % count][row % count]
                     dx = (x - sx + size / 2) % size - size / 2
                     dy = (y - sy + size / 2) % size - size / 2
-                    neighbor.append((dx * dx + dy * dy, dx, dy, shade))
+                    neighbor.append((dx * dx + dy * dy, dx, dy, shade, color))
             first, second = sorted(neighbor)[:2]
-            _, dx, dy, shade = first
+            _, dx, dy, shade, color = first
             gap = (second[0] - first[0]) / max(1, 2 * sqrt((second[1] - dx)**2 + (second[2] - dy)**2))
             noise = periodic_noise(x, y, size) + rng.uniform(-3.5, 3.5)
             mortar = .72 + .14 * sin(1.21 * dx + .37 * dy)
             if gap < mortar:
                 paint(image, x, y, (95, 89, 77), noise + shade * .18)
+                heights.putpixel((x, y), 26)
             else:
                 height = min(1, (gap - mortar) / 2.15)
                 bevel = max(-12, min(12, -dy * 1.45 - dx * .80)) * (1 - height)
                 pitting = -rng.uniform(7, 17) if rng.random() < .045 else 0
-                paint(image, x, y, (151, 145, 132), shade + bevel + 14 * height + noise + pitting)
-    return image
+                paint(image, x, y, color, shade + bevel + 14 * height + noise + pitting)
+                heights.putpixel((x, y), round(44 + 193 * height + .6 * pitting))
+    return image, relief_texture(heights, .37)
 
 
 def masonry():
     rng = Random(8512)
     image = Image.new("RGB", (SIZE, SIZE))
+    heights = Image.new("L", (SIZE, SIZE))
     rows, columns = 8, 5
     courses = [[rng.uniform(-14, 12) for _ in range(columns)] for _ in range(rows)]
     for y in range(SIZE):
@@ -81,17 +102,21 @@ def masonry():
             u_out, v_out = (x - 6) % SIZE, (y - 5) % SIZE
             if v == 0 or edge:
                 paint(image, u_out, v_out, (79, 76, 64), shift * .45)
+                heights.putpixel((u_out, v_out), 30)
             else:
                 lip = 10 if v == 1 else -19 if v == 15 else 0
                 mottling = 6 * sin(2 * pi * (10 * x + 9 * y) / SIZE + row)
                 paint(image, u_out, v_out, (163, 151, 128), shift + lip + mottling)
-    return image
+                bevel = min(1, min(vline - 1.2, SIZE / columns - .8 - vline, v, 16 - v) / 2.3)
+                heights.putpixel((u_out, v_out), round(63 + 172 * bevel))
+    return image, relief_texture(heights, .42)
 
 
 def slate():
     rng = Random(579)
     size = EXTENDED_SIZE
     image = Image.new("RGB", (size, size))
+    heights = Image.new("L", (size, size))
     nominal = 16
     count = size // nominal
     # Jitter cumulative edges to vary individual tile widths without breaking the repeat.
@@ -102,7 +127,7 @@ def slate():
         for left, right in zip(tile_edges, tile_edges[1:]):
             variation = rng.uniform(-13, 13) + 4 * cos(2 * pi * row / count)
             chip_side = rng.choice((-1, 0, 1))
-            color = rng.choice(((89, 121, 129), (98, 127, 132), (97, 130, 136)))
+            color = rng.choice(((74, 108, 121), (90, 123, 130), (94, 125, 119)))
             for y in range(top, bottom):
                 v = (y - top) / (bottom - top)
                 for tx in range(left, right):
@@ -117,7 +142,10 @@ def slate():
                         (chip_side < 0 and u < 2) or (chip_side > 0 and right - tx < 3)
                     )
                     paint(image, x, y, color, variation + grain + brown + lap + joint - (9 if chipped else 0))
-    return image
+                    crown = max(0, sin(pi * min(1, (u + .5) / (right - left)))) ** .65
+                    height = 45 + 135 * crown + 54 * v - (20 if chipped else 0)
+                    heights.putpixel((x, y), 22 if y == top else round(height))
+    return image, relief_texture(heights, .62)
 
 
 def plaster():
@@ -183,5 +211,9 @@ def blossom_canopy():
 
 if __name__ == "__main__":
     OUTPUT.mkdir(parents=True, exist_ok=True)
-    for generator in (cobblestone, masonry, slate, plaster, quay_planks, market_canvas, blossom_canopy):
+    for generator in (cobblestone, masonry, slate):
+        albedo, relief = generator()
+        albedo.save(OUTPUT / f"{generator.__name__}.png", optimize=True)
+        relief.save(OUTPUT / f"{generator.__name__}_relief.png", optimize=True)
+    for generator in (plaster, quay_planks, market_canvas, blossom_canopy):
         generator().save(OUTPUT / f"{generator.__name__}.png", optimize=True)
