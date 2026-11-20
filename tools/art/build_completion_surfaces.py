@@ -19,7 +19,7 @@ def build():
         x, y = index % 2, index // 2
         panel = source.crop((round(x * source.width / 2), round(y * source.height / 2),
                              round((x + 1) * source.width / 2), round((y + 1) * source.height / 2)))
-        image = periodic_panel(panel)
+        image = periodic_panel(panel, name)
         path = OUTPUT / f'{name}.png'
         image.save(path, optimize=True)
         entries.append(dict(id=name, file=path.name, width=256, height=256,
@@ -27,7 +27,7 @@ def build():
     manifest = dict(version=1, source=str(SOURCE.relative_to(ROOT)),
                     source_sha256=hashlib.sha256(SOURCE.read_bytes()).hexdigest(),
                     source_dimensions=list(source.size), native_generated_dimensions_claimed=False,
-                    normalization='Per quadrant nearest256, symmetric12px wrap,128colour palette; original source retained',
+                    normalization='Per quadrant nearest256, northwest-lit cliff/limestone relief, symmetric12px wrap, 128-colour palette',
                     retained_rgba_bytes=4 * 256 * 256 * 4, materials=entries)
     (OUTPUT / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     print(json.dumps(manifest))

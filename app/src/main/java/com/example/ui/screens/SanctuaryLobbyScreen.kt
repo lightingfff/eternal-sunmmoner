@@ -1,6 +1,7 @@
 package com.example.ui.screens
 
 import com.example.ui.components.FantasyTextButton
+import com.example.ui.components.FantasyChoiceButton
 import com.example.ui.components.FantasyIconButton
 import com.example.ui.components.FantasySurface
 import com.example.ui.theme.SanctuaryUi
@@ -125,7 +126,10 @@ import com.example.data.model.SanctuaryMealRecipe
 import com.example.data.model.TrainingFocus
 import com.example.game.lobby.LobbyHeroActor
 import com.example.game.lobby.SanctuaryLobbyEngine
+import com.example.game.map.GroundView
 import com.example.game.map.ObliqueCamera
+import com.example.game.pixel.withGroundView
+import com.example.game.pixel.SanctuaryDioramaLight.drawDioramaLight
 import com.example.game.map.SanctuaryIslandGeometry
 import com.example.game.map.WorldObstacle
 import com.example.game.pixel.PixelSpriteRenderer.drawForegroundAtmosphere
@@ -286,6 +290,7 @@ fun SanctuaryLobbyScreen(
   var showQuickCommands by remember { mutableStateOf(false) }
   var showMasterHub by remember { mutableStateOf(false) }
   var cameraExpanded by remember { mutableStateOf(false) }
+  var courtyardOpen by remember { mutableStateOf(false) }
   var managementMode by remember { mutableStateOf<String?>(null) }
   var promptedFacility by remember { mutableStateOf<FacilityType?>(null) }
   var inspectingHeroId by remember { mutableStateOf<String?>(null) }
@@ -337,7 +342,7 @@ fun SanctuaryLobbyScreen(
 
   LaunchedEffect(Unit) { focusRequester.requestFocus() }
   SceneFrameLoop(
-    active = sceneActive && !showMasterHub && state.activeFacilityModal == null && managementMode == null &&
+    active = sceneActive && !courtyardOpen && !showMasterHub && state.activeFacilityModal == null && managementMode == null &&
       !showPauseMapModal && !showChronicleModal && !showExpansionModal && inspectingHeroId == null && !showPrologue,
     targetFps = settings.performanceMode.targetFps,
   ) { elapsed, nanos ->
@@ -390,6 +395,7 @@ fun SanctuaryLobbyScreen(
       .focusRequester(focusRequester)
       .focusable()
       .onKeyEvent { event ->
+        if (courtyardOpen) return@onKeyEvent false
         val down = event.type == KeyEventType.KeyDown
         when (event.key) {
           Key.W, Key.DirectionUp -> { keyUp = down; true }
@@ -418,6 +424,10 @@ fun SanctuaryLobbyScreen(
         }
       },
   ) {
+    if (courtyardOpen) {
+      SanctuaryCourtyardScreen(onExit = { courtyardOpen = false })
+      return@BoxWithConstraints
+    }
     val isWideScreen = maxWidth >= 600.dp
     val isShortHeight = maxHeight < 460.dp
     val isNarrowScreen = maxWidth < 480.dp
@@ -425,6 +435,8 @@ fun SanctuaryLobbyScreen(
       constraints.maxWidth.toFloat() / 3380f,
       (constraints.maxHeight.toFloat() - 150f).coerceAtLeast(240f) / 2120f,
     ).coerceIn(0.27f, 0.54f)
+
+    fun currentGroundView() = GroundView.forSanctuary(lobbyEngine.isInsideInterior)
 
     fun computeLobbyCam(viewportHalfW: Float, viewportHalfH: Float): Pair<Float, Float> =
       lobbyEngine.renderedCamera(viewportHalfW * 2f, viewportHalfH * 2f, zoom)
@@ -441,23 +453,24 @@ fun SanctuaryLobbyScreen(
           onTransform = { centroid, pan, zoomChange ->
             val halfW = constraints.maxWidth / 2f
             val halfH = constraints.maxHeight / 2f
+            val (renderedX, renderedY) = computeLobbyCam(halfW, halfH)
             if (abs(zoomChange - 1f) > 0.003f) {
               val oldZoom = lobbyEngine.zoom
               val newZoom = (oldZoom * zoomChange).coerceIn(0.36f, 1.48f)
               if (abs(newZoom - oldZoom) > 0.0005f) {
-                val anchorWx = ObliqueCamera.screenToWorldX(centroid.x, lobbyEngine.camX, oldZoom, halfW)
-                val anchorWy = ObliqueCamera.screenToWorldY(centroid.y, lobbyEngine.camY, oldZoom, halfH)
+                val anchorWx = ObliqueCamera.screenToWorldX(centroid.x, renderedX, oldZoom, halfW)
+                val anchorWy = currentGroundView().unprojectY(centroid.y, renderedY, oldZoom, halfH)
                 lobbyEngine.setZoomClamped(newZoom)
                 zoom = lobbyEngine.zoom
                 val anchoredCamX = anchorWx - (centroid.x - halfW) / zoom
-                val anchoredCamY = anchorWy - (centroid.y - halfH) / (zoom * ObliqueCamera.OBLIQUE_Y_SCALE)
+                val anchoredCamY = anchorWy - (centroid.y - halfH) / (zoom * currentGroundView().groundY)
                 lobbyEngine.setCameraPosition(anchoredCamX, anchoredCamY)
               }
             }
             if (abs(pan.x) > 0.1f || abs(pan.y) > 0.1f) {
               lobbyEngine.panCameraWorld(
                 worldDx = -pan.x / zoom,
-                worldDy = -pan.y / (zoom * ObliqueCamera.OBLIQUE_Y_SCALE),
+                worldDy = -pan.y / (zoom * currentGroundView().groundY),
               )
             }
           },
@@ -466,7 +479,7 @@ fun SanctuaryLobbyScreen(
             val halfH = constraints.maxHeight / 2f
             val (camX, camY) = computeLobbyCam(halfW, halfH)
             val worldX = ObliqueCamera.screenToWorldX(tapOffset.x, camX, zoom, halfW)
-            val worldY = ObliqueCamera.screenToWorldY(tapOffset.y, camY, zoom, halfH)
+            val worldY = currentGroundView().unprojectY(tapOffset.y, camY, zoom, halfH)
 
             if (lobbyEngine.isInsideInterior) {
               val activeInt = lobbyEngine.activeInterior ?: return@tap
@@ -503,6 +516,7 @@ fun SanctuaryLobbyScreen(
                 zoom,
                 Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat()),
                 minimumTargetPx = if (tappedFacility == null) 44f * artContext.resources.displayMetrics.density else 0f,
+                view = currentGroundView(),
               )
 
               if (screenHitHero != null && !screenHitHero.isSanctuaryKeeperNpc) {
@@ -560,11 +574,12 @@ fun SanctuaryLobbyScreen(
           onPickUp = { point ->
             val (cx, cy) = computeLobbyCam(constraints.maxWidth / 2f, constraints.maxHeight / 2f)
             val wx = ObliqueCamera.screenToWorldX(point.x, cx, zoom, constraints.maxWidth / 2f)
-            val wy = ObliqueCamera.screenToWorldY(point.y, cy, zoom, constraints.maxHeight / 2f)
+            val wy = currentGroundView().unprojectY(point.y, cy, zoom, constraints.maxHeight / 2f)
             val facilityBehind = lobbyEngine.selectFacilityAt(wx, wy)
             val actor = if (!lobbyEngine.isInsideInterior) pickupHeroAtScreen(lobbyEngine.heroActors, point, cx, cy, zoom,
               Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat()),
-              minimumTargetPx = if (facilityBehind == null) 48f * artContext.resources.displayMetrics.density else 0f) else null
+              minimumTargetPx = if (facilityBehind == null) 48f * artContext.resources.displayMetrics.density else 0f,
+              view = currentGroundView()) else null
             if (actor == null || !lobbyEngine.beginHeroPickUp(actor.heroId)) false else {
               pickupOffset = Offset(actor.x - wx, actor.y - wy)
               heldPointer.value = point
@@ -579,14 +594,14 @@ fun SanctuaryLobbyScreen(
             dragInvalidation.intValue++
             lobbyEngine.dragPickedHeroTo(
               ObliqueCamera.screenToWorldX(point.x, cx, zoom, constraints.maxWidth / 2f) + pickupOffset.x,
-              ObliqueCamera.screenToWorldY(point.y, cy, zoom, constraints.maxHeight / 2f) + pickupOffset.y)
+              currentGroundView().unprojectY(point.y, cy, zoom, constraints.maxHeight / 2f) + pickupOffset.y)
           },
           onDrop = { point ->
             heldPointer.value = null
             val (cx, cy) = computeLobbyCam(constraints.maxWidth / 2f, constraints.maxHeight / 2f)
             val request = lobbyEngine.dropRequestAt(
               ObliqueCamera.screenToWorldX(point.x, cx, zoom, constraints.maxWidth / 2f),
-              ObliqueCamera.screenToWorldY(point.y, cy, zoom, constraints.maxHeight / 2f))
+              currentGroundView().unprojectY(point.y, cy, zoom, constraints.maxHeight / 2f))
             if (request == null) lobbyEngine.finishHeroPickUp(false) else {
               pendingDrop = true
               dropScope.launch {
@@ -615,117 +630,120 @@ fun SanctuaryLobbyScreen(
       val layout = lobbyEngine.mapLayout
       val highestClearedFloorInt = (profile?.highestClearedFloor ?: 0L).toInt()
 
-      drawWorldBackground(
-        biome = layout.biome,
-        worldWidth = layout.width,
-        worldHeight = layout.height,
-        wallMargin = layout.wallMargin,
-        camX = camX,
-        camY = camY,
-        zoom = zoom,
-        timeSec = animTimeSec,
-        patches = layout.patches,
-        paths = layout.paths,
-        unlockedExpansions = unlockedExpansions,
-      )
-
-      if (!lobbyEngine.isInsideInterior) {
-        TowerFloorCatalog.SANCTUARY_ZONES.forEach { zone ->
-          val inside = lobbyEngine.nearbyFacility == zone.facility || promptedFacility == zone.facility
-          drawSanctuaryZoneFloorRing(zone, inside, camX, camY, zoom, animTimeSec)
-        }
-      }
-
-      // Foreshortened 3/4 Elliptical Tap-to-Move Destination Rune Ring
-      val selHeroActor = lobbyEngine.selectedHeroId?.let { id -> lobbyEngine.heroActors.find { it.heroId == id } }
-      val tx = selHeroActor?.targetX
-      val ty = selHeroActor?.targetY
-      if (tx != null && ty != null) {
-        val sx = ObliqueCamera.worldToScreenX(tx, camX, zoom, halfW)
-        val sy = ObliqueCamera.worldToScreenY(ty, camY, zoom, halfH)
-        val rx = 18f * zoom
-        val ry = rx * ObliqueCamera.GROUND_ELLIPSE_RATIO
-        drawOval(
-          color = SummonerGold.copy(alpha = 0.78f),
-          topLeft = Offset(sx - rx, sy - ry),
-          size = Size(rx * 2f, ry * 2f),
-          style = Stroke(width = 2.4f * zoom),
-        )
-      }
-
-      if (!lobbyEngine.isInsideInterior) with(com.example.game.pixel.LivingWorldRenderer) { drawWeather(camX,camY,zoom,false) }
-      // Y-Sorted 2.5D Architecture, Trees, Furnishings, and Autonomous 3/4 Anime Heroes
-      val drawables = depthQueue.ordered(layout.obstacles,lobbyEngine.heroActors)
       var visibleDrawables = 0
-
-      with(com.example.game.pixel.SanctuaryEnvironmentShadows) {
-        drawGroundShadows(layout.obstacles, camX, camY, zoom,
-          clipToIsland = !lobbyEngine.isInsideInterior, groundWidth = layout.width, groundHeight = layout.height)
-      }
-      drawables.forEach { item ->
-        // Share the existing renderer's generous margins; also skip offscreen canopy work.
-        val visible = when (item) {
-          is LobbyDrawableItem.Prop -> {
-            val sx = ObliqueCamera.worldToScreenX(item.obs.x, camX, zoom, halfW)
-            val sy = ObliqueCamera.worldToScreenY(item.obs.y, camY, zoom, halfH, item.obs.elevationZ)
-            sx >= -380f && sx <= size.width + 380f && sy >= -400f && sy <= size.height + 380f
-          }
-          is LobbyDrawableItem.HeroNpc -> {
-            val sx = ObliqueCamera.worldToScreenX(item.actor.x, camX, zoom, halfW)
-            val sy = ObliqueCamera.worldToScreenY(item.actor.y, camY, zoom, halfH)
-            sx >= -120f && sx <= size.width + 120f && sy >= -150f && sy <= size.height + 120f
-          }
-          is LobbyDrawableItem.Master -> false
-        }
-        if (!visible) return@forEach
-        visibleDrawables++
-        when (item) {
-          is LobbyDrawableItem.Prop -> drawProp(
-            obs = item.obs,
-            camX = camX,
-            camY = camY,
-            zoom = zoom,
-            timeSec = animTimeSec,
-            highestClearedFloor = highestClearedFloorInt,
-            renderShadow = null,
-          )
-          is LobbyDrawableItem.Master -> {} // External Commander is observing from outside world
-          is LobbyDrawableItem.HeroNpc -> {
-            val a = item.actor
-            val isSelected = lobbyEngine.selectedHeroId == a.heroId
-            if (a.heroId == lobbyEngine.pickedHeroId) return@forEach
-            drawLobbyHero(a, camX, camY, zoom, animTimeSec, isSelected)
-            drawActorCanopyOcclusion(layout.obstacles,a.x,a.y,camX,camY,zoom,animTimeSec)
-          }
-        }
-      }
-
-      // Foreground Southern Fortress Parapet Walls (layered above courtyard terrain & characters near rim)
-      if (!lobbyEngine.isInsideInterior) {
-        drawSouthernForegroundWalls(
+      withGroundView(currentGroundView()) {
+        drawWorldBackground(
           biome = layout.biome,
+          worldWidth = layout.width,
+          worldHeight = layout.height,
+          wallMargin = layout.wallMargin,
           camX = camX,
           camY = camY,
           zoom = zoom,
+          timeSec = animTimeSec,
+          patches = layout.patches,
+          paths = layout.paths,
+          unlockedExpansions = unlockedExpansions,
         )
-      }
 
-      if (!lobbyEngine.isInsideInterior) with(com.example.game.pixel.LivingWorldRenderer) {
-        drawWorldGrade()
-        drawLocalLights(layout.obstacles,camX,camY,zoom)
-        drawWeather(camX,camY,zoom,true)
-      }
-      lobbyEngine.pickedHeroId?.let { id ->
-        lobbyEngine.heroActors.firstOrNull { it.heroId == id }?.let { actor ->
-          drawLobbyHero(actor, camX, camY, zoom, animTimeSec, selected = true, held = true)
+        if (!lobbyEngine.isInsideInterior) {
+          TowerFloorCatalog.SANCTUARY_ZONES.forEach { zone ->
+            val inside = lobbyEngine.nearbyFacility == zone.facility || promptedFacility == zone.facility
+            drawSanctuaryZoneFloorRing(zone, inside, camX, camY, zoom, animTimeSec)
+          }
         }
-        lobbyEngine.dropZones.forEach { zone ->
-          val r = zone.bounds
-          val left = ObliqueCamera.worldToScreenX(r.left, camX, zoom, halfW)
-          val top = ObliqueCamera.worldToScreenY(r.top, camY, zoom, halfH)
-          val right = ObliqueCamera.worldToScreenX(r.right, camX, zoom, halfW)
-          val bottom = ObliqueCamera.worldToScreenY(r.bottom, camY, zoom, halfH)
-          drawRect(ESDesignTokens.cyan.copy(alpha = .60f), Offset(left, top), Size(right - left, bottom - top), style = Stroke(2f))
+
+        // Foreshortened 3/4 Elliptical Tap-to-Move Destination Rune Ring
+        val selHeroActor = lobbyEngine.selectedHeroId?.let { id -> lobbyEngine.heroActors.find { it.heroId == id } }
+        val tx = selHeroActor?.targetX
+        val ty = selHeroActor?.targetY
+        if (tx != null && ty != null) {
+          val sx = ObliqueCamera.worldToScreenX(tx, camX, zoom, halfW)
+          val sy = currentGroundView().projectY(ty, camY, zoom, halfH)
+          val rx = 18f * zoom
+          val ry = rx * currentGroundView().ellipseRatio
+          drawOval(
+            color = SummonerGold.copy(alpha = 0.78f),
+            topLeft = Offset(sx - rx, sy - ry),
+            size = Size(rx * 2f, ry * 2f),
+            style = Stroke(width = 2.4f * zoom),
+          )
+        }
+
+        if (!lobbyEngine.isInsideInterior) with(com.example.game.pixel.LivingWorldRenderer) { drawWeather(camX,camY,zoom,false) }
+        // Y-Sorted 2.5D Architecture, Trees, Furnishings, and Autonomous 3/4 Anime Heroes
+        val drawables = depthQueue.ordered(layout.obstacles,lobbyEngine.heroActors)
+
+        with(com.example.game.pixel.SanctuaryEnvironmentShadows) {
+          drawGroundShadows(layout.obstacles, camX, camY, zoom,
+            clipToIsland = !lobbyEngine.isInsideInterior, groundWidth = layout.width, groundHeight = layout.height)
+        }
+        drawables.forEach { item ->
+          // Share the existing renderer's generous margins; also skip offscreen canopy work.
+          val visible = when (item) {
+            is LobbyDrawableItem.Prop -> {
+              val sx = ObliqueCamera.worldToScreenX(item.obs.x, camX, zoom, halfW)
+              val sy = currentGroundView().projectY(item.obs.y, camY, zoom, halfH, item.obs.elevationZ)
+              sx >= -380f && sx <= size.width + 380f && sy >= -400f && sy <= size.height + 380f
+            }
+            is LobbyDrawableItem.HeroNpc -> {
+              val sx = ObliqueCamera.worldToScreenX(item.actor.x, camX, zoom, halfW)
+              val sy = currentGroundView().projectY(item.actor.y, camY, zoom, halfH)
+              sx >= -120f && sx <= size.width + 120f && sy >= -150f && sy <= size.height + 120f
+            }
+            is LobbyDrawableItem.Master -> false
+          }
+          if (!visible) return@forEach
+          visibleDrawables++
+          when (item) {
+            is LobbyDrawableItem.Prop -> drawProp(
+              obs = item.obs,
+              camX = camX,
+              camY = camY,
+              zoom = zoom,
+              timeSec = animTimeSec,
+              highestClearedFloor = highestClearedFloorInt,
+              renderShadow = null,
+            )
+            is LobbyDrawableItem.Master -> {} // External Commander is observing from outside world
+            is LobbyDrawableItem.HeroNpc -> {
+              val a = item.actor
+              val isSelected = lobbyEngine.selectedHeroId == a.heroId
+              if (a.heroId == lobbyEngine.pickedHeroId) return@forEach
+              drawLobbyHero(a, camX, camY, zoom, animTimeSec, isSelected)
+              drawActorCanopyOcclusion(layout.obstacles,a.x,a.y,camX,camY,zoom,animTimeSec)
+            }
+          }
+        }
+
+        // Foreground Southern Fortress Parapet Walls (layered above courtyard terrain & characters near rim)
+        if (!lobbyEngine.isInsideInterior) {
+          drawSouthernForegroundWalls(
+            biome = layout.biome,
+            camX = camX,
+            camY = camY,
+            zoom = zoom,
+          )
+        }
+
+        if (!lobbyEngine.isInsideInterior) with(com.example.game.pixel.LivingWorldRenderer) {
+          drawWorldGrade()
+          drawLocalLights(layout.obstacles,camX,camY,zoom)
+          drawWeather(camX,camY,zoom,true)
+        }
+        if (!lobbyEngine.isInsideInterior) drawDioramaLight()
+        lobbyEngine.pickedHeroId?.let { id ->
+          lobbyEngine.heroActors.firstOrNull { it.heroId == id }?.let { actor ->
+            drawLobbyHero(actor, camX, camY, zoom, animTimeSec, selected = true, held = true)
+          }
+          lobbyEngine.dropZones.forEach { zone ->
+            val r = zone.bounds
+            val left = ObliqueCamera.worldToScreenX(r.left, camX, zoom, halfW)
+            val top = currentGroundView().projectY(r.top, camY, zoom, halfH)
+            val right = ObliqueCamera.worldToScreenX(r.right, camX, zoom, halfW)
+            val bottom = currentGroundView().projectY(r.bottom, camY, zoom, halfH)
+            drawRect(ESDesignTokens.cyan.copy(alpha = .60f), Offset(left, top), Size(right - left, bottom - top), style = Stroke(2f))
+          }
         }
       }
       val topHudSafePx = (if (isWideScreen) 64.dp else 112.dp).toPx()
@@ -734,7 +752,7 @@ fun SanctuaryLobbyScreen(
 
       fun drawLandmarkPlaque(wx: Float, wy: Float, elevationZ: Float, labelText: String, borderCol: Color) {
         val zx = ObliqueCamera.worldToScreenX(wx, camX, zoom, halfW)
-        val zy = ObliqueCamera.worldToScreenY(wy, camY, zoom, halfH, elevationZ = elevationZ)
+        val zy = currentGroundView().projectY(wy, camY, zoom, halfH, elevation = elevationZ)
         if (zx !in -180f..(size.width + 180f) || zy !in (topHudSafePx + 14f)..(size.height - 18f)) return
 
         val fontSp = if (zoom < 0.60f) 8.5.sp else 10.5.sp
@@ -843,7 +861,7 @@ fun SanctuaryLobbyScreen(
       lobbyEngine.heroActors.forEach { actor ->
         if (zoom < 0.62f && actor.isSanctuaryKeeperNpc) return@forEach
         val hx = ObliqueCamera.worldToScreenX(actor.x, camX, zoom, halfW)
-        val footTagY = ObliqueCamera.worldToScreenY(actor.y, camY, zoom, halfH, elevationZ = -8f)
+        val footTagY = currentGroundView().projectY(actor.y, camY, zoom, halfH, elevation = -8f)
         if (hx in 24f..(size.width - 24f) && footTagY in (topHudSafePx + 8f)..(size.height - 22f)) {
           val tag = if (actor.isSanctuaryKeeperNpc) {
             actor.name.substringAfterLast(" ")
@@ -900,7 +918,7 @@ fun SanctuaryLobbyScreen(
         val fadeAlpha = (actor.speechTimer / 0.85f).coerceIn(0f, 1f)
         val hx = ObliqueCamera.worldToScreenX(actor.x, camX, zoom, halfW)
         val headElevation = if (isHeld) 108f else 86f
-        val headY = ObliqueCamera.worldToScreenY(actor.y, camY, zoom, halfH, elevationZ = headElevation)
+        val headY = currentGroundView().projectY(actor.y, camY, zoom, halfH, elevation = headElevation)
         if (hx in 16f..(size.width - 16f) && headY in (topHudSafePx + 18f)..(size.height - 24f)) {
           val bLayout = textMeasurer.measure(
             text = bubble,
@@ -1068,7 +1086,7 @@ fun SanctuaryLobbyScreen(
           .testTag("camera_controls_bar"),
       ) {
         // P29: camera tools are COLLAPSED by default — one toggle button keeps the idle
-        // viewport clear; expanding reveals all five tools (tags preserved).
+        // viewport clear until the player opens the camera tools.
         if (!cameraExpanded) {
           FantasyIconButton(
             onClick = { cameraExpanded = true },
@@ -1108,7 +1126,7 @@ fun SanctuaryLobbyScreen(
                 lobbyEngine.setZoomClamped(fitOverviewZoom)
                 zoom = lobbyEngine.zoom
               } else {
-                lobbyEngine.setCameraPosition(1660f, 1260f)
+                lobbyEngine.resetExteriorCamera()
                 lobbyEngine.setZoomClamped(0.88f)
                 zoom = lobbyEngine.zoom
               }
@@ -1137,6 +1155,19 @@ fun SanctuaryLobbyScreen(
             modifier = Modifier.size(cameraIconSize).testTag("camera_gate_button"),
           ) {
             Icon(Icons.Default.Castle, contentDescription = "Đến Cổng Tháp", tint = EmeraldVitality, modifier = Modifier.size(cameraIconInner))
+          }
+          if (!insideInterior) {
+            FantasyTextButton(
+              onClick = {
+                courtyardOpen = true
+                cameraExpanded = false
+              },
+              modifier = Modifier.testTag("sanctuary_3d_enter"),
+              enabled = !pendingDrop && lobbyEngine.pickedHeroId == null,
+              contentPadding = PaddingValues(horizontal = 8.dp),
+            ) {
+              Text("Sân 3D", style = MaterialTheme.typography.labelSmall, maxLines = 1)
+            }
           }
         }
         }

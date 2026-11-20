@@ -1,0 +1,520 @@
+package com.example.game.diorama
+
+internal object CourtyardShaders {
+  val shadowVertex = """#version 300 es
+    layout(location=0) in vec3 point;
+    uniform mat4 sunMatrix;
+    out vec2 casterXZ;
+    void main() {
+      casterXZ = point.xz;
+      gl_Position = sunMatrix * vec4(point, 1.0);
+    }
+  """.trimIndent()
+
+  val shadowFragment = """#version 300 es
+    precision highp float;
+    uniform int dappled;
+    uniform vec4 marketBounds;
+    in vec2 casterXZ;
+
+    float hash(vec2 cell) {
+      return fract(sin(dot(cell, vec2(127.1, 311.7))) * 43758.5453);
+    }
+
+    float clusters(vec2 p) {
+      vec2 cell = floor(p);
+      vec2 k = smoothstep(0.0, 1.0, fract(p));
+      return mix(mix(hash(cell), hash(cell + vec2(1, 0)), k.x),
+        mix(hash(cell + vec2(0, 1)), hash(cell + vec2(1, 1)), k.x), k.y);
+    }
+
+    void main() {
+      if (dappled == 0 || any(lessThan(casterXZ, marketBounds.xy)) ||
+        any(greaterThan(casterXZ, marketBounds.zw))) return;
+      // The shadow is a perforated proxy of the actual canopy. All its layers
+      // share light-space holes, baked once so they cannot swim with the camera.
+      vec2 p = gl_FragCoord.xy / vec2(11.0, 15.0);
+      float holes = clusters(p) * .77 + clusters(p * 2.37 + vec2(4.6, 7.2)) * .23;
+      if (holes > .61) discard;
+    }
+  """.trimIndent()
+
+  val worldVertex = """#version 300 es
+    layout(location=0) in vec3 point;
+    layout(location=1) in vec3 normal;
+    layout(location=2) in vec2 uv;
+    layout(location=3) in vec3 color;
+    uniform mat4 viewProjection;
+    uniform mat4 sunMatrix;
+    out vec3 position;
+    out vec3 surfaceNormal;
+    out vec2 texCoord;
+    out vec3 tint;
+    out vec4 sunPosition;
+    void main() {
+      position = point;
+      surfaceNormal = normal;
+      texCoord = uv;
+      tint = color;
+      sunPosition = sunMatrix * vec4(point, 1.0);
+      gl_Position = viewProjection * vec4(point, 1.0);
+    }
+  """.trimIndent()
+
+  // The RGBA8 path compands linear radiance so values over 1 survive on ES 3.0
+  // devices where RGBA16F is not color-renderable. All math uses decoded light.
+  private val radiance = """
+    uniform int packedRadiance;
+    vec3 storeLight(vec3 light) {
+      return packedRadiance == 0 ? light : light / (1.0 + light);
+    }
+    vec3 readLight(sampler2D image, vec2 p) {
+      vec3 value = texture(image, p).rgb;
+      return packedRadiance == 0 ? value : value / max(1.0 - value, vec3(.004));
+    }
+    float luminance(vec3 light) { return dot(light, vec3(.2126, .7152, .0722)); }
+  """.trimIndent()
+
+  val worldFragment = """#version 300 es
+    precision highp float;
+    precision highp sampler2D;
+    $radiance
+    uniform sampler2D material;
+    uniform sampler2D sunDepth;
+    uniform sampler2D heroAtlas;
+    uniform vec4 heroFrame;
+    uniform vec3 heroSide;
+    uniform vec2 heroHeight;
+    uniform vec3 camera;
+    uniform vec3 actor;
+    uniform vec3 sunDirection;
+    uniform int kind;
+    uniform float uvScale;
+    uniform float timer;
+    uniform vec3 lamps[4];
+    uniform sampler2D marketContact;
+    uniform vec4 marketBounds;
+    uniform float marketView;
+    uniform vec3 fountain;
+    uniform float surfaceSheen;
+    uniform sampler2D reliefMap;
+    uniform float reliefStrength;
+    in vec3 position;
+    in vec3 surfaceNormal;
+    in vec2 texCoord;
+    in vec3 tint;
+    in vec4 sunPosition;
+    out vec4 pixel;
+
+    float plazaLight(vec2 p) {
+      vec2 inside = min(p - marketBounds.xy, marketBounds.zw - p);
+      return smoothstep(-.75, 1.05, min(inside.x, inside.y));
+    }
+
+    vec3 surfaceRelief(vec3 normal, vec2 slope, vec2 uvDx, vec2 uvDy) {
+      vec3 right = cross(dFdy(position), normal);
+      vec3 up = cross(normal, dFdx(position));
+      vec3 u = right * uvDx.x + up * uvDy.x;
+      vec3 v = right * uvDx.y + up * uvDy.y;
+      float scale = inversesqrt(max(max(dot(u, u), dot(v, v)), .000000001));
+      return normalize(normal + (u * slope.x + v * slope.y) * scale);
+    }
+
+    float visibility(float cosine, float plaza) {
+      vec3 uvz = sunPosition.xyz / sunPosition.w * 0.5 + 0.5;
+      if (any(lessThan(uvz, vec3(0.0))) || any(greaterThan(uvz, vec3(1.0)))) return 1.0;
+      float bias = mix(.00192, .00067, cosine);
+      vec2 texel = 1.0 / vec2(textureSize(sunDepth, 0));
+      float reference = uvz.z - bias;
+      float blocker = texture(sunDepth, uvz.xy).r;
+      float separation = max(0.0, reference - blocker) * 87.0;
+      vec2 spread = texel * mix(1.35, 1.05 + min(2.30, .77 * separation), plaza);
+      float visible = 2.0 * step(reference, blocker);
+      visible += step(reference, texture(sunDepth, uvz.xy + spread).r);
+      visible += step(reference, texture(sunDepth, uvz.xy - spread).r);
+      visible += step(reference, texture(sunDepth, uvz.xy + vec2(-spread.x, spread.y)).r);
+      visible += step(reference, texture(sunDepth, uvz.xy + vec2(spread.x, -spread.y)).r);
+      return visible / 6.0;
+    }
+
+    float actorShadow(vec2 delta) {
+      if (dot(delta, delta) > 13.0) return 0.0;
+      vec2 side = heroSide.xy;
+      vec2 forward = vec2(-side.y, side.x);
+      float approach = dot(sunDirection.xz, forward);
+      if (abs(approach) < .08) return 0.0;
+      float ray = -dot(delta, forward) / approach;
+      if (ray <= 0.0) return 0.0;
+      vec2 k = vec2(dot(delta + sunDirection.xz * ray, side) / (2.0 * heroSide.z) + .5,
+        (position.y + ray * sunDirection.y - heroHeight.x) / (heroHeight.y - heroHeight.x));
+      if (any(lessThan(k, vec2(0.0))) || any(greaterThan(k, vec2(1.0)))) return 0.0;
+      vec2 uv = mix(heroFrame.xy, heroFrame.zw, k);
+      vec2 blur = vec2(.00135, .0) * mix(.68, 1.30, k.y);
+      float mask = texture(heroAtlas, uv).a * .50
+        + texture(heroAtlas, uv - blur).a * .25 + texture(heroAtlas, uv + blur).a * .25;
+      return smoothstep(.08, .91, mask);
+    }
+
+    vec3 lamplight(vec3 n) {
+      float spill = 0.0;
+      for (int i = 0; i < 4; ++i) {
+        vec3 ray = lamps[i] - position;
+        float square = dot(ray, ray);
+        if (square >= 7.2) continue;
+        float falloff = 1.0 - smoothstep(0.08, 7.2, square);
+        spill += falloff * falloff * max(0.0, dot(n, ray) * inversesqrt(max(square, .04)));
+      }
+      return vec3(1.1, .44, .12) * spill;
+    }
+
+    float canopyReveal() {
+      vec3 center = actor + vec3(0.0, .78, 0.0);
+      vec3 ray = normalize(camera - center);
+      vec3 offset = position - center;
+      float along = dot(ray, offset);
+      if (along <= .18 || along >= 8.5) return 0.0;
+      vec3 side = offset - along * ray;
+      return .96 * (1.0 - smoothstep(.48, .96, length(side)));
+    }
+
+    float ringWave(vec2 point, vec2 strike, float time) {
+      float radius = length(point - strike);
+      float phase = radius * 19.0 - time * 2.5;
+      return (1.0 - smoothstep(.08, .61, radius)) * sin(phase);
+    }
+
+    vec3 fountainSurface(vec2 point, float shadow) {
+      float radius = length(point);
+      float phaseX = dot(point, vec2(5.4, 2.9)) + timer * .72;
+      float phaseZ = dot(point, vec2(-1.9, 6.0)) - timer * .53;
+      float rim = smoothstep(.91, fountain.z * .84, radius);
+      vec3 color = mix(vec3(.036, .174, .211), vec3(.077, .269, .244), rim);
+      float filterWeight = 1.0 - smoothstep(.32, 1.42, 19.0 * length(fwidth(point)));
+      float rings = (ringWave(point, vec2(.535, .927), timer)
+        + ringWave(point, vec2(.535, -.927), timer + .64)
+        + ringWave(point, vec2(-1.07, 0), timer + 1.25)) * filterWeight;
+      vec3 n = normalize(vec3(.068 * cos(phaseX) + .022 * rings,
+        1.0, .080 * cos(phaseZ) - .026 * rings));
+      vec3 eye = normalize(camera - position);
+      float facing = max(dot(n, eye), 0.0);
+      float fresnel = pow(1.0 - facing, 3.0);
+      float mainGlint = pow(max(dot(n, normalize(sunDirection + eye)), 0.0), 19.0);
+      float litRim = smoothstep(.25, 1.30, dot(point, normalize(sunDirection.xz)));
+      // A broad sky reflection plus a small warm highlight near the lit rim.
+      float sheen = .11 * fresnel + shadow * (.023 + .087 * litRim) *
+        (1.0 + .42 * sin(phaseX) * cos(phaseZ));
+      float caustic = smoothstep(.68, .99, sin(phaseX * 2.3 + cos(phaseZ)) * sin(phaseZ * 1.8));
+      color *= (.68 + .32 * shadow) * mix(.73, 1.0, smoothstep(.15, .78, radius));
+      color += vec3(.26, .64, .72) * (sheen + .017 * rings);
+      color += vec3(.035, .16, .138) * caustic * rim * filterWeight * shadow * (1.0 - fresnel);
+      color += vec3(1.00, .87, .61) * shadow * (mainGlint * 1.17 + .109 * litRim);
+      return max(color, vec3(0.0));
+    }
+
+    vec3 marketSea(vec3 viewDirection, float distanceToEye) {
+      // Crossed, low-amplitude swells lose high frequencies as the water recedes.
+      vec2 xz = position.xz;
+      float detail = 1.0 - smoothstep(18.0, 49.0, distanceToEye);
+      float a = dot(xz, vec2(.83, 1.71)) + .65 * sin(xz.x * .52) + timer * .50;
+      float b = dot(xz, vec2(1.40, -.99)) - timer * .34;
+      vec2 slope = (vec2(.031, .068) * cos(a) + vec2(.039, -.028) * cos(b)) * detail;
+      vec3 normal = normalize(vec3(slope.x, 1.0, slope.y));
+      float grazing = 1.0 - clamp(dot(normal, viewDirection), 0.0, 1.0);
+      float fresnel = .04 + .62 * grazing * grazing * grazing;
+      float sky = clamp(reflect(-viewDirection, normal).y * 1.6, 0.0, 1.0);
+      vec3 reflected = mix(vec3(.24, .33, .34), vec3(.11, .23, .35), sky);
+      vec3 water = mix(vec3(.026, .098, .12) + cos(a + b) * detail * vec3(.003, .010, .019),
+        reflected, fresnel);
+      float glint = pow(max(0.0, dot(normal, normalize(sunDirection + viewDirection))), 38.0);
+      water += vec3(.34, .30, .21) * glint * detail;
+      return mix(water, vec3(.24, .32, .35), smoothstep(35.0, 72.0, distanceToEye));
+    }
+
+    void main() {
+      vec3 normal = normalize(surfaceNormal);
+      bool horizontalGround = kind == 1 && abs(normal.y) > .68;
+      vec2 surfaceUv = (horizontalGround ? position.xz * .62 : texCoord) * uvScale;
+      vec4 source = texture(material, surfaceUv);
+      if (source.a < .45) discard;
+      if (kind == 5) {
+        // Keep alpha cutout in the same depth buffer while the actor passes behind foliage.
+        float screenDoor = fract(dot(floor(gl_FragCoord.xy), vec2(.75487766, .56984030)));
+        if (screenDoor < canopyReveal()) discard;
+      }
+      vec3 base = pow(max(source.rgb * tint, vec3(.001)), vec3(2.2));
+      float plaza = plazaLight(position.xz);
+      vec2 fountainOffset = position.xz - fountain.xy;
+      float shadow = visibility(max(dot(normal, sunDirection), 0.0), plaza);
+      vec3 n = normal;
+      float crevice = 1.0;
+      if (reliefStrength > 0.0) {
+        vec2 uvDx = dFdx(surfaceUv);
+        vec2 uvDy = dFdy(surfaceUv);
+        vec3 detail = textureGrad(reliefMap, surfaceUv, uvDx, uvDy).rgb;
+        float influence = max(plaza, marketView * .40);
+        vec2 slope = (detail.rg * 255.0 - 128.0) / 127.0 * reliefStrength * influence;
+        // World-space UVs on the paving already align with the ground axes.
+        n = horizontalGround ? normalize(normal + vec3(slope.x, 0.0, slope.y))
+          : surfaceRelief(normal, slope, uvDx, uvDy);
+        crevice = mix(1.0, smoothstep(.08, .79, detail.b), influence);
+      }
+      float lambert = max(dot(n, sunDirection), 0.0);
+      vec3 ambient = mix(vec3(.22, .21, .22), vec3(.32, .43, .57), .5 + .5 * normal.y);
+      vec3 skylight = mix(vec3(.16, .218, .294), vec3(.255, .345, .49), .5 + .5 * normal.y);
+      ambient = mix(ambient, skylight, plaza);
+      ambient *= mix(.63, 1.0, crevice);
+      float focalLight = 1.0 - smoothstep(12.0, 82.0, dot(fountainOffset, fountainOffset));
+      vec3 marketSun = mix(vec3(2.73, 2.18, 1.57), vec3(3.45, 2.91, 2.16), focalLight);
+      vec3 sunlight = mix(vec3(4.04, 3.12, 2.15), marketSun, plaza) * lambert * shadow;
+      sunlight *= mix(.75, 1.0, crevice);
+      bool fountainBasin = kind == 2 && abs(position.y - .31) < .015
+        && dot(fountainOffset, fountainOffset) < fountain.z * fountain.z;
+      bool openWater = kind == 2 && position.y < -.9;
+      if (kind == 1) {
+        vec2 dx = (position.xz - actor.xz) / vec2(.38, .28);
+        float contact = exp(-dot(dx, dx) * 1.7) * (1.0 - smoothstep(.035, .26, abs(position.y - actor.y)));
+        ambient *= 1.0 - .50 * contact;
+        if (plaza > .001) {
+          vec2 patchUv = (position.xz - marketBounds.xy) / (marketBounds.zw - marketBounds.xy);
+          vec2 ground = texture(marketContact, patchUv).rg;
+          float staticContact = ground.r * plaza;
+          vec3 wear = reliefStrength > 0.0
+            ? mix(vec3(.76, .85, .93), vec3(1.05, 1.00, .92), ground.g)
+            : mix(vec3(.75, .84, .76), vec3(1.04, .99, .72), ground.g);
+          base *= mix(vec3(1.0), wear, plaza);
+          ambient *= 1.0 - .40 * staticContact;
+          sunlight *= 1.0 - .18 * staticContact;
+        }
+        float silhouette = actorShadow(position.xz - actor.xz);
+        sunlight *= 1.0 - max(.88 * contact, .93 * silhouette);
+      } else if (kind == 2 && !fountainBasin && !(openWater && marketView > .999)) {
+        float t = timer * .46;
+        float a = position.z * 5.1 + sin(position.x * 1.64) + t;
+        float b = position.x * 3.8 - position.z * 2.7 + t * .71;
+        n = normalize(vec3(.15 * cos(b), 1.0, .24 * cos(a)));
+        vec3 viewDirection = normalize(camera - position);
+        float fresnel = pow(1.0 - max(0.0, dot(n, viewDirection)), 3.0);
+        float glint = pow(max(dot(n, normalize(sunDirection + viewDirection)), 0.0), 21.0);
+        base = mix(base, vec3(.10, .25, .28), fresnel * .43);
+        sunlight = vec3(.82, .87, .82) + vec3(1.32, 1.09, .66) * glint * shadow;
+      } else if (kind == 3) {
+        ambient = mix(vec3(.95, .96, 1.04), vec3(.92, 1.02, 1.15), plaza);
+        sunlight = mix(vec3(1.48, 1.13, .73), vec3(1.50, 1.23, .94), plaza) * shadow;
+      }
+      vec3 lit = fountainBasin ? fountainSurface(fountainOffset, shadow) : base * (ambient + sunlight + lamplight(n));
+      if (kind == 4) lit = base * mix(4.8, 2.30, max(plaza, marketView * .83));
+      if (kind == 5 && plaza > .001) {
+        // Leaves transmit warm light across the turn from the sunlit side into shade.
+        float wrap = smoothstep(-.54, .46, dot(normal, sunDirection)) * shadow;
+        float upperLeaves = smoothstep(1.1, 3.0, position.y);
+        lit += base * vec3(.81, .54, .19) * wrap * upperLeaves * plaza;
+      }
+      if (surfaceSheen > 0.0 && plaza > .01) {
+        vec3 halfAngle = normalize(sunDirection + normalize(camera - position));
+        float highlight = pow(max(dot(n, halfAngle), 0.0), 9.0);
+        lit += vec3(1.38, 1.21, .90) * surfaceSheen * highlight * shadow * plaza * crevice;
+      }
+      float distanceToEye = distance(camera, position);
+      float haze = smoothstep(mix(16.0, 23.0, marketView), mix(48.0, 53.0, marketView), distanceToEye)
+        * mix(.46, .267, marketView);
+      float coolGroundFog = (1.0 - smoothstep(-.8, 2.0, position.y)) * smoothstep(19.0, 44.0, distanceToEye);
+      vec3 air = mix(vec3(.19, .30, .38), vec3(.41, .40, .31), shadow * .46);
+      air = mix(air, vec3(.13, .225, .285), marketView * .82);
+      lit = mix(lit, air, haze + (1.0 - haze) * coolGroundFog * mix(.32, .09, marketView));
+      if (openWater && marketView > .001) {
+        vec3 viewDirection = (camera - position) / max(.001, distanceToEye);
+        lit = mix(lit, marketSea(viewDirection, distanceToEye), marketView);
+      }
+      pixel = vec4(storeLight(lit), 1.0);
+    }
+  """.trimIndent()
+
+  val lensVertex = """#version 300 es
+    out vec2 uv;
+    void main() {
+      vec2 corner = vec2(gl_VertexID == 1 ? 3.0 : -1.0, gl_VertexID == 2 ? 3.0 : -1.0);
+      uv = corner * .5 + .5;
+      gl_Position = vec4(corner, 0.0, 1.0);
+    }
+  """.trimIndent()
+
+  val bloomFragment = """#version 300 es
+    precision highp float;
+    precision highp sampler2D;
+    $radiance
+    uniform sampler2D rendered;
+    uniform vec2 sampleStep;
+    uniform int extract;
+    in vec2 uv;
+    out vec4 pixel;
+
+    vec3 highlights(vec2 p) {
+      vec3 color = readLight(rendered, p);
+      float value = luminance(color);
+      return color * smoothstep(.83, 2.12, value);
+    }
+
+    void main() {
+      vec3 light;
+      if (extract == 1) {
+        vec2 d = sampleStep * 1.15;
+        light = (highlights(uv + d) + highlights(uv - d) +
+          highlights(uv + vec2(d.x, -d.y)) + highlights(uv + vec2(-d.x, d.y))) * .25;
+      } else {
+        light = readLight(rendered, uv) * .227027;
+        light += (readLight(rendered, uv + sampleStep * 1.384615) +
+          readLight(rendered, uv - sampleStep * 1.384615)) * .316216;
+        light += (readLight(rendered, uv + sampleStep * 3.230769) +
+          readLight(rendered, uv - sampleStep * 3.230769)) * .070270;
+      }
+      pixel = vec4(storeLight(light), 1.0);
+    }
+  """.trimIndent()
+
+  val lensFragment = """#version 300 es
+    precision highp float;
+    precision highp sampler2D;
+    $radiance
+    uniform sampler2D rendered;
+    uniform sampler2D depth;
+    uniform sampler2D glow;
+    uniform sampler2D fogSunDepth;
+    uniform mat4 inverseViewProjection;
+    uniform mat4 sunMatrix;
+    uniform vec3 camera;
+    uniform vec2 pixelStep;
+    uniform vec2 planes;
+    uniform float focus;
+    uniform float fountainFocus;
+    uniform float marketView;
+    uniform float shaftStrength;
+    uniform vec3 sunDirection;
+    in vec2 uv;
+    out vec4 pixel;
+
+    float viewDistance(float d) {
+      return (planes.x * planes.y) / mix(planes.y, planes.x, d);
+    }
+
+    vec3 colorAt(vec2 p, float d) {
+      if (d < .99999) return readLight(rendered, p);
+      vec3 sky = mix(vec3(.52, .49, .38), vec3(.21, .32, .42), smoothstep(.22, 1.0, p.y));
+      sky = mix(sky, mix(vec3(.32, .36, .35), vec3(.155, .266, .365),
+        smoothstep(.36, 1.22, p.y)), marketView);
+      vec2 ray = (p - vec2(.07, 1.03)) * vec2(2.2, 3.4);
+      return sky + vec3(.27, .20, .10) * exp(-dot(ray, ray)) * (1.0 - marketView * .84);
+    }
+
+    vec3 marketShaft(vec3 ray, float rayLength) {
+      // Intersect a bounded world-space volume beside the market tree, then trace
+      // only the visible interval. The canopy and roofs use the existing sun depth.
+      vec3 origin = vec3(-7.82, 1.37, 18.84);
+      vec3 across = normalize(cross(vec3(0.0, 1.0, 0.0), sunDirection));
+      vec3 rise = cross(sunDirection, across);
+      vec2 scale = vec2(.49, 1.02);
+      vec3 offset = camera - origin;
+      vec2 start = vec2(dot(offset, across), dot(offset, rise)) * scale;
+      vec2 travel = vec2(dot(ray, across), dot(ray, rise)) * scale;
+      float a = max(dot(travel, travel), .00001);
+      float b = dot(start, travel);
+      float discriminant = b * b - a * (dot(start, start) - 1.0);
+      if (discriminant <= 0.0) return vec3(0.0);
+      float halfChord = sqrt(discriminant);
+      float entry = max(0.0, (-b - halfChord) / a);
+      float exit = min(rayLength, (-b + halfChord) / a);
+      const vec2 heights = vec2(.24, 8.6);
+      if (abs(ray.y) > .0001) {
+        vec2 faces = (heights - camera.y) / ray.y;
+        entry = max(entry, min(faces.x, faces.y));
+        exit = min(exit, max(faces.x, faces.y));
+      } else if (camera.y < heights.x || camera.y > heights.y) {
+        return vec3(0.0);
+      }
+      if (exit <= entry) return vec3(0.0);
+      float stepSize = (exit - entry) * .25;
+      float scatter = 0.0;
+      for (int i = 0; i < 4; ++i) {
+        float t = entry + stepSize * (float(i) + .5);
+        vec3 p = camera + ray * t;
+        vec2 section = start + travel * t;
+        float envelope = 1.0 - smoothstep(.4, 1.0, dot(section, section));
+        float curtain = 1.0 - smoothstep(.16, .45, abs(section.x - .18));
+        float thread = 1.0 - smoothstep(.075, .22, abs(section.x + .54));
+        float height = smoothstep(heights.x, 1.18, p.y) * (1.0 - smoothstep(3.1, heights.y, p.y));
+        float bank = smoothstep(-14.8, -11.62, p.x);
+        float density = envelope * height * bank * (curtain + thread * .58);
+        if (density > .001) {
+          vec3 lightUv = (sunMatrix * vec4(p, 1.0)).xyz * .5 + .5;
+          float lit = smoothstep(-.0014, .001, texture(fogSunDepth, lightUv.xy).r - lightUv.z + .0012);
+          scatter += density * lit;
+        }
+      }
+      return vec3(1.0, .77, .48) * scatter * stepSize * .102;
+    }
+
+    vec3 sunHaze(float sceneDepth) {
+      if (marketView > .999 && shaftStrength <= .001) return vec3(0.0);
+      vec2 ndc = uv * 2.0 - 1.0;
+      vec4 clip = inverseViewProjection * vec4(ndc, sceneDepth * 2.0 - 1.0, 1.0);
+      vec3 segment = clip.xyz / clip.w - camera;
+      float rayLength = length(segment);
+      vec3 ray = segment / max(rayLength, .001);
+      vec3 local = vec3(0.0);
+      if (marketView > .001 && shaftStrength > .001) {
+        local = marketShaft(ray, rayLength) * marketView * shaftStrength;
+      }
+      if (marketView > .999) return local;
+      float end = min(rayLength, 38.0);
+      float scatter = 0.0;
+      for (int i = 0; i < 4; ++i) {
+        vec3 p = camera + ray * end * (float(i) + .5) * .25;
+        // Limit scattering to the stream and the gap between roofs.
+        vec2 axis = (p.xz + p.y * vec2(1.5, -.94) - vec2(-2.0, -3.1)) * vec2(.42, .17);
+        float density = exp(-dot(axis, axis)) * (1.0 - smoothstep(1.6, 8.0, p.y));
+        vec4 light = sunMatrix * vec4(p, 1.0);
+        vec3 lightUv = light.xyz / light.w * .5 + .5;
+        float lit = step(lightUv.z - .0012, texture(fogSunDepth, lightUv.xy).r);
+        scatter += density * lit;
+      }
+      return local + vec3(.76, .52, .26) * scatter * end * .0019 * (1.0 - marketView);
+    }
+
+    void main() {
+      float sceneDepth = texture(depth, uv).r;
+      float center = viewDistance(sceneDepth);
+      float defocus = center < focus ? focus - center : (center - focus) * .81;
+      float playBand = max(0.0, abs(center - fountainFocus) - 2.25);
+      defocus = mix(defocus, min(defocus, playBand), marketView);
+      float radius = smoothstep(mix(2.25, 3.20, marketView), mix(10.0, 15.5, marketView), defocus)
+        * mix(6.0, 2.45, marketView);
+      vec3 color = colorAt(uv, sceneDepth);
+      if (radius > .35) {
+        vec3 sum = color * 2.0;
+        float weight = 2.0;
+        for (int i = 0; i < 8; ++i) {
+          float angle = float(i) * .785398;
+          vec2 q = uv + vec2(cos(angle), sin(angle)) * pixelStep * radius;
+          float sampleDepth = texture(depth, q).r;
+          float other = viewDistance(sampleDepth);
+          // Weight similar depths so blurred roofs and railings do not leak onto the player.
+          float w = 1.0 - smoothstep(.85, 3.0, abs(other - center));
+          if (w > 0.0) sum += colorAt(q, sampleDepth) * w;
+          weight += w;
+        }
+        color = sum / weight;
+      }
+      color += readLight(glow, uv) * mix(.22, .16, marketView) + sunHaze(sceneDepth);
+      float edge = smoothstep(.31, .74, length((uv - vec2(.48, .48)) * vec2(1.0, .89)));
+      color *= 1.0 - .24 * edge;
+      // Tone mapping compresses highlights before conversion from linear light to display color.
+      vec3 exposed = color * 1.04;
+      color = (exposed * (2.51 * exposed + .03)) / (exposed * (2.43 * exposed + .59) + .14);
+      float midtone = luminance(color);
+      vec3 splitTone = mix(vec3(.78, .88, 1.01), vec3(1.02, .995, .94),
+        smoothstep(.16, .77, midtone));
+      vec3 graded = (vec3(midtone) + (color - midtone) * 1.12) * splitTone;
+      color = mix(color, graded, marketView);
+      pixel = vec4(pow(clamp(color, 0.0, 1.0), vec3(1.0 / 2.2)), 1.0);
+    }
+  """.trimIndent()
+}

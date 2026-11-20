@@ -3,8 +3,11 @@ package com.example.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
@@ -180,10 +183,43 @@ class P29HubHudTest {
     rule.mainClock.advanceTimeBy(120L)
     rule.waitForIdle()
     rule.onNodeWithTag("master_hub_screen").assertExists()
-    rule.runOnIdle { owner?.onBackPressedDispatcher?.onBackPressed() }
+    rule.runOnIdle {
+      requireNotNull(owner) { "The host must provide Android's Back dispatcher" }
+        .onBackPressedDispatcher.onBackPressed()
+      // The manual frame clock must observe the external Android callback's state write.
+      Snapshot.sendApplyNotifications()
+    }
     rule.mainClock.advanceTimeBy(200L)
     rule.waitForIdle()
     rule.onNodeWithTag("master_hub_screen").assertDoesNotExist()
+  }
+
+  @Test
+  @Config(qualifiers = "w800dp-h360dp-land-mdpi")
+  fun cameraMenuOpensCourtyardAndExitReturnsToSanctuary() {
+    rule.mainClock.autoAdvance = false
+    rule.setContent {
+      EternalSummonerTheme {
+        SanctuaryLobbyScreen(
+          state = sampleState(), sceneActive = false,
+          onOpenFacility = {}, onCloseFacility = {}, onSummonHero = {},
+          onTrainHero = { _, _ -> }, onEquipItem = { _, _ -> }, onSynthesizeGear = {},
+          onEnhanceGear = {}, onRecoverHero = { _, _ -> }, onHostMeal = {},
+          onToggleSquad = {}, onCompletePrologue = {}, onSignOut = {},
+        )
+      }
+    }
+    rule.mainClock.advanceTimeBy(120L)
+    rule.onNodeWithTag("camera_controls_toggle").performClick()
+    rule.mainClock.advanceTimeBy(120L)
+    rule.onNodeWithTag("sanctuary_3d_enter").performClick()
+    rule.mainClock.advanceTimeBy(120L)
+    rule.onNodeWithTag("sanctuary_3d_courtyard").assertExists()
+    rule.onNodeWithTag("sanctuary_canvas").assertDoesNotExist()
+    rule.onNodeWithTag("sanctuary_3d_exit").performClick()
+    rule.mainClock.advanceTimeBy(120L)
+    rule.onNodeWithTag("sanctuary_3d_courtyard").assertDoesNotExist()
+    rule.onNodeWithTag("sanctuary_canvas").assertExists()
   }
 
   @Test
@@ -278,10 +314,15 @@ class P29HubHudTest {
 
     fun coveragePct(): Double {
       val root = rule.onRoot().fetchSemanticsNode().boundsInRoot
+      println("P29 viewport bounds=$root")
       // Measure VISIBLE chrome pixels: the actual chip row (not the transparent full-width
       // container), the nav dock, the (collapsed) camera toggle and the command panel.
       val rects = listOf("top_hud_chip_row", "management_navigation", "camera_controls_bar", "hero_command_panel")
-        .map { rule.onNodeWithTag(it).fetchSemanticsNode().boundsInRoot }
+        .map { tag ->
+          rule.onNodeWithTag(tag).fetchSemanticsNode().boundsInRoot.also {
+            println("P29 $tag bounds=$it")
+          }
+        }
       val gx = 80; val gy = 36
       var covered = 0
       for (i in 0 until gx) for (j in 0 until gy) {
@@ -292,6 +333,11 @@ class P29HubHudTest {
       return covered * 100.0 / (gx * gy)
     }
 
+    val minimumTouchPx = with(rule.density) { 48.dp.toPx() }
+    listOf("heroes", "summon", "team", "tower", "inventory").forEach { id ->
+      val bounds = rule.onNodeWithTag("nav_$id").fetchSemanticsNode().boundsInRoot
+      assertTrue("nav_$id must retain a 48dp touch target: $bounds", bounds.width >= minimumTouchPx && bounds.height >= minimumTouchPx)
+    }
     val idlePct = coveragePct()
     // Expand the quick-command dock (hero chips + facility buttons) and re-measure.
     rule.onNodeWithTag("quick_commands_toggle").performClick()

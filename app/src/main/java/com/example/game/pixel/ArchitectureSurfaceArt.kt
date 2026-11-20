@@ -94,7 +94,7 @@ internal object ArchitectureSurfaceArt {
 
   fun DrawScope.drawCanalBank(start: Offset, end: Offset, width: Float, origin: Offset, zoom: Float) {
     val material = materials["canal"] ?: return
-    matrix.setScale(.7f * zoom, .7f * zoom * .72f)
+    matrix.setScale(.7f * zoom, .7f * zoom * groundView.groundY)
     matrix.postTranslate(origin.x, origin.y)
     material.shader.setLocalMatrix(matrix)
     val paint = material.paints[0]

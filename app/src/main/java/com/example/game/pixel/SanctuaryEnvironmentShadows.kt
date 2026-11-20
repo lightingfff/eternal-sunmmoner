@@ -88,7 +88,7 @@ object SanctuaryEnvironmentShadows {
     projection.values[0] = if (mirrored) -pixelScale else pixelScale
     projection.values[1] = 0f
     projection.values[4] = SanctuaryLight.SHADOW_DIR_X * pixelScale / SanctuaryLight.TAN_ELEV
-    projection.values[5] = SanctuaryLight.SHADOW_DIR_Y * pixelScale * ObliqueCamera.OBLIQUE_Y_SCALE / SanctuaryLight.TAN_ELEV
+    projection.values[5] = SanctuaryLight.SHADOW_DIR_Y * pixelScale * groundView.groundY / SanctuaryLight.TAN_ELEV
     val pivotDelta = if (groundPivotY == null) 0f else (groundPivotY - bounds.bottom).toFloat()
     projection.values[12] = cx + projection.values[4]*pivotDelta
     projection.values[13] = if (groundPivotY == null) cy + 6f*zoom - bounds.bottomPadding*pixelScale
@@ -100,7 +100,7 @@ object SanctuaryEnvironmentShadows {
       drawPath(path, Color(0xFF050A14).copy(alpha = (0.56f * shadowStrength).coerceIn(0f, 0.72f)))
     }
     val contactRadius = (bitmap.width * pixelScale * 0.22f).coerceIn(10f * zoom, 28f * zoom)
-    val contactRy = contactRadius * ObliqueCamera.GROUND_ELLIPSE_RATIO * 0.72f
+    val contactRy = contactRadius * groundView.ellipseRatio * 0.72f
     drawOval(
       color = Color(0x68060B16),
       topLeft = Offset(cx - contactRadius * 1.15f, cy - contactRy * 0.65f),
@@ -116,7 +116,7 @@ object SanctuaryEnvironmentShadows {
   }
   private class CasterGeometry(
     val silhouette: Path, val contact: Path, val spriteScale: Float,
-    val visibleHeight: Float, val height: Float, val footOffset: Float, val tree: Boolean,
+    val visibleHeight: Float, val height: Float, val footElevation: Float, val tree: Boolean,
   )
   // Generated tower maps can be released; a global cache must not retain their obstacles.
   private val casters = java.util.WeakHashMap<WorldObstacle,CasterGeometry>()
@@ -140,17 +140,18 @@ object SanctuaryEnvironmentShadows {
       lineTo(hw,0f);lineTo(hw*.74f,hd*.58f);lineTo(-hw*.84f,hd*.58f);close()
     }
     return CasterGeometry(silhouette(bitmap),contact,scale*obs.scale,bounds.visibleHeight.toFloat(),height,
-      (foot-obs.elevationZ)/ObliqueCamera.OBLIQUE_Y_SCALE,tree).also { casters[obs]=it;casterGeometryBuildCount++ }
+      (foot-obs.elevationZ),tree).also { casters[obs]=it;casterGeometryBuildCount++ }
   }
   fun DrawScope.drawGroundShadows(
     obstacles: List<WorldObstacle>,camX:Float,camY:Float,zoom:Float,
     clipToIsland:Boolean=true,groundWidth:Float=3200f,groundHeight:Float=2760f,
   ) {
+    val viewGroundY = groundView.groundY
     val halfWorldW=size.width/(2f*zoom)
-    val halfWorldH=size.height/(2f*zoom*ObliqueCamera.OBLIQUE_Y_SCALE)
+    val halfWorldH=size.height/(2f*zoom*viewGroundY)
     withTransform({
-      translate(size.width/2f-camX*zoom,size.height/2f-camY*zoom*ObliqueCamera.OBLIQUE_Y_SCALE)
-      scale(zoom,zoom*ObliqueCamera.OBLIQUE_Y_SCALE,Offset.Zero)
+      translate(size.width/2f-camX*zoom,size.height/2f-camY*zoom*viewGroundY)
+      scale(zoom,zoom*viewGroundY,Offset.Zero)
     }) {
       if(clipToIsland) clipPath(island) { drawCasters(obstacles,camX,camY,halfWorldW,halfWorldH) }
       else clipRect(0f,0f,groundWidth,groundHeight) { drawCasters(obstacles,camX,camY,halfWorldW,halfWorldH) }
@@ -158,8 +159,9 @@ object SanctuaryEnvironmentShadows {
   }
   private fun DrawScope.drawCasters(obstacles:List<WorldObstacle>,camX:Float,camY:Float,halfW:Float,halfH:Float) {
     val light=com.example.game.world.WorldEnvironment.lighting
+    val viewGroundY = groundView.groundY
     for(obs in obstacles) {
-      val reach=500f*obs.scale*(1f+1f/SanctuaryLight.TAN_ELEV)+kotlin.math.abs(obs.elevationZ)/ObliqueCamera.OBLIQUE_Y_SCALE
+      val reach=500f*obs.scale*(1f+1f/SanctuaryLight.TAN_ELEV)+kotlin.math.abs(obs.elevationZ)/viewGroundY
       if(kotlin.math.abs(obs.x-camX)>halfW+reach || kotlin.math.abs(obs.y-camY)>halfH+reach) continue
       val g=geometry(obs) ?: continue
       projection.reset()
@@ -167,7 +169,7 @@ object SanctuaryEnvironmentShadows {
       projection.values[4]=SanctuaryLight.SHADOW_DIR_X*g.height/(g.visibleHeight*SanctuaryLight.TAN_ELEV)
       projection.values[5]=SanctuaryLight.SHADOW_DIR_Y*g.height/(g.visibleHeight*SanctuaryLight.TAN_ELEV)
       projection.values[12]=obs.x
-      projection.values[13]=obs.y+g.footOffset
+      projection.values[13]=obs.y+g.footElevation/viewGroundY
       val rawOpacity=SanctuaryShadowRegistry.opacityFor(obs.propKind)*light.shadowStrength
       val deepOpacity=(rawOpacity * 1.68f).coerceAtMost(0.76f)
       withTransform({ transform(projection) }) {
@@ -179,7 +181,7 @@ object SanctuaryEnvironmentShadows {
         }
         drawPath(g.silhouette,Color(0xFF060C18).copy(alpha=deepOpacity*(if(g.tree) .90f else 1f)))
       }
-      withTransform({ translate(obs.x,obs.y+g.footOffset) }) {
+      withTransform({ translate(obs.x,obs.y+g.footElevation/viewGroundY) }) {
         withTransform({ scale(1.22f, 1.22f, Offset.Zero) }) {
           drawPath(g.contact,Color(0xFF070D19).copy(alpha=(if(g.tree) .34f else .28f)*light.shadowStrength))
         }
