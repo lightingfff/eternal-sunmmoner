@@ -96,13 +96,16 @@ class CourtyardGlInstrumentedTest {
       assertFalse("Repeated drawing and zooming must keep the production renderer active", failed)
 
       renderer.zoomBy(.18f)
-      for ((index, name) in listOf(1 to "sanctuary-harbor.png", 2 to "sanctuary-orchard.png")) {
-        val target = Courtyard.landmarks[index].destination
-        walkAndCapture(renderer, target, File(context.filesDir, name), width, height)
-        camera.frame(target, width, height, 1f)
-        assertGroundPick(camera, target, width, height)
-        if (index == 1) recordAfternoonWalk(renderer, context.filesDir, width, height)
-      }
+      val market = Courtyard.landmarks[1].destination
+      val marketColor = walkAndCapture(renderer, market,
+        File(context.filesDir, "sanctuary-harbor.png"), width, height)
+      camera.frame(market, width, height, 1f)
+      assertGroundPick(camera, market, width, height)
+      recordAfternoonWalk(renderer, context.filesDir, width, height)
+      val orchard = Courtyard.landmarks[2].destination
+      walkAndCapture(renderer, orchard, File(context.filesDir, "sanctuary-orchard.png"), width, height)
+      camera.frame(orchard, width, height, 1f)
+      assertGroundPick(camera, orchard, width, height)
       walkAndCapture(renderer, GroundPoint(11.30f, 19.35f),
         File(context.filesDir, "sanctuary-orchard-canopy.png"), width, height)
 
@@ -115,17 +118,24 @@ class CourtyardGlInstrumentedTest {
       }
       assertFalse("RGBA8 fallback must compile and draw even without float targets", failed)
       val compactColor = capture(width, height)
-      val red = fullColor.indices.sumOf { i ->
-        kotlin.math.abs((fullColor[i] shr 16 and 255) - (compactColor[i] shr 16 and 255))
-      }.toDouble() / fullColor.size
-      assertTrue("The two radiance formats must preserve comparable exposure ($red)", red < 4.0)
+      assertComparableExposure(fullColor, compactColor, "Royal Quarter")
       saveCapture(File(context.filesDir, "sanctuary-3d-packed.png"), compactColor, width, height)
+      val marketCompact = walkAndCapture(backup, market,
+        File(context.filesDir, "sanctuary-harbor-packed.png"), width, height)
+      assertComparableExposure(marketColor, marketCompact, "River Market sun shafts and water")
     } finally {
       EGL14.eglMakeCurrent(display, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_CONTEXT)
       EGL14.eglDestroySurface(display, buffer)
       EGL14.eglDestroyContext(display, session)
       EGL14.eglTerminate(display)
     }
+  }
+
+  private fun assertComparableExposure(hdr: IntArray, packed: IntArray, scene: String) {
+    val red = hdr.indices.sumOf { i ->
+      kotlin.math.abs((hdr[i] shr 16 and 255) - (packed[i] shr 16 and 255))
+    }.toDouble() / hdr.size
+    assertTrue("$scene must preserve comparable exposure across radiance formats ($red)", red < 4.0)
   }
 
   private fun recordAfternoonWalk(renderer: CourtyardRenderer, directory: File, width: Int, height: Int) {
@@ -164,7 +174,7 @@ class CourtyardGlInstrumentedTest {
     output: File,
     width: Int,
     height: Int,
-  ) {
+  ): IntArray {
     renderer.walkTo(destination)
     repeat(600) { renderer.advance(1f / 24f) }
     assertTrue("The renderer must walk the route to $destination", renderer.actorPosition.distance(destination) < .36f)
@@ -175,6 +185,7 @@ class CourtyardGlInstrumentedTest {
     val image = capture(width, height)
     assertTrue("Destination framebuffer must show the environment", image.toSet().size > 512)
     saveCapture(output, image, width, height)
+    return image
   }
 
   private fun drawAtGameCadence(renderer: CourtyardRenderer, frames: Int) {

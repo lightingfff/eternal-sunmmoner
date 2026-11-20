@@ -6,9 +6,9 @@ import kotlin.math.sqrt
 
 /** Parameters for the world sun and the market's baked contact shading. */
 internal object CourtyardDaylight {
-  private const val SUN_X = -24f
-  private const val SUN_Y = 20f
-  private const val SUN_Z = 15f
+  private const val SUN_X = -21f
+  private const val SUN_Y = 20.5f
+  private const val SUN_Z = 13f
   const val contactSize = 128
   val bounds = Courtyard.market
   private val sunLength = sqrt(SUN_X * SUN_X + SUN_Y * SUN_Y + SUN_Z * SUN_Z)
